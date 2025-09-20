@@ -4,8 +4,8 @@ pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "charity-tracker-db"
-database_id = "your-database-id-here"
+database_name = "charity-tracker-qwik-db"
+database_id = "charity-tracker-qwik-db"
 
 [env.production]
 vars = { ENVIRONMENT = "production" }
