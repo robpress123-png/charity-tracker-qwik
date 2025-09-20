@@ -27,10 +27,18 @@ Based on analysis of the v4.6 demo file, here's the comprehensive feature list a
 
 ### 1. Donation Management
 - [ ] Add/Edit/Delete donations
-- [ ] Donation categories (Cash, Goods, Stocks, Cryptocurrency)
+- [ ] Donation categories (Cash, Goods, Stocks, Cryptocurrency, **Mileage**)
 - [ ] Receipt photo upload and storage
 - [ ] Donation notes and descriptions
 - [ ] Multiple donation methods tracking
+- [ ] **Mileage Donation Tracking**
+  - [ ] Miles driven for volunteer work
+  - [ ] Miles driven for charity events
+  - [ ] Automatic IRS mileage rate calculation
+  - [ ] Year-specific mileage rates (e.g., $0.67/mile for 2025)
+  - [ ] Purpose/destination tracking
+  - [ ] Mileage log upload support
+  - [ ] Total deduction calculation (miles × rate)
 
 ### 2. Charity Management
 - [ ] Charity autocomplete with search
@@ -117,6 +125,13 @@ Based on analysis of the v4.6 demo file, here's the comprehensive feature list a
 - Add donation_categories table
 - Add user_settings table
 - Add recurring_donations table
+- Add mileage_donations table (or extend donations table with mileage fields)
+  - miles_driven
+  - mileage_rate
+  - purpose
+  - destination
+  - mileage_log_url
+- Add mileage_rates table (IRS rates by year)
 - Consider adding audit_log table
 
 ### API Endpoints Needed
