@@ -823,41 +823,78 @@
                         <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
                     </div>
 
-                    <!-- Item Selection Row -->
-                    <div style="display:grid; grid-template-columns:1.5fr 2fr 1fr 0.8fr auto; gap:0.5rem; align-items:end;">
-                        <div class="form-group" style="margin-bottom:0;">
-                            <label for="itemCategory" style="font-size:0.875rem;">Category</label>
-                            <select id="itemCategory" onchange="loadItemsForCategory()" style="font-size:0.875rem;">
-                                <option value="">Select...</option>
-                                <!-- Populated from database -->
-                            </select>
-                        </div>
+                    <!-- Step 1: Category Search with Autocomplete -->
+                    <div class="form-group">
+                        <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 1: Select or Search Category</label>
+                        <div style="position:relative;">
+                            <input type="text"
+                                   id="itemCategorySearch"
+                                   placeholder="Type to search categories (e.g., 'Women', 'Electronics', 'Furniture')..."
+                                   oninput="searchCategories(this.value)"
+                                   onfocus="showCategoryDropdown()"
+                                   style="font-size:0.875rem;width:100%;padding-right:2rem;">
+                            <span id="selectedCategoryIcon" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);font-size:1.25rem;"></span>
+                            <input type="hidden" id="itemCategory">
 
-                        <div class="form-group" id="itemSelectGroup" style="display:none; margin-bottom:0;">
-                            <label for="itemSelect" style="font-size:0.875rem;">Item</label>
-                            <select id="itemSelect" onchange="updateItemValue()" style="font-size:0.875rem;">
-                                <option value="">Select...</option>
-                                <!-- Populated based on category -->
-                            </select>
+                            <!-- Category Dropdown -->
+                            <div id="categoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                <!-- Populated dynamically -->
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="form-group" id="itemQualityGroup" style="display:none; margin-bottom:0;">
-                            <label for="itemQuality" style="font-size:0.875rem;">Condition</label>
-                            <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;">
-                                <option value="good">Good</option>
-                                <option value="very_good">Very Good</option>
-                                <option value="excellent">Excellent</option>
-                            </select>
+                    <!-- Step 2: Item Search (shown after category selection) -->
+                    <div id="itemSearchSection" style="display:none;">
+                        <div class="form-group">
+                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search for Item in <span id="selectedCategoryName"></span></label>
+                            <div style="position:relative;">
+                                <input type="text"
+                                       id="itemSearch"
+                                       placeholder="Type to search items..."
+                                       oninput="searchItems(this.value)"
+                                       onfocus="showItemDropdown()"
+                                       style="font-size:0.875rem;width:100%;">
+                                <input type="hidden" id="itemSelect">
+
+                                <!-- Item Dropdown -->
+                                <div id="itemDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="form-group" id="itemQuantityGroup" style="display:none; margin-bottom:0;">
-                            <label for="itemQuantity" style="font-size:0.875rem;">Qty</label>
-                            <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem; width:60px;">
+                    <!-- Step 3: Condition and Quantity (shown after item selection) -->
+                    <div id="itemDetailsSection" style="display:none;">
+                        <div style="background:#f9fafb;padding:1rem;border-radius:6px;margin-bottom:1rem;">
+                            <div style="font-size:0.875rem;color:#6b7280;margin-bottom:0.5rem;">Selected Item:</div>
+                            <div id="selectedItemDisplay" style="font-size:1rem;font-weight:600;color:#374151;margin-bottom:0.75rem;"></div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:end;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label for="itemQuality" style="font-size:0.875rem;">Condition</label>
+                                    <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;">
+                                        <option value="good">Good</option>
+                                        <option value="very_good">Very Good</option>
+                                        <option value="excellent">Excellent</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label for="itemQuantity" style="font-size:0.875rem;">Quantity</label>
+                                    <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem;">
+                                </div>
+
+                                <div style="text-align:right;">
+                                    <div style="font-size:0.75rem;color:#6b7280;">Item Value:</div>
+                                    <div id="itemValuePreview" style="font-size:1.25rem;font-weight:bold;color:#667eea;">$0.00</div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="addItemToList()" style="width:100%;margin-top:1rem;padding:0.5rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.875rem;font-weight:600;">
+                                ➕ Add Item to Donation
+                            </button>
                         </div>
-
-                        <button type="button" id="addItemBtn" onclick="addItemToList()" style="display:none; padding:0.4rem 0.8rem; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.875rem; height:32px; margin-top:20px;">
-                            + Add
-                        </button>
                     </div>
 
                     <!-- Receipt-Style Items Display -->
@@ -1084,9 +1121,13 @@
             // Reset item selection
             selectedDonationItems = [];
             updateSelectedItemsDisplay();
-            document.getElementById('itemSelectGroup').style.display = 'none';
-            document.getElementById('itemQualityGroup').style.display = 'none';
-            document.getElementById('itemQuantityGroup').style.display = 'none';
+            document.getElementById('itemCategorySearch').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('selectedCategoryIcon').textContent = '';
+            document.getElementById('itemSearchSection').style.display = 'none';
+            document.getElementById('itemDetailsSection').style.display = 'none';
+            document.getElementById('itemSearch').value = '';
+            document.getElementById('itemSelect').value = '';
             // Clear editing flag
             window.editingDonationId = null;
         }
@@ -2071,47 +2112,134 @@
 
                 if (data.success) {
                     itemCategories = data.categories;
-                    const select = document.getElementById('itemCategory');
-                    if (select) {
-                        select.innerHTML = '<option value="">Select Category</option>';
-
-                        itemCategories.forEach(cat => {
-                            select.innerHTML += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
-                        });
-                    }
+                    // Categories are now loaded for search functionality
                 }
             } catch (error) {
                 console.error('Failed to load categories:', error);
             }
         }
 
-        // Load items for selected category
-        async function loadItemsForCategory() {
-            const categoryId = document.getElementById('itemCategory').value;
+        // Show category dropdown
+        function showCategoryDropdown() {
+            const dropdown = document.getElementById('categoryDropdown');
+            const searchValue = document.getElementById('itemCategorySearch').value.toLowerCase();
 
-            if (!categoryId) {
-                document.getElementById('itemSelectGroup').style.display = 'none';
-                return;
+            let html = '';
+            const filteredCategories = searchValue
+                ? itemCategories.filter(cat => cat.name.toLowerCase().includes(searchValue))
+                : itemCategories;
+
+            if (filteredCategories.length === 0) {
+                html = '<div style="padding:0.75rem;color:#6b7280;text-align:center;">No categories found</div>';
+            } else {
+                filteredCategories.forEach(cat => {
+                    html += `
+                        <div onclick="selectCategory(${cat.id}, '${cat.name}', '${cat.icon}')"
+                             style="padding:0.75rem;cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:background 0.2s;"
+                             onmouseover="this.style.background='#f3f4f6'"
+                             onmouseout="this.style.background='white'">
+                            <span style="font-size:1.25rem;">${cat.icon}</span>
+                            <span style="flex:1;">${cat.name}</span>
+                        </div>
+                    `;
+                });
             }
 
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+
+        // Search categories
+        function searchCategories(value) {
+            showCategoryDropdown();
+        }
+
+        // Select a category
+        async function selectCategory(categoryId, categoryName, categoryIcon) {
+            document.getElementById('itemCategory').value = categoryId;
+            document.getElementById('itemCategorySearch').value = categoryName;
+            document.getElementById('selectedCategoryIcon').textContent = categoryIcon;
+            document.getElementById('categoryDropdown').style.display = 'none';
+            document.getElementById('selectedCategoryName').textContent = categoryName;
+
+            // Show item search section
+            document.getElementById('itemSearchSection').style.display = 'block';
+            document.getElementById('itemSearch').value = '';
+            document.getElementById('itemDetailsSection').style.display = 'none';
+
+            // Load items for this category
             try {
                 const response = await fetch(`/api/items?category_id=${categoryId}`);
                 const data = await response.json();
 
                 if (data.success) {
                     currentItems = data.items;
-                    const select = document.getElementById('itemSelect');
-                    select.innerHTML = '<option value="">Select Item</option>';
-
-                    currentItems.forEach(item => {
-                        select.innerHTML += `<option value="${item.id}">${item.name} - ${item.description}</option>`;
-                    });
-
-                    document.getElementById('itemSelectGroup').style.display = 'block';
+                    // Items are now loaded for search
                 }
             } catch (error) {
                 console.error('Failed to load items:', error);
             }
+        }
+
+        // Show item dropdown
+        function showItemDropdown() {
+            const dropdown = document.getElementById('itemDropdown');
+            const searchValue = document.getElementById('itemSearch').value.toLowerCase();
+
+            let html = '';
+            const filteredItems = searchValue
+                ? currentItems.filter(item =>
+                    item.name.toLowerCase().includes(searchValue) ||
+                    (item.description && item.description.toLowerCase().includes(searchValue))
+                  )
+                : currentItems;
+
+            if (filteredItems.length === 0) {
+                html = '<div style="padding:0.75rem;color:#6b7280;text-align:center;">No items found</div>';
+            } else {
+                filteredItems.forEach(item => {
+                    const priceRange = `$${item.value_good || 0} - $${item.value_excellent || 0}`;
+                    html += `
+                        <div onclick="selectItem(${item.id}, '${item.name.replace(/'/g, "\\'")}')"
+                             style="padding:0.75rem;cursor:pointer;border-bottom:1px solid #e5e7eb;transition:background 0.2s;"
+                             onmouseover="this.style.background='#f3f4f6'"
+                             onmouseout="this.style.background='white'">
+                            <div style="font-weight:500;">${item.name}</div>
+                            <div style="font-size:0.75rem;color:#6b7280;">${item.description || ''}</div>
+                            <div style="font-size:0.75rem;color:#667eea;margin-top:0.25rem;">${priceRange}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+
+        // Search items
+        function searchItems(value) {
+            showItemDropdown();
+        }
+
+        // Select an item
+        function selectItem(itemId, itemName) {
+            const item = currentItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('itemSelect').value = itemId;
+            document.getElementById('itemSearch').value = itemName;
+            document.getElementById('itemDropdown').style.display = 'none';
+
+            // Show details section
+            document.getElementById('itemDetailsSection').style.display = 'block';
+            document.getElementById('selectedItemDisplay').textContent = `${item.name} - ${item.description || ''}`;
+
+            // Reset quality and quantity
+            document.getElementById('itemQuality').value = 'good';
+            document.getElementById('itemQuantity').value = '1';
+
+            // Update value preview
+            updateItemValue();
         }
 
         // Update value based on selected item and quality
@@ -2120,18 +2248,10 @@
             const quality = document.getElementById('itemQuality').value;
             const quantity = parseInt(document.getElementById('itemQuantity').value) || 1;
 
-            if (!itemId) {
-                document.getElementById('itemQualityGroup').style.display = 'none';
-                document.getElementById('itemQuantityGroup').style.display = 'none';
-                return;
-            }
+            if (!itemId) return;
 
             const item = currentItems.find(i => i.id == itemId);
             if (!item) return;
-
-            document.getElementById('itemQualityGroup').style.display = 'block';
-            document.getElementById('itemQuantityGroup').style.display = 'block';
-            document.getElementById('addItemBtn').style.display = 'block';
 
             // Map the quality values correctly
             let valueKey;
@@ -2144,7 +2264,8 @@
             const unitValue = item[valueKey] || item.value_good;
             const totalValue = unitValue * quantity;
 
-            // Don't update the total value yet - wait for the item to be added
+            // Update the preview
+            document.getElementById('itemValuePreview').textContent = `$${totalValue.toFixed(2)}`;
         }
 
         // Add item to list
@@ -2665,10 +2786,29 @@
         loadStats();
         loadItemCategories(); // Load item categories for donation form
 
-        // Close modals when clicking outside
+        // Close modals and dropdowns when clicking outside
         window.onclick = function(event) {
+            // Close modals
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
+            }
+
+            // Close category dropdown
+            if (!event.target.closest('#itemCategorySearch') && !event.target.closest('#categoryDropdown')) {
+                const dropdown = document.getElementById('categoryDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+
+            // Close item dropdown
+            if (!event.target.closest('#itemSearch') && !event.target.closest('#itemDropdown')) {
+                const dropdown = document.getElementById('itemDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+
+            // Close charity search dropdown
+            if (!event.target.closest('#charitySearch') && !event.target.closest('#charityDropdown')) {
+                const dropdown = document.getElementById('charityDropdown');
+                if (dropdown) dropdown.style.display = 'none';
             }
         }
     </script>
