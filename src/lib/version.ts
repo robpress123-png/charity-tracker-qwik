@@ -1,5 +1,5 @@
 // Version management - Update APP_VERSION when making changes
-export const APP_VERSION = '1.0.1';
+export const APP_VERSION = '1.0.2';
 export const BUILD_DATE = new Date().toISOString().split('T')[0];
 export const VERSION_INFO = `v${APP_VERSION}`;
 
