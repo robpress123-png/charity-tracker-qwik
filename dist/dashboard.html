@@ -614,7 +614,7 @@
                 <div style="padding: 2rem;">
                     <div class="form-group">
                         <label>Filing Status</label>
-                        <select id="filingStatus" style="width: 300px;">
+                        <select id="filingStatus" style="width: 300px;" onchange="updateTaxRate()">
                             <option value="single">Single</option>
                             <option value="married_jointly">Married Filing Jointly</option>
                             <option value="married_separately">Married Filing Separately</option>
@@ -622,14 +622,35 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Income Bracket</label>
-                        <select id="incomeBracket" style="width: 300px;">
-                            <option value="0-50k">$0 - $50,000</option>
-                            <option value="50k-100k">$50,000 - $100,000</option>
-                            <option value="100k-200k">$100,000 - $200,000</option>
-                            <option value="200k-500k">$200,000 - $500,000</option>
-                            <option value="500k+">$500,000+</option>
+                        <label>Annual Income</label>
+                        <select id="incomeBracket" style="width: 300px;" onchange="updateTaxRate()">
+                            <option value="22000">Up to $22,000</option>
+                            <option value="50000">$22,001 - $50,000</option>
+                            <option value="89075">$50,001 - $89,075</option>
+                            <option value="100000">$89,076 - $100,000</option>
+                            <option value="190750">$100,001 - $190,750</option>
+                            <option value="200000">$190,751 - $200,000</option>
+                            <option value="364200">$200,001 - $364,200</option>
+                            <option value="500000">$364,201 - $500,000</option>
+                            <option value="600000">$500,001+</option>
                         </select>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                        <h3 style="margin-bottom: 0.5rem;">Your Tax Information</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div>
+                                <div style="font-size: 0.875rem; opacity: 0.9;">Federal Marginal Tax Rate</div>
+                                <div style="font-size: 2rem; font-weight: bold;" id="marginalTaxRate">22%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.875rem; opacity: 0.9;">Est. Tax Savings per $100</div>
+                                <div style="font-size: 2rem; font-weight: bold;" id="savingsPerHundred">$22</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
+                            <div style="font-size: 0.875rem; opacity: 0.9;">Standard Deduction (2024)</div>
+                            <div style="font-size: 1.25rem; font-weight: 600;" id="standardDeduction">$14,600</div>
+                        </div>
                     </div>
                     <button class="btn-primary" onclick="saveProfile()">
                         Save Profile
@@ -799,6 +820,23 @@
                 <div class="form-group">
                     <label for="donationNotes">Notes (optional)</label>
                     <textarea id="donationNotes" rows="3"></textarea>
+                </div>
+                <!-- Tax Savings Calculator -->
+                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <h4 style="color: #166534; margin-bottom: 0.5rem;">💰 Estimated Tax Savings</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.875rem; color: #666;">Donation Amount</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;" id="donationAmountDisplay">$0</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: #666;">Tax Savings (<span id="taxRateDisplay">22</span>%)</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;" id="taxSavingsDisplay">$0</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
+                        * Based on your marginal tax rate. Actual savings depend on itemizing deductions.
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeDonationModal()">Cancel</button>
@@ -1473,6 +1511,137 @@
             }
         }
 
+        // Tax rate calculations (2024 rates)
+        const taxBrackets = {
+            single: [
+                {min: 0, max: 11600, rate: 0.10},
+                {min: 11600, max: 47150, rate: 0.12},
+                {min: 47150, max: 100525, rate: 0.22},
+                {min: 100525, max: 191950, rate: 0.24},
+                {min: 191950, max: 243725, rate: 0.32},
+                {min: 243725, max: 609350, rate: 0.35},
+                {min: 609350, max: Infinity, rate: 0.37}
+            ],
+            married_jointly: [
+                {min: 0, max: 23200, rate: 0.10},
+                {min: 23200, max: 94300, rate: 0.12},
+                {min: 94300, max: 201050, rate: 0.22},
+                {min: 201050, max: 383900, rate: 0.24},
+                {min: 383900, max: 487450, rate: 0.32},
+                {min: 487450, max: 731200, rate: 0.35},
+                {min: 731200, max: Infinity, rate: 0.37}
+            ],
+            married_separately: [
+                {min: 0, max: 11600, rate: 0.10},
+                {min: 11600, max: 47150, rate: 0.12},
+                {min: 47150, max: 100525, rate: 0.22},
+                {min: 100525, max: 191950, rate: 0.24},
+                {min: 191950, max: 243725, rate: 0.32},
+                {min: 243725, max: 365600, rate: 0.35},
+                {min: 365600, max: Infinity, rate: 0.37}
+            ],
+            head_of_household: [
+                {min: 0, max: 16550, rate: 0.10},
+                {min: 16550, max: 63100, rate: 0.12},
+                {min: 63100, max: 100500, rate: 0.22},
+                {min: 100500, max: 191950, rate: 0.24},
+                {min: 191950, max: 243700, rate: 0.32},
+                {min: 243700, max: 609350, rate: 0.35},
+                {min: 609350, max: Infinity, rate: 0.37}
+            ]
+        };
+
+        const standardDeductions = {
+            single: 14600,
+            married_jointly: 29200,
+            married_separately: 14600,
+            head_of_household: 21900
+        };
+
+        let currentTaxRate = 0.22; // Default 22%
+
+        function updateTaxRate() {
+            const filingStatus = document.getElementById('filingStatus').value;
+            const income = parseInt(document.getElementById('incomeBracket').value);
+
+            const brackets = taxBrackets[filingStatus] || taxBrackets.single;
+            let rate = 0.10;
+
+            for (const bracket of brackets) {
+                if (income >= bracket.min && income <= bracket.max) {
+                    rate = bracket.rate;
+                    break;
+                }
+            }
+
+            currentTaxRate = rate;
+            const percentage = Math.round(rate * 100);
+
+            // Update profile display
+            document.getElementById('marginalTaxRate').textContent = percentage + '%';
+            document.getElementById('savingsPerHundred').textContent = '$' + percentage;
+            document.getElementById('standardDeduction').textContent =
+                '$' + (standardDeductions[filingStatus] || 14600).toLocaleString();
+
+            // Update donation form display
+            document.getElementById('taxRateDisplay').textContent = percentage;
+            updateTaxSavings();
+
+            // Save to localStorage
+            localStorage.setItem('taxRate', rate);
+            localStorage.setItem('filingStatus', filingStatus);
+            localStorage.setItem('income', income);
+        }
+
+        function updateTaxSavings() {
+            let amount = 0;
+            const donationType = document.getElementById('donationType').value;
+
+            // Get amount based on donation type
+            switch(donationType) {
+                case 'cash':
+                    amount = parseFloat(document.getElementById('donationAmount').value) || 0;
+                    break;
+                case 'items':
+                    amount = parseFloat(document.getElementById('estimatedValue').value) || 0;
+                    break;
+                case 'miles':
+                    const miles = parseFloat(document.getElementById('milesDriven').value) || 0;
+                    amount = miles * 0.14;
+                    break;
+                case 'stock':
+                    amount = parseFloat(document.getElementById('fairMarketValue').value) || 0;
+                    break;
+                case 'crypto':
+                    amount = parseFloat(document.getElementById('cryptoValue').value) || 0;
+                    break;
+            }
+
+            const savings = amount * currentTaxRate;
+
+            document.getElementById('donationAmountDisplay').textContent = '$' + amount.toFixed(2);
+            document.getElementById('taxSavingsDisplay').textContent = '$' + savings.toFixed(2);
+        }
+
+        // Load saved tax settings
+        function loadTaxSettings() {
+            const savedRate = localStorage.getItem('taxRate');
+            const savedStatus = localStorage.getItem('filingStatus');
+            const savedIncome = localStorage.getItem('income');
+
+            if (savedRate) {
+                currentTaxRate = parseFloat(savedRate);
+            }
+            if (savedStatus) {
+                document.getElementById('filingStatus').value = savedStatus;
+            }
+            if (savedIncome) {
+                document.getElementById('incomeBracket').value = savedIncome;
+            }
+
+            updateTaxRate();
+        }
+
         // Item donation management
         let selectedItems = [];
 
@@ -1765,7 +1934,16 @@
             }
         }
 
+        // Add event listeners for tax savings updates
+        document.getElementById('donationAmount')?.addEventListener('input', updateTaxSavings);
+        document.getElementById('estimatedValue')?.addEventListener('input', updateTaxSavings);
+        document.getElementById('milesDriven')?.addEventListener('input', updateTaxSavings);
+        document.getElementById('fairMarketValue')?.addEventListener('input', updateTaxSavings);
+        document.getElementById('cryptoValue')?.addEventListener('input', updateTaxSavings);
+        document.getElementById('donationType')?.addEventListener('change', updateTaxSavings);
+
         // Load data on page load
+        loadTaxSettings();
         loadCharities();
         loadDonations();
         loadStats();
