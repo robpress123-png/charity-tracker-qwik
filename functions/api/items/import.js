@@ -126,54 +126,40 @@ export async function onRequestPost(context) {
                 }
 
                 if (existingCheck && updateExisting) {
-                    // Update existing item
+                    // Update existing item - simplified for basic schema
                     await env.DB.prepare(`
                         UPDATE donation_items
                         SET description = ?,
-                            unit = ?,
+                            value_poor = ?,
+                            value_fair = ?,
                             value_good = ?,
-                            value_very_good = ?,
-                            value_excellent = ?,
-                            source_reference = ?,
-                            min_condition_note = ?,
-                            updated_at = datetime('now'),
-                            last_updated_by = 'csv_import'
+                            value_excellent = ?
                         WHERE id = ?
                     `).bind(
                         item.description || item.name,
-                        item.unit || 'each',
-                        parseFloat(item.value_good) || 0,
+                        0, // value_poor - not used
                         parseFloat(item.value_very_good) || parseFloat(item.value_good) * 1.5,
+                        parseFloat(item.value_good) || 0,
                         parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2,
-                        item.source_reference || 'Goodwill Guide 2024',
-                        item.min_condition_note || 'Good condition or better required',
                         existingCheck.id
                     ).run();
 
                     results.updated++;
                 } else if (!existingCheck) {
-                    // Insert new item
+                    // Insert new item - simplified for basic schema
                     await env.DB.prepare(`
                         INSERT INTO donation_items (
-                            category_id, name, description, unit,
-                            value_poor, value_fair, value_good, value_excellent,
-                            source_reference, min_condition_note,
-                            is_active, sort_order,
-                            created_at, updated_at, last_updated_by
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 'csv_import')
+                            category_id, name, description,
+                            value_poor, value_fair, value_good, value_excellent
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
                     `).bind(
                         parseInt(item.category_id),
                         item.name,
                         item.description || item.name,
-                        item.unit || 'each',
                         0, // value_poor - not used but in schema
-                        0, // value_fair - not used but in schema
+                        parseFloat(item.value_very_good) || parseFloat(item.value_good) * 1.5, // use very_good for fair column
                         parseFloat(item.value_good) || 0,
-                        parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2,
-                        item.source_reference || 'Goodwill Guide 2024',
-                        item.min_condition_note || 'Good condition or better required',
-                        1, // is_active
-                        parseInt(item.sort_order) || 100
+                        parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2
                     ).run();
 
                     results.added++;
@@ -185,23 +171,28 @@ export async function onRequestPost(context) {
             }
         }
 
-        // Log import to history
-        await env.DB.prepare(`
-            INSERT INTO import_history (
-                file_name, import_type,
-                records_processed, records_added, records_updated, records_failed,
-                error_log, imported_by, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-        `).bind(
-            'csv_import',
-            'donation_items',
-            results.processed,
-            results.added,
-            results.updated,
-            results.failed,
-            results.errors.length > 0 ? results.errors.join('\n') : null,
-            'admin'
-        ).run();
+        // Skip import history logging if table doesn't exist
+        try {
+            await env.DB.prepare(`
+                INSERT INTO import_history (
+                    file_name, import_type,
+                    records_processed, records_added, records_updated, records_failed,
+                    error_log, imported_by, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            `).bind(
+                'csv_import',
+                'donation_items',
+                results.processed,
+                results.added,
+                results.updated,
+                results.failed,
+                results.errors.length > 0 ? results.errors.join('\n') : null,
+                'admin'
+            ).run();
+        } catch (e) {
+            // Import history table might not exist, continue anyway
+            console.log('Import history logging skipped:', e.message);
+        }
 
         return new Response(JSON.stringify({
             success: true,

@@ -35,10 +35,18 @@ export async function onRequestGet(context) {
             'SELECT COUNT(*) as count FROM charities'
         ).first();
 
-        // Get database items count
-        const itemsResult = await env.DB.prepare(
-            'SELECT COUNT(*) as count FROM donation_items WHERE is_active = 1'
-        ).first();
+        // Get database items count - try with is_active first, fallback to without
+        let itemsResult;
+        try {
+            itemsResult = await env.DB.prepare(
+                'SELECT COUNT(*) as count FROM donation_items WHERE is_active = 1'
+            ).first();
+        } catch (e) {
+            // Fallback if is_active column doesn't exist
+            itemsResult = await env.DB.prepare(
+                'SELECT COUNT(*) as count FROM donation_items'
+            ).first();
+        }
 
         // Get monthly statistics (last 30 days)
         const thirtyDaysAgo = new Date();
