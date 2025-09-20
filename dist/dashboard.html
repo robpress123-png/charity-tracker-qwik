@@ -485,10 +485,10 @@
                     🔧 Tools
                 </button>
                 <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem; padding-right: 1rem;">
-                    <label style="color: white; font-size: 0.9rem;">Year:</label>
-                    <select id="globalYearFilter" onchange="updateYearFilter()" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem;">
+                    <label style="color: white; font-size: 0.9rem; font-weight: 500;">Tax Year:</label>
+                    <select id="globalYearFilter" onchange="updateYearFilter()" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; cursor: pointer;">
                         <option value="2024">2024</option>
-                        <option value="2025">2025</option>
+                        <option value="2025" selected>2025</option>
                         <option value="2026">2026</option>
                         <option value="2027">2027</option>
                         <option value="all">All Years</option>
@@ -580,10 +580,10 @@
             </div>
             <div style="display: grid; gap: 1rem;">
                 <div class="form-group">
-                    <label>Report Year</label>
+                    <label>Report Tax Year</label>
                     <select id="reportYear" style="width: 200px;">
                         <option value="2024">2024</option>
-                        <option value="2025">2025</option>
+                        <option value="2025" selected>2025</option>
                         <option value="2026">2026</option>
                         <option value="2027">2027</option>
                         <option value="all">All Years</option>
@@ -1248,7 +1248,7 @@
         // Load and display donations
         async function loadDonations() {
             const container = document.getElementById('donationsContent');
-            const year = document.getElementById('globalYearFilter')?.value || '2024';
+            const year = document.getElementById('globalYearFilter')?.value || '2025';
 
             try {
                 let url = '/api/donations?limit=10';
@@ -1640,6 +1640,129 @@
             }
 
             updateTaxRate();
+        }
+
+        // View Summary function
+        async function viewSummary() {
+            const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2025';
+            const summaryDiv = document.getElementById('reportSummary');
+
+            summaryDiv.innerHTML = '<p>Loading summary...</p>';
+
+            try {
+                let url = '/api/donations?limit=10000';
+                if (selectedYear && selectedYear !== 'all') {
+                    url = `/api/donations?year=${selectedYear}&limit=10000`;
+                }
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!data.success || !data.donations || data.donations.length === 0) {
+                    summaryDiv.innerHTML = '<p style="color: #666;">No donations found for the selected year.</p>';
+                    return;
+                }
+
+                // Calculate summary statistics
+                const donations = data.donations;
+                const totalAmount = donations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
+                const taxSavings = totalAmount * currentTaxRate;
+
+                // Group by charity
+                const charityTotals = {};
+                donations.forEach(d => {
+                    const charity = d.charity_name || 'Unknown';
+                    charityTotals[charity] = (charityTotals[charity] || 0) + parseFloat(d.amount);
+                });
+
+                // Group by type
+                const typeTotals = {
+                    cash: 0,
+                    items: 0,
+                    miles: 0,
+                    stock: 0,
+                    crypto: 0
+                };
+                donations.forEach(d => {
+                    const type = d.donation_type || 'cash';
+                    typeTotals[type] = (typeTotals[type] || 0) + parseFloat(d.amount);
+                });
+
+                // Generate HTML summary
+                let html = `
+                    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">Tax Year ${selectedYear === 'all' ? 'All Years' : selectedYear} Summary</h3>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 0.875rem; color: #6b7280;">Total Donations</div>
+                                <div style="font-size: 1.75rem; font-weight: bold; color: #667eea;">$${totalAmount.toFixed(2)}</div>
+                            </div>
+                            <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 0.875rem; color: #6b7280;">Est. Tax Savings</div>
+                                <div style="font-size: 1.75rem; font-weight: bold; color: #16a34a;">$${taxSavings.toFixed(2)}</div>
+                            </div>
+                            <div style="background: #fef2f2; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 0.875rem; color: #6b7280;">Number of Donations</div>
+                                <div style="font-size: 1.75rem; font-weight: bold; color: #dc2626;">${donations.length}</div>
+                            </div>
+                        </div>
+
+                        <h4 style="color: #4b5563; margin-bottom: 0.5rem;">Donations by Type</h4>
+                        <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                `;
+
+                Object.entries(typeTotals).forEach(([type, amount]) => {
+                    if (amount > 0) {
+                        const percentage = ((amount / totalAmount) * 100).toFixed(1);
+                        html += `
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb;">
+                                <span style="text-transform: capitalize;">${type}</span>
+                                <span><strong>$${amount.toFixed(2)}</strong> (${percentage}%)</span>
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `
+                        </div>
+
+                        <h4 style="color: #4b5563; margin-bottom: 0.5rem;">Top Charities</h4>
+                        <div style="background: #f9fafb; padding: 1rem; border-radius: 8px;">
+                `;
+
+                // Sort charities by total amount
+                const sortedCharities = Object.entries(charityTotals)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+
+                sortedCharities.forEach(([charity, amount]) => {
+                    const percentage = ((amount / totalAmount) * 100).toFixed(1);
+                    html += `
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb;">
+                            <span>${charity}</span>
+                            <span><strong>$${amount.toFixed(2)}</strong> (${percentage}%)</span>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #fef3c7; border-radius: 8px;">
+                            <p style="font-size: 0.875rem; color: #92400e;">
+                                <strong>Note:</strong> Tax savings shown are estimates based on your ${Math.round(currentTaxRate * 100)}% marginal tax rate.
+                                Actual savings depend on itemizing deductions vs. standard deduction ($${(standardDeductions[localStorage.getItem('filingStatus')] || 14600).toLocaleString()}).
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                summaryDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error('Failed to generate summary:', error);
+                summaryDiv.innerHTML = '<p style="color: #dc2626;">Failed to generate summary. Please try again.</p>';
+            }
         }
 
         // Item donation management
