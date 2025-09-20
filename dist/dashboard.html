@@ -761,39 +761,46 @@
                 <!-- Item donation fields -->
                 <div id="itemFields" class="donation-type-fields" style="display:none;">
                     <div class="form-group">
-                        <label for="itemCategory">Item Category</label>
-                        <select id="itemCategory" onchange="updateItemsList()">
+                        <label for="itemCategory">Category *</label>
+                        <select id="itemCategory" onchange="loadItemsForCategory()" required>
                             <option value="">Select Category</option>
-                            <option value="clothing">Clothing & Accessories</option>
-                            <option value="household">Household Goods</option>
-                            <option value="electronics">Electronics</option>
-                            <option value="furniture">Furniture</option>
-                            <option value="books">Books & Media</option>
-                            <option value="toys">Toys & Games</option>
-                            <option value="sports">Sports Equipment</option>
-                            <option value="other">Other</option>
+                            <!-- Populated from database -->
                         </select>
                     </div>
-                    <div class="form-group" id="itemsListGroup" style="display:none;">
-                        <label>Quick Add Common Items</label>
-                        <select id="itemsList" multiple size="4" style="width:100%">
+
+                    <div class="form-group" id="itemSelectGroup" style="display:none;">
+                        <label for="itemSelect">Item *</label>
+                        <select id="itemSelect" onchange="updateItemValue()" required>
+                            <option value="">Select Item</option>
+                            <!-- Populated based on category -->
                         </select>
-                        <small>Click items to add them</small>
                     </div>
+
+                    <div class="form-group" id="itemQualityGroup" style="display:none;">
+                        <label for="itemQuality">Condition *</label>
+                        <select id="itemQuality" onchange="updateItemValue()" required>
+                            <option value="fair">Fair - Some wear, fully functional</option>
+                            <option value="good" selected>Good - Minor wear, clean</option>
+                            <option value="excellent">Excellent - Like new</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="itemQuantityGroup" style="display:none;">
+                        <label for="itemQuantity">Quantity</label>
+                        <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()">
+                    </div>
+
                     <div class="form-group">
                         <label>Selected Items</label>
-                        <div id="selectedItemsList" style="max-height:120px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:0.5rem;background:#f9fafb;">
+                        <div id="selectedItemsList" style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:0.5rem;background:#f9fafb;">
                             <div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>
                         </div>
                     </div>
+
                     <div class="form-group">
-                        <label>Add Custom Item</label>
-                        <div style="display:flex;gap:0.5rem;">
-                            <input type="text" id="customItemName" placeholder="Item name" style="flex:1;">
-                            <input type="number" id="customItemValue" placeholder="Value" step="0.01" style="width:100px;">
-                            <button type="button" onclick="addCustomItem()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;">Add</button>
-                        </div>
+                        <button type="button" class="btn-primary" onclick="addItemToList()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">Add Item</button>
                     </div>
+
                     <div class="form-group">
                         <label for="estimatedValue">Total Value</label>
                         <input type="number" id="estimatedValue" step="0.01" min="0" readonly style="background:#f9fafb;">
@@ -993,6 +1000,14 @@
             document.getElementById('donationForm').reset();
             document.getElementById('selectedCharityId').value = '';
             document.getElementById('charityDropdown').classList.remove('show');
+            // Reset item selection
+            selectedDonationItems = [];
+            updateSelectedItemsDisplay();
+            document.getElementById('itemSelectGroup').style.display = 'none';
+            document.getElementById('itemQualityGroup').style.display = 'none';
+            document.getElementById('itemQuantityGroup').style.display = 'none';
+            // Clear editing flag
+            window.editingDonationId = null;
         }
 
         function showAddCharity() {
@@ -1963,158 +1978,163 @@
         }
 
         // Item donation management
-        let selectedItems = [];
+        let itemCategories = [];
+        let currentItems = [];
+        let selectedDonationItems = [];
 
-        const itemDatabase = {
-            clothing: [
-                {name: "Men's Suit", value: 60},
-                {name: "Women's Dress", value: 40},
-                {name: "Children's Clothing", value: 15},
-                {name: "Shoes (pair)", value: 25},
-                {name: "Winter Coat", value: 85},
-                {name: "Jeans", value: 20}
-            ],
-            household: [
-                {name: "Kitchen Appliances", value: 50},
-                {name: "Dishes/Utensils Set", value: 30},
-                {name: "Bedding Set", value: 40},
-                {name: "Towels", value: 15},
-                {name: "Small Appliances", value: 35}
-            ],
-            electronics: [
-                {name: "Computer/Laptop", value: 200},
-                {name: "Television", value: 150},
-                {name: "Smartphone", value: 100},
-                {name: "Tablet", value: 75},
-                {name: "Printer", value: 50}
-            ],
-            furniture: [
-                {name: "Sofa", value: 300},
-                {name: "Dining Table", value: 250},
-                {name: "Office Chair", value: 100},
-                {name: "Dresser", value: 150},
-                {name: "Bookshelf", value: 75}
-            ],
-            books: [
-                {name: "Hardcover Books", value: 5},
-                {name: "Paperback Books", value: 3},
-                {name: "Textbooks", value: 15},
-                {name: "DVDs/CDs", value: 2}
-            ],
-            toys: [
-                {name: "Board Games", value: 10},
-                {name: "Stuffed Animals", value: 5},
-                {name: "Building Sets", value: 20},
-                {name: "Dolls", value: 15}
-            ],
-            sports: [
-                {name: "Bicycle", value: 75},
-                {name: "Golf Clubs", value: 150},
-                {name: "Exercise Equipment", value: 100},
-                {name: "Sports Gear", value: 30}
-            ]
-        };
+        // Load categories on page load
+        async function loadItemCategories() {
+            try {
+                const response = await fetch('/api/items?type=categories');
+                const data = await response.json();
 
-        function updateItemsList() {
-            const category = document.getElementById('itemCategory').value;
-            const itemsList = document.getElementById('itemsList');
-            const listGroup = document.getElementById('itemsListGroup');
+                if (data.success) {
+                    itemCategories = data.categories;
+                    const select = document.getElementById('itemCategory');
+                    if (select) {
+                        select.innerHTML = '<option value="">Select Category</option>';
 
-            if (!category) {
-                listGroup.style.display = 'none';
+                        itemCategories.forEach(cat => {
+                            select.innerHTML += `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+
+        // Load items for selected category
+        async function loadItemsForCategory() {
+            const categoryId = document.getElementById('itemCategory').value;
+
+            if (!categoryId) {
+                document.getElementById('itemSelectGroup').style.display = 'none';
                 return;
             }
 
-            const items = itemDatabase[category] || [];
-            itemsList.innerHTML = '';
+            try {
+                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                const data = await response.json();
 
-            items.forEach(item => {
-                const option = document.createElement('option');
-                option.value = JSON.stringify(item);
-                option.textContent = `${item.name} ($${item.value})`;
-                itemsList.appendChild(option);
-            });
+                if (data.success) {
+                    currentItems = data.items;
+                    const select = document.getElementById('itemSelect');
+                    select.innerHTML = '<option value="">Select Item</option>';
 
-            listGroup.style.display = 'block';
-        }
+                    currentItems.forEach(item => {
+                        select.innerHTML += `<option value="${item.id}">${item.name} - ${item.description}</option>`;
+                    });
 
-        function addSelectedItems() {
-            const itemsList = document.getElementById('itemsList');
-            const selected = Array.from(itemsList.selectedOptions);
-
-            selected.forEach(option => {
-                const item = JSON.parse(option.value);
-                addItemToList(item.name, item.value);
-                option.selected = false;
-            });
-        }
-
-        document.getElementById('itemsList')?.addEventListener('click', addSelectedItems);
-
-        function addCustomItem() {
-            const name = document.getElementById('customItemName').value.trim();
-            const value = parseFloat(document.getElementById('customItemValue').value);
-
-            if (name && value > 0) {
-                addItemToList(name, value);
-                document.getElementById('customItemName').value = '';
-                document.getElementById('customItemValue').value = '';
+                    document.getElementById('itemSelectGroup').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Failed to load items:', error);
             }
         }
 
-        function addItemToList(name, value) {
-            const existingItem = selectedItems.find(item => item.name === name);
-            if (existingItem) {
-                existingItem.quantity++;
-                existingItem.totalValue = existingItem.quantity * existingItem.unitValue;
-            } else {
-                selectedItems.push({
-                    name: name,
-                    quantity: 1,
-                    unitValue: value,
-                    totalValue: value
-                });
+        // Update value based on selected item and quality
+        function updateItemValue() {
+            const itemId = document.getElementById('itemSelect').value;
+            const quality = document.getElementById('itemQuality').value;
+            const quantity = parseInt(document.getElementById('itemQuantity').value) || 1;
+
+            if (!itemId) {
+                document.getElementById('itemQualityGroup').style.display = 'none';
+                document.getElementById('itemQuantityGroup').style.display = 'none';
+                return;
             }
-            updateSelectedItemsDisplay();
+
+            const item = currentItems.find(i => i.id == itemId);
+            if (!item) return;
+
+            document.getElementById('itemQualityGroup').style.display = 'block';
+            document.getElementById('itemQuantityGroup').style.display = 'block';
+
+            const valueKey = `value_${quality}`;
+            const unitValue = item[valueKey] || item.value_good;
+            const totalValue = unitValue * quantity;
+
+            // Don't update the total value yet - wait for the item to be added
         }
 
-        function removeItem(index) {
-            selectedItems.splice(index, 1);
+        // Add item to list
+        function addItemToList() {
+            const categoryId = document.getElementById('itemCategory').value;
+            const itemId = document.getElementById('itemSelect').value;
+            const quality = document.getElementById('itemQuality').value;
+            const quantity = parseInt(document.getElementById('itemQuantity').value) || 1;
+
+            if (!categoryId || !itemId) {
+                alert('Please select category and item');
+                return;
+            }
+
+            const category = itemCategories.find(c => c.id == categoryId);
+            const item = currentItems.find(i => i.id == itemId);
+            const valueKey = `value_${quality}`;
+            const unitValue = item[valueKey] || item.value_good;
+
+            selectedDonationItems.push({
+                categoryName: category.name,
+                itemName: item.name,
+                quality: quality,
+                quantity: quantity,
+                unitValue: unitValue,
+                totalValue: unitValue * quantity
+            });
+
             updateSelectedItemsDisplay();
+
+            // Reset form
+            document.getElementById('itemSelect').value = '';
+            document.getElementById('itemQuality').value = 'good';
+            document.getElementById('itemQuantity').value = '1';
+            document.getElementById('itemQualityGroup').style.display = 'none';
+            document.getElementById('itemQuantityGroup').style.display = 'none';
         }
 
         function updateSelectedItemsDisplay() {
             const container = document.getElementById('selectedItemsList');
-            const totalValue = document.getElementById('estimatedValue');
 
-            if (selectedItems.length === 0) {
+            if (selectedDonationItems.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>';
-                totalValue.value = '0.00';
-                document.getElementById('itemDescription').value = '';
+                document.getElementById('estimatedValue').value = '0.00';
                 return;
             }
 
             let html = '';
-            let total = 0;
-            let description = [];
+            let totalValue = 0;
 
-            selectedItems.forEach((item, index) => {
+            selectedDonationItems.forEach((item, index) => {
                 html += `
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.25rem;border-bottom:1px solid #e5e7eb;">
-                        <span>${item.name} ${item.quantity > 1 ? `(x${item.quantity})` : ''}</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem;border-bottom:1px solid #e5e7eb;">
                         <div>
-                            <span style="color:#667eea;">$${item.totalValue.toFixed(2)}</span>
-                            <button type="button" onclick="removeItem(${index})" style="margin-left:0.5rem;color:#ef4444;cursor:pointer;">×</button>
+                            <strong>${item.itemName}</strong> (${item.quality})
+                            <br><small>${item.categoryName} • Qty: ${item.quantity}</small>
+                        </div>
+                        <div>
+                            <span style="color:#667eea;font-weight:600;">$${item.totalValue.toFixed(2)}</span>
+                            <button type="button" onclick="removeItemFromList(${index})" style="margin-left:0.5rem;color:#ef4444;cursor:pointer;">×</button>
                         </div>
                     </div>
                 `;
-                total += item.totalValue;
-                description.push(`${item.name}${item.quantity > 1 ? ` (x${item.quantity})` : ''}`);
+                totalValue += item.totalValue;
             });
 
             container.innerHTML = html;
-            totalValue.value = total.toFixed(2);
-            document.getElementById('itemDescription').value = description.join(', ');
+            document.getElementById('estimatedValue').value = totalValue.toFixed(2);
+
+            // Update item description for database
+            const descriptions = selectedDonationItems.map(i =>
+                `${i.itemName} (${i.quality}, qty: ${i.quantity})`
+            ).join('; ');
+            document.getElementById('itemDescription').value = descriptions;
+        }
+
+        function removeItemFromList(index) {
+            selectedDonationItems.splice(index, 1);
+            updateSelectedItemsDisplay();
         }
 
         // Helper function to handle donation type changes
@@ -2148,6 +2168,11 @@
                     if (donation.donation_type === 'cash') {
                         document.getElementById('donationAmount').value = donation.amount;
                     } else if (donation.donation_type === 'items') {
+                        // For editing, we can't recreate the item list from the description alone
+                        // Just show the description and value
+                        document.getElementById('itemCategory').value = '';
+                        selectedDonationItems = [];
+                        updateSelectedItemsDisplay();
                         document.getElementById('itemDescription').value = donation.item_description || '';
                         document.getElementById('estimatedValue').value = donation.estimated_value || donation.amount;
                     } else if (donation.donation_type === 'miles') {
@@ -2308,6 +2333,7 @@
         loadCharities();
         loadDonations();
         loadStats();
+        loadItemCategories(); // Load item categories for donation form
 
         // Close modals when clicking outside
         window.onclick = function(event) {
