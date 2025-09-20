@@ -14,7 +14,23 @@ export async function onRequestPost(context) {
   try {
     // Parse request body
     const body = await request.json();
-    const { charity_id, amount, donation_date, notes } = body;
+    const {
+      charity_id,
+      amount,
+      donation_date,
+      notes,
+      donation_type = 'cash',
+      // Type-specific fields
+      miles_driven,
+      mileage_rate,
+      mileage_purpose,
+      item_description,
+      estimated_value,
+      quantity,
+      cost_basis,
+      fair_market_value,
+      crypto_type
+    } = body;
 
     // For now, use test user ID
     const userId = 'test-user-id';
@@ -40,6 +56,16 @@ export async function onRequestPost(context) {
           amount,
           donation_date,
           notes,
+          donation_type,
+          miles_driven,
+          mileage_rate,
+          mileage_purpose,
+          item_description,
+          estimated_value,
+          quantity,
+          cost_basis,
+          fair_market_value,
+          crypto_type,
           created_at: new Date().toISOString()
         },
         message: 'Donation created (mock mode)'
@@ -53,11 +79,23 @@ export async function onRequestPost(context) {
 
     // Insert donation into database
     const stmt = env.DB.prepare(`
-      INSERT INTO donations (user_id, charity_id, amount, donation_date, notes)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO donations (
+        user_id, charity_id, amount, donation_date, notes, donation_type,
+        miles_driven, mileage_rate, mileage_purpose,
+        item_description, estimated_value,
+        quantity, cost_basis, fair_market_value,
+        crypto_type
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    
-    const result = await stmt.bind(userId, charity_id, amount, donation_date, notes).run();
+
+    const result = await stmt.bind(
+      userId, charity_id, amount, donation_date, notes, donation_type,
+      miles_driven, mileage_rate, mileage_purpose,
+      item_description, estimated_value,
+      quantity, cost_basis, fair_market_value,
+      crypto_type
+    ).run();
 
     if (result.meta.last_row_id) {
       // Fetch the created donation

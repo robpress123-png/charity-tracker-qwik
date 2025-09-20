@@ -1358,10 +1358,15 @@
             }
         }
 
+        // Helper function to handle donation type changes
+        function handleDonationTypeChange(event) {
+            updateDonationFields();
+        }
+
         // Helper function to open donation modal with specific type
         function openDonationModal(type) {
             document.getElementById('donationType').value = type;
-            handleDonationTypeChange({ target: { value: type } });
+            updateDonationFields();
             showAddDonation();
         }
 
