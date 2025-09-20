@@ -32,8 +32,18 @@ export async function onRequestPost(context) {
       crypto_type
     } = body;
 
-    // For now, use test user ID
-    const userId = 'test-user-id';
+    // Get user ID from session or header (in production, validate session token)
+    const authHeader = request.headers.get('Authorization');
+    let userId = 'test-user-id'; // Default for backwards compatibility
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        // In production, validate token and get user ID from session
+        // For now, we'll use the token as user ID (simplified)
+        if (token && token !== 'test-token') {
+            userId = token;
+        }
+    }
 
     if (!charity_id || !amount || !donation_date) {
       return new Response(JSON.stringify({

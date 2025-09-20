@@ -670,6 +670,9 @@
                         <button class="btn-primary" onclick="showImportDonations()">
                             📥 Import Donations (CSV)
                         </button>
+                        <button class="btn-primary" onclick="showImportItems()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            📦 Import Donation Items Database (CSV)
+                        </button>
                         <button class="btn-primary" onclick="calculateTaxSavings()">
                             💰 Tax Savings Calculator
                         </button>
@@ -714,6 +717,61 @@
                                     Cancel
                                 </button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Import Items Panel -->
+                    <div id="importItemsPanel" style="display:none; margin-top: 2rem;">
+                        <h3 style="color: #10b981; margin-bottom: 1rem;">Import Donation Items Database</h3>
+
+                        <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                <span style="color: #f59e0b; font-size: 1.25rem;">⚠️</span>
+                                <div style="flex: 1;">
+                                    <strong style="color: #92400e;">Important:</strong>
+                                    <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem; color: #92400e;">
+                                        <li>CSV must have columns: category_id, name, value_good, value_very_good, value_excellent</li>
+                                        <li>Optional columns: description, unit, source_reference, min_condition_note</li>
+                                        <li>Category IDs: 1=Women's, 2=Men's, 3=Children's, 4=Household, 5=Electronics, 6=Furniture, 7=Books, 8=Sports, 9=Toys, 10=Appliances, 11=Jewelry, 12=Tools</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="itemsCsvDropZone" style="border: 2px dashed #10b981; border-radius: 12px; padding: 3rem; text-align: center; background: #f0fdf4; cursor: pointer;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 0.5rem;">Drag & Drop Items CSV File Here</p>
+                            <p style="color: #9ca3af;">or click to browse</p>
+                            <input type="file" id="itemsCsvFileInput" accept=".csv" style="display: none;" onchange="handleItemsCsvSelect(event)">
+                        </div>
+
+                        <div style="margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="updateExistingItems" style="width: auto;">
+                                <span>Update existing items (if unchecked, duplicates will be skipped)</span>
+                            </label>
+                        </div>
+
+                        <div id="itemsImportPreview" style="display:none; margin-top: 2rem;">
+                            <h4 style="color: #374151; margin-bottom: 1rem;">Preview (First 10 items)</h4>
+                            <div id="itemsPreviewTable" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto;"></div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="confirmItemsImport()">
+                                    ✅ Import Items
+                                </button>
+                                <button class="btn-secondary" onclick="cancelItemsImport()">
+                                    ❌ Cancel
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="itemsImportResults" style="display:none; margin-top: 2rem;">
+                            <h4 style="color: #374151; margin-bottom: 1rem;">Import Results</h4>
+                            <div id="itemsResultsContent" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;"></div>
+                            <button class="btn-primary" style="margin-top: 1rem;" onclick="closeItemsImport()">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2401,6 +2459,204 @@
         document.getElementById('fairMarketValue')?.addEventListener('input', updateTaxSavings);
         document.getElementById('cryptoValue')?.addEventListener('input', updateTaxSavings);
         document.getElementById('donationType')?.addEventListener('change', updateTaxSavings);
+
+        // Items Import Functions
+        let itemsImportData = [];
+
+        function showImportItems() {
+            document.getElementById('importItemsPanel').style.display = 'block';
+            document.getElementById('importDonationsPanel').style.display = 'none';
+        }
+
+        function handleItemsCsvSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processItemsCsvFile(file);
+            }
+        }
+
+        function processItemsCsvFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvText = e.target.result;
+                parseItemsCsv(csvText);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseItemsCsv(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            itemsImportData = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let char of lines[i]) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header] = values[index] || '';
+                });
+
+                itemsImportData.push(item);
+            }
+
+            // Show preview
+            const preview = document.getElementById('itemsImportPreview');
+            const table = document.getElementById('itemsPreviewTable');
+
+            let html = '<table class="table"><thead><tr><th>Category</th><th>Name</th><th>Good</th><th>Very Good</th><th>Excellent</th></tr></thead><tbody>';
+
+            itemsImportData.slice(0, 10).forEach(item => {
+                const categoryNames = {
+                    '1': 'Women\'s', '2': 'Men\'s', '3': 'Children\'s',
+                    '4': 'Household', '5': 'Electronics', '6': 'Furniture',
+                    '7': 'Books', '8': 'Sports', '9': 'Toys',
+                    '10': 'Appliances', '11': 'Jewelry', '12': 'Tools'
+                };
+                html += `<tr>
+                    <td>${categoryNames[item.category_id] || item.category_id}</td>
+                    <td>${item.name}</td>
+                    <td>$${parseFloat(item.value_good || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(item.value_very_good || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(item.value_excellent || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            if (itemsImportData.length > 10) {
+                html += `<tr><td colspan="5" style="text-align: center; font-style: italic;">... and ${itemsImportData.length - 10} more items</td></tr>`;
+            }
+
+            html += '</tbody></table>';
+            table.innerHTML = html;
+            preview.style.display = 'block';
+        }
+
+        async function confirmItemsImport() {
+            const updateExisting = document.getElementById('updateExistingItems').checked;
+            const resultsDiv = document.getElementById('itemsImportResults');
+            const resultsContent = document.getElementById('itemsResultsContent');
+
+            resultsContent.innerHTML = '<p>Importing items...</p>';
+            resultsDiv.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/items/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        csvData: [Object.keys(itemsImportData[0]).join(',')]
+                            .concat(itemsImportData.map(row =>
+                                Object.keys(itemsImportData[0]).map(k => row[k]).join(',')
+                            )).join('\n'),
+                        updateExisting: updateExisting
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsContent.innerHTML = `
+                        <div style="color: #10b981; margin-bottom: 1rem;">
+                            <strong>✅ Import Successful!</strong>
+                        </div>
+                        <div>
+                            <p>Processed: ${data.results.processed} items</p>
+                            <p>Added: ${data.results.added} new items</p>
+                            <p>Updated: ${data.results.updated} existing items</p>
+                            <p>Failed: ${data.results.failed} items</p>
+                        </div>
+                        ${data.results.errors.length > 0 ? `
+                            <div style="margin-top: 1rem; color: #ef4444;">
+                                <strong>Errors:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                    ${data.results.errors.map(e => `<li>${e}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+
+                    // Reload item categories if we're on the donation form
+                    loadItemCategories();
+                } else {
+                    resultsContent.innerHTML = `
+                        <div style="color: #ef4444;">
+                            <strong>❌ Import Failed</strong>
+                            <p style="margin-top: 0.5rem;">${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div style="color: #ef4444;">
+                        <strong>❌ Import Error</strong>
+                        <p style="margin-top: 0.5rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('itemsImportPreview').style.display = 'none';
+        }
+
+        function cancelItemsImport() {
+            document.getElementById('itemsImportPreview').style.display = 'none';
+            document.getElementById('itemsCsvFileInput').value = '';
+            itemsImportData = [];
+        }
+
+        function closeItemsImport() {
+            document.getElementById('importItemsPanel').style.display = 'none';
+            document.getElementById('itemsImportResults').style.display = 'none';
+            document.getElementById('itemsCsvFileInput').value = '';
+            itemsImportData = [];
+        }
+
+        // Setup drag and drop for items CSV
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsDropZone = document.getElementById('itemsCsvDropZone');
+            if (itemsDropZone) {
+                itemsDropZone.addEventListener('click', () => {
+                    document.getElementById('itemsCsvFileInput').click();
+                });
+
+                itemsDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    itemsDropZone.style.borderColor = '#059669';
+                    itemsDropZone.style.background = '#d1fae5';
+                });
+
+                itemsDropZone.addEventListener('dragleave', () => {
+                    itemsDropZone.style.borderColor = '#10b981';
+                    itemsDropZone.style.background = '#f0fdf4';
+                });
+
+                itemsDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    itemsDropZone.style.borderColor = '#10b981';
+                    itemsDropZone.style.background = '#f0fdf4';
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        processItemsCsvFile(files[0]);
+                    }
+                });
+            }
+        });
 
         // Load data on page load
         loadTaxSettings();
