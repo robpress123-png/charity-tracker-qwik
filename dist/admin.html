@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Charity Tracker v1.0.2</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .version {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .warning {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .warning p {
+            color: #991b1b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="password"],
+        input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="password"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            background: #f3f4f6;
+            border: 2px dashed #9ca3af;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .file-input-wrapper.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            color: #6b7280;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .progress.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: #e5e7eb;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .status {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .results {
+            background: #f3f4f6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results.success {
+            background: #ecfdf5;
+            border: 2px solid #86efac;
+        }
+
+        .results.error {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .sample-format {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ Admin Panel</h1>
+        <div class="version">Charity Tracker v1.0.2</div>
+
+        <div class="warning">
+            <p>⚠️ Admin Access Only</p>
+            <p style="color: #7f1d1d; font-size: 0.85rem; font-weight: normal;">
+                This page allows bulk importing of charity data. Use with caution.
+            </p>
+        </div>
+
+        <div class="section">
+            <div class="form-group">
+                <label for="adminToken">Admin Token</label>
+                <input type="password" id="adminToken" placeholder="Enter admin token" value="admin-secret-2024">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Import Charities</h2>
+            <p style="color: #6b7280; margin-bottom: 1rem;">
+                Upload a CSV file with charity data to bulk import into the database.
+            </p>
+
+            <div class="form-group">
+                <label>Select CSV File</label>
+                <div class="file-input-wrapper" id="dropZone">
+                    <input type="file" id="csvFile" accept=".csv">
+                    <p style="font-size: 1.25rem; margin-bottom: 0.5rem;">📁</p>
+                    <p style="color: #333; font-weight: 500;">Drop CSV file here or click to browse</p>
+                    <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Maximum file size: 10MB</p>
+                </div>
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+
+            <details style="margin-bottom: 1.5rem;">
+                <summary style="cursor: pointer; color: #667eea; font-weight: 500;">CSV Format Requirements</summary>
+                <div class="sample-format">
+                    <strong>Required columns:</strong><br>
+                    name,ein,category,website,description<br><br>
+                    <strong>Example:</strong><br>
+                    "Red Cross","530196605","Health","https://redcross.org","Humanitarian organization"<br>
+                    "United Way","131635294","Human Services","https://unitedway.org","Community support"
+                </div>
+            </details>
+
+            <button class="btn-primary" id="importBtn" disabled>Import Charities</button>
+        </div>
+
+        <div class="progress" id="progress">
+            <h3 style="margin-bottom: 0.5rem;">Import Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <p class="status" id="status">Preparing import...</p>
+        </div>
+
+        <div class="results" id="results">
+            <h3 style="margin-bottom: 0.5rem;">Import Results</h3>
+            <div id="resultMessage"></div>
+            <div class="stats" id="stats"></div>
+        </div>
+
+        <a href="/dashboard.html" class="back-link">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('csvFile');
+        const fileInfo = document.getElementById('fileInfo');
+        const importBtn = document.getElementById('importBtn');
+        const adminToken = document.getElementById('adminToken');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');
+        const status = document.getElementById('status');
+        const results = document.getElementById('results');
+        const resultMessage = document.getElementById('resultMessage');
+        const stats = document.getElementById('stats');
+
+        let csvData = null;
+
+        // File drop handling
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Please select a CSV file');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB');
+                return;
+            }
+
+            fileInfo.innerHTML = `Selected: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(2)} KB)`;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                csvData = parseCSV(e.target.result);
+                if (csvData.length > 0) {
+                    importBtn.disabled = false;
+                    fileInfo.innerHTML += ` - ${csvData.length} records found`;
+                } else {
+                    alert('No valid data found in CSV');
+                    importBtn.disabled = true;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/['"]/g, ''));
+            const nameIdx = headers.indexOf('name');
+            const einIdx = headers.indexOf('ein');
+            const categoryIdx = headers.indexOf('category') >= 0 ? headers.indexOf('category') : -1;
+            const websiteIdx = headers.indexOf('website') >= 0 ? headers.indexOf('website') : -1;
+            const descriptionIdx = headers.indexOf('description') >= 0 ? headers.indexOf('description') : -1;
+
+            // Also check for IRS file format
+            const irsNameIdx = headers.indexOf('name');
+            const irsEinIdx = headers.indexOf('ein');
+            const irsStateIdx = headers.indexOf('state');
+            const irsCityIdx = headers.indexOf('city');
+            const irsStreetIdx = headers.indexOf('street');
+            const irsNteeIdx = headers.indexOf('ntee_cd');
+
+            if (nameIdx < 0 || einIdx < 0) return [];
+
+            const charities = [];
+            for (let i = 1; i < lines.length && i <= 500; i++) { // Limit to 500
+                const values = parseCSVLine(lines[i]);
+
+                if (values.length > einIdx && values[nameIdx] && values[einIdx]) {
+                    const charity = {
+                        name: cleanValue(values[nameIdx]),
+                        ein: cleanValue(values[einIdx]),
+                        category: categoryIdx >= 0 ? cleanValue(values[categoryIdx]) : getCategoryFromNTEE(values[irsNteeIdx]),
+                        website: websiteIdx >= 0 ? cleanValue(values[websiteIdx]) : '',
+                        description: ''
+                    };
+
+                    // Build description if not provided
+                    if (descriptionIdx >= 0) {
+                        charity.description = cleanValue(values[descriptionIdx]);
+                    } else if (irsStateIdx >= 0 && irsCityIdx >= 0) {
+                        const location = `${cleanValue(values[irsCityIdx])}, ${cleanValue(values[irsStateIdx])}`;
+                        charity.description = `${charity.category} organization based in ${location}`;
+                    }
+
+                    charities.push(charity);
+                }
+            }
+
+            return charities;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current);
+            return result;
+        }
+
+        function cleanValue(value) {
+            if (!value) return '';
+            return value.trim().replace(/^["']|["']$/g, '').substring(0, 200);
+        }
+
+        function getCategoryFromNTEE(code) {
+            if (!code) return 'Other';
+            const firstChar = code[0].toUpperCase();
+            const categories = {
+                'A': 'Arts & Culture',
+                'B': 'Education',
+                'C': 'Environment',
+                'D': 'Health',
+                'E': 'Health',
+                'F': 'Health',
+                'G': 'Health',
+                'H': 'Health',
+                'I': 'Human Services',
+                'J': 'Human Services',
+                'K': 'Human Services',
+                'L': 'Human Services',
+                'M': 'Human Services',
+                'N': 'Human Services',
+                'O': 'Human Services',
+                'P': 'Human Services',
+                'Q': 'International',
+                'X': 'Religion'
+            };
+            return categories[firstChar] || 'Other';
+        }
+
+        importBtn.addEventListener('click', async () => {
+            if (!csvData || csvData.length === 0) {
+                alert('No data to import');
+                return;
+            }
+
+            if (!adminToken.value) {
+                alert('Please enter admin token');
+                return;
+            }
+
+            importBtn.disabled = true;
+            progress.classList.add('active');
+            results.classList.remove('active');
+
+            // Reset progress
+            progressFill.style.width = '0%';
+            status.textContent = 'Starting import...';
+
+            try {
+                // Simulate progress updates
+                progressFill.style.width = '20%';
+                status.textContent = `Importing ${csvData.length} charities...`;
+
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:5173/api/admin/import-charities'
+                    : '/api/admin/import-charities';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminToken.value}`
+                    },
+                    body: JSON.stringify({ charities: csvData })
+                });
+
+                progressFill.style.width = '80%';
+                status.textContent = 'Processing response...';
+
+                const data = await response.json();
+
+                progressFill.style.width = '100%';
+                status.textContent = 'Import complete!';
+
+                // Show results
+                setTimeout(() => {
+                    progress.classList.remove('active');
+                    results.classList.add('active');
+
+                    if (data.success) {
+                        results.classList.add('success');
+                        results.classList.remove('error');
+                        resultMessage.innerHTML = `<p style="color: #14532d; font-weight: 600;">✅ ${data.message}</p>`;
+
+                        if (data.stats) {
+                            stats.innerHTML = `
+                                <div class="stat-item">
+                                    <div class="stat-label">Total Processed</div>
+                                    <div class="stat-value">${data.stats.total || 0}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Successful</div>
+                                    <div class="stat-value" style="color: #16a34a;">${data.stats.successful || 0}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Failed</div>
+                                    <div class="stat-value" style="color: #dc2626;">${data.stats.failed || 0}</div>
+                                </div>
+                            `;
+
+                            if (data.stats.errors && data.stats.errors.length > 0) {
+                                stats.innerHTML += `
+                                    <div style="grid-column: 1/-1; margin-top: 1rem;">
+                                        <strong>Errors:</strong>
+                                        <ul style="margin-top: 0.5rem; color: #dc2626;">
+                                            ${data.stats.errors.map(e => `<li>${e}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                `;
+                            }
+                        }
+                    } else {
+                        results.classList.add('error');
+                        results.classList.remove('success');
+                        resultMessage.innerHTML = `<p style="color: #991b1b; font-weight: 600;">❌ Import failed: ${data.error}</p>`;
+                    }
+                }, 500);
+
+            } catch (error) {
+                progress.classList.remove('active');
+                results.classList.add('active', 'error');
+                resultMessage.innerHTML = `<p style="color: #991b1b; font-weight: 600;">❌ Error: ${error.message}</p>`;
+            } finally {
+                importBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
