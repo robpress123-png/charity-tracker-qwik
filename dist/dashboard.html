@@ -503,7 +503,7 @@
         <div id="dashboardSection" class="section-content">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Total Donations</div>
+                    <div class="stat-label" id="totalDonationsLabel">Total Donations (2025)</div>
                     <div class="stat-value" id="totalDonations">$0</div>
                 </div>
                 <div class="stat-card">
@@ -511,8 +511,8 @@
                     <div class="stat-value" id="charityCount">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">This Year</div>
-                    <div class="stat-value" id="yearTotal">$0</div>
+                    <div class="stat-label" id="taxSavingsLabel">Est. Tax Savings (2025)</div>
+                    <div class="stat-value" id="taxSavings">$0</div>
                 </div>
             </div>
 
@@ -1302,17 +1302,54 @@
 
         // Load statistics
         async function loadStats() {
+            const year = document.getElementById('globalYearFilter')?.value || '2025';
+
+            // Update labels with selected year
+            if (year === 'all') {
+                document.getElementById('totalDonationsLabel').textContent = 'Total Donations (All Years)';
+                document.getElementById('taxSavingsLabel').textContent = 'Est. Tax Savings (All Years)';
+            } else {
+                document.getElementById('totalDonationsLabel').textContent = `Total Donations (${year})`;
+                document.getElementById('taxSavingsLabel').textContent = `Est. Tax Savings (${year})`;
+            }
+
             try {
-                const response = await fetch('/api/donations/stats');
+                // Fetch donations for the selected year
+                let url = '/api/donations?limit=10000';
+                if (year && year !== 'all') {
+                    url += `&year=${year}`;
+                }
+
+                const response = await fetch(url);
                 const data = await response.json();
 
-                if (data.success && data.stats) {
-                    document.getElementById('totalDonations').textContent = `$${parseFloat(data.stats.total_donations || 0).toFixed(0)}`;
-                    document.getElementById('charityCount').textContent = data.stats.charity_count || '0';
-                    document.getElementById('yearTotal').textContent = `$${parseFloat(data.stats.year_total || 0).toFixed(0)}`;
+                if (data.success && data.donations) {
+                    // Calculate totals from donations
+                    const totalAmount = data.donations.reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
+
+                    // Count unique charities
+                    const uniqueCharities = new Set(data.donations.map(d => d.charity_id)).size;
+
+                    // Calculate tax savings based on current tax rate
+                    const taxRate = currentTaxRate || 0.22;
+                    const estimatedSavings = totalAmount * taxRate;
+
+                    // Update display
+                    document.getElementById('totalDonations').textContent = `$${totalAmount.toFixed(0)}`;
+                    document.getElementById('charityCount').textContent = uniqueCharities.toString();
+                    document.getElementById('taxSavings').textContent = `$${estimatedSavings.toFixed(0)}`;
+                } else {
+                    // No donations, show zeros
+                    document.getElementById('totalDonations').textContent = '$0';
+                    document.getElementById('charityCount').textContent = '0';
+                    document.getElementById('taxSavings').textContent = '$0';
                 }
             } catch (error) {
                 console.error('Failed to load stats:', error);
+                // Show zeros on error
+                document.getElementById('totalDonations').textContent = '$0';
+                document.getElementById('charityCount').textContent = '0';
+                document.getElementById('taxSavings').textContent = '$0';
             }
         }
 
