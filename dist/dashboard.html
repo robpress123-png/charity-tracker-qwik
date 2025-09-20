@@ -693,12 +693,43 @@
                 <!-- Item donation fields -->
                 <div id="itemFields" class="donation-type-fields" style="display:none;">
                     <div class="form-group">
-                        <label for="itemDescription">Item Description</label>
-                        <textarea id="itemDescription" rows="2" placeholder="Describe the donated items"></textarea>
+                        <label for="itemCategory">Item Category</label>
+                        <select id="itemCategory" onchange="updateItemsList()">
+                            <option value="">Select Category</option>
+                            <option value="clothing">Clothing & Accessories</option>
+                            <option value="household">Household Goods</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="books">Books & Media</option>
+                            <option value="toys">Toys & Games</option>
+                            <option value="sports">Sports Equipment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="itemsListGroup" style="display:none;">
+                        <label>Quick Add Common Items</label>
+                        <select id="itemsList" multiple size="4" style="width:100%">
+                        </select>
+                        <small>Click items to add them</small>
                     </div>
                     <div class="form-group">
-                        <label for="estimatedValue">Estimated Value</label>
-                        <input type="number" id="estimatedValue" step="0.01" min="0">
+                        <label>Selected Items</label>
+                        <div id="selectedItemsList" style="max-height:120px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:0.5rem;background:#f9fafb;">
+                            <div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Add Custom Item</label>
+                        <div style="display:flex;gap:0.5rem;">
+                            <input type="text" id="customItemName" placeholder="Item name" style="flex:1;">
+                            <input type="number" id="customItemValue" placeholder="Value" step="0.01" style="width:100px;">
+                            <button type="button" onclick="addCustomItem()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;">Add</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="estimatedValue">Total Value</label>
+                        <input type="number" id="estimatedValue" step="0.01" min="0" readonly style="background:#f9fafb;">
+                        <input type="hidden" id="itemDescription">
                     </div>
                 </div>
                 <!-- Mileage donation fields -->
@@ -1401,6 +1432,161 @@
                 default:
                     return 'Cash donation';
             }
+        }
+
+        // Item donation management
+        let selectedItems = [];
+
+        const itemDatabase = {
+            clothing: [
+                {name: "Men's Suit", value: 60},
+                {name: "Women's Dress", value: 40},
+                {name: "Children's Clothing", value: 15},
+                {name: "Shoes (pair)", value: 25},
+                {name: "Winter Coat", value: 85},
+                {name: "Jeans", value: 20}
+            ],
+            household: [
+                {name: "Kitchen Appliances", value: 50},
+                {name: "Dishes/Utensils Set", value: 30},
+                {name: "Bedding Set", value: 40},
+                {name: "Towels", value: 15},
+                {name: "Small Appliances", value: 35}
+            ],
+            electronics: [
+                {name: "Computer/Laptop", value: 200},
+                {name: "Television", value: 150},
+                {name: "Smartphone", value: 100},
+                {name: "Tablet", value: 75},
+                {name: "Printer", value: 50}
+            ],
+            furniture: [
+                {name: "Sofa", value: 300},
+                {name: "Dining Table", value: 250},
+                {name: "Office Chair", value: 100},
+                {name: "Dresser", value: 150},
+                {name: "Bookshelf", value: 75}
+            ],
+            books: [
+                {name: "Hardcover Books", value: 5},
+                {name: "Paperback Books", value: 3},
+                {name: "Textbooks", value: 15},
+                {name: "DVDs/CDs", value: 2}
+            ],
+            toys: [
+                {name: "Board Games", value: 10},
+                {name: "Stuffed Animals", value: 5},
+                {name: "Building Sets", value: 20},
+                {name: "Dolls", value: 15}
+            ],
+            sports: [
+                {name: "Bicycle", value: 75},
+                {name: "Golf Clubs", value: 150},
+                {name: "Exercise Equipment", value: 100},
+                {name: "Sports Gear", value: 30}
+            ]
+        };
+
+        function updateItemsList() {
+            const category = document.getElementById('itemCategory').value;
+            const itemsList = document.getElementById('itemsList');
+            const listGroup = document.getElementById('itemsListGroup');
+
+            if (!category) {
+                listGroup.style.display = 'none';
+                return;
+            }
+
+            const items = itemDatabase[category] || [];
+            itemsList.innerHTML = '';
+
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = JSON.stringify(item);
+                option.textContent = `${item.name} ($${item.value})`;
+                itemsList.appendChild(option);
+            });
+
+            listGroup.style.display = 'block';
+        }
+
+        function addSelectedItems() {
+            const itemsList = document.getElementById('itemsList');
+            const selected = Array.from(itemsList.selectedOptions);
+
+            selected.forEach(option => {
+                const item = JSON.parse(option.value);
+                addItemToList(item.name, item.value);
+                option.selected = false;
+            });
+        }
+
+        document.getElementById('itemsList')?.addEventListener('click', addSelectedItems);
+
+        function addCustomItem() {
+            const name = document.getElementById('customItemName').value.trim();
+            const value = parseFloat(document.getElementById('customItemValue').value);
+
+            if (name && value > 0) {
+                addItemToList(name, value);
+                document.getElementById('customItemName').value = '';
+                document.getElementById('customItemValue').value = '';
+            }
+        }
+
+        function addItemToList(name, value) {
+            const existingItem = selectedItems.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity++;
+                existingItem.totalValue = existingItem.quantity * existingItem.unitValue;
+            } else {
+                selectedItems.push({
+                    name: name,
+                    quantity: 1,
+                    unitValue: value,
+                    totalValue: value
+                });
+            }
+            updateSelectedItemsDisplay();
+        }
+
+        function removeItem(index) {
+            selectedItems.splice(index, 1);
+            updateSelectedItemsDisplay();
+        }
+
+        function updateSelectedItemsDisplay() {
+            const container = document.getElementById('selectedItemsList');
+            const totalValue = document.getElementById('estimatedValue');
+
+            if (selectedItems.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>';
+                totalValue.value = '0.00';
+                document.getElementById('itemDescription').value = '';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            let description = [];
+
+            selectedItems.forEach((item, index) => {
+                html += `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.25rem;border-bottom:1px solid #e5e7eb;">
+                        <span>${item.name} ${item.quantity > 1 ? `(x${item.quantity})` : ''}</span>
+                        <div>
+                            <span style="color:#667eea;">$${item.totalValue.toFixed(2)}</span>
+                            <button type="button" onclick="removeItem(${index})" style="margin-left:0.5rem;color:#ef4444;cursor:pointer;">×</button>
+                        </div>
+                    </div>
+                `;
+                total += item.totalValue;
+                description.push(`${item.name}${item.quantity > 1 ? ` (x${item.quantity})` : ''}`);
+            });
+
+            container.innerHTML = html;
+            totalValue.value = total.toFixed(2);
+            document.getElementById('itemDescription').value = description.join(', ');
         }
 
         // Helper function to handle donation type changes
