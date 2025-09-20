@@ -10,24 +10,46 @@ export async function onRequestPost(context) {
     const body = await request.json();
     const { email, password } = body;
 
-    // For now, use test credentials
-    // Later, this will check against D1 database
-    if (email === 'test@example.com' && password === 'password123') {
-      return new Response(JSON.stringify({
-        success: true,
-        user: {
-          id: '1',
-          email: 'test@example.com',
-          name: 'Test User',
-          plan: 'free'
-        },
-        token: 'test-token-123'
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+    // Check if D1 database is available
+    if (env.DB) {
+      // Query the database for the user
+      const result = await env.DB.prepare(
+        'SELECT id, email, name, plan FROM users WHERE email = ? AND password = ?'
+      )
+        .bind(email, password)
+        .first();
+
+      if (result) {
+        return new Response(JSON.stringify({
+          success: true,
+          user: result,
+          token: `token-${result.id}-${Date.now()}`
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+    } else {
+      // Fallback for local testing without D1
+      if (email === 'test@example.com' && password === 'password123') {
+        return new Response(JSON.stringify({
+          success: true,
+          user: {
+            id: '1',
+            email: 'test@example.com',
+            name: 'Test User',
+            plan: 'free'
+          },
+          token: 'test-token-123'
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
     }
 
     return new Response(JSON.stringify({
@@ -43,7 +65,7 @@ export async function onRequestPost(context) {
   } catch (error) {
     return new Response(JSON.stringify({
       success: false,
-      error: 'Server error'
+      error: 'Server error: ' + error.message
     }), {
       status: 500,
       headers: {
