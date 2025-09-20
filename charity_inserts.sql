@@ -1,5 +1,5 @@
--- Insert top 500 charities from IRS data
--- These are public charities available to all users
+-- Insert top 500 501(c)(3) charities from IRS data
+-- These are public 501(c)(3) charities available to all users
 
 -- First, get the test user ID
 INSERT OR IGNORE INTO users (email, password, name, plan) VALUES ('test@example.com', 'password123', 'Test User', 'free');
@@ -42,9 +42,6 @@ SELECT id, 'DIGNITY HEALTH', '941196203', 'Health', '', 'Health organization wit
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TRUSTEES OF THE UNIVERSITY OF PENNSYLVANIA', '231352685', 'Education', '', 'Education organization with annual revenue of approximately $10747M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'THRIVENT FINANCIAL FOR LUTHERANS', '390123480', 'Other', '', 'Other organization with annual revenue of approximately $10636M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'JOHNS HOPKINS UNIVERSITY', '520595110', 'Education', '', 'Education organization with annual revenue of approximately $10496M'
@@ -149,12 +146,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'UCARE MINNESOTA', '363573805', 'Health', '', 'Health organization with annual revenue of approximately $6156M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'DELTA DENTAL OF CALIFORNIA', '941461312', 'Health', '', 'Health organization with annual revenue of approximately $6137M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HEALTHFIRST HEALTH PLAN INC', '113029569', 'Other', '', 'Other organization with annual revenue of approximately $5911M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF ROCHESTER', '160743209', 'Education', '', 'Education organization with annual revenue of approximately $5909M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -173,9 +164,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'SANFORD', '453791176', 'Other', '', 'Other organization with annual revenue of approximately $5738M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'GOVERNMENT EMPLOYEES HEALTH ASSOCIATION INC', '440545275', 'Other', '', 'Other organization with annual revenue of approximately $5736M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'INOVA HEALTH CARE SERVICES', '540620889', 'Health', '', 'Health organization with annual revenue of approximately $5667M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -188,16 +176,10 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'PROVIDENCE HEALTH & SERVICES OREGON', '510216587', 'Health', '', 'Health organization with annual revenue of approximately $5465M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PRIORITY HEALTH', '382715520', 'Other', '', 'Other organization with annual revenue of approximately $5417M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'ALLINA HEALTH SYSTEM', '363261413', 'Health', '', 'Health organization with annual revenue of approximately $5383M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'OCHSNER CLINIC FOUNDATION', '720502505', 'Health', '', 'Health organization with annual revenue of approximately $5368M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HEALTH INSURANCE PLAN OF GREATER NEW YORK', '131828429', 'Health', '', 'Health organization with annual revenue of approximately $5316M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY HOSPITALS HEALTH SYSTEM INC', '900059117', 'Health', '', 'Health organization with annual revenue of approximately $5286M'
@@ -236,9 +218,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'ECMC GROUP INC', '411991995', 'Education', '', 'Education organization with annual revenue of approximately $5041M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'CENTRAL STATES SOUTHEAST & SOUTHWEST AREAS HEALTH & WELFARE F', '362154936', 'Other', '', 'Other organization with annual revenue of approximately $5014M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SCAN HEALTH PLAN', '953858259', 'Health', '', 'Health organization with annual revenue of approximately $4939M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -263,12 +242,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'SUTTER VALLEY HOSPITALS', '941156621', 'Health', '', 'Health organization with annual revenue of approximately $4658M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'SELECTHEALTH INC', '870409820', 'Health', '', 'Health organization with annual revenue of approximately $4594M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'ASTRAZENECA PATIENT ASSISTANCE ORGANIZATION', '562591004', 'Health', '', 'Health organization with annual revenue of approximately $4586M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'YALE NEW HAVEN HOSPITAL', '060646652', 'Health', '', 'Health organization with annual revenue of approximately $4571M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -276,9 +249,6 @@ SELECT id, 'MULTICARE HEALTH SYSTEM', '911352172', 'Health', '', 'Health organiz
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'HENRY FORD HEALTH SYSTEM', '381357020', 'Health', '', 'Health organization with annual revenue of approximately $4495M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'BLUE CARE NETWORK OF MICHIGAN', '382359234', 'Health', '', 'Health organization with annual revenue of approximately $4483M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'DUKE UNIVERSITY', '560532129', 'Education', '', 'Education organization with annual revenue of approximately $4479M'
@@ -359,9 +329,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'FRANCISCAN ALLIANCE INC', '351330472', 'Health', '', 'Health organization with annual revenue of approximately $3539M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'WALMART INC ASSOCIATES HEALTH AND WELFARE PLAN', '710569421', 'Other', '', 'Other organization with annual revenue of approximately $3525M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SUTTER BAY MEDICAL FOUNDATION', '941156581', 'Health', '', 'Health organization with annual revenue of approximately $3512M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -386,9 +353,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'HEALTH SHARE OF OREGON', '455093195', 'Health', '', 'Health organization with annual revenue of approximately $3361M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HEALTHPARTNERS INC', '411693838', 'Other', '', 'Other organization with annual revenue of approximately $3345M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF NOTRE DAME DU LAC', '350868188', 'Education', '', 'Education organization with annual revenue of approximately $3322M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -396,9 +360,6 @@ SELECT id, 'ASCENSION SETON', '741109643', 'Other', '', 'Other organization with
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CATHOLIC HEALTH INITIATIVES COLORADO', '840405257', 'Health', '', 'Health organization with annual revenue of approximately $3295M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HMO MINNESOTA', '416173747', 'Other', '', 'Other organization with annual revenue of approximately $3285M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TRINITY HEALTH-MICHIGAN', '382113393', 'Health', '', 'Health organization with annual revenue of approximately $3277M'
@@ -414,9 +375,6 @@ SELECT id, 'PRISMA HEALTH - UPSTATE', '811723202', 'Health', '', 'Health organiz
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'LEHIGH VALLEY HOSPITAL', '231689692', 'Health', '', 'Health organization with annual revenue of approximately $3224M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'GEISINGER HEALTH PLAN', '232311553', 'Other', '', 'Other organization with annual revenue of approximately $3214M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF CHICAGO MEDICAL CENTER', '363488183', 'Health', '', 'Health organization with annual revenue of approximately $3211M'
@@ -458,9 +416,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'ALBANY MEDICAL CENTER GROUP ORGANIZATION', '473869194', 'Other', '', 'Other organization with annual revenue of approximately $3043M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MVP HEALTH PLAN INC', '141640868', 'Other', '', 'Other organization with annual revenue of approximately $3039M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SWEDISH HEALTH SERVICES', '910433740', 'Health', '', 'Health organization with annual revenue of approximately $3005M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -494,15 +449,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'MILTONS S HERSHEY MEDICAL CENTER', '251854772', 'Health', '', 'Health organization with annual revenue of approximately $2851M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'NOVO HOLDINGS A-S', '980571483', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2825M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'BOEING COMPANY VEBA MASTER TRUST', '113601529', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2823M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'BANKAMERICA GROUP BENEFITS PROGRAM TR', '957055654', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2819M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'LUCILE SALTER PACKARD CHILDRENS HOSPITAL AT STANFORD', '770003859', 'Health', '', 'Health organization with annual revenue of approximately $2778M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -516,9 +462,6 @@ SELECT id, 'ST LUKES REGIONAL MEDICAL CENTER', '820161600', 'Health', '', 'Healt
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'FRESNO COMMUNITY HOSPITAL AND MEDICAL CENTER', '941156276', 'Health', '', 'Health organization with annual revenue of approximately $2742M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'TUFTS ASSOCIATED HEALTH MAINTENANCE ORGANIZATION INC', '042674079', 'Other', '', 'Other organization with annual revenue of approximately $2738M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF BRITISH COLUMBIA', '986001255', 'Education', '', 'Education organization with annual revenue of approximately $2716M'
@@ -554,16 +497,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'GAVI ALLIANCE', '980593375', 'International', '', 'International organization with annual revenue of approximately $2630M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'STATE CHARTERED CREDIT UNIONS INC', '560475645', 'Other', '', 'Other organization with annual revenue of approximately $2616M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BOSTON MEDICAL CENTER CORPORATION', '043314093', 'Health', '', 'Health organization with annual revenue of approximately $2600M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PRAIRIE MEADOWS RACE TRACK & CASINO INC', '421244913', 'Other', '', 'Other organization with annual revenue of approximately $2595M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'UAW RETIREE MEDICAL BENEFITS TR', '900424876', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2584M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'VANDERBILT UNIVERSITY', '620476822', 'Education', '', 'Education organization with annual revenue of approximately $2567M'
@@ -581,19 +515,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'CARESOURCE', '311703368', 'Health', '', 'Health organization with annual revenue of approximately $2546M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'WELLS FARGO & COMPANY EMPLOYEE BENEFIT TRUST', '411340042', 'Other', '', 'Other organization with annual revenue of approximately $2546M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HEALTH PARTNERS PLANS INC', '232379751', 'Other', '', 'Other organization with annual revenue of approximately $2533M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'AT&T VEBA TRUST', '431491162', 'Other', '', 'Other organization with annual revenue of approximately $2486M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CAREOREGON INC', '930933975', 'Health', '', 'Health organization with annual revenue of approximately $2483M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'TUFTS HEALTH PUBLIC PLANS INC', '800721489', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2470M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'NORTHWELL HEALTHCARE INC', '112965586', 'Health', '', 'Health organization with annual revenue of approximately $2459M'
@@ -602,16 +524,10 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'THE CHICAGO COMMUNITY TRUST', '362167000', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2455M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PROVIDENCE HEALTH PLAN', '930863097', 'Other', '', 'Other organization with annual revenue of approximately $2454M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'NATIONAL CHRISTIAN CHARITABLE FOUNDATION INC', '581493949', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2442M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CHILDRENS HEALTH SYSTEM OF TEXAS', '750800628', 'Health', '', 'Health organization with annual revenue of approximately $2436M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'JPMORGAN CHASE VEBA TRUST FOR ACTIVE EMPLOYEES', '133093382', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2419M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'KAISER FOUNDATION HEALTH PLAN OF GEORGIA INC', '581592076', 'Health', '', 'Health organization with annual revenue of approximately $2416M'
@@ -680,9 +596,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'COOK CHILDRENS MEDICAL CENTER', '752051646', 'Health', '', 'Health organization with annual revenue of approximately $2221M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, '1199 NATIONAL BENEFIT FUND FOR HOSPITAL & HUMAN SERVICE EMPLOYEES', '131628401', 'Human Services', '', 'Human Services organization with annual revenue of approximately $2193M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'COMMUNITY HEALTH NETWORK INC', '350983617', 'Health', '', 'Health organization with annual revenue of approximately $2181M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -746,9 +659,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'BON SECOURS RICHMOND HEALTH SYSTEM', '521988421', 'Health', '', 'Health organization with annual revenue of approximately $2045M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'CAPITAL DISTRICT PHYSICIANS HEALTH PLAN INC', '141641028', 'Other', '', 'Other organization with annual revenue of approximately $2035M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'FRED HUTCHINSON CANCER CENTER', '911935159', 'Health', '', 'Health organization with annual revenue of approximately $2027M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -756,9 +666,6 @@ SELECT id, 'SUTTER VALLEY MEDICAL FOUNDATION', '680273974', 'Health', '', 'Healt
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'ST JUDE CHILDRENS RESEARCH HOSPITAL INC', '620646012', 'Health', '', 'Health organization with annual revenue of approximately $2009M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'NATIONAL RURAL UTILITIES COOPERATIVE FINANCE CORP', '520891669', 'Other', '', 'Other organization with annual revenue of approximately $2006M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CARNEGIE MELLON UNIVERSITY', '250969449', 'Other', '', 'Other organization with annual revenue of approximately $2003M'
@@ -774,9 +681,6 @@ SELECT id, 'BAYLOR UNIVERSITY MEDICAL CENTER', '751837454', 'Health', '', 'Healt
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CARILION MEDICAL CENTER', '540506332', 'Health', '', 'Health organization with annual revenue of approximately $1983M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MODERN WOODMEN OF AMERICA', '361493430', 'Other', '', 'Other organization with annual revenue of approximately $1973M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BANNER UNIVERSITY FAMILY CARE', '463766901', 'Other', '', 'Other organization with annual revenue of approximately $1971M'
@@ -801,12 +705,6 @@ SELECT id, 'ST ELIZABETH MEDICAL CENTER INC', '610445850', 'Health', '', 'Health
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'GEORGE WASHINGTON UNIVERSITY', '530196584', 'Education', '', 'Education organization with annual revenue of approximately $1912M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MDWISE MEDICAID NETWORK INC', '473192307', 'Health', '', 'Health organization with annual revenue of approximately $1907M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'COMMUNITY HEALTH CHOICE TEXAS INC', '814077507', 'Other', '', 'Other organization with annual revenue of approximately $1905M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'OUR LADY OF THE LAKE HOSPITAL INC', '720423651', 'Health', '', 'Health organization with annual revenue of approximately $1901M'
@@ -851,25 +749,16 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'LESTER E COX MEDICAL CENTER', '440577118', 'Health', '', 'Health organization with annual revenue of approximately $1830M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PGA TOUR INC', '520999206', 'Other', '', 'Other organization with annual revenue of approximately $1828M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'FRANCISCAN HEALTH SYSTEM', '910564491', 'Health', '', 'Health organization with annual revenue of approximately $1821M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BAYSTATE MEDICAL CENTER INC', '042790311', 'Health', '', 'Health organization with annual revenue of approximately $1815M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MDWISE INC', '351931354', 'Other', '', 'Other organization with annual revenue of approximately $1812M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'LIBERTY UNIVERSITY INC', '540946734', 'Education', '', 'Education organization with annual revenue of approximately $1802M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'THE ADMINISTRATORS OF THE TULANE EDUCATIONAL FUND', '720423889', 'Education', '', 'Education organization with annual revenue of approximately $1798M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'BUILDING SERVICE 32BJ HEALTH FUND', '132928869', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1795M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SCOTT & WHITE MEMORIAL HOSPITAL', '741166904', 'Health', '', 'Health organization with annual revenue of approximately $1794M'
@@ -884,12 +773,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'GOTHIC CORPORATION', '561776668', 'Education', '', 'Education organization with annual revenue of approximately $1766M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MASS GENERAL BRIGHAM HEALTH PLAN INC', '042932021', 'Health', '', 'Health organization with annual revenue of approximately $1763M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MICHIGAN CATASTROPHIC CLAIMS ASSOCIATION U S', '382227794', 'Other', '', 'Other organization with annual revenue of approximately $1760M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'HOWARD HUGHES MEDICAL INSTITUTE', '590735717', 'Health', '', 'Health organization with annual revenue of approximately $1760M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -897,9 +780,6 @@ SELECT id, 'SAINT FRANCIS HOSPITAL INC', '730700090', 'Health', '', 'Health orga
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SHARP HEALTHCARE', '956077327', 'Health', '', 'Health organization with annual revenue of approximately $1758M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'DELTA DENTAL OF WASHINGTON', '910621480', 'Health', '', 'Health organization with annual revenue of approximately $1755M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'FALLON COMMUNITY HEALTH PLAN INC', '237442369', 'Health', '', 'Health organization with annual revenue of approximately $1751M'
@@ -918,9 +798,6 @@ SELECT id, 'MAIN LINE HOSPITALS INC', '231352160', 'Health', '', 'Health organiz
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'GEISINGER CLINIC', '236291113', 'Health', '', 'Health organization with annual revenue of approximately $1746M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'AARP', '951985500', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1741M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'RADY CHILDRENS HOSPITAL-SAN DIEGO', '951691313', 'Health', '', 'Health organization with annual revenue of approximately $1741M'
@@ -986,9 +863,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'BOSTON COLLEGE TRUSTEES', '042103545', 'Education', '', 'Education organization with annual revenue of approximately $1638M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'SCOTT AND WHITE HEALTH PLAN', '742052197', 'Other', '', 'Other organization with annual revenue of approximately $1632M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'ST LUKES ROOSEVELT HOSPITAL CENTER', '132997301', 'Health', '', 'Health organization with annual revenue of approximately $1628M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -1005,12 +879,6 @@ SELECT id, 'MAIMONIDES MEDICAL CENTER-', '111635081', 'Health', '', 'Health orga
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'LOMA LINDA MERCANTILE', '953858272', 'Health', '', 'Health organization with annual revenue of approximately $1622M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'HEALTH ALLIANCE PLAN OF MICHIGAN', '382242827', 'Health', '', 'Health organization with annual revenue of approximately $1621M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'RAILROAD EMPLOYEES NATIONAL HEALTH AND WELFARE PLAN TRUST', '521118310', 'Other', '', 'Other organization with annual revenue of approximately $1620M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'THOMAS JEFFERSON UNIVERSITY', '231352651', 'Education', '', 'Education organization with annual revenue of approximately $1613M'
@@ -1031,13 +899,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'CASE WESTERN RESERVE UNIVERSITY', '341018992', 'Education', '', 'Education organization with annual revenue of approximately $1607M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'FINANCIAL INDUSTRY REGULATORY AUTHORITY INC', '530088710', 'Other', '', 'Other organization with annual revenue of approximately $1604M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TEMPLE UNIVERSITY-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUC', '231365971', 'Education', '', 'Education organization with annual revenue of approximately $1604M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'INDEPENDENT HEALTH ASSOCIATION INC', '161080163', 'Health', '', 'Health organization with annual revenue of approximately $1600M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SILICON VALLEY COMMUNITY FOUNDATION', '205205488', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1598M'
@@ -1094,9 +956,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'ANN & ROBERT H LURIE CHILDRENS HOSPITAL OF CHICAGO', '362170833', 'Health', '', 'Health organization with annual revenue of approximately $1526M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'CONFERENCE ON JEWISH MATERIAL CLAIMS AGAINST GERMANY', '131677841', 'Other', '', 'Other organization with annual revenue of approximately $1523M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'READING HOSPITAL', '231352204', 'Health', '', 'Health organization with annual revenue of approximately $1521M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -1116,9 +975,6 @@ SELECT id, 'ST JOSEPH HEALTH NORTHERN CALIFORNIA LLC', '814791043', 'Health', ''
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY HEALTH SYSTEM INC', '311626179', 'Health', '', 'Health organization with annual revenue of approximately $1498M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'CENTRAL ELECTRIC POWER COOPERATIVE INC', '570299350', 'Other', '', 'Other organization with annual revenue of approximately $1494M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'NATURE CONSERVANCY', '530242652', 'Other', '', 'Other organization with annual revenue of approximately $1482M'
@@ -1148,12 +1004,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'RENAISSANCE CHARITABLE FOUNDATION INC', '352129262', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1459M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'CHP OF WASHINGTON', '911729710', 'Health', '', 'Health organization with annual revenue of approximately $1458M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MEDICA HEALTH PLANS', '411242261', 'Other', '', 'Other organization with annual revenue of approximately $1453M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'THE GOVERNORS OF THE UNIVERSITY OF ALBERTA', '986001254', 'International', '', 'International organization with annual revenue of approximately $1452M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -1164,15 +1014,6 @@ SELECT id, 'FORSYTH MEMORIAL HOSPITAL INC', '560928089', 'Health', '', 'Health o
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF WISCONSIN MEDICAL FOUNDATION INC', '391824445', 'Health', '', 'Health organization with annual revenue of approximately $1439M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'FEDERATION INTERNATIONALE DE FOOTBALL ASSOCIATION', '980132529', 'Other', '', 'Other organization with annual revenue of approximately $1438M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'SECURITY HEALTH PLAN OF WISCONSIN INC', '391572880', 'Other', '', 'Other organization with annual revenue of approximately $1438M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'THE UNIVERSITY OF QUEENSLAND', '980127096', 'Other', '', 'Other organization with annual revenue of approximately $1438M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'MOTHER FRANCES HOSPITAL REGIONAL HEALTH CARE CENTER', '750818167', 'Health', '', 'Health organization with annual revenue of approximately $1435M'
@@ -1200,9 +1041,6 @@ SELECT id, 'DREXEL UNIVERSITY', '231352630', 'Education', '', 'Education organiz
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TRUSTEES OF TUFTS COLLEGE', '042103634', 'Education', '', 'Education organization with annual revenue of approximately $1389M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'TEXAS MUTUAL INSURANCE COMPANY', '742615873', 'Other', '', 'Other organization with annual revenue of approximately $1386M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TEXAS HEALTH RESOURCES', '752702388', 'Health', '', 'Health organization with annual revenue of approximately $1385M'
@@ -1238,13 +1076,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'PROVIDENCE MEDICAL FOUNDATION', '330185031', 'Health', '', 'Health organization with annual revenue of approximately $1350M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PENNSYLVANIA EMPLOYEES BENEFIT', '521588740', 'Other', '', 'Other organization with annual revenue of approximately $1348M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY OF WATERLOO', '980061413', 'Other', '', 'Other organization with annual revenue of approximately $1348M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'UNITE HERE HEALTH', '237385560', 'Other', '', 'Other organization with annual revenue of approximately $1346M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BAPTIST HEALTH OF SOUTH FLORIDA INC', '650267668', 'Health', '', 'Health organization with annual revenue of approximately $1342M'
@@ -1262,9 +1094,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'HEALTHTEXAS PROVIDER NETWORK', '752536818', 'Health', '', 'Health organization with annual revenue of approximately $1324M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'NORTHROP GRUMMAN VEBA MASTER TRUST I', '953386394', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1322M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'AMERICAN ENDOWMENT FOUNDATION', '341747398', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1320M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -1275,9 +1104,6 @@ SELECT id, 'ERLANGER HEALTH', '883616696', 'Health', '', 'Health organization wi
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SCOTT & WHITE CLINIC', '742958277', 'Health', '', 'Health organization with annual revenue of approximately $1310M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MICHIGAN EDUCATION SPECIAL SERVICES ASSOCIATION', '381641634', 'Other', '', 'Other organization with annual revenue of approximately $1309M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BRONSON METHODIST HOSPITAL', '381359087', 'Health', '', 'Health organization with annual revenue of approximately $1307M'
@@ -1304,13 +1130,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'PRIORITY HEALTH CHOICE INC', '320016523', 'Health', '', 'Health organization with annual revenue of approximately $1288M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'AMERICAN POSTAL WORKERS UNION', '520940594', 'Other', '', 'Other organization with annual revenue of approximately $1288M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'DUKE HEALTH INTEGRATED PRACTICE INC', '862109896', 'Other', '', 'Other organization with annual revenue of approximately $1286M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'TEAMSTERS WESTERN REGION AND NEW JERSEY HEALTH CARE FUND', '866052021', 'Other', '', 'Other organization with annual revenue of approximately $1286M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'INDIANA UNIVERSITY HEALTH CARE ASSOCIATES INC', '351747218', 'Health', '', 'Health organization with annual revenue of approximately $1283M'
@@ -1391,22 +1211,7 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'EDWARD W SPARROW HOSPITAL ASSOCIATION', '381360584', 'Health', '', 'Health organization with annual revenue of approximately $1211M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'GENERAL ELECTRIC COMPANY INSURANCE PLAN TRUST CO V A DIAMANTE', '510169382', 'Other', '', 'Other organization with annual revenue of approximately $1210M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'LINE CONSTRUCTION BENEFIT FUND', '366066988', 'Other', '', 'Other organization with annual revenue of approximately $1208M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'STRATACOR', '411852523', 'Other', '', 'Other organization with annual revenue of approximately $1205M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, '130 REGIONAL WATER SYPPLY CORPORATION', '813220497', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1204M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SOUTHCOAST HOSPITALS GROUP INC', '222592333', 'Health', '', 'Health organization with annual revenue of approximately $1203M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'MCLAREN HEALTH PLAN INC', '383252216', 'Health', '', 'Health organization with annual revenue of approximately $1202M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'TEXAS CHRISTIAN UNIVERSITY', '750827465', 'Education', '', 'Education organization with annual revenue of approximately $1198M'
@@ -1418,22 +1223,10 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'FIRST HEALTH OF THE CAROLINAS INC', '561936354', 'Health', '', 'Health organization with annual revenue of approximately $1190M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'DELTA ACCOUNT BASED MEDICAL TR', '753261600', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1190M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'DELTA DENTAL PLAN OF MICHIGAN', '381791480', 'Health', '', 'Health organization with annual revenue of approximately $1188M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'BANK OF AMERICA CHARITABLE GIFT FUND', '046010342', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1188M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CUMBERLAND COUNTY HOSPITAL SYSTEM INC', '560845796', 'Health', '', 'Health organization with annual revenue of approximately $1176M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'KROGER CO HEALTH AND WELFARE BENEFIT TR FOR COLLECTIVELY-BARGAI', '311444123', 'Other', '', 'Other organization with annual revenue of approximately $1174M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'NORTH CAROLINA ELECTRIC MEMBERSHIP CORPORATION', '560995910', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1171M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'GUNDERSEN LUTHERAN ADMINISTRATIVE SERVICES INC', '391606449', 'Health', '', 'Health organization with annual revenue of approximately $1171M'
@@ -1463,12 +1256,6 @@ INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, descript
 SELECT id, 'VALLEY HOSPITAL INC', '221487307', 'Health', '', 'Health organization with annual revenue of approximately $1153M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'ALLIANT CREDIT UNION', '366066772', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1150M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'PARKLAND COMMUNITY HEALTH PLAN INC', '752603847', 'Other', '', 'Other organization with annual revenue of approximately $1149M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'SOUTHERN METHODIST UNIVERSITY', '750800689', 'Education', '', 'Education organization with annual revenue of approximately $1148M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
@@ -1476,9 +1263,6 @@ SELECT id, 'SALEM HEALTH', '930579722', 'Health', '', 'Health organization with 
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'KETTERING COLLEGE', '310621866', 'Health', '', 'Health organization with annual revenue of approximately $1140M'
-FROM users WHERE email = 'test@example.com';
-INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
-SELECT id, 'WOODMEN OF THE WORLD LIFE INSURANCE SOCIETY', '470339250', 'Other', '', 'Other organization with annual revenue of approximately $1140M'
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'CHILDRENS HEALTH CARE', '411754276', 'Health', '', 'Health organization with annual revenue of approximately $1138M'
@@ -1503,6 +1287,222 @@ SELECT id, 'INSPIRA MEDICAL CENTERS INC', '210634484', 'Health', '', 'Health org
 FROM users WHERE email = 'test@example.com';
 INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, 'UNIVERSITY COMMUNITY HOSPITAL INC', '591113901', 'Health', '', 'Health organization with annual revenue of approximately $1132M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'WORLD FEDERATION OF HEMOPHILIA USA', '161513923', 'Health', '', 'Health organization with annual revenue of approximately $1131M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'CENTRA HEALTH INC', '540715569', 'Health', '', 'Health organization with annual revenue of approximately $1131M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'INTERMOUNTAIN FRONT RANGE INC', '841103606', 'Health', '', 'Health organization with annual revenue of approximately $1130M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'OHIO STATE UNIVERSITY PHYSICIANS INC', '311447726', 'Education', '', 'Education organization with annual revenue of approximately $1128M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'FORDHAM UNIVERSITY', '131740451', 'Education', '', 'Education organization with annual revenue of approximately $1124M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MCMASTER UNIVERSITY ONTARIO', '237213309', 'Other', '', 'Other organization with annual revenue of approximately $1123M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'CAPE COD HEALTHCARE INC', '900054984', 'Health', '', 'Health organization with annual revenue of approximately $1117M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'COMMONWEALTH SCIENTIFIC AND INDUSTRIAL RESEARCH ORGANIZATION', '980119947', 'Other', '', 'Other organization with annual revenue of approximately $1114M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'BROOKDALE HOSPITAL MEDICAL CENTER', '111631746', 'Health', '', 'Health organization with annual revenue of approximately $1111M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'EASTERN MAINE HEALTHCARE SYSTEMS', '010211501', 'Health', '', 'Health organization with annual revenue of approximately $1111M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'PARKVIEW HEALTH SYSTEM INC', '351972384', 'Health', '', 'Health organization with annual revenue of approximately $1111M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'DRISCOLL CHILDRENS HOSPITAL', '742577746', 'Health', '', 'Health organization with annual revenue of approximately $1108M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'PHYSICIAN AFFILIATE GROUP OF NEW YORK PC', '900603487', 'Health', '', 'Health organization with annual revenue of approximately $1104M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'YALE NEW HAVEN HEALTH SERVICES CORPORATION', '222529464', 'Health', '', 'Health organization with annual revenue of approximately $1102M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'NCF CHARITABLE TRUST', '204326440', 'Religion', '', 'Religion organization with annual revenue of approximately $1102M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'METHODIST HOSPITAL', '571201170', 'Health', '', 'Health organization with annual revenue of approximately $1100M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ALASKA NATIVE TRIBAL HEALTH CONSORTIUM', '920162721', 'Health', '', 'Health organization with annual revenue of approximately $1092M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'EDUCATIONAL TESTING SERVICE', '210634479', 'Education', '', 'Education organization with annual revenue of approximately $1091M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ENGLEWOOD HOSPITAL AND MEDICAL CENTER A NEW JERSEY NONPROFIT CORP', '221487173', 'Health', '', 'Health organization with annual revenue of approximately $1091M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ST CLOUD HOSPITAL', '410695596', 'Health', '', 'Health organization with annual revenue of approximately $1090M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'HEALTH RESEARCH INCORPORATED ELIZABETH WOOD', '141402155', 'Health', '', 'Health organization with annual revenue of approximately $1087M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'GROSSMONT HOSPITAL CORPORATION', '330449527', 'Health', '', 'Health organization with annual revenue of approximately $1086M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ASCENSION ST JOHN HOSPITAL', '381359063', 'Health', '', 'Health organization with annual revenue of approximately $1085M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'STORMONT-VAIL HEALTHCARE INC', '480543789', 'Health', '', 'Health organization with annual revenue of approximately $1084M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'NEWYORK-PRESBYTERIAN-QUEENS', '111839362', 'Health', '', 'Health organization with annual revenue of approximately $1083M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'TALLAHASSEE MEMORIAL HEALTHCARE INC', '591917016', 'Health', '', 'Health organization with annual revenue of approximately $1080M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ORLANDO HEALTH MEDICAL GROUP INC', '593259553', 'Health', '', 'Health organization with annual revenue of approximately $1080M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'BAYHEALTH MEDICAL CENTER INC', '510064318', 'Health', '', 'Health organization with annual revenue of approximately $1080M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'CHRISTUS TRINITY CLINIC TEXAS', '752616977', 'Health', '', 'Health organization with annual revenue of approximately $1078M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'LOYOLA UNIVERSITY OF CHICAGO', '361408475', 'Education', '', 'Education organization with annual revenue of approximately $1078M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MOUNTAIN STATES HEALTH ALLIANCE', '620476282', 'Health', '', 'Health organization with annual revenue of approximately $1070M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'SOUTH SHORE UNIVERSITY HOSPITAL', '111667761', 'Health', '', 'Health organization with annual revenue of approximately $1069M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'SSM HEALTH CARE OF OKLAHOMA INC', '730657693', 'Health', '', 'Health organization with annual revenue of approximately $1066M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MOUNT SINAI MEDICAL CENTER OF FLORIDA INC', '590624424', 'Health', '', 'Health organization with annual revenue of approximately $1061M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'REGIONS HOSPITAL', '410956618', 'Health', '', 'Health organization with annual revenue of approximately $1059M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'HCR MANORCARE INC', '825373223', 'Health', '', 'Health organization with annual revenue of approximately $1049M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'OCHSNER LSU HEALTH SYSTEM OF NORTH LOUISIANA', '831605004', 'Health', '', 'Health organization with annual revenue of approximately $1046M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'FLORIDA HOSPITAL MEDICAL GROUP INC', '593214635', 'Other', '', 'Other organization with annual revenue of approximately $1041M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'WHITE PLAINS HOSPITAL MEDICAL CENTER', '131740130', 'Health', '', 'Health organization with annual revenue of approximately $1035M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'WELLSPAN MEDICAL GROUP', '232730785', 'Health', '', 'Health organization with annual revenue of approximately $1032M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'POUDRE VALLEY MEDICAL GROUP LLC', '800348943', 'Health', '', 'Health organization with annual revenue of approximately $1032M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MONUMENT HEALTH RAPID CITY HOSPITAL INC', '460319070', 'Health', '', 'Health organization with annual revenue of approximately $1031M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'CAMP BOWIE SERVICE CENTER', '943299123', 'Health', '', 'Health organization with annual revenue of approximately $1026M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'LEHIGH VALLEY PHYSICIAN GROUP', '232700908', 'Health', '', 'Health organization with annual revenue of approximately $1026M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ST JOSEPHS HEALTH SYSTEM SUBORDINATE GROUP RETURN', '271344467', 'Other', '', 'Other organization with annual revenue of approximately $1025M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'SAINT JOSEPH HEALTH SYSTEM INC', '611334601', 'Health', '', 'Health organization with annual revenue of approximately $1025M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'NOVA SOUTHEASTERN UNIVERSITY INC', '591083502', 'Education', '', 'Education organization with annual revenue of approximately $1024M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'COLLEGE BOARD', '131623965', 'Education', '', 'Education organization with annual revenue of approximately $1019M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'BAYCARE HEALTH SYSTEMS INC', '592796965', 'Health', '', 'Health organization with annual revenue of approximately $1016M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MEDICAL CENTER OF CENTRAL GEORGIA INC', '582149128', 'Health', '', 'Health organization with annual revenue of approximately $1016M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ALLIANCE FOR SUSTAINABLE ENERGY LLC', '261939342', 'Research', '', 'Research organization with annual revenue of approximately $1009M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'SINAI HOSPITAL OF BALTIMORE INC', '520486540', 'Health', '', 'Health organization with annual revenue of approximately $1008M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'INLAND COUNTIES REGIONAL CENTER INC', '237121672', 'Human Services', '', 'Human Services organization with annual revenue of approximately $1008M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MORTON PLANT HOSPITAL ASSOCIATION INC', '590624462', 'Health', '', 'Health organization with annual revenue of approximately $1004M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'COMMUNITY HOSPITAL OF THE MONTEREY PENINSULA', '940760193', 'Health', '', 'Health organization with annual revenue of approximately $1000M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'AU MEDICAL CENTER INC', '582144788', 'Education', '', 'Education organization with annual revenue of approximately $1000M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'FOSTER CHARITABLE TRUST', '846847169', 'Other', '', 'Other organization with annual revenue of approximately $1000M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ENLOE MEDICAL CENTER', '941603784', 'Health', '', 'Health organization with annual revenue of approximately $997M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'UNITED HEALTH SERVICES HOSPITALS INC', '161165049', 'Health', '', 'Health organization with annual revenue of approximately $993M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'UNIVERSITY HOSPITALS HEALTH SYSTEM INC', '340714775', 'Health', '', 'Health organization with annual revenue of approximately $990M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ATLANTICARE HEALTH SYSTEM INC', '900779828', 'Other', '', 'Other organization with annual revenue of approximately $989M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'YORK UNIVERSITY', '237069967', 'Education', '', 'Education organization with annual revenue of approximately $987M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'NORTH MISSISSIPPI MEDICAL CENTER INC', '640662976', 'Health', '', 'Health organization with annual revenue of approximately $985M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'AULTMAN HEALTH FOUNDATION GROUP RETURN', '320483994', 'Health', '', 'Health organization with annual revenue of approximately $982M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'SANTA BARBARA COTTAGE HOSPITAL', '951644629', 'Health', '', 'Health organization with annual revenue of approximately $979M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'CATHOLIC HEALTH INITIATIVES-IOWA CORP', '420680448', 'Health', '', 'Health organization with annual revenue of approximately $977M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'ASHLAND HOSPITAL CORPORATION', '610444716', 'Health', '', 'Health organization with annual revenue of approximately $976M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'BAPTIST MEMORIAL HOSPITAL', '620123940', 'Health', '', 'Health organization with annual revenue of approximately $975M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'VARIETY CHILDRENS HOSPITAL', '590638499', 'Health', '', 'Health organization with annual revenue of approximately $974M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'AMERICAN HEART ASSOCIATION INC', '135613797', 'Health', '', 'Health organization with annual revenue of approximately $972M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'MERCY HEALTH SERVICES IOWA CORP', '311373080', 'Health', '', 'Health organization with annual revenue of approximately $972M'
+FROM users WHERE email = 'test@example.com';
+INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
+SELECT id, 'POUDRE VALLEY HEALTH CARE INC', '841262971', 'Health', '', 'Health organization with annual revenue of approximately $970M'
 FROM users WHERE email = 'test@example.com';
 
 -- Charities successfully loaded

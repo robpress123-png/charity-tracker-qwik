@@ -75,6 +75,11 @@ for file_path in files:
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             reader = csv.DictReader(f)
             for row in reader:
+                # Only include 501(c)(3) organizations
+                subsection = row.get('SUBSECTION', '')
+                if subsection != '03' and subsection != '3':  # Check both formats
+                    continue
+
                 # Get revenue amount
                 revenue = 0
                 if 'REVENUE_AMT' in row:
@@ -121,13 +126,13 @@ for file_path in files:
 all_charities.sort(key=lambda x: x['revenue'], reverse=True)
 top_charities = all_charities[:500]
 
-print(f"Found {len(all_charities)} charities with >$1M revenue")
-print(f"Selecting top 500 charities")
+print(f"Found {len(all_charities)} 501(c)(3) charities with >$1M revenue")
+print(f"Selecting top 500 501(c)(3) charities")
 
 # Generate SQL inserts
 with open('/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/charity_inserts.sql', 'w') as f:
-    f.write("-- Insert top 500 charities from IRS data\n")
-    f.write("-- These are public charities available to all users\n\n")
+    f.write("-- Insert top 500 501(c)(3) charities from IRS data\n")
+    f.write("-- These are public 501(c)(3) charities available to all users\n\n")
 
     # Get test user ID
     f.write("-- First, get the test user ID\n")
@@ -154,4 +159,26 @@ FROM users WHERE email = 'test@example.com';
     f.write("\n-- Charities successfully loaded\n")
 
 print("SQL script created: charity_inserts.sql")
+
+# Generate CSV file for import
+import csv as csv_module
+csv_file = '/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/charities_501c3.csv'
+
+with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+    fieldnames = ['name', 'ein', 'category', 'website', 'description']
+    writer = csv_module.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for charity in top_charities:
+        revenue_millions = int(charity['revenue'] / 1000000)
+        writer.writerow({
+            'name': charity['name'],
+            'ein': charity['ein'],
+            'category': charity['category'],
+            'website': '',  # No website data in source
+            'description': f"{charity['category']} organization with annual revenue of approximately ${revenue_millions}M"
+        })
+
+print(f"CSV file created: charities_501c3.csv")
 print(f"Top charity: {top_charities[0]['name']} - Revenue: ${top_charities[0]['revenue']:,.0f}")
+print(f"Total 501(c)(3) charities exported: {len(top_charities)}")
