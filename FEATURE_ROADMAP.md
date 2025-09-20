@@ -40,12 +40,28 @@ Based on analysis of the v4.6 demo file, here's the comprehensive feature list a
   - [ ] Mileage log upload support
   - [ ] Total deduction calculation (miles × rate)
 
-### 2. Charity Management
-- [ ] Charity autocomplete with search
-- [ ] Add custom charities
+### 2. Charity Management (Two-Tier System)
+- [ ] **Master Charity Database** (IRS-sourced)
+  - [ ] Global charities available to all users
+  - [ ] Admin-managed and verified
+  - [ ] Periodic updates from IRS data
+  - [ ] Searchable by name, EIN, location
+- [ ] **User-Added Charities**
+  - [ ] Users can add charities not in master database
+  - [ ] Immediately available for that user's donations
+  - [ ] Private to user until approved
+  - [ ] Charity autocomplete searches both master and user charities
+- [ ] **Admin Approval Queue**
+  - [ ] User-added charities enter approval queue
+  - [ ] Admin review interface
+  - [ ] Verification tools (EIN lookup, IRS status check)
+  - [ ] Approve → Add to master database
+  - [ ] Reject → Remains user-private or removed
+  - [ ] Merge duplicates functionality
 - [ ] Charity information (EIN, address, website)
 - [ ] Charity categories
 - [ ] Favorite/frequently used charities
+- [ ] Charity verification status indicators
 
 ### 3. Reports & Analytics
 - [ ] Tax year reports
