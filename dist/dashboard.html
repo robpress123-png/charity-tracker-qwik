@@ -667,11 +667,14 @@
                 </div>
                 <div style="padding: 2rem;">
                     <div style="display: grid; gap: 1rem; max-width: 600px;">
+                        <button class="btn-primary" onclick="showImportDonations()">
+                            📥 Import Donations (CSV)
+                        </button>
                         <button class="btn-primary" onclick="calculateTaxSavings()">
                             💰 Tax Savings Calculator
                         </button>
                         <button class="btn-primary" onclick="importTransactions()">
-                            📊 Import Bank Transactions (CSV)
+                            📊 Import Bank Transactions
                         </button>
                         <button class="btn-primary" onclick="manageReceipts()">
                             📸 Manage Receipt Photos
@@ -679,6 +682,39 @@
                         <button class="btn-primary" onclick="backupData()">
                             💾 Backup/Export All Data
                         </button>
+                    </div>
+
+                    <!-- Import Donations Panel -->
+                    <div id="importDonationsPanel" style="display:none; margin-top: 2rem;">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">Import Donations from CSV</h3>
+
+                        <div id="csvDropZone" style="border: 2px dashed #667eea; border-radius: 12px; padding: 3rem; text-align: center; background: #f9fafb; cursor: pointer;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 0.5rem;">Drag & Drop CSV File Here</p>
+                            <p style="color: #9ca3af;">or click to browse</p>
+                            <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                        </div>
+
+                        <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 8px;">
+                            <p style="font-size: 0.875rem; color: #92400e;"><strong>CSV Format Required:</strong></p>
+                            <code style="font-size: 0.75rem;">charity_id,amount,donation_date,donation_type,notes</code>
+                            <p style="font-size: 0.75rem; color: #92400e; margin-top: 0.5rem;">
+                                Example: 1,500.00,2025-01-15,cash,New Year donation
+                            </p>
+                        </div>
+
+                        <div id="importPreview" style="display:none; margin-top: 1rem;">
+                            <h4>Preview</h4>
+                            <div id="previewTable" style="max-height: 300px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;"></div>
+                            <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                                <button class="btn-primary" onclick="confirmImport()">
+                                    ✅ Import Donations
+                                </button>
+                                <button class="btn-secondary" onclick="cancelImport()">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -689,11 +725,21 @@
     <div id="donationModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add Donation</h2>
+                <h2 id="donationModalTitle">Add Cash Donation</h2>
             </div>
             <form id="donationForm">
+                <input type="hidden" id="donationType" value="cash">
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span id="donationTypeIcon" style="font-size: 2rem;">💵</span>
+                        <div>
+                            <div style="font-weight: 600; color: #075985; font-size: 1.1rem;" id="donationTypeLabel">Cash/Check Donation</div>
+                            <div style="font-size: 0.875rem; color: #0369a1; margin-top: 0.25rem;" id="donationTypeDesc">Record a monetary donation</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label for="donationCharity">Charity</label>
+                    <label for="donationCharity">Charity *</label>
                     <div class="autocomplete-wrapper">
                         <input type="text"
                                id="donationCharity"
@@ -704,16 +750,6 @@
                         <input type="hidden" id="selectedCharityId">
                         <div id="charityDropdown" class="autocomplete-dropdown"></div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="donationType">Donation Type</label>
-                    <select id="donationType" required onchange="updateDonationFields()">
-                        <option value="cash">💵 Cash/Check</option>
-                        <option value="items">📦 Items/Goods</option>
-                        <option value="miles">🚗 Miles Driven</option>
-                        <option value="stock">📈 Stock</option>
-                        <option value="crypto">₿ Cryptocurrency</option>
-                    </select>
                 </div>
                 <!-- Cash donation fields -->
                 <div id="cashFields" class="donation-type-fields">
@@ -1660,6 +1696,130 @@
             document.getElementById('taxSavingsDisplay').textContent = '$' + savings.toFixed(2);
         }
 
+        // CSV Import functionality
+        let importData = [];
+
+        function showImportDonations() {
+            document.getElementById('importDonationsPanel').style.display = 'block';
+        }
+
+        // Setup drag and drop
+        const dropZone = document.getElementById('csvDropZone');
+        const fileInput = document.getElementById('csvFileInput');
+
+        dropZone?.addEventListener('click', () => fileInput.click());
+
+        dropZone?.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#e0e7ff';
+        });
+
+        dropZone?.addEventListener('dragleave', () => {
+            dropZone.style.background = '#f9fafb';
+        });
+
+        dropZone?.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#f9fafb';
+            const files = e.dataTransfer.files;
+            if (files.length) handleCSVFile(files[0]);
+        });
+
+        fileInput?.addEventListener('change', (e) => {
+            if (e.target.files.length) handleCSVFile(e.target.files[0]);
+        });
+
+        function handleCSVFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const csv = e.target.result;
+                parseCSV(csv);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            importData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const donation = {};
+                headers.forEach((header, index) => {
+                    donation[header] = values[index];
+                });
+                importData.push(donation);
+            }
+
+            showPreview();
+        }
+
+        function showPreview() {
+            const preview = document.getElementById('importPreview');
+            const table = document.getElementById('previewTable');
+
+            let html = '<table class="table"><thead><tr><th>Charity ID</th><th>Amount</th><th>Date</th><th>Type</th><th>Notes</th></tr></thead><tbody>';
+
+            importData.slice(0, 10).forEach(donation => {
+                html += `<tr>
+                    <td>${donation.charity_id}</td>
+                    <td>$${parseFloat(donation.amount).toFixed(2)}</td>
+                    <td>${donation.donation_date}</td>
+                    <td>${donation.donation_type || 'cash'}</td>
+                    <td>${donation.notes || ''}</td>
+                </tr>`;
+            });
+
+            if (importData.length > 10) {
+                html += `<tr><td colspan="5" style="text-align: center; font-style: italic;">... and ${importData.length - 10} more</td></tr>`;
+            }
+
+            html += '</tbody></table>';
+            table.innerHTML = html;
+            preview.style.display = 'block';
+        }
+
+        async function confirmImport() {
+            const successCount = { success: 0, failed: 0 };
+
+            for (const donation of importData) {
+                try {
+                    const response = await fetch('/api/donations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            charity_id: donation.charity_id,
+                            amount: parseFloat(donation.amount),
+                            donation_date: donation.donation_date,
+                            donation_type: donation.donation_type || 'cash',
+                            notes: donation.notes || ''
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount.success++;
+                    } else {
+                        successCount.failed++;
+                    }
+                } catch (error) {
+                    successCount.failed++;
+                }
+            }
+
+            alert(`Import Complete!\nSuccessful: ${successCount.success}\nFailed: ${successCount.failed}`);
+            cancelImport();
+            loadDonations();
+            loadStats();
+        }
+
+        function cancelImport() {
+            document.getElementById('importDonationsPanel').style.display = 'none';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('csvFileInput').value = '';
+            importData = [];
+        }
+
         // Load saved tax settings
         function loadTaxSettings() {
             const savedRate = localStorage.getItem('taxRate');
@@ -2046,7 +2206,48 @@
 
         // Helper function to open donation modal with specific type
         function openDonationModal(type) {
+            const typeInfo = {
+                cash: {
+                    title: 'Add Cash Donation',
+                    icon: '💵',
+                    label: 'Cash/Check Donation',
+                    desc: 'Record a monetary donation'
+                },
+                items: {
+                    title: 'Add Item Donation',
+                    icon: '📦',
+                    label: 'Item/Goods Donation',
+                    desc: 'Record donated items with values'
+                },
+                miles: {
+                    title: 'Add Mileage Donation',
+                    icon: '🚗',
+                    label: 'Mileage Donation',
+                    desc: 'Record miles driven for charity'
+                },
+                stock: {
+                    title: 'Add Stock Donation',
+                    icon: '📈',
+                    label: 'Stock/Securities Donation',
+                    desc: 'Record donated stocks or securities'
+                },
+                crypto: {
+                    title: 'Add Crypto Donation',
+                    icon: '₿',
+                    label: 'Cryptocurrency Donation',
+                    desc: 'Record cryptocurrency donations'
+                }
+            };
+
+            const info = typeInfo[type] || typeInfo.cash;
+
+            // Update modal header and type display
+            document.getElementById('donationModalTitle').textContent = info.title;
+            document.getElementById('donationTypeIcon').textContent = info.icon;
+            document.getElementById('donationTypeLabel').textContent = info.label;
+            document.getElementById('donationTypeDesc').textContent = info.desc;
             document.getElementById('donationType').value = type;
+
             updateDonationFields();
             showAddDonation();
         }

@@ -1,0 +1,21 @@
+charity_id,amount,donation_date,donation_type,notes
+1,500.00,2025-01-15,cash,New Year donation to Red Cross
+2,1200.00,2025-01-20,stock,Apple stock donation
+3,150.00,2025-02-01,cash,Monthly contribution
+4,250.00,2025-02-14,items,Clothing donation - Winter coats and jeans
+5,75.00,2025-02-28,miles,Volunteer driving - 535 miles for food bank
+1,300.00,2025-03-10,cash,Disaster relief fund
+6,450.00,2025-03-15,items,Furniture donation - Desk and bookshelf
+7,2000.00,2025-03-20,crypto,Bitcoin donation
+8,100.00,2025-04-01,cash,Spring fundraiser
+9,180.00,2025-04-15,items,Electronics - Laptop and printer
+10,42.00,2025-04-22,miles,Earth Day event transport - 300 miles
+2,750.00,2025-05-01,cash,Annual pledge payment
+3,350.00,2025-05-15,items,Book donation - 35 books
+4,500.00,2025-05-30,stock,Microsoft shares
+5,125.00,2025-06-01,cash,Summer campaign
+6,56.00,2025-06-15,miles,Medical transport volunteer - 400 miles
+7,220.00,2025-06-20,items,Sports equipment - Bicycles and golf clubs
+8,1500.00,2025-06-30,crypto,Ethereum donation
+9,400.00,2025-07-04,cash,Independence Day fundraiser
+10,280.00,2025-07-15,items,Household goods - Kitchen appliances and bedding
