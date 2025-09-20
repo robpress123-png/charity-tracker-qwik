@@ -202,9 +202,12 @@ export async function onRequestPost(context) {
         });
 
     } catch (error) {
+        console.error('Import error details:', error);
         return new Response(JSON.stringify({
             success: false,
-            error: error.message
+            error: error.message,
+            stack: error.stack,
+            details: 'Check browser console and Cloudflare logs for more details'
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
