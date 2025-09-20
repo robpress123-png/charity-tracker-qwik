@@ -761,107 +761,122 @@
                 <!-- Item donation fields -->
                 <div id="itemFields" class="donation-type-fields" style="display:none;">
                     <!-- IRS Compliance Warning -->
-                    <div class="alert" style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:0.75rem;border-radius:8px;margin-bottom:1rem;">
-                        <strong>⚠️ IRS Requirement:</strong> Only items in "good used condition or better" qualify for tax deductions.
-                        Items in poor or fair condition that show excessive wear are NOT tax deductible per IRS regulations.
+                    <div class="alert" style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:0.5rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.875rem;">
+                        <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
                     </div>
 
-                    <div class="form-group">
-                        <label for="itemCategory">Category *</label>
-                        <select id="itemCategory" onchange="loadItemsForCategory()" required>
-                            <option value="">Select Category</option>
-                            <!-- Populated from database -->
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="itemSelectGroup" style="display:none;">
-                        <label for="itemSelect">Item *</label>
-                        <select id="itemSelect" onchange="updateItemValue()" required>
-                            <option value="">Select Item</option>
-                            <!-- Populated based on category -->
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="itemQualityGroup" style="display:none;">
-                        <label for="itemQuality">Condition * <span style="color:#059669;font-size:0.875rem;">(All qualify for tax deduction)</span></label>
-                        <select id="itemQuality" onchange="updateItemValue()" required>
-                            <option value="good" selected>Good - Normal wear, fully functional</option>
-                            <option value="very_good">Very Good - Light wear, well-maintained</option>
-                            <option value="excellent">Excellent - Like new condition</option>
-                        </select>
-                        <small style="color:#6b7280;">Items below "Good" condition are not tax deductible and should not be included</small>
-                    </div>
-
-                    <div class="form-group" id="itemQuantityGroup" style="display:none;">
-                        <label for="itemQuantity">Quantity</label>
-                        <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Selected Items</label>
-                        <div id="selectedItemsList" style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px;padding:0.5rem;background:#f9fafb;">
-                            <div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>
+                    <!-- Item Selection Row -->
+                    <div style="display:grid; grid-template-columns:1.5fr 2fr 1fr 0.8fr auto; gap:0.5rem; align-items:end;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="itemCategory" style="font-size:0.875rem;">Category</label>
+                            <select id="itemCategory" onchange="loadItemsForCategory()" style="font-size:0.875rem;">
+                                <option value="">Select...</option>
+                                <!-- Populated from database -->
+                            </select>
                         </div>
+
+                        <div class="form-group" id="itemSelectGroup" style="display:none; margin-bottom:0;">
+                            <label for="itemSelect" style="font-size:0.875rem;">Item</label>
+                            <select id="itemSelect" onchange="updateItemValue()" style="font-size:0.875rem;">
+                                <option value="">Select...</option>
+                                <!-- Populated based on category -->
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="itemQualityGroup" style="display:none; margin-bottom:0;">
+                            <label for="itemQuality" style="font-size:0.875rem;">Condition</label>
+                            <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;">
+                                <option value="good">Good</option>
+                                <option value="very_good">Very Good</option>
+                                <option value="excellent">Excellent</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="itemQuantityGroup" style="display:none; margin-bottom:0;">
+                            <label for="itemQuantity" style="font-size:0.875rem;">Qty</label>
+                            <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem; width:60px;">
+                        </div>
+
+                        <button type="button" id="addItemBtn" onclick="addItemToList()" style="display:none; padding:0.4rem 0.8rem; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.875rem; height:32px; margin-top:20px;">
+                            + Add
+                        </button>
                     </div>
 
-                    <div class="form-group">
-                        <button type="button" class="btn-primary" onclick="addItemToList()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">Add Item</button>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="estimatedValue">Total Value</label>
-                        <input type="number" id="estimatedValue" step="0.01" min="0" readonly style="background:#f9fafb;">
+                    <!-- Receipt-Style Items Display -->
+                    <div style="margin-top:1rem;">
+                        <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:0.75rem;">
+                            <div style="border-bottom:1px solid #e5e7eb; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+                                <strong style="font-size:0.875rem;">📋 Donation Receipt</strong>
+                            </div>
+                            <div id="selectedItemsList" style="min-height:60px; max-height:150px; overflow-y:auto;">
+                                <div class="empty-state" style="color:#9ca3af; text-align:center; padding:1rem; font-size:0.875rem;">
+                                    No items added yet
+                                </div>
+                            </div>
+                            <div style="border-top:2px solid #e5e7eb; margin-top:0.5rem; padding-top:0.5rem; display:flex; justify-content:between; align-items:center;">
+                                <strong>Total Value:</strong>
+                                <span style="font-size:1.25rem; font-weight:bold; color:#667eea;">$<span id="receiptTotal">0.00</span></span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="estimatedValue">
                         <input type="hidden" id="itemDescription">
                     </div>
                 </div>
                 <!-- Mileage donation fields -->
                 <div id="milesFields" class="donation-type-fields" style="display:none;">
-                    <div class="form-group">
-                        <label for="milesDriven">Miles Driven</label>
-                        <input type="number" id="milesDriven" step="0.1" min="0">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="milesDriven">Miles Driven</label>
+                            <input type="number" id="milesDriven" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="mileagePurpose">Purpose</label>
+                            <input type="text" id="mileagePurpose" placeholder="e.g., Deliver meals">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="mileagePurpose">Purpose</label>
-                        <input type="text" id="mileagePurpose" placeholder="e.g., Deliver meals, volunteer at event">
-                    </div>
-                    <div class="form-group" style="background:#f3f4f6; padding:0.5rem; border-radius:8px;">
+                    <div style="background:#f3f4f6; padding:0.5rem; border-radius:8px; margin-top:0.5rem;">
                         <small>2024 IRS Rate: $0.14/mile | Deduction: $<span id="mileageDeduction">0.00</span></small>
                     </div>
                 </div>
                 <!-- Stock donation fields -->
                 <div id="stockFields" class="donation-type-fields" style="display:none;">
-                    <div class="form-group">
-                        <label for="stockQuantity">Number of Shares</label>
-                        <input type="number" id="stockQuantity" step="0.001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="fairMarketValue">Closing Price on Date of Donation</label>
-                        <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="Price per share">
-                        <small style="color:#6b7280;">Future: Auto-lookup feature coming soon</small>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="stockQuantity">Number of Shares</label>
+                            <input type="number" id="stockQuantity" step="0.001" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="fairMarketValue">Closing Price per Share</label>
+                            <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="$ per share">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="costBasis">Cost Basis (optional)</label>
-                        <input type="number" id="costBasis" step="0.01" min="0">
+                        <input type="number" id="costBasis" step="0.01" min="0" placeholder="Total cost basis">
+                        <small style="color:#6b7280;">Price lookup feature coming soon</small>
                     </div>
                 </div>
                 <!-- Crypto donation fields -->
                 <div id="cryptoFields" class="donation-type-fields" style="display:none;">
-                    <div class="form-group">
-                        <label for="cryptoType">Cryptocurrency Type</label>
-                        <select id="cryptoType">
-                            <option value="">Select...</option>
-                            <option value="BTC">Bitcoin (BTC)</option>
-                            <option value="ETH">Ethereum (ETH)</option>
-                            <option value="other">Other</option>
-                        </select>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="cryptoType">Cryptocurrency</label>
+                            <select id="cryptoType">
+                                <option value="">Select...</option>
+                                <option value="BTC">Bitcoin (BTC)</option>
+                                <option value="ETH">Ethereum (ETH)</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoQuantity">Quantity</label>
+                            <input type="number" id="cryptoQuantity" step="0.00000001" min="0" placeholder="Amount">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="cryptoQuantity">Quantity</label>
-                        <input type="number" id="cryptoQuantity" step="0.00000001" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="cryptoValue">USD Value at Donation</label>
-                        <input type="number" id="cryptoValue" step="0.01" min="0">
+                        <label for="cryptoValue">USD Value at Time of Donation</label>
+                        <input type="number" id="cryptoValue" step="0.01" min="0" placeholder="Total USD value">
+                        <small style="color:#6b7280;">Use exchange rate at time of donation</small>
                     </div>
                 </div>
                 <div class="form-group">
@@ -2058,6 +2073,7 @@
 
             document.getElementById('itemQualityGroup').style.display = 'block';
             document.getElementById('itemQuantityGroup').style.display = 'block';
+            document.getElementById('addItemBtn').style.display = 'block';
 
             // Map the quality values correctly
             let valueKey;
@@ -2125,34 +2141,63 @@
 
         function updateSelectedItemsDisplay() {
             const container = document.getElementById('selectedItemsList');
+            const receiptTotal = document.getElementById('receiptTotal');
+            const addItemBtn = document.getElementById('addItemBtn');
 
             if (selectedDonationItems.length === 0) {
-                container.innerHTML = '<div class="empty-state" style="color:#9ca3af;text-align:center;">No items added</div>';
+                container.innerHTML = '<div class="empty-state" style="color:#9ca3af;text-align:center;padding:1rem;">No items added</div>';
                 document.getElementById('estimatedValue').value = '0.00';
+                if (receiptTotal) receiptTotal.textContent = '$0.00';
+                if (addItemBtn) addItemBtn.style.display = 'block';
                 return;
             }
 
-            let html = '';
+            // Create receipt-style display
+            let html = '<div style="font-family:monospace;font-size:0.875rem;background:#f9fafb;padding:0.75rem;border-radius:4px;">';
+            html += '<div style="border-bottom:1px dashed #d1d5db;padding-bottom:0.5rem;margin-bottom:0.5rem;">';
+            html += '<div style="text-align:center;font-weight:bold;margin-bottom:0.25rem;">DONATION RECEIPT</div>';
+            html += '<div style="text-align:center;font-size:0.75rem;color:#6b7280;">Items for Tax Deduction</div>';
+            html += '</div>';
+
             let totalValue = 0;
 
             selectedDonationItems.forEach((item, index) => {
+                const lineTotal = item.totalValue;
+                totalValue += lineTotal;
+
                 html += `
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem;border-bottom:1px solid #e5e7eb;">
-                        <div>
-                            <strong>${item.itemName}</strong> (${item.quality})
-                            <br><small>${item.categoryName} • Qty: ${item.quantity}</small>
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.375rem;font-size:0.8125rem;">
+                        <div style="flex:1;padding-right:0.5rem;">
+                            <div style="display:flex;justify-content:space-between;">
+                                <span>${item.quantity}x ${item.itemName}</span>
+                                <span>$${lineTotal.toFixed(2)}</span>
+                            </div>
+                            <div style="color:#6b7280;font-size:0.75rem;margin-left:1rem;">
+                                ${item.categoryName} • ${item.quality.replace('_', ' ')}
+                            </div>
                         </div>
-                        <div>
-                            <span style="color:#667eea;font-weight:600;">$${item.totalValue.toFixed(2)}</span>
-                            <button type="button" onclick="removeItemFromList(${index})" style="margin-left:0.5rem;color:#ef4444;cursor:pointer;">×</button>
-                        </div>
+                        <button type="button" onclick="removeItemFromList(${index})" style="color:#ef4444;background:none;border:none;cursor:pointer;padding:0;margin-left:0.25rem;font-size:1rem;line-height:1;">×</button>
                     </div>
                 `;
-                totalValue += item.totalValue;
             });
+
+            html += '<div style="border-top:1px dashed #d1d5db;margin-top:0.5rem;padding-top:0.5rem;">';
+            html += `<div style="display:flex;justify-content:space-between;font-weight:bold;">
+                        <span>TOTAL VALUE:</span>
+                        <span style="color:#667eea;">$${totalValue.toFixed(2)}</span>
+                     </div>`;
+            html += `<div style="font-size:0.75rem;color:#6b7280;margin-top:0.25rem;text-align:center;">
+                        ${selectedDonationItems.length} item${selectedDonationItems.length > 1 ? 's' : ''}
+                     </div>`;
+            html += '</div>';
+            html += '</div>';
 
             container.innerHTML = html;
             document.getElementById('estimatedValue').value = totalValue.toFixed(2);
+            if (receiptTotal) receiptTotal.textContent = `$${totalValue.toFixed(2)}`;
+
+            // Show add item button when there are items
+            if (addItemBtn) addItemBtn.style.display = selectedDonationItems.length > 0 ? 'block' : 'none';
 
             // Update item description for database
             const descriptions = selectedDonationItems.map(i =>
