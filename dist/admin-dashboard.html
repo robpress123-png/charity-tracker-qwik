@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Charity Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #1f2937;
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        /* Admin Header */
+        .admin-header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .admin-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-title h1 {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .admin-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Admin Layout */
+        .admin-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            background: #111827;
+            padding: 1.5rem;
+            border-right: 1px solid #374151;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #e5e7eb;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-item:hover {
+            background: #1f2937;
+            color: white;
+        }
+
+        .sidebar-item.active {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* Main Content */
+        .admin-main {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h2 {
+            color: #f3f4f6;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: #9ca3af;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .stat-card h3 {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            color: #f3f4f6;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .change {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Tool Cards */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .tool-card:hover {
+            border-color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+        }
+
+        .tool-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #6b7280;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .tool-card h3 {
+            color: #f3f4f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .tool-btn:hover {
+            background: #b91c1c;
+        }
+
+        .tool-btn.secondary {
+            background: #374151;
+        }
+
+        .tool-btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Import Panel */
+        .import-panel {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .import-panel.active {
+            display: block;
+        }
+
+        .drop-zone {
+            border: 2px dashed #dc2626;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(220, 38, 38, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone:hover {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: #ef4444;
+        }
+
+        .drop-zone.active {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #f87171;
+        }
+
+        /* Tables */
+        .admin-table {
+            width: 100%;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .admin-table th {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            color: #e5e7eb;
+            border-top: 1px solid #374151;
+        }
+
+        .admin-table tr:hover {
+            background: #1f2937;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background: #7c2d12;
+            border: 1px solid #ea580c;
+            color: #fed7aa;
+        }
+
+        .alert-success {
+            background: #14532d;
+            border: 1px solid #16a34a;
+            color: #bbf7d0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .action-btn.edit {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .action-btn.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <div class="admin-title">
+            <h1>🔐 Admin Dashboard</h1>
+            <span class="admin-badge">ADMINISTRATOR</span>
+        </div>
+        <div class="admin-user">
+            <span>Welcome, <strong id="adminName">Admin</strong></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Overview</div>
+                <button class="sidebar-item active" onclick="showSection('overview')">
+                    📊 Dashboard
+                </button>
+                <button class="sidebar-item" onclick="showSection('analytics')">
+                    📈 Analytics
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Data Management</div>
+                <button class="sidebar-item" onclick="showSection('import')">
+                    📦 Import Items Database
+                </button>
+                <button class="sidebar-item" onclick="showSection('users')">
+                    👥 User Management
+                </button>
+                <button class="sidebar-item" onclick="showSection('charities')">
+                    🏢 Charity Verification
+                </button>
+                <button class="sidebar-item" onclick="showSection('items')">
+                    📝 Item Management
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">System</div>
+                <button class="sidebar-item" onclick="showSection('database')">
+                    🗄️ Database Management
+                </button>
+                <button class="sidebar-item" onclick="showSection('backup')">
+                    💾 Backup & Restore
+                </button>
+                <button class="sidebar-item" onclick="showSection('logs')">
+                    📋 System Logs
+                </button>
+                <button class="sidebar-item" onclick="showSection('settings')">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Overview Section -->
+            <div id="overview" class="content-section active">
+                <div class="section-header">
+                    <h2>System Overview</h2>
+                    <p>Monitor system health and key metrics</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>Total Users</h3>
+                        <div class="value">1,247</div>
+                        <div class="change">↑ 12% from last month</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Donations</h3>
+                        <div class="value">$452,380</div>
+                        <div class="change">↑ 8% from last month</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Charities</h3>
+                        <div class="value">89</div>
+                        <div class="change">↑ 3 new this month</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Database Items</h3>
+                        <div class="value">0</div>
+                        <div class="change">Import CSV to populate</div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem; color: #f3f4f6;">Quick Actions</h3>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">📦</div>
+                            <span class="tool-status status-active">Ready</span>
+                        </div>
+                        <h3>Import Items Database</h3>
+                        <p>Bulk import donation items from CSV file</p>
+                        <button class="tool-btn" onclick="showSection('import')">Import Now</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">👥</div>
+                            <span class="tool-status status-active">Active</span>
+                        </div>
+                        <h3>User Management</h3>
+                        <p>View and manage user accounts</p>
+                        <button class="tool-btn" onclick="showSection('users')">Manage Users</button>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">💾</div>
+                            <span class="tool-status status-pending">Scheduled</span>
+                        </div>
+                        <h3>Database Backup</h3>
+                        <p>Last backup: 2 hours ago</p>
+                        <button class="tool-btn secondary" onclick="showSection('backup')">View Backups</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Section -->
+            <div id="import" class="content-section">
+                <div class="section-header">
+                    <h2>Import Items Database</h2>
+                    <p>Bulk import donation items from CSV file</p>
+                </div>
+
+                <div class="alert alert-warning">
+                    ⚠️ <strong>Important:</strong> CSV must contain: category_id, name, value_good, value_very_good, value_excellent
+                </div>
+
+                <div id="itemsCsvDropZone" class="drop-zone">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                    <h3 style="color: #f3f4f6; margin-bottom: 0.5rem;">Drop CSV File Here</h3>
+                    <p style="color: #9ca3af;">or click to browse files</p>
+                    <input type="file" id="itemsCsvFileInput" accept=".csv" style="display: none;" onchange="handleItemsCsvSelect(event)">
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #e5e7eb;">
+                        <input type="checkbox" id="updateExistingItems">
+                        <span>Update existing items (if unchecked, duplicates will be skipped)</span>
+                    </label>
+                </div>
+
+                <div id="itemsImportPreview" class="import-panel">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview</h3>
+                    <div id="itemsPreviewTable"></div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="tool-btn" onclick="confirmItemsImport()">Import Items</button>
+                        <button class="tool-btn secondary" onclick="cancelItemsImport()">Cancel</button>
+                    </div>
+                </div>
+
+                <div id="itemsImportResults" class="import-panel">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Results</h3>
+                    <div id="itemsResultsContent"></div>
+                    <button class="tool-btn" style="margin-top: 1rem;" onclick="closeItemsImport()">Close</button>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users" class="content-section">
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <p>View and manage all user accounts</p>
+                </div>
+
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Registered</th>
+                            <th>Total Donations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>test@example.com</td>
+                            <td>Test User</td>
+                            <td>2024-01-15</td>
+                            <td>$5,420</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn edit">Edit</button>
+                                    <button class="action-btn delete">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Other Placeholder Sections -->
+            <div id="charities" class="content-section">
+                <div class="section-header">
+                    <h2>Charity Verification</h2>
+                    <p>Verify and manage approved charities</p>
+                </div>
+                <div class="alert alert-warning">
+                    This feature is coming soon. It will allow verification of charity EIN numbers and tax-exempt status.
+                </div>
+            </div>
+
+            <div id="items" class="content-section">
+                <div class="section-header">
+                    <h2>Item Management</h2>
+                    <p>Edit and manage donation item values</p>
+                </div>
+                <div class="alert alert-warning">
+                    This feature is coming soon. Import items first using the Import Tool.
+                </div>
+            </div>
+
+            <div id="database" class="content-section">
+                <div class="section-header">
+                    <h2>Database Management</h2>
+                    <p>Monitor and optimize database performance</p>
+                </div>
+                <div class="alert alert-warning">
+                    This feature is coming soon. It will show database statistics and optimization tools.
+                </div>
+            </div>
+
+            <div id="backup" class="content-section">
+                <div class="section-header">
+                    <h2>Backup & Restore</h2>
+                    <p>Manage system backups and restore points</p>
+                </div>
+                <div class="alert alert-warning">
+                    Automatic backups are enabled. Manual backup feature coming soon.
+                </div>
+            </div>
+
+            <div id="logs" class="content-section">
+                <div class="section-header">
+                    <h2>System Logs</h2>
+                    <p>View system activity and error logs</p>
+                </div>
+                <div class="alert alert-warning">
+                    Log viewer coming soon. All admin actions are currently being logged.
+                </div>
+            </div>
+
+            <div id="analytics" class="content-section">
+                <div class="section-header">
+                    <h2>Analytics</h2>
+                    <p>Detailed system analytics and reports</p>
+                </div>
+                <div class="alert alert-warning">
+                    Advanced analytics dashboard coming soon.
+                </div>
+            </div>
+
+            <div id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                    <p>Configure system-wide settings</p>
+                </div>
+                <div class="alert alert-warning">
+                    Settings panel coming soon.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check admin authentication
+        window.onload = function() {
+            const adminToken = localStorage.getItem('adminToken');
+            const adminUser = localStorage.getItem('adminUser');
+
+            if (!adminToken || !adminUser) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            document.getElementById('adminName').textContent = adminUser;
+        };
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/admin-login.html';
+        }
+
+        // Show section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section
+            const section = document.getElementById(sectionName);
+            if (section) {
+                section.classList.add('active');
+            }
+
+            // Mark sidebar item as active
+            event.target.classList.add('active');
+        }
+
+        // Items Import Functions
+        let itemsImportData = [];
+
+        function handleItemsCsvSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processItemsCsvFile(file);
+            }
+        }
+
+        function processItemsCsvFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvText = e.target.result;
+                parseItemsCsv(csvText);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseItemsCsv(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            itemsImportData = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let char of lines[i]) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header] = values[index] || '';
+                });
+
+                itemsImportData.push(item);
+            }
+
+            showItemsPreview();
+        }
+
+        function showItemsPreview() {
+            const preview = document.getElementById('itemsImportPreview');
+            const table = document.getElementById('itemsPreviewTable');
+
+            let html = '<table class="admin-table"><thead><tr><th>Category</th><th>Name</th><th>Good</th><th>Very Good</th><th>Excellent</th></tr></thead><tbody>';
+
+            const categoryNames = {
+                '1': "Women's", '2': "Men's", '3': "Children's",
+                '4': 'Household', '5': 'Electronics', '6': 'Furniture',
+                '7': 'Books', '8': 'Sports', '9': 'Toys',
+                '10': 'Appliances', '11': 'Jewelry', '12': 'Tools'
+            };
+
+            itemsImportData.slice(0, 10).forEach(item => {
+                html += `<tr>
+                    <td>${categoryNames[item.category_id] || item.category_id}</td>
+                    <td>${item.name}</td>
+                    <td>$${parseFloat(item.value_good || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(item.value_very_good || 0).toFixed(2)}</td>
+                    <td>$${parseFloat(item.value_excellent || 0).toFixed(2)}</td>
+                </tr>`;
+            });
+
+            if (itemsImportData.length > 10) {
+                html += `<tr><td colspan="5" style="text-align: center; color: #9ca3af;">... and ${itemsImportData.length - 10} more items</td></tr>`;
+            }
+
+            html += '</tbody></table>';
+            table.innerHTML = html;
+            preview.classList.add('active');
+        }
+
+        async function confirmItemsImport() {
+            const updateExisting = document.getElementById('updateExistingItems').checked;
+            const resultsDiv = document.getElementById('itemsImportResults');
+            const resultsContent = document.getElementById('itemsResultsContent');
+
+            resultsContent.innerHTML = '<p style="color: #f59e0b;">Importing items...</p>';
+            resultsDiv.classList.add('active');
+
+            try {
+                const response = await fetch('/api/items/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        csvData: [Object.keys(itemsImportData[0]).join(',')]
+                            .concat(itemsImportData.map(row =>
+                                Object.keys(itemsImportData[0]).map(k => row[k]).join(',')
+                            )).join('\n'),
+                        updateExisting: updateExisting
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsContent.innerHTML = `
+                        <div class="alert alert-success">
+                            ✅ <strong>Import Successful!</strong>
+                        </div>
+                        <p>Processed: ${data.results.processed} items</p>
+                        <p>Added: ${data.results.added} new items</p>
+                        <p>Updated: ${data.results.updated} existing items</p>
+                        <p>Failed: ${data.results.failed} items</p>
+                        ${data.results.errors && data.results.errors.length > 0 ? `
+                            <div style="margin-top: 1rem; color: #ef4444;">
+                                <strong>Errors:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                    ${data.results.errors.map(e => `<li>${e}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+
+                    // Update the database items count
+                    document.querySelector('.stat-card .value').textContent = data.results.added + data.results.updated;
+                } else {
+                    resultsContent.innerHTML = `
+                        <div class="alert alert-warning">
+                            ❌ <strong>Import Failed</strong>
+                            <p style="margin-top: 0.5rem;">${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="alert alert-warning">
+                        ❌ <strong>Import Error</strong>
+                        <p style="margin-top: 0.5rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('itemsImportPreview').classList.remove('active');
+        }
+
+        function cancelItemsImport() {
+            document.getElementById('itemsImportPreview').classList.remove('active');
+            document.getElementById('itemsCsvFileInput').value = '';
+            itemsImportData = [];
+        }
+
+        function closeItemsImport() {
+            document.getElementById('itemsImportResults').classList.remove('active');
+            document.getElementById('itemsCsvFileInput').value = '';
+            itemsImportData = [];
+        }
+
+        // Setup drag and drop
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('itemsCsvDropZone');
+            if (dropZone) {
+                dropZone.addEventListener('click', () => {
+                    document.getElementById('itemsCsvFileInput').click();
+                });
+
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('active');
+                });
+
+                dropZone.addEventListener('dragleave', () => {
+                    dropZone.classList.remove('active');
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('active');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        document.getElementById('itemsCsvFileInput').files = files;
+                        processItemsCsvFile(files[0]);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
