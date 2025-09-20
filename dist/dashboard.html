@@ -243,6 +243,61 @@
         .btn-secondary:hover {
             background: #d1d5db;
         }
+
+        .charity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .charity-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.2s;
+        }
+
+        .charity-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .charity-card h3 {
+            color: #111827;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .charity-ein {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin: 0.25rem 0;
+        }
+
+        .charity-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        .charity-description {
+            color: #4b5563;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .charity-count {
+            text-align: center;
+            color: #6b7280;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -434,10 +489,74 @@
 
         // Load charities for donation select
         async function loadCharitiesForSelect() {
-            // TODO: Load charities from API
             const select = document.getElementById('donationCharity');
-            select.innerHTML = '<option value="">Select a charity...</option>';
+            select.innerHTML = '<option value="">Loading charities...</option>';
+
+            try {
+                const response = await fetch('/api/charities');
+                const data = await response.json();
+
+                select.innerHTML = '<option value="">Select a charity...</option>';
+
+                if (data.success && data.charities) {
+                    data.charities.forEach(charity => {
+                        const option = document.createElement('option');
+                        option.value = charity.id;
+                        option.textContent = `${charity.name} ${charity.ein ? `(${charity.ein})` : ''}`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load charities:', error);
+                select.innerHTML = '<option value="">Failed to load charities</option>';
+            }
         }
+
+        // Load and display charities
+        async function loadCharities() {
+            const container = document.getElementById('charitiesContent');
+
+            try {
+                const response = await fetch('/api/charities?limit=10');
+                const data = await response.json();
+
+                if (data.success && data.charities && data.charities.length > 0) {
+                    let html = '<div class="charity-grid">';
+                    data.charities.forEach(charity => {
+                        html += `
+                            <div class="charity-card">
+                                <h3>${charity.name}</h3>
+                                ${charity.ein ? `<p class="charity-ein">EIN: ${charity.ein}</p>` : ''}
+                                ${charity.category ? `<p class="charity-category">${charity.category}</p>` : ''}
+                                ${charity.description ? `<p class="charity-description">${charity.description}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    if (data.total > 10) {
+                        html += `<p class="charity-count">Showing 10 of ${data.total} charities</p>`;
+                    }
+                    container.innerHTML = html;
+                } else {
+                    // Keep the empty state if no charities
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏛️</div>
+                            <p>No charities available yet. Check back after import!</p>
+                        </div>
+                    `;
+                }
+
+                // Update charity count in stats
+                document.getElementById('charityCount').textContent = data.total || '0';
+
+            } catch (error) {
+                console.error('Failed to load charities:', error);
+            }
+        }
+
+        // Load data on page load
+        loadCharities();
 
         // Close modals when clicking outside
         window.onclick = function(event) {
