@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.0.2</title>
+    <title>Dashboard - Charity Tracker v1.1.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -224,6 +224,89 @@
             border-color: #667eea;
         }
 
+        /* Autocomplete styles */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+
+        .autocomplete-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .autocomplete-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 100;
+            display: none;
+        }
+
+        .autocomplete-dropdown.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: #f3f4f6;
+        }
+
+        .autocomplete-item-name {
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .autocomplete-item-ein {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .autocomplete-item-category {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: #667eea;
+            margin-left: 0.5rem;
+        }
+
+        .autocomplete-add-new {
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            cursor: pointer;
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .autocomplete-add-new:hover {
+            background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+        }
+
+        .autocomplete-loading {
+            padding: 0.75rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
         .modal-footer {
             display: flex;
             gap: 1rem;
@@ -304,7 +387,7 @@
     <header class="header">
         <div class="header-content">
             <div>
-                <h1>🎯 Charity Tracker <span class="version">v1.0.2</span></h1>
+                <h1>🎯 Charity Tracker <span class="version">v1.1.0</span></h1>
             </div>
             <div class="user-info">
                 <span id="userName">Loading...</span>
@@ -365,9 +448,16 @@
             <form id="donationForm">
                 <div class="form-group">
                     <label for="donationCharity">Charity</label>
-                    <select id="donationCharity" required>
-                        <option value="">Select a charity...</option>
-                    </select>
+                    <div class="autocomplete-wrapper">
+                        <input type="text"
+                               id="donationCharity"
+                               class="autocomplete-input"
+                               placeholder="Start typing to search charities..."
+                               required
+                               autocomplete="off">
+                        <input type="hidden" id="selectedCharityId">
+                        <div id="charityDropdown" class="autocomplete-dropdown"></div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="donationAmount">Amount</label>
@@ -448,12 +538,14 @@
         // Modal functions
         function showAddDonation() {
             document.getElementById('donationModal').classList.add('active');
-            loadCharitiesForSelect();
+            initCharityAutocomplete();
         }
 
         function closeDonationModal() {
             document.getElementById('donationModal').classList.remove('active');
             document.getElementById('donationForm').reset();
+            document.getElementById('selectedCharityId').value = '';
+            document.getElementById('charityDropdown').classList.remove('show');
         }
 
         function showAddCharity() {
@@ -472,12 +564,213 @@
             window.location.href = '/';
         }
 
+        // Autocomplete functionality
+        let allCharities = [];
+        let selectedCharityIndex = -1;
+        let searchTimeout;
+
+        async function initCharityAutocomplete() {
+            // Load top charities for quick access
+            if (allCharities.length === 0) {
+                try {
+                    const response = await fetch('/api/charities?limit=500');
+                    const data = await response.json();
+                    if (data.success && data.charities) {
+                        allCharities = data.charities;
+                    }
+                } catch (error) {
+                    console.error('Failed to load charities:', error);
+                }
+            }
+
+            const input = document.getElementById('donationCharity');
+            const dropdown = document.getElementById('charityDropdown');
+            const hiddenInput = document.getElementById('selectedCharityId');
+
+            // Setup event listeners
+            input.addEventListener('input', handleCharitySearch);
+            input.addEventListener('focus', handleCharitySearch);
+            input.addEventListener('keydown', handleCharityKeydown);
+        }
+
+        function handleCharitySearch(e) {
+            const query = e.target.value.toLowerCase();
+            const dropdown = document.getElementById('charityDropdown');
+
+            clearTimeout(searchTimeout);
+            selectedCharityIndex = -1;
+
+            if (query.length < 2) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            // Show loading state
+            dropdown.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
+            dropdown.classList.add('show');
+
+            // Debounce search
+            searchTimeout = setTimeout(async () => {
+                // First, filter local charities for immediate results
+                let results = allCharities.filter(charity =>
+                    charity.name.toLowerCase().includes(query) ||
+                    (charity.ein && charity.ein.toLowerCase().includes(query))
+                ).slice(0, 10);
+
+                // If we have fewer than 10 results, search the full database
+                if (results.length < 10) {
+                    try {
+                        const response = await fetch(`/api/charities?search=${encodeURIComponent(query)}&limit=10`);
+                        const data = await response.json();
+                        if (data.success && data.charities) {
+                            // Merge results, avoiding duplicates
+                            const existingIds = new Set(results.map(r => r.id));
+                            const newResults = data.charities.filter(c => !existingIds.has(c.id));
+                            results = [...results, ...newResults].slice(0, 10);
+                        }
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                    }
+                }
+
+                displayCharityResults(results, query);
+            }, 300);
+        }
+
+        function displayCharityResults(results, query) {
+            const dropdown = document.getElementById('charityDropdown');
+
+            if (results.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="autocomplete-add-new" onclick="showAddCharityFromSearch('${query}')">
+                        + Add new charity "${query}"
+                    </div>
+                `;
+            } else {
+                let html = '';
+                results.forEach((charity, index) => {
+                    html += `
+                        <div class="autocomplete-item ${index === selectedCharityIndex ? 'selected' : ''}"
+                             data-id="${charity.id}"
+                             data-index="${index}"
+                             onclick="selectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">
+                            <div class="autocomplete-item-name">${charity.name}</div>
+                            ${charity.ein ? `<span class="autocomplete-item-ein">EIN: ${charity.ein}</span>` : ''}
+                            ${charity.category ? `<span class="autocomplete-item-category">${charity.category}</span>` : ''}
+                        </div>
+                    `;
+                });
+
+                // Add "Add new charity" option at the end
+                html += `
+                    <div class="autocomplete-add-new" onclick="showAddCharityFromSearch('${query}')">
+                        + Add new charity
+                    </div>
+                `;
+
+                dropdown.innerHTML = html;
+            }
+
+            dropdown.classList.add('show');
+        }
+
+        function handleCharityKeydown(e) {
+            const dropdown = document.getElementById('charityDropdown');
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+
+            if (!dropdown.classList.contains('show') || items.length === 0) return;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedCharityIndex = Math.min(selectedCharityIndex + 1, items.length - 1);
+                    updateSelectedItem(items);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedCharityIndex = Math.max(selectedCharityIndex - 1, -1);
+                    updateSelectedItem(items);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedCharityIndex >= 0 && items[selectedCharityIndex]) {
+                        items[selectedCharityIndex].click();
+                    }
+                    break;
+                case 'Escape':
+                    dropdown.classList.remove('show');
+                    selectedCharityIndex = -1;
+                    break;
+            }
+        }
+
+        function updateSelectedItem(items) {
+            items.forEach((item, index) => {
+                if (index === selectedCharityIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function selectCharity(id, name) {
+            document.getElementById('selectedCharityId').value = id;
+            document.getElementById('donationCharity').value = name;
+            document.getElementById('charityDropdown').classList.remove('show');
+            selectedCharityIndex = -1;
+        }
+
+        function showAddCharityFromSearch(searchQuery) {
+            // Close donation modal
+            closeDonationModal();
+            // Open charity modal with pre-filled name
+            showAddCharity();
+            document.getElementById('charityName').value = searchQuery;
+        }
+
         // Form submissions
         document.getElementById('donationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // TODO: Implement donation submission to API
-            alert('Donation tracking will be fully implemented once all APIs are connected!');
-            closeDonationModal();
+
+            const charityId = document.getElementById('selectedCharityId').value;
+            if (!charityId) {
+                alert('Please select a charity from the dropdown');
+                return;
+            }
+
+            const formData = {
+                charity_id: charityId,
+                amount: parseFloat(document.getElementById('donationAmount').value),
+                donation_date: document.getElementById('donationDate').value,
+                notes: document.getElementById('donationNotes').value
+            };
+
+            try {
+                const response = await fetch('/api/donations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Donation added successfully!');
+                    closeDonationModal();
+                    // Refresh the dashboard
+                    loadDonations();
+                    loadStats();
+                    loadCharities(); // Refresh charities to show the one with donation
+                } else {
+                    alert('Failed to add donation: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error adding donation:', error);
+                alert('Failed to add donation. Please try again.');
+            }
         });
 
         document.getElementById('charityForm').addEventListener('submit', async (e) => {
@@ -487,37 +780,66 @@
             closeCharityModal();
         });
 
-        // Load charities for donation select
-        async function loadCharitiesForSelect() {
-            const select = document.getElementById('donationCharity');
-            select.innerHTML = '<option value="">Loading charities...</option>';
+        // Load and display donations
+        async function loadDonations() {
+            const container = document.getElementById('donationsContent');
 
             try {
-                const response = await fetch('/api/charities');
+                const response = await fetch('/api/donations?limit=10');
                 const data = await response.json();
 
-                select.innerHTML = '<option value="">Select a charity...</option>';
-
-                if (data.success && data.charities) {
-                    data.charities.forEach(charity => {
-                        const option = document.createElement('option');
-                        option.value = charity.id;
-                        option.textContent = `${charity.name} ${charity.ein ? `(${charity.ein})` : ''}`;
-                        select.appendChild(option);
+                if (data.success && data.donations && data.donations.length > 0) {
+                    let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Amount</th><th>Notes</th></tr></thead><tbody>';
+                    data.donations.forEach(donation => {
+                        const date = new Date(donation.donation_date).toLocaleDateString();
+                        html += `
+                            <tr>
+                                <td>${date}</td>
+                                <td>${donation.charity_name || 'Unknown'}</td>
+                                <td>$${parseFloat(donation.amount).toFixed(2)}</td>
+                                <td>${donation.notes || ''}</td>
+                            </tr>
+                        `;
                     });
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                } else {
+                    // Keep empty state
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No donations yet. Add your first donation to get started!</p>
+                        </div>
+                    `;
                 }
             } catch (error) {
-                console.error('Failed to load charities:', error);
-                select.innerHTML = '<option value="">Failed to load charities</option>';
+                console.error('Failed to load donations:', error);
             }
         }
 
-        // Load and display charities
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/donations/stats');
+                const data = await response.json();
+
+                if (data.success && data.stats) {
+                    document.getElementById('totalDonations').textContent = `$${parseFloat(data.stats.total_donations || 0).toFixed(0)}`;
+                    document.getElementById('charityCount').textContent = data.stats.charity_count || '0';
+                    document.getElementById('yearTotal').textContent = `$${parseFloat(data.stats.year_total || 0).toFixed(0)}`;
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Load and display charities (only those with donations)
         async function loadCharities() {
             const container = document.getElementById('charitiesContent');
 
             try {
-                const response = await fetch('/api/charities?limit=10');
+                // Only show charities that have donations
+                const response = await fetch('/api/charities?with_donations=true&limit=10');
                 const data = await response.json();
 
                 if (data.success && data.charities && data.charities.length > 0) {
@@ -538,11 +860,11 @@
                     }
                     container.innerHTML = html;
                 } else {
-                    // Keep the empty state if no charities
+                    // Show empty state when no charities have donations
                     container.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">🏛️</div>
-                            <p>No charities available yet. Check back after import!</p>
+                            <p>No charities with donations yet. Add your first donation to see charities here!</p>
                         </div>
                     `;
                 }
@@ -557,6 +879,8 @@
 
         // Load data on page load
         loadCharities();
+        loadDonations();
+        loadStats();
 
         // Close modals when clicking outside
         window.onclick = function(event) {

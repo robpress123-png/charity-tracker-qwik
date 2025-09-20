@@ -12,6 +12,7 @@ export async function onRequestGet(context) {
     const searchTerm = url.searchParams.get('search');
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
+    const withDonations = url.searchParams.get('with_donations') === 'true';
 
     // Check if D1 database is available
     if (!env.DB) {
@@ -22,21 +23,21 @@ export async function onRequestGet(context) {
           name: 'American Red Cross',
           ein: '53-0196605',
           category: 'Human Services',
-          description: 'Humanitarian organization providing emergency assistance'
+          description: 'Humanitarian organization with annual revenue of $3.8B'
         },
         {
           id: '2',
           name: 'Doctors Without Borders',
           ein: '13-3433452',
           category: 'Health',
-          description: 'Medical humanitarian organization'
+          description: 'Medical humanitarian organization with annual revenue of $2.1B'
         },
         {
           id: '3',
           name: 'World Wildlife Fund',
           ein: '52-1693387',
           category: 'Environment',
-          description: 'Wildlife conservation organization'
+          description: 'Wildlife conservation organization with annual revenue of $380M'
         }
       ];
 
@@ -56,26 +57,50 @@ export async function onRequestGet(context) {
     let query;
     let queryParams = [];
 
-    if (searchTerm) {
-      // Search in name, EIN, and category
-      query = `
-        SELECT id, name, ein, category, website, description
-        FROM charities
-        WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
-        ORDER BY name
-        LIMIT ? OFFSET ?
-      `;
-      const searchPattern = `%${searchTerm}%`;
-      queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+    if (withDonations) {
+      // Only get charities that have donations
+      if (searchTerm) {
+        query = `
+          SELECT DISTINCT c.id, c.name, c.ein, c.category, c.website, c.description
+          FROM charities c
+          INNER JOIN donations d ON c.id = d.charity_id
+          WHERE (c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?)
+          ORDER BY c.name
+          LIMIT ? OFFSET ?
+        `;
+        const searchPattern = `%${searchTerm}%`;
+        queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+      } else {
+        query = `
+          SELECT DISTINCT c.id, c.name, c.ein, c.category, c.website, c.description
+          FROM charities c
+          INNER JOIN donations d ON c.id = d.charity_id
+          ORDER BY c.name
+          LIMIT ? OFFSET ?
+        `;
+        queryParams = [limit, offset];
+      }
     } else {
-      // Get all charities
-      query = `
-        SELECT id, name, ein, category, website, description
-        FROM charities
-        ORDER BY name
-        LIMIT ? OFFSET ?
-      `;
-      queryParams = [limit, offset];
+      // Get all charities (existing logic)
+      if (searchTerm) {
+        query = `
+          SELECT id, name, ein, category, website, description
+          FROM charities
+          WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
+          ORDER BY name
+          LIMIT ? OFFSET ?
+        `;
+        const searchPattern = `%${searchTerm}%`;
+        queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+      } else {
+        query = `
+          SELECT id, name, ein, category, website, description
+          FROM charities
+          ORDER BY name
+          LIMIT ? OFFSET ?
+        `;
+        queryParams = [limit, offset];
+      }
     }
 
     // Execute query
@@ -83,13 +108,32 @@ export async function onRequestGet(context) {
     const result = await stmt.bind(...queryParams).all();
 
     // Get total count for pagination
-    let countQuery = searchTerm
-      ? 'SELECT COUNT(*) as total FROM charities WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?'
-      : 'SELECT COUNT(*) as total FROM charities';
+    let countQuery;
+    let countParams = [];
+
+    if (withDonations) {
+      countQuery = searchTerm
+        ? 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id WHERE c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?'
+        : 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id';
+
+      if (searchTerm) {
+        const searchPattern = `%${searchTerm}%`;
+        countParams = [searchPattern, searchPattern, searchPattern];
+      }
+    } else {
+      countQuery = searchTerm
+        ? 'SELECT COUNT(*) as total FROM charities WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?'
+        : 'SELECT COUNT(*) as total FROM charities';
+
+      if (searchTerm) {
+        const searchPattern = `%${searchTerm}%`;
+        countParams = [searchPattern, searchPattern, searchPattern];
+      }
+    }
 
     const countStmt = env.DB.prepare(countQuery);
-    const countResult = searchTerm
-      ? await countStmt.bind(`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`).first()
+    const countResult = countParams.length > 0
+      ? await countStmt.bind(...countParams).first()
       : await countStmt.first();
 
     return new Response(JSON.stringify({

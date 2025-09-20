@@ -147,8 +147,14 @@ with open('/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-track
         address = charity['address']
 
         # Create description based on category and revenue
-        revenue_millions = int(charity['revenue'] / 1000000)
-        description = f"{category} organization with annual revenue of approximately ${revenue_millions}M"
+        revenue = charity['revenue']
+        if revenue >= 1000000000:
+            # Billions
+            revenue_display = f"${revenue / 1000000000:.1f}B"
+        else:
+            # Millions
+            revenue_display = f"${int(revenue / 1000000)}M"
+        description = f"{category} organization with annual revenue of {revenue_display}"
 
         sql = f"""INSERT OR IGNORE INTO charities (user_id, name, ein, category, website, description)
 SELECT id, '{name}', '{ein}', '{category}', '', '{description}'
@@ -170,13 +176,19 @@ with open(csv_file, 'w', newline='', encoding='utf-8') as f:
     writer.writeheader()
 
     for charity in top_charities:
-        revenue_millions = int(charity['revenue'] / 1000000)
+        revenue = charity['revenue']
+        if revenue >= 1000000000:
+            # Billions
+            revenue_display = f"${revenue / 1000000000:.1f}B"
+        else:
+            # Millions
+            revenue_display = f"${int(revenue / 1000000)}M"
         writer.writerow({
             'name': charity['name'],
             'ein': charity['ein'],
             'category': charity['category'],
             'website': '',  # No website data in source
-            'description': f"{charity['category']} organization with annual revenue of approximately ${revenue_millions}M"
+            'description': f"{charity['category']} organization with annual revenue of {revenue_display}"
         })
 
 print(f"CSV file created: charities_501c3.csv")
