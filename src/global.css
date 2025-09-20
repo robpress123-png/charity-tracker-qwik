@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.gradient-primary {
+  @apply bg-gradient-to-r from-primary to-secondary;
+}
+
+.gradient-success {
+  @apply bg-gradient-to-r from-success to-accent;
+}
+
+/* Charity Tracker specific styles */
+.donation-card {
+  @apply card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-200;
+}
+
+.stat-card {
+  @apply stats shadow bg-base-100;
+}

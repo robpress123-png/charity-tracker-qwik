@@ -1,0 +1,1 @@
+import{R as n}from"./q-D-3l6r4m.js";import"./q-fFn9hMSC.js";const e=()=>n("div",null,{class:"min-h-screen flex items-center justify-center"},n("div",null,{class:"text-center"},n("h1",null,{class:"text-2xl"},"Signing out...",3,null),3,null),3,"Ag_0");export{e as s_6vQ0sdqns6U};
