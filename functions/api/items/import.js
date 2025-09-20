@@ -1,6 +1,18 @@
 export async function onRequestPost(context) {
     const { request, env } = context;
 
+    // Check database connection first
+    if (!env.DB) {
+        console.error('Database not configured in environment');
+        return new Response(JSON.stringify({
+            success: false,
+            error: 'Database connection not available. Please check Cloudflare D1 configuration.'
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     try {
         const contentType = request.headers.get('content-type');
 
@@ -86,6 +98,14 @@ export async function onRequestPost(context) {
                 if (!item.category_id || !item.name || !item.value_good) {
                     results.failed++;
                     results.errors.push(`Row ${i}: Missing required fields`);
+                    continue;
+                }
+
+                // Check database connection
+                if (!env.DB) {
+                    console.error('Database connection not available');
+                    results.failed++;
+                    results.errors.push(`Row ${i}: Database connection error`);
                     continue;
                 }
 

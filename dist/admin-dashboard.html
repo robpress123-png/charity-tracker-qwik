@@ -460,23 +460,23 @@
                 <div class="dashboard-grid">
                     <div class="stat-card">
                         <h3>Total Users</h3>
-                        <div class="value">1,247</div>
-                        <div class="change">↑ 12% from last month</div>
+                        <div class="value" id="totalUsers">0</div>
+                        <div class="change" id="userChange">Loading...</div>
                     </div>
                     <div class="stat-card">
                         <h3>Total Donations</h3>
-                        <div class="value">$452,380</div>
-                        <div class="change">↑ 8% from last month</div>
+                        <div class="value" id="totalDonations">$0</div>
+                        <div class="change" id="donationChange">Loading...</div>
                     </div>
                     <div class="stat-card">
                         <h3>Active Charities</h3>
-                        <div class="value">89</div>
-                        <div class="change">↑ 3 new this month</div>
+                        <div class="value" id="activeCharities">0</div>
+                        <div class="change" id="charityChange">Loading...</div>
                     </div>
                     <div class="stat-card">
                         <h3>Database Items</h3>
-                        <div class="value">0</div>
-                        <div class="change">Import CSV to populate</div>
+                        <div class="value" id="databaseItems">0</div>
+                        <div class="change" id="itemsChange">Loading...</div>
                     </div>
                 </div>
 
@@ -663,8 +663,8 @@
     </div>
 
     <script>
-        // Check admin authentication
-        window.onload = function() {
+        // Check admin authentication and load stats
+        window.onload = async function() {
             const adminToken = localStorage.getItem('adminToken');
             const adminUser = localStorage.getItem('adminUser');
 
@@ -674,7 +674,41 @@
             }
 
             document.getElementById('adminName').textContent = adminUser;
+
+            // Load real statistics
+            await loadAdminStats();
         };
+
+        // Load admin statistics
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+
+                    // Update stat cards with real values
+                    document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
+                    document.getElementById('totalDonations').textContent = `$${(stats.totalDonations || 0).toLocaleString()}`;
+                    document.getElementById('activeCharities').textContent = stats.activeCharities.toLocaleString();
+                    document.getElementById('databaseItems').textContent = stats.databaseItems.toLocaleString();
+
+                    // Calculate percentage changes (simplified - would need historical data for real percentages)
+                    const userChange = stats.newUsersThisMonth > 0 ? `↑ ${stats.newUsersThisMonth} new this month` : 'No new users this month';
+                    const donationChange = stats.monthlyDonations > 0 ? `↑ $${stats.monthlyDonations.toLocaleString()} this month` : 'No donations this month';
+                    const charityChange = stats.newCharitiesThisMonth > 0 ? `↑ ${stats.newCharitiesThisMonth} new this month` : 'No new charities';
+                    const itemsChange = stats.databaseItems === 0 ? 'Import CSV to populate' : `${stats.databaseItems} items loaded`;
+
+                    document.getElementById('userChange').textContent = userChange;
+                    document.getElementById('donationChange').textContent = donationChange;
+                    document.getElementById('charityChange').textContent = charityChange;
+                    document.getElementById('itemsChange').textContent = itemsChange;
+                }
+            } catch (error) {
+                console.error('Failed to load admin stats:', error);
+            }
+        }
 
         // Logout function
         function logout() {
@@ -833,8 +867,8 @@
                         ` : ''}
                     `;
 
-                    // Update the database items count
-                    document.querySelector('.stat-card .value').textContent = data.results.added + data.results.updated;
+                    // Reload stats to show updated counts
+                    await loadAdminStats();
                 } else {
                     resultsContent.innerHTML = `
                         <div class="alert alert-warning">
