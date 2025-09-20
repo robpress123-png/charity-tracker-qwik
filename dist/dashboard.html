@@ -760,6 +760,12 @@
                 </div>
                 <!-- Item donation fields -->
                 <div id="itemFields" class="donation-type-fields" style="display:none;">
+                    <!-- IRS Compliance Warning -->
+                    <div class="alert" style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:0.75rem;border-radius:8px;margin-bottom:1rem;">
+                        <strong>⚠️ IRS Requirement:</strong> Only items in "good used condition or better" qualify for tax deductions.
+                        Items in poor or fair condition that show excessive wear are NOT tax deductible per IRS regulations.
+                    </div>
+
                     <div class="form-group">
                         <label for="itemCategory">Category *</label>
                         <select id="itemCategory" onchange="loadItemsForCategory()" required>
@@ -777,12 +783,13 @@
                     </div>
 
                     <div class="form-group" id="itemQualityGroup" style="display:none;">
-                        <label for="itemQuality">Condition *</label>
+                        <label for="itemQuality">Condition * <span style="color:#059669;font-size:0.875rem;">(All qualify for tax deduction)</span></label>
                         <select id="itemQuality" onchange="updateItemValue()" required>
-                            <option value="fair">Fair - Some wear, fully functional</option>
-                            <option value="good" selected>Good - Minor wear, clean</option>
-                            <option value="excellent">Excellent - Like new</option>
+                            <option value="good" selected>Good - Normal wear, fully functional</option>
+                            <option value="very_good">Very Good - Light wear, well-maintained</option>
+                            <option value="excellent">Excellent - Like new condition</option>
                         </select>
+                        <small style="color:#6b7280;">Items below "Good" condition are not tax deductible and should not be included</small>
                     </div>
 
                     <div class="form-group" id="itemQuantityGroup" style="display:none;">
@@ -2051,7 +2058,14 @@
             document.getElementById('itemQualityGroup').style.display = 'block';
             document.getElementById('itemQuantityGroup').style.display = 'block';
 
-            const valueKey = `value_${quality}`;
+            // Map the quality values correctly
+            let valueKey;
+            if (quality === 'very_good') {
+                valueKey = 'value_very_good';
+            } else {
+                valueKey = `value_${quality}`;
+            }
+
             const unitValue = item[valueKey] || item.value_good;
             const totalValue = unitValue * quantity;
 
@@ -2072,13 +2086,27 @@
 
             const category = itemCategories.find(c => c.id == categoryId);
             const item = currentItems.find(i => i.id == itemId);
-            const valueKey = `value_${quality}`;
+
+            // Map the quality values correctly
+            let valueKey;
+            let qualityLabel;
+            if (quality === 'good') {
+                valueKey = 'value_good';
+                qualityLabel = 'Good';
+            } else if (quality === 'very_good') {
+                valueKey = 'value_very_good';
+                qualityLabel = 'Very Good';
+            } else if (quality === 'excellent') {
+                valueKey = 'value_excellent';
+                qualityLabel = 'Excellent';
+            }
+
             const unitValue = item[valueKey] || item.value_good;
 
             selectedDonationItems.push({
                 categoryName: category.name,
                 itemName: item.name,
-                quality: quality,
+                quality: qualityLabel,
                 quantity: quantity,
                 unitValue: unitValue,
                 totalValue: unitValue * quantity
