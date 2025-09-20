@@ -280,7 +280,22 @@ export async function onRequestPut(context) {
     }
 
     const body = await request.json();
-    const { amount, donation_date, notes } = body;
+    const {
+      amount,
+      donation_date,
+      notes,
+      donation_type = 'cash',
+      // Type-specific fields
+      miles_driven,
+      mileage_rate,
+      mileage_purpose,
+      item_description,
+      estimated_value,
+      quantity,
+      cost_basis,
+      fair_market_value,
+      crypto_type
+    } = body;
     const userId = 'test-user-id';
 
     if (!env.DB) {
@@ -299,12 +314,23 @@ export async function onRequestPut(context) {
 
     // Update donation
     const stmt = env.DB.prepare(`
-      UPDATE donations 
-      SET amount = ?, donation_date = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+      UPDATE donations
+      SET amount = ?, donation_date = ?, notes = ?, donation_type = ?,
+          miles_driven = ?, mileage_rate = ?, mileage_purpose = ?,
+          item_description = ?, estimated_value = ?,
+          quantity = ?, cost_basis = ?, fair_market_value = ?,
+          crypto_type = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND user_id = ?
     `);
-    
-    const result = await stmt.bind(amount, donation_date, notes, donationId, userId).run();
+
+    const result = await stmt.bind(
+      amount, donation_date, notes, donation_type,
+      miles_driven, mileage_rate, mileage_purpose,
+      item_description, estimated_value,
+      quantity, cost_basis, fair_market_value,
+      crypto_type,
+      donationId, userId
+    ).run();
 
     if (result.meta.changes === 0) {
       return new Response(JSON.stringify({

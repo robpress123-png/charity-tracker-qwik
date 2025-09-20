@@ -203,6 +203,30 @@
             border-bottom: 1px solid #e5e7eb;
         }
 
+        .btn-action {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.25rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #e5e7eb;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            border-color: #fecaca;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -1047,6 +1071,7 @@
             }
 
             const donationType = document.getElementById('donationType').value;
+            const isEditing = window.editingDonationId !== undefined;
             const formData = {
                 charity_id: charityId,
                 donation_type: donationType,
@@ -1086,8 +1111,11 @@
             }
 
             try {
-                const response = await fetch('/api/donations', {
-                    method: 'POST',
+                const url = isEditing ? `/api/donations/${window.editingDonationId}` : '/api/donations';
+                const method = isEditing ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -1097,18 +1125,22 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert('Donation added successfully!');
+                    alert(isEditing ? 'Donation updated successfully!' : 'Donation added successfully!');
                     closeDonationModal();
+                    // Clear editing flag
+                    delete window.editingDonationId;
+                    // Reset modal title
+                    document.querySelector('#donationModal .modal-header h2').textContent = 'Add Donation';
                     // Refresh the dashboard
                     loadDonations();
                     loadStats();
                     loadCharities(); // Refresh charities to show the one with donation
                 } else {
-                    alert('Failed to add donation: ' + data.error);
+                    alert(`Failed to ${isEditing ? 'update' : 'add'} donation: ` + data.error);
                 }
             } catch (error) {
-                console.error('Error adding donation:', error);
-                alert('Failed to add donation. Please try again.');
+                console.error(`Error ${isEditing ? 'updating' : 'adding'} donation:`, error);
+                alert(`Failed to ${isEditing ? 'update' : 'add'} donation. Please try again.`);
             }
         });
 
@@ -1128,15 +1160,28 @@
                 const data = await response.json();
 
                 if (data.success && data.donations && data.donations.length > 0) {
-                    let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Amount</th><th>Notes</th></tr></thead><tbody>';
+                    let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
                     data.donations.forEach(donation => {
                         const date = new Date(donation.donation_date).toLocaleDateString();
+                        const typeIcons = {
+                            'cash': '💵',
+                            'items': '📦',
+                            'miles': '🚗',
+                            'stock': '📈',
+                            'crypto': '₿'
+                        };
+                        const typeIcon = typeIcons[donation.donation_type] || '💵';
                         html += `
                             <tr>
                                 <td>${date}</td>
                                 <td>${donation.charity_name || 'Unknown'}</td>
+                                <td>${typeIcon} ${donation.donation_type || 'cash'}</td>
                                 <td>$${parseFloat(donation.amount).toFixed(2)}</td>
                                 <td>${donation.notes || ''}</td>
+                                <td>
+                                    <button class="btn-action" onclick="editDonation('${donation.id}')">✏️</button>
+                                    <button class="btn-action btn-danger" onclick="deleteDonation('${donation.id}')">🗑️</button>
+                                </td>
                             </tr>
                         `;
                     });
@@ -1361,6 +1406,88 @@
         // Helper function to handle donation type changes
         function handleDonationTypeChange(event) {
             updateDonationFields();
+        }
+
+        // Edit donation function
+        async function editDonation(donationId) {
+            try {
+                // Fetch the donation details
+                const response = await fetch(`/api/donations/${donationId}`);
+                const data = await response.json();
+
+                if (data.success && data.donation) {
+                    const donation = data.donation;
+
+                    // Store the donation ID for update
+                    window.editingDonationId = donationId;
+
+                    // Populate the form with existing data
+                    document.getElementById('selectedCharityId').value = donation.charity_id;
+                    document.getElementById('donationCharity').value = donation.charity_name || '';
+                    document.getElementById('donationType').value = donation.donation_type || 'cash';
+                    document.getElementById('donationDate').value = donation.donation_date;
+                    document.getElementById('donationNotes').value = donation.notes || '';
+
+                    // Set type-specific fields
+                    updateDonationFields();
+
+                    if (donation.donation_type === 'cash') {
+                        document.getElementById('donationAmount').value = donation.amount;
+                    } else if (donation.donation_type === 'items') {
+                        document.getElementById('itemDescription').value = donation.item_description || '';
+                        document.getElementById('estimatedValue').value = donation.estimated_value || donation.amount;
+                    } else if (donation.donation_type === 'miles') {
+                        document.getElementById('milesDriven').value = donation.miles_driven || '';
+                        document.getElementById('mileagePurpose').value = donation.mileage_purpose || '';
+                    } else if (donation.donation_type === 'stock') {
+                        document.getElementById('stockQuantity').value = donation.quantity || '';
+                        document.getElementById('fairMarketValue').value = donation.fair_market_value || donation.amount;
+                        document.getElementById('costBasis').value = donation.cost_basis || '';
+                    } else if (donation.donation_type === 'crypto') {
+                        document.getElementById('cryptoType').value = donation.crypto_type || '';
+                        document.getElementById('cryptoQuantity').value = donation.quantity || '';
+                        document.getElementById('cryptoValue').value = donation.amount;
+                    }
+
+                    // Change the modal title and show it
+                    document.querySelector('#donationModal .modal-header h2').textContent = 'Edit Donation';
+                    showAddDonation();
+                }
+            } catch (error) {
+                console.error('Error fetching donation:', error);
+                alert('Failed to load donation details');
+            }
+        }
+
+        // Delete donation function
+        async function deleteDonation(donationId) {
+            if (!confirm('Are you sure you want to delete this donation?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/donations/${donationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Donation deleted successfully');
+                    // Refresh the dashboard
+                    loadDonations();
+                    loadStats();
+                    loadCharities();
+                } else {
+                    alert('Failed to delete donation: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error deleting donation:', error);
+                alert('Failed to delete donation');
+            }
         }
 
         // Helper function to open donation modal with specific type
