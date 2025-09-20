@@ -484,6 +484,16 @@
                 <button class="nav-item" onclick="showSection('tools')">
                     🔧 Tools
                 </button>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem; padding-right: 1rem;">
+                    <label style="color: white; font-size: 0.9rem;">Year:</label>
+                    <select id="globalYearFilter" onchange="updateYearFilter()" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem;">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="all">All Years</option>
+                    </select>
+                </div>
             </div>
         </nav>
     </header>
@@ -570,11 +580,12 @@
             </div>
             <div style="display: grid; gap: 1rem;">
                 <div class="form-group">
-                    <label>Select Year</label>
+                    <label>Report Year</label>
                     <select id="reportYear" style="width: 200px;">
                         <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
                         <option value="all">All Years</option>
                     </select>
                 </div>
@@ -1182,12 +1193,31 @@
             closeCharityModal();
         });
 
+        // Update year filter
+        function updateYearFilter() {
+            const year = document.getElementById('globalYearFilter').value;
+            // Sync with report year dropdown
+            const reportYear = document.getElementById('reportYear');
+            if (reportYear) {
+                reportYear.value = year;
+            }
+            // Reload data with new filter
+            loadDonations();
+            loadStats();
+            loadCharities();
+        }
+
         // Load and display donations
         async function loadDonations() {
             const container = document.getElementById('donationsContent');
+            const year = document.getElementById('globalYearFilter')?.value || '2024';
 
             try {
-                const response = await fetch('/api/donations?limit=10');
+                let url = '/api/donations?limit=10';
+                if (year && year !== 'all') {
+                    url += `&year=${year}`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (data.success && data.donations && data.donations.length > 0) {
@@ -1295,9 +1325,13 @@
         // Export functions
         async function exportCSV() {
             try {
-                // Fetch all donations for the current year
-                const currentYear = new Date().getFullYear();
-                const response = await fetch(`/api/donations?year=${currentYear}&limit=10000`);
+                // Fetch all donations for the selected year
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
+                let url = '/api/donations?limit=10000';
+                if (selectedYear && selectedYear !== 'all') {
+                    url = `/api/donations?year=${selectedYear}&limit=10000`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (!data.success || !data.donations || data.donations.length === 0) {
@@ -1323,7 +1357,8 @@
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `donations_${currentYear}.csv`;
+                const filename = selectedYear === 'all' ? 'donations_all.csv' : `donations_${selectedYear}.csv`;
+                link.download = filename;
                 link.click();
             } catch (error) {
                 console.error('Export failed:', error);
@@ -1333,9 +1368,13 @@
 
         async function exportPDF() {
             try {
-                // Fetch all donations for the current year
-                const currentYear = new Date().getFullYear();
-                const response = await fetch(`/api/donations?year=${currentYear}&limit=10000`);
+                // Fetch all donations for the selected year
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
+                let url = '/api/donations?limit=10000';
+                if (selectedYear && selectedYear !== 'all') {
+                    url = `/api/donations?year=${selectedYear}&limit=10000`;
+                }
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (!data.success || !data.donations || data.donations.length === 0) {
@@ -1348,7 +1387,7 @@
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>Donation Report ${currentYear}</title>
+                        <title>Donation Report ${selectedYear === 'all' ? 'All Years' : selectedYear}</title>
                         <style>
                             body { font-family: Arial, sans-serif; margin: 40px; }
                             h1 { color: #667eea; }
@@ -1360,7 +1399,7 @@
                         </style>
                     </head>
                     <body>
-                        <h1>Tax Deductible Donations - ${currentYear}</h1>
+                        <h1>Tax Deductible Donations - ${selectedYear === 'all' ? 'All Years' : selectedYear}</h1>
                         <div class="summary">
                             <h2>Summary</h2>
                             <p><strong>Total Donations:</strong> $${data.donations.reduce((sum, d) => sum + parseFloat(d.amount), 0).toFixed(2)}</p>
