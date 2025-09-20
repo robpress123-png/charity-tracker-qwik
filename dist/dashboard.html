@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.1.0</title>
+    <title>Dashboard - Charity Tracker v1.2.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -23,8 +23,12 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem 2rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-top {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .header-content {
@@ -36,14 +40,14 @@
         }
 
         .header h1 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .version {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             opacity: 0.9;
         }
 
@@ -66,6 +70,49 @@
 
         .logout-btn:hover {
             background: rgba(255,255,255,0.3);
+        }
+
+        /* Navigation menu */
+        .nav-menu {
+            background: rgba(0,0,0,0.1);
+            padding: 0 2rem;
+        }
+
+        .nav-menu-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            color: white;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: white;
         }
 
         .container {
@@ -385,55 +432,198 @@
 </head>
 <body>
     <header class="header">
-        <div class="header-content">
-            <div>
-                <h1>🎯 Charity Tracker <span class="version">v1.1.0</span></h1>
-            </div>
-            <div class="user-info">
-                <span id="userName">Loading...</span>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="header-top">
+            <div class="header-content">
+                <div>
+                    <h1>🎯 Charity Tracker <span class="version">v1.2.0</span></h1>
+                </div>
+                <div class="user-info">
+                    <span id="userName">Loading...</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
             </div>
         </div>
+        <nav class="nav-menu">
+            <div class="nav-menu-content">
+                <button class="nav-item active" onclick="showSection('dashboard')">
+                    📊 Dashboard
+                </button>
+                <button class="nav-item" onclick="showSection('donations')">
+                    ➕ Add Donation
+                </button>
+                <button class="nav-item" onclick="showSection('reports')">
+                    📈 Reports
+                </button>
+                <button class="nav-item" onclick="showSection('profile')">
+                    👤 Profile
+                </button>
+                <button class="nav-item" onclick="showSection('tools')">
+                    🔧 Tools
+                </button>
+            </div>
+        </nav>
     </header>
 
     <div class="container">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Donations</div>
-                <div class="stat-value" id="totalDonations">$0</div>
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Donations</div>
+                    <div class="stat-value" id="totalDonations">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Charities Supported</div>
+                    <div class="stat-value" id="charityCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">This Year</div>
+                    <div class="stat-value" id="yearTotal">$0</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Charities Supported</div>
-                <div class="stat-value" id="charityCount">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">This Year</div>
-                <div class="stat-value" id="yearTotal">$0</div>
-            </div>
-        </div>
 
-        <div class="section">
-            <div class="section-header">
-                <h2>Recent Donations</h2>
-                <button class="btn-primary" onclick="showAddDonation()">Add Donation</button>
+            <div class="section">
+                <div class="section-header">
+                    <h2>Recent Donations</h2>
+                    <button class="btn-primary" onclick="showAddDonation()">Add Donation</button>
+                </div>
+                <div id="donationsContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>No donations yet. Add your first donation to get started!</p>
+                    </div>
+                </div>
             </div>
-            <div id="donationsContent">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
-                    <p>No donations yet. Add your first donation to get started!</p>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2>My Charities</h2>
+                    <button class="btn-primary" onclick="showAddCharity()">Add Charity</button>
+                </div>
+                <div id="charitiesContent">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏛️</div>
+                        <p>No charities added yet. Add your favorite charities!</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-header">
-                <h2>My Charities</h2>
-                <button class="btn-primary" onclick="showAddCharity()">Add Charity</button>
+        <!-- Add Donation Section (hidden by default) -->
+        <div id="addDonationSection" class="section-content" style="display:none;">
+            <div class="section">
+                <div class="section-header">
+                    <h2>➕ Add New Donation</h2>
+                </div>
+                <div style="padding: 2rem; text-align: center;">
+                    <p style="margin-bottom: 2rem;">Select the type of donation you want to record:</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
+                        <button class="btn-primary" onclick="openDonationModal('cash')">
+                            💵 Cash Donation
+                        </button>
+                        <button class="btn-primary" onclick="openDonationModal('items')">
+                            📦 Donated Items
+                        </button>
+                        <button class="btn-primary" onclick="openDonationModal('miles')">
+                            🚗 Mileage
+                        </button>
+                        <button class="btn-primary" onclick="openDonationModal('stock')">
+                            📈 Stock/Securities
+                        </button>
+                        <button class="btn-primary" onclick="openDonationModal('crypto')">
+                            ₿ Cryptocurrency
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div id="charitiesContent">
-                <div class="empty-state">
-                    <div class="empty-state-icon">🏛️</div>
-                    <p>No charities added yet. Add your favorite charities!</p>
+        </div>
+
+        <!-- Reports Section (hidden by default) -->
+        <div id="reportsSection" class="section-content" style="display:none;">
+            <div class="section">
+            <div class="section-header">
+                <h2>📈 Tax Reports & Export</h2>
+            </div>
+            <div style="display: grid; gap: 1rem;">
+                <div class="form-group">
+                    <label>Select Year</label>
+                    <select id="reportYear" style="width: 200px;">
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="all">All Years</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="exportCSV()">
+                        📄 Download CSV
+                    </button>
+                    <button class="btn-primary" onclick="exportPDF()">
+                        📑 Download PDF Report
+                    </button>
+                    <button class="btn-primary" onclick="viewSummary()">
+                        👁️ View Summary
+                    </button>
+                </div>
+                <div id="reportSummary" style="margin-top: 2rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section (hidden by default) -->
+        <div id="profileSection" class="section-content" style="display:none;">
+            <div class="section">
+                <div class="section-header">
+                    <h2>👤 Profile Settings</h2>
+                </div>
+                <div style="padding: 2rem;">
+                    <div class="form-group">
+                        <label>Filing Status</label>
+                        <select id="filingStatus" style="width: 300px;">
+                            <option value="single">Single</option>
+                            <option value="married_jointly">Married Filing Jointly</option>
+                            <option value="married_separately">Married Filing Separately</option>
+                            <option value="head_of_household">Head of Household</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Income Bracket</label>
+                        <select id="incomeBracket" style="width: 300px;">
+                            <option value="0-50k">$0 - $50,000</option>
+                            <option value="50k-100k">$50,000 - $100,000</option>
+                            <option value="100k-200k">$100,000 - $200,000</option>
+                            <option value="200k-500k">$200,000 - $500,000</option>
+                            <option value="500k+">$500,000+</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="saveProfile()">
+                        Save Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Section (hidden by default) -->
+        <div id="toolsSection" class="section-content" style="display:none;">
+            <div class="section">
+                <div class="section-header">
+                    <h2>🛠️ Tools & Utilities</h2>
+                </div>
+                <div style="padding: 2rem;">
+                    <div style="display: grid; gap: 1rem; max-width: 600px;">
+                        <button class="btn-primary" onclick="calculateTaxSavings()">
+                            💰 Tax Savings Calculator
+                        </button>
+                        <button class="btn-primary" onclick="importTransactions()">
+                            📊 Import Bank Transactions (CSV)
+                        </button>
+                        <button class="btn-primary" onclick="manageReceipts()">
+                            📸 Manage Receipt Photos
+                        </button>
+                        <button class="btn-primary" onclick="backupData()">
+                            💾 Backup/Export All Data
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -460,8 +650,81 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="donationAmount">Amount</label>
-                    <input type="number" id="donationAmount" step="0.01" min="0" required>
+                    <label for="donationType">Donation Type</label>
+                    <select id="donationType" required onchange="updateDonationFields()">
+                        <option value="cash">💵 Cash/Check</option>
+                        <option value="items">📦 Items/Goods</option>
+                        <option value="miles">🚗 Miles Driven</option>
+                        <option value="stock">📈 Stock</option>
+                        <option value="crypto">₿ Cryptocurrency</option>
+                    </select>
+                </div>
+                <!-- Cash donation fields -->
+                <div id="cashFields" class="donation-type-fields">
+                    <div class="form-group">
+                        <label for="donationAmount">Amount</label>
+                        <input type="number" id="donationAmount" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <!-- Item donation fields -->
+                <div id="itemFields" class="donation-type-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="itemDescription">Item Description</label>
+                        <textarea id="itemDescription" rows="2" placeholder="Describe the donated items"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="estimatedValue">Estimated Value</label>
+                        <input type="number" id="estimatedValue" step="0.01" min="0">
+                    </div>
+                </div>
+                <!-- Mileage donation fields -->
+                <div id="milesFields" class="donation-type-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="milesDriven">Miles Driven</label>
+                        <input type="number" id="milesDriven" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="mileagePurpose">Purpose</label>
+                        <input type="text" id="mileagePurpose" placeholder="e.g., Deliver meals, volunteer at event">
+                    </div>
+                    <div class="form-group" style="background:#f3f4f6; padding:0.5rem; border-radius:8px;">
+                        <small>2024 IRS Rate: $0.14/mile | Deduction: $<span id="mileageDeduction">0.00</span></small>
+                    </div>
+                </div>
+                <!-- Stock donation fields -->
+                <div id="stockFields" class="donation-type-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="stockQuantity">Number of Shares</label>
+                        <input type="number" id="stockQuantity" step="0.001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="fairMarketValue">Fair Market Value</label>
+                        <input type="number" id="fairMarketValue" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="costBasis">Cost Basis (optional)</label>
+                        <input type="number" id="costBasis" step="0.01" min="0">
+                    </div>
+                </div>
+                <!-- Crypto donation fields -->
+                <div id="cryptoFields" class="donation-type-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="cryptoType">Cryptocurrency Type</label>
+                        <select id="cryptoType">
+                            <option value="">Select...</option>
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cryptoQuantity">Quantity</label>
+                        <input type="number" id="cryptoQuantity" step="0.00000001" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="cryptoValue">USD Value at Donation</label>
+                        <input type="number" id="cryptoValue" step="0.01" min="0">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="donationDate">Date</label>
@@ -534,6 +797,50 @@
 
         // Set today's date as default for donation form
         document.getElementById('donationDate').valueAsDate = new Date();
+
+        // Function to update donation fields based on type
+        function updateDonationFields() {
+            const donationType = document.getElementById('donationType').value;
+
+            // Hide all type-specific fields
+            document.querySelectorAll('.donation-type-fields').forEach(el => {
+                el.style.display = 'none';
+                // Remove required from hidden fields
+                el.querySelectorAll('input, textarea, select').forEach(field => {
+                    field.removeAttribute('required');
+                });
+            });
+
+            // Show relevant fields and set required
+            const fieldsToShow = document.getElementById(donationType + 'Fields');
+            if (fieldsToShow) {
+                fieldsToShow.style.display = 'block';
+                // Add required to visible amount fields
+                if (donationType === 'cash') {
+                    document.getElementById('donationAmount').setAttribute('required', '');
+                } else if (donationType === 'miles') {
+                    document.getElementById('milesDriven').setAttribute('required', '');
+                } else if (donationType === 'items') {
+                    document.getElementById('itemDescription').setAttribute('required', '');
+                    document.getElementById('estimatedValue').setAttribute('required', '');
+                } else if (donationType === 'stock') {
+                    document.getElementById('stockQuantity').setAttribute('required', '');
+                    document.getElementById('fairMarketValue').setAttribute('required', '');
+                } else if (donationType === 'crypto') {
+                    document.getElementById('cryptoType').setAttribute('required', '');
+                    document.getElementById('cryptoQuantity').setAttribute('required', '');
+                    document.getElementById('cryptoValue').setAttribute('required', '');
+                }
+            }
+        }
+
+        // Calculate mileage deduction
+        document.getElementById('milesDriven')?.addEventListener('input', (e) => {
+            const miles = parseFloat(e.target.value) || 0;
+            const rate = 0.14; // 2024 IRS rate
+            const deduction = (miles * rate).toFixed(2);
+            document.getElementById('mileageDeduction').textContent = deduction;
+        });
 
         // Modal functions
         function showAddDonation() {
@@ -739,12 +1046,44 @@
                 return;
             }
 
+            const donationType = document.getElementById('donationType').value;
             const formData = {
                 charity_id: charityId,
-                amount: parseFloat(document.getElementById('donationAmount').value),
+                donation_type: donationType,
                 donation_date: document.getElementById('donationDate').value,
                 notes: document.getElementById('donationNotes').value
             };
+
+            // Add type-specific data
+            switch(donationType) {
+                case 'cash':
+                    formData.amount = parseFloat(document.getElementById('donationAmount').value);
+                    break;
+                case 'items':
+                    formData.item_description = document.getElementById('itemDescription').value;
+                    formData.amount = parseFloat(document.getElementById('estimatedValue').value);
+                    formData.estimated_value = formData.amount;
+                    break;
+                case 'miles':
+                    const miles = parseFloat(document.getElementById('milesDriven').value);
+                    const rate = 0.14; // 2024 IRS rate
+                    formData.miles_driven = miles;
+                    formData.mileage_rate = rate;
+                    formData.mileage_purpose = document.getElementById('mileagePurpose').value;
+                    formData.amount = miles * rate; // Calculate deduction amount
+                    break;
+                case 'stock':
+                    formData.quantity = parseFloat(document.getElementById('stockQuantity').value);
+                    formData.fair_market_value = parseFloat(document.getElementById('fairMarketValue').value);
+                    formData.cost_basis = parseFloat(document.getElementById('costBasis').value) || null;
+                    formData.amount = formData.fair_market_value;
+                    break;
+                case 'crypto':
+                    formData.crypto_type = document.getElementById('cryptoType').value;
+                    formData.quantity = parseFloat(document.getElementById('cryptoQuantity').value);
+                    formData.amount = parseFloat(document.getElementById('cryptoValue').value);
+                    break;
+            }
 
             try {
                 const response = await fetch('/api/donations', {
@@ -874,6 +1213,198 @@
 
             } catch (error) {
                 console.error('Failed to load charities:', error);
+            }
+        }
+
+        // Export functions
+        async function exportCSV() {
+            try {
+                // Fetch all donations for the current year
+                const currentYear = new Date().getFullYear();
+                const response = await fetch(`/api/donations?year=${currentYear}&limit=10000`);
+                const data = await response.json();
+
+                if (!data.success || !data.donations || data.donations.length === 0) {
+                    alert('No donations to export');
+                    return;
+                }
+
+                // Create CSV content
+                let csvContent = 'Date,Charity,Type,Amount,Description,Notes\n';
+
+                data.donations.forEach(donation => {
+                    const date = new Date(donation.donation_date).toLocaleDateString();
+                    const charity = (donation.charity_name || 'Unknown').replace(/,/g, ';');
+                    const type = donation.donation_type || 'cash';
+                    const amount = parseFloat(donation.amount).toFixed(2);
+                    const description = getDescriptionForType(donation);
+                    const notes = (donation.notes || '').replace(/,/g, ';');
+
+                    csvContent += `${date},"${charity}",${type},${amount},"${description}","${notes}"\n`;
+                });
+
+                // Download CSV file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `donations_${currentYear}.csv`;
+                link.click();
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export donations. Please try again.');
+            }
+        }
+
+        async function exportPDF() {
+            try {
+                // Fetch all donations for the current year
+                const currentYear = new Date().getFullYear();
+                const response = await fetch(`/api/donations?year=${currentYear}&limit=10000`);
+                const data = await response.json();
+
+                if (!data.success || !data.donations || data.donations.length === 0) {
+                    alert('No donations to export');
+                    return;
+                }
+
+                // Create HTML content for PDF
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Donation Report ${currentYear}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 40px; }
+                            h1 { color: #667eea; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #f2f2f2; }
+                            .summary { margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+                            .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Tax Deductible Donations - ${currentYear}</h1>
+                        <div class="summary">
+                            <h2>Summary</h2>
+                            <p><strong>Total Donations:</strong> $${data.donations.reduce((sum, d) => sum + parseFloat(d.amount), 0).toFixed(2)}</p>
+                            <p><strong>Number of Donations:</strong> ${data.donations.length}</p>
+                            <p><strong>Report Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Charity</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                data.donations.forEach(donation => {
+                    const date = new Date(donation.donation_date).toLocaleDateString();
+                    const description = getDescriptionForType(donation);
+                    htmlContent += `
+                        <tr>
+                            <td>${date}</td>
+                            <td>${donation.charity_name || 'Unknown'}</td>
+                            <td>${donation.donation_type || 'cash'}</td>
+                            <td>$${parseFloat(donation.amount).toFixed(2)}</td>
+                            <td>${description}</td>
+                            <td>${donation.notes || ''}</td>
+                        </tr>
+                    `;
+                });
+
+                htmlContent += `
+                            </tbody>
+                        </table>
+                        <div class="footer">
+                            <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
+                            <p>Generated by Charity Tracker v1.2.0</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+
+                // Open in new window for printing
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(htmlContent);
+                printWindow.document.close();
+                printWindow.print();
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export donations. Please try again.');
+            }
+        }
+
+        function getDescriptionForType(donation) {
+            switch(donation.donation_type) {
+                case 'items':
+                    return donation.item_description || 'Donated items';
+                case 'miles':
+                    return `${donation.miles_driven || 0} miles @ $${donation.mileage_rate || 0.14}/mile - ${donation.mileage_purpose || 'Charity work'}`;
+                case 'stock':
+                    return `${donation.quantity || 0} shares (FMV: $${donation.fair_market_value || 0})`;
+                case 'crypto':
+                    return `${donation.quantity || 0} ${donation.crypto_type || 'units'}`;
+                case 'cash':
+                default:
+                    return 'Cash donation';
+            }
+        }
+
+        // Helper function to open donation modal with specific type
+        function openDonationModal(type) {
+            document.getElementById('donationType').value = type;
+            handleDonationTypeChange({ target: { value: type } });
+            showAddDonation();
+        }
+
+        // Section navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show the selected section
+            const sectionMap = {
+                'dashboard': 'dashboardSection',
+                'donations': 'addDonationSection',
+                'reports': 'reportsSection',
+                'profile': 'profileSection',
+                'tools': 'toolsSection'
+            };
+
+            const sectionId = sectionMap[sectionName];
+            if (sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.style.display = 'block';
+                }
+
+                // Mark nav item as active
+                const navItem = document.querySelector(`.nav-item[onclick*="${sectionName}"]`);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            }
+
+            // If showing dashboard, reload data
+            if (sectionName === 'dashboard') {
+                loadCharities();
+                loadDonations();
+                loadStats();
             }
         }
 
