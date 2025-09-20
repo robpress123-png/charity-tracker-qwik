@@ -10,8 +10,8 @@ database_id = "your-database-id-here"
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-[env.development]
-vars = { ENVIRONMENT = "development" }
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
 
 # KV namespace for sessions
 [[kv_namespaces]]
