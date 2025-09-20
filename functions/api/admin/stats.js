@@ -2,16 +2,23 @@ export async function onRequestGet(context) {
     const { env } = context;
 
     try {
-        // Check database connection
-        if (!env.DB) {
+        // Check database connection - try different binding names
+        const db = env.DB || env['charity-tracker-qwik-db'] || env.DATABASE;
+
+        if (!db) {
+            console.error('Database not configured. Available env keys:', Object.keys(env));
             return new Response(JSON.stringify({
                 success: false,
-                error: 'Database connection not available'
+                error: 'Database connection not available. Please configure D1 binding in Cloudflare Pages settings.',
+                debug: Object.keys(env) // Show available keys for debugging
             }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
+
+        // Use the found database for all operations
+        env.DB = db;
 
         // Get total users
         const usersResult = await env.DB.prepare(
