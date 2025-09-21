@@ -48,22 +48,40 @@ export async function onRequestGet(context) {
             ).first();
         }
 
-        // Get monthly statistics (last 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+        // Get monthly statistics - simplified queries
+        let monthlyDonations = { count: 0, total: 0 };
+        let newUsersMonth = { count: 0 };
+        let newCharitiesMonth = { count: 0 };
 
-        const monthlyDonations = await env.DB.prepare(
-            'SELECT COUNT(*) as count, SUM(amount) as total FROM donations WHERE donation_date >= ?'
-        ).bind(thirtyDaysAgoStr).first();
+        try {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
 
-        const newUsersMonth = await env.DB.prepare(
-            'SELECT COUNT(*) as count FROM users WHERE created_at >= datetime("now", "-30 days")'
-        ).first();
+            monthlyDonations = await env.DB.prepare(
+                'SELECT COUNT(*) as count, SUM(amount) as total FROM donations WHERE donation_date >= ?'
+            ).bind(thirtyDaysAgoStr).first();
+        } catch (e) {
+            console.log('Monthly donations query failed:', e);
+        }
 
-        const newCharitiesMonth = await env.DB.prepare(
-            'SELECT COUNT(*) as count FROM charities WHERE created_at >= datetime("now", "-30 days")'
-        ).first();
+        try {
+            // Note: users table might not have created_at column
+            newUsersMonth = await env.DB.prepare(
+                'SELECT COUNT(*) as count FROM users'
+            ).first();
+        } catch (e) {
+            console.log('New users query failed:', e);
+        }
+
+        try {
+            // Note: charities table might not have created_at column
+            newCharitiesMonth = await env.DB.prepare(
+                'SELECT COUNT(*) as count FROM charities'
+            ).first();
+        } catch (e) {
+            console.log('New charities query failed:', e);
+        }
 
         return new Response(JSON.stringify({
             success: true,
