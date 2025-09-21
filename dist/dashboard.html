@@ -36,7 +36,7 @@
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -83,7 +83,7 @@
         }
 
         .nav-menu-content {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             display: flex;
             gap: 1rem;
@@ -126,9 +126,9 @@
         }
 
         .container {
-            max-width: 100%;
-            margin: 0;
-            padding: 0 0.5rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 1rem;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -136,59 +136,62 @@
         }
 
         .stats-grid {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: nowrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .stat-card {
             background: white;
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-            flex: 1;
-            min-width: 120px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            padding: 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
         .stat-label {
             color: #6b7280;
-            font-size: 0.75rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         .stat-value {
-            font-size: 1.1rem;
+            font-size: 1.75rem;
             font-weight: 700;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1;
+            line-height: 1.2;
         }
 
         .section {
             background: white;
-            border-radius: 6px;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.4rem;
-            padding-bottom: 0.25rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
             border-bottom: 1px solid #e5e7eb;
         }
 
         .section h2 {
             color: #333;
-            font-size: 0.95rem;
+            font-size: 1.125rem;
             font-weight: 600;
         }
 
@@ -196,10 +199,10 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -216,20 +219,20 @@
 
         .table th {
             text-align: left;
-            padding: 0.4rem;
+            padding: 0.75rem;
             border-bottom: 2px solid #e5e7eb;
             color: #6b7280;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             position: sticky;
             top: 0;
             background: white;
         }
 
         .table td {
-            padding: 0.4rem;
+            padding: 0.75rem;
             border-bottom: 1px solid #e5e7eb;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .btn-action {
@@ -473,6 +476,33 @@
             margin: 0.5rem 0;
         }
 
+        /* Responsive improvements */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1800px;
+            }
+            .header-content,
+            .nav-menu-content {
+                max-width: 1800px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            .stat-card {
+                padding: 0.75rem;
+            }
+            .stat-value {
+                font-size: 1.25rem;
+            }
+        }
+
         .charity-description {
             color: #4b5563;
             font-size: 0.875rem;
@@ -535,7 +565,7 @@
     <main class="main-content">
     <div class="container">
         <!-- Dashboard Section -->
-        <div id="dashboardSection" class="section-content" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+        <div id="dashboardSection" class="section-content" style="display: flex; flex-direction: column; height: 100%; overflow: hidden; gap: 0.5rem;">
             <div class="stats-grid">
                 <div class="stat-card">
                     <div>
@@ -563,12 +593,12 @@
                 </div>
             </div>
 
-            <div class="section" style="flex: 1; display: flex; flex-direction: column; min-height: 0; max-height: calc(50vh - 100px);">
+            <div class="section" style="flex: 1; display: flex; flex-direction: column; min-height: 0; max-height: calc(60vh - 120px);">
                 <div class="section-header" style="flex-shrink: 0;">
                     <h2>Recent Donations</h2>
                 </div>
                 <!-- Search/Filter Bar -->
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f9fafb; border-radius: 6px;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px;">
                     <input type="text" id="donationSearch" placeholder="Search by charity or notes..."
                            style="flex: 1; padding: 0.4rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem;"
                            oninput="filterDonations()">
@@ -614,7 +644,7 @@
                 </div>
                 <div style="padding: 2rem; text-align: center;">
                     <p style="margin-bottom: 2rem;">Select the type of donation you want to record:</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 800px; margin: 0 auto;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
                         <button class="btn-primary" onclick="openDonationModal('cash')">
                             💵 Cash Donation
                         </button>
@@ -673,7 +703,7 @@
                 <div style="padding: 1rem;">
                     <!-- Personal Information Section -->
                     <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.1rem;">📝 Personal Information</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                         <div class="form-group">
                             <label>Full Name</label>
                             <input type="text" id="profileName" placeholder="Enter your full name" style="width: 100%;">
