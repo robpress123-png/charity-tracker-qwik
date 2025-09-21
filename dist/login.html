@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Charity Tracker v1.4.3</title>
+    <title>Login - Charity Tracker v1.4.5</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -159,12 +159,12 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required value="test@example.com">
+                <input type="email" id="email" name="email" required value="test@example.com" autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required value="password123">
+                <input type="password" id="password" name="password" required value="password123" autocomplete="current-password">
             </div>
 
             <button type="submit" id="submitBtn">Sign In</button>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Charity Tracker</title>
-    <link rel="stylesheet" href="/styles.css">
+    <!-- Inline styles only, no external stylesheet needed -->
     <style>
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -140,12 +140,12 @@
         <form id="registerForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="you@example.com">
+                <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter a strong password">
+                <input type="password" id="password" name="password" required placeholder="Enter a strong password" autocomplete="new-password">
                 <div class="password-requirements">
                     Minimum 8 characters
                 </div>
@@ -153,12 +153,12 @@
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password">
+                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password" autocomplete="new-password">
             </div>
 
             <div class="form-group">
                 <label for="name">Full Name (Optional)</label>
-                <input type="text" id="name" name="name" placeholder="John Doe">
+                <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name">
             </div>
 
             <button type="submit" class="btn-primary" id="registerButton">
