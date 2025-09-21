@@ -41,3 +41,11 @@ coverage/
 *.pid
 *.seed
 *.pid.lock
+
+# Large data files - generate locally when needed
+data/top_10000_charities.json
+data/top_10000_charities.sql
+data/sql-chunks/
+data/charities_import.csv
+data/charity-verification-report*.json
+data/exported_charities.csv
