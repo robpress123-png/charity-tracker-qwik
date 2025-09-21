@@ -205,7 +205,7 @@
             // Simple validation for development
             if (username === 'admin' && password === 'admin123') {
                 // Set admin session
-                localStorage.setItem('adminToken', 'admin-' + Date.now());
+                localStorage.setItem('adminToken', 'admin-token');
                 localStorage.setItem('adminUser', username);
 
                 // Redirect to admin dashboard
