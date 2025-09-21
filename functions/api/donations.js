@@ -116,6 +116,17 @@ export async function onRequestPost(context) {
       mileage_purpose,
       item_description,
       estimated_value,
+      stock_name: body.stock_name,
+      stock_symbol: body.stock_symbol,
+      shares_donated: body.shares_donated,
+      crypto_name: body.crypto_name,
+      crypto_symbol: body.crypto_symbol,
+      crypto_quantity: body.crypto_quantity,
+      crypto_price_per_unit: body.crypto_price_per_unit,
+      crypto_exchange: body.crypto_exchange,
+      crypto_cost_basis: body.crypto_cost_basis,
+      crypto_holding_period: body.crypto_holding_period,
+      crypto_donation_datetime: body.crypto_donation_datetime,
       notes: notes || ''
     };
 
@@ -293,6 +304,14 @@ export async function onRequestGet(context) {
         stock_name: parsedNotes.stock_name,
         stock_symbol: parsedNotes.stock_symbol,
         shares_donated: parsedNotes.shares_donated,
+        crypto_name: parsedNotes.crypto_name,
+        crypto_symbol: parsedNotes.crypto_symbol,
+        crypto_quantity: parsedNotes.crypto_quantity,
+        crypto_price_per_unit: parsedNotes.crypto_price_per_unit,
+        crypto_exchange: parsedNotes.crypto_exchange,
+        crypto_cost_basis: parsedNotes.crypto_cost_basis,
+        crypto_holding_period: parsedNotes.crypto_holding_period,
+        crypto_donation_datetime: parsedNotes.crypto_donation_datetime,
         notes: parsedNotes.notes || donation.notes || '',
         // Rename 'date' to 'donation_date' for consistency
         donation_date: donation.date

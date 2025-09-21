@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.4.3</title>
+    <title>Dashboard - Charity Tracker v1.4.5</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -457,13 +457,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.4.4</strong> - New: Stock donations with name & symbol tracking, horizontal layout!
+        <strong>🎯 Charity Tracker v1.4.5</strong> - New: IRS-compliant crypto donations with exact timestamp tracking!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.4.4</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.4.5</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -523,7 +523,6 @@
             <div class="section">
                 <div class="section-header">
                     <h2>Recent Donations</h2>
-                    <button class="btn-primary" onclick="showAddDonation()">Add Donation</button>
                 </div>
                 <div id="donationsContent">
                     <div class="empty-state">
@@ -918,25 +917,75 @@
                 </div>
                 <!-- Crypto donation fields -->
                 <div id="cryptoFields" class="donation-type-fields" style="display:none;">
+                    <!-- IRS Notice -->
+                    <div class="alert" style="background:#e0f2fe;border:1px solid #0284c7;color:#075985;padding:0.5rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.875rem;">
+                        <strong>📊 IRS Rule:</strong> Use fair market value at exact time of donation. For crypto held >1 year, deduct full FMV. For ≤1 year, deduct lesser of cost basis or FMV.
+                    </div>
+
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                         <div class="form-group">
-                            <label for="cryptoType">Cryptocurrency</label>
-                            <select id="cryptoType">
-                                <option value="">Select...</option>
-                                <option value="BTC">Bitcoin (BTC)</option>
-                                <option value="ETH">Ethereum (ETH)</option>
-                                <option value="other">Other</option>
-                            </select>
+                            <label for="cryptoName">Cryptocurrency Name</label>
+                            <input type="text" id="cryptoName" placeholder="e.g., Bitcoin" required>
                         </div>
                         <div class="form-group">
-                            <label for="cryptoQuantity">Quantity</label>
-                            <input type="number" id="cryptoQuantity" step="0.00000001" min="0" placeholder="Amount">
+                            <label for="cryptoSymbol">Symbol/Ticker</label>
+                            <input type="text" id="cryptoSymbol" placeholder="e.g., BTC" style="text-transform:uppercase;" required>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="cryptoValue">USD Value at Time of Donation</label>
-                        <input type="number" id="cryptoValue" step="0.01" min="0" placeholder="Total USD value">
-                        <small style="color:#6b7280;">Use exchange rate at time of donation</small>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="cryptoDonationDate">Donation Date</label>
+                            <input type="date" id="cryptoDonationDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoDonationTime">Exact Time (for price verification)</label>
+                            <input type="time" id="cryptoDonationTime" step="1" required>
+                            <small style="color:#6b7280;">Critical for IRS valuation</small>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="cryptoQuantity">Quantity</label>
+                            <input type="number" id="cryptoQuantity" step="0.00000001" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="Amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoPricePerUnit">Price per Unit (USD)</label>
+                            <input type="number" id="cryptoPricePerUnit" step="0.01" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="$ per coin/token at exact time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoExchange">Exchange/Source</label>
+                            <input type="text" id="cryptoExchange" placeholder="e.g., Coinbase, Binance" required>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="cryptoCostBasis">Cost Basis (optional)</label>
+                            <input type="number" id="cryptoCostBasis" step="0.01" min="0" placeholder="Total purchase cost">
+                            <small style="color:#6b7280;">Your original purchase price</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoHoldingPeriod">Holding Period</label>
+                            <select id="cryptoHoldingPeriod">
+                                <option value="long">Over 1 year (Long-term)</option>
+                                <option value="short">1 year or less (Short-term)</option>
+                            </select>
+                            <small style="color:#6b7280;">Affects deduction calculation</small>
+                        </div>
+                    </div>
+
+                    <!-- Total Display -->
+                    <div style="background:#f0f9ff; padding:0.75rem; border-radius:6px; margin-top:1rem; border:1px solid #bae6fd;">
+                        <div style="font-size:0.875rem; color:#0369a1; font-weight:600;">Total Crypto Donation Value:</div>
+                        <div id="cryptoTotalDisplay" style="font-size:1.5rem; font-weight:bold; color:#075985;">$0.00</div>
+                        <div style="font-size:0.75rem; color:#0c4a6e; margin-top:0.25rem;">
+                            <span id="cryptoCalculation">0 units × $0.00 = $0.00</span>
+                        </div>
+                        <div id="cryptoDeductionNote" style="font-size:0.75rem; color:#0c4a6e; margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #bae6fd;">
+                            <strong>Tax Deduction:</strong> <span id="cryptoDeductionAmount">$0.00</span>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1370,9 +1419,23 @@
                     formData.amount = shares * pricePerShare; // Total donation = shares × price per share
                     break;
                 case 'crypto':
-                    formData.crypto_type = document.getElementById('cryptoType').value;
-                    formData.quantity = parseFloat(document.getElementById('cryptoQuantity').value);
-                    formData.amount = parseFloat(document.getElementById('cryptoValue').value);
+                    const cryptoQuantity = parseFloat(document.getElementById('cryptoQuantity').value);
+                    const cryptoPricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value);
+                    const cryptoDate = document.getElementById('cryptoDonationDate').value || document.getElementById('donationDate').value;
+                    const cryptoTime = document.getElementById('cryptoDonationTime').value;
+
+                    formData.crypto_name = document.getElementById('cryptoName').value;
+                    formData.crypto_symbol = document.getElementById('cryptoSymbol').value.toUpperCase();
+                    formData.crypto_quantity = cryptoQuantity;
+                    formData.crypto_price_per_unit = cryptoPricePerUnit;
+                    formData.crypto_exchange = document.getElementById('cryptoExchange').value;
+                    formData.crypto_cost_basis = parseFloat(document.getElementById('cryptoCostBasis').value) || null;
+                    formData.crypto_holding_period = document.getElementById('cryptoHoldingPeriod').value;
+                    formData.amount = cryptoQuantity * cryptoPricePerUnit;
+                    // Store exact donation timestamp
+                    formData.crypto_donation_datetime = `${cryptoDate}T${cryptoTime}`;
+                    // Override the donation date with crypto-specific date
+                    formData.donation_date = cryptoDate;
                     break;
             }
 
@@ -1774,7 +1837,9 @@
                     const stockTotal = (donation.shares_donated || 0) * (donation.fair_market_value || 0);
                     return `${donation.stock_symbol || 'Stock'}: ${donation.shares_donated || 0} shares @ $${donation.fair_market_value || 0}/share = $${stockTotal.toFixed(2)}`;
                 case 'crypto':
-                    return `${donation.quantity || 0} ${donation.crypto_type || 'units'}`;
+                    const cryptoTotal = (donation.crypto_quantity || 0) * (donation.crypto_price_per_unit || 0);
+                    const cryptoTime = donation.crypto_donation_datetime ? new Date(donation.crypto_donation_datetime).toLocaleTimeString() : '';
+                    return `${donation.crypto_symbol || 'Crypto'}: ${donation.crypto_quantity || 0} units @ $${donation.crypto_price_per_unit || 0}/unit = $${cryptoTotal.toFixed(2)} (${cryptoTime})`;
                 case 'cash':
                 default:
                     return 'Cash donation';
@@ -1885,7 +1950,9 @@
                     amount = stockShares * stockPrice; // Total = shares × price
                     break;
                 case 'crypto':
-                    amount = parseFloat(document.getElementById('cryptoValue').value) || 0;
+                    const cryptoQty = parseFloat(document.getElementById('cryptoQuantity').value) || 0;
+                    const cryptoPrice = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
+                    amount = cryptoQty * cryptoPrice;
                     break;
             }
 
@@ -2883,6 +2950,29 @@
             document.getElementById('stockTotalDisplay').textContent = '$' + total.toFixed(2);
             document.getElementById('stockCalculation').textContent =
                 `${shares} shares × $${pricePerShare.toFixed(2)} = $${total.toFixed(2)}`;
+        }
+
+        // Calculate crypto donation total
+        function calculateCryptoTotal() {
+            const quantity = parseFloat(document.getElementById('cryptoQuantity').value) || 0;
+            const pricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
+            const total = quantity * pricePerUnit;
+            const costBasis = parseFloat(document.getElementById('cryptoCostBasis').value) || 0;
+            const holdingPeriod = document.getElementById('cryptoHoldingPeriod').value;
+
+            document.getElementById('cryptoTotalDisplay').textContent = '$' + total.toFixed(2);
+            document.getElementById('cryptoCalculation').textContent =
+                `${quantity} units × $${pricePerUnit.toFixed(2)} = $${total.toFixed(2)}`;
+
+            // Calculate tax deduction based on holding period
+            let deduction = total;
+            let note = '';
+            if (holdingPeriod === 'short' && costBasis > 0) {
+                deduction = Math.min(costBasis, total);
+                note = deduction === costBasis ? ' (limited to cost basis)' : ' (at fair market value)';
+            }
+
+            document.getElementById('cryptoDeductionAmount').textContent = '$' + deduction.toFixed(2) + note;
         }
 
         // Calculate mileage deduction
