@@ -1130,7 +1130,7 @@
             const hiddenInput = document.getElementById('selectedCharityId');
 
             if (!input || !dropdown) {
-                console.error('Charity input or dropdown not found');
+                console.error('Charity input or dropdown not found', 'Input:', input, 'Dropdown:', dropdown);
                 return;
             }
 
@@ -1140,14 +1140,22 @@
                 return; // Already initialized
             }
 
-            // Setup event listeners
-            input.addEventListener('input', handleCharitySearch);
-            input.addEventListener('focus', handleCharitySearch);
-            input.addEventListener('keydown', handleCharityKeydown);
+            // Setup event listeners - use anonymous functions to ensure they're attached
+            input.addEventListener('input', function(e) {
+                console.log('Input event fired');
+                handleCharitySearch(e);
+            });
+            input.addEventListener('focus', function(e) {
+                console.log('Focus event fired');
+                handleCharitySearch(e);
+            });
+            input.addEventListener('keydown', function(e) {
+                handleCharityKeydown(e);
+            });
 
             // Mark as initialized
             input._charityListenersAdded = true;
-            console.log('Charity autocomplete initialized');
+            console.log('Charity autocomplete initialized - listeners attached to:', input);
         }
 
         function handleCharitySearch(e) {
