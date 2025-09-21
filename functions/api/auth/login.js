@@ -12,14 +12,22 @@ export async function onRequestPost(context) {
 
     // Check if D1 database is available
     if (env.DB) {
+      // Hash the password to match what's stored in the database
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
       // Query the database for the user
       const result = await env.DB.prepare(
         'SELECT id, email, name, plan FROM users WHERE email = ? AND password = ?'
       )
-        .bind(email, password)
+        .bind(email.toLowerCase(), hashedPassword)
         .first();
 
       if (result) {
+        console.log('Login successful for user:', email);
         return new Response(JSON.stringify({
           success: true,
           user: result,
@@ -30,6 +38,8 @@ export async function onRequestPost(context) {
             'Access-Control-Allow-Origin': '*'
           }
         });
+      } else {
+        console.log('Login failed - no matching user for:', email);
       }
     } else {
       // Fallback for local testing without D1
