@@ -793,7 +793,7 @@
 
                         <!-- Step 2: Item Search (shown after category selection) -->
                         <div id="itemSearchSection" style="display:none;">
-                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search Items</label>
+                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search Items in <span id="selectedCategoryName" style="color:#667eea;"></span></label>
                             <div style="position:relative;">
                                 <input type="text"
                                        id="itemSearch"
@@ -2307,7 +2307,12 @@
             document.getElementById('itemCategorySearch').value = categoryName;
             document.getElementById('selectedCategoryIcon').textContent = categoryIcon;
             document.getElementById('categoryDropdown').style.display = 'none';
-            document.getElementById('selectedCategoryName').textContent = categoryName;
+
+            // Check if element exists before setting
+            const categoryNameElement = document.getElementById('selectedCategoryName');
+            if (categoryNameElement) {
+                categoryNameElement.textContent = categoryName;
+            }
 
             // Show item search section
             document.getElementById('itemSearchSection').style.display = 'block';
@@ -2317,11 +2322,20 @@
             // Load items for this category
             try {
                 const response = await fetch(`/api/items?category_id=${categoryId}`);
+                console.log('Items API response status:', response.status);
                 const data = await response.json();
+                console.log('Items data:', data);
 
                 if (data.success) {
-                    currentItems = data.items;
-                    // Items are now loaded for search
+                    currentItems = data.items || [];
+                    console.log(`Loaded ${currentItems.length} items for category ${categoryName}`);
+                    // Show dropdown immediately if there are items
+                    if (currentItems.length > 0) {
+                        showItemDropdown();
+                    }
+                } else {
+                    console.error('Failed to load items:', data.error);
+                    currentItems = [];
                 }
             } catch (error) {
                 console.error('Failed to load items:', error);
