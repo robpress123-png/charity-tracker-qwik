@@ -1,7 +1,6 @@
 /**
  * Cloudflare Pages Function for bulk importing charities
  * POST /api/charities/import - Import charities from CSV with duplicate checking
- * Fixed version with proper user handling and address fields
  */
 
 // Helper function to get user from token
@@ -12,9 +11,9 @@ function getUserFromToken(token) {
 
     const tokenValue = token.replace('Bearer ', '');
 
-    // For admin/test mode
+    // For admin/test mode - use a special system user ID
     if (tokenValue === 'test-token' || tokenValue === 'demo-token' || tokenValue === 'admin-token') {
-        return { id: 'admin', email: 'admin@example.com', isAdmin: true };
+        return { id: 'system', email: 'admin@example.com', isAdmin: true };
     }
 
     // Parse real token format: token-{userId}-{timestamp}
@@ -92,38 +91,6 @@ export async function onRequestPost(context) {
             });
         }
 
-        // Get or create a system user for charity imports
-        let systemUserId;
-        try {
-            // First try to get the test user
-            const testUser = await env.DB.prepare(
-                'SELECT id FROM users WHERE email = ?'
-            ).bind('test@example.com').first();
-
-            if (testUser) {
-                systemUserId = testUser.id;
-            } else {
-                // Create a system user if it doesn't exist
-                const newUserId = generateId();
-                await env.DB.prepare(
-                    'INSERT INTO users (id, email, password, name, plan, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-                ).bind(newUserId, 'system@charitytracker.com', 'system-import', 'System Import', 'system').run();
-                systemUserId = newUserId;
-            }
-        } catch (e) {
-            console.error('User lookup/creation error:', e);
-            return new Response(JSON.stringify({
-                success: false,
-                error: 'Failed to get or create system user: ' + e.message
-            }), {
-                status: 500,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-
         // Process charities
         const results = {
             processed: 0,
@@ -134,10 +101,8 @@ export async function onRequestPost(context) {
             errors: []
         };
 
-        // Process in smaller batches to avoid timeout and show all charities
-        const BATCH_SIZE = 50;
-        const MAX_ERRORS_TO_SHOW = 10;
-
+        // Process in batches to avoid timeout
+        const BATCH_SIZE = 100;
         for (let i = 0; i < charities.length; i += BATCH_SIZE) {
             const batch = charities.slice(i, Math.min(i + BATCH_SIZE, charities.length));
 
@@ -148,19 +113,22 @@ export async function onRequestPost(context) {
                     // Validate required fields
                     if (!charity.name || !charity.ein) {
                         results.failed++;
-                        if (results.errors.length < MAX_ERRORS_TO_SHOW) {
-                            results.errors.push(`Row ${results.processed}: Missing required fields (name or EIN)`);
-                        }
+                        results.errors.push(`Row ${results.processed}: Missing required fields (name or EIN)`);
                         continue;
                     }
 
                     // Clean EIN (remove non-numeric characters)
-                    const cleanEIN = charity.ein.replace(/[^0-9]/g, '').padStart(9, '0');
+                    const cleanEIN = charity.ein.replace(/[^0-9]/g, '');
+                    if (cleanEIN.length < 9) {
+                        results.failed++;
+                        results.errors.push(`Row ${results.processed}: Invalid EIN "${charity.ein}"`);
+                        continue;
+                    }
 
-                    // Check for existing charity by EIN (system-wide)
+                    // Check for existing charity by EIN
                     const existing = await env.DB.prepare(
-                        'SELECT id FROM charities WHERE ein = ?'
-                    ).bind(cleanEIN).first();
+                        'SELECT id FROM charities WHERE ein = ? AND user_id = ?'
+                    ).bind(cleanEIN, user.id).first();
 
                     if (existing) {
                         if (skipDuplicates && !updateExisting) {
@@ -169,31 +137,22 @@ export async function onRequestPost(context) {
                         }
 
                         if (updateExisting) {
-                            // Update existing charity with all fields including address
+                            // Update existing charity
                             await env.DB.prepare(`
                                 UPDATE charities SET
                                     name = ?,
                                     category = ?,
-                                    address = ?,
-                                    city = ?,
-                                    state = ?,
-                                    zip_code = ?,
                                     website = ?,
                                     description = ?,
-                                    phone = ?,
                                     updated_at = CURRENT_TIMESTAMP
-                                WHERE id = ?
+                                WHERE id = ? AND user_id = ?
                             `).bind(
                                 charity.name,
                                 charity.category || 'Other',
-                                charity.address || '',
-                                charity.city || '',
-                                charity.state || '',
-                                charity.zip_code || charity.zip || '',
-                                charity.website || '',
-                                charity.description || '',
-                                charity.phone || '',
-                                existing.id
+                                charity.website || null,
+                                charity.description || null,
+                                existing.id,
+                                user.id
                             ).run();
 
                             results.updated++;
@@ -201,60 +160,48 @@ export async function onRequestPost(context) {
                             results.skipped++;
                         }
                     } else {
-                        // Add new charity with all address fields
+                        // Add new charity
                         const charityId = generateId();
 
                         await env.DB.prepare(`
                             INSERT INTO charities (
-                                id, user_id, name, ein, category,
-                                address, city, state, zip_code,
-                                website, description, phone, created_at
+                                id, user_id, name, ein, category, website, description, created_at
                             ) VALUES (
-                                ?, ?, ?, ?, ?,
-                                ?, ?, ?, ?,
-                                ?, ?, ?, CURRENT_TIMESTAMP
+                                ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
                             )
                         `).bind(
                             charityId,
-                            systemUserId,
+                            user.id,
                             charity.name,
                             cleanEIN,
                             charity.category || 'Other',
-                            charity.address || '',
-                            charity.city || '',
-                            charity.state || '',
-                            charity.zip_code || charity.zip || '',
-                            charity.website || '',
-                            charity.description || '',
-                            charity.phone || ''
+                            charity.website || null,
+                            charity.description || null
                         ).run();
 
                         results.added++;
                     }
                 } catch (error) {
                     results.failed++;
-                    if (results.errors.length < MAX_ERRORS_TO_SHOW) {
-                        results.errors.push(`Row ${results.processed}: ${error.message}`);
+                    results.errors.push(`Row ${results.processed}: ${error.message}`);
+
+                    // Stop if too many errors
+                    if (results.errors.length >= 50) {
+                        results.errors.push('Too many errors, stopping import');
+                        break;
                     }
                 }
             }
 
-            // If we've processed a lot and have many errors, stop early
-            if (results.failed > 100 && results.added === 0) {
-                results.errors.push(`Stopping import due to too many errors (${results.failed} failures)`);
+            // Break if too many errors
+            if (results.errors.length >= 50) {
                 break;
             }
         }
 
-        // Add summary if there were more errors than shown
-        if (results.failed > MAX_ERRORS_TO_SHOW) {
-            results.errors.push(`... and ${results.failed - MAX_ERRORS_TO_SHOW} more errors`);
-        }
-
         return new Response(JSON.stringify({
-            success: results.added > 0 || results.updated > 0,
-            results: results,
-            message: `Import completed: ${results.added} added, ${results.updated} updated, ${results.skipped} skipped, ${results.failed} failed`
+            success: true,
+            results: results
         }), {
             headers: {
                 'Content-Type': 'application/json',
@@ -263,10 +210,10 @@ export async function onRequestPost(context) {
         });
 
     } catch (error) {
-        console.error('Import error:', error);
+        console.error('Error importing charities:', error);
         return new Response(JSON.stringify({
             success: false,
-            error: 'Import failed: ' + error.message
+            error: 'Failed to import charities: ' + error.message
         }), {
             status: 500,
             headers: {
@@ -277,8 +224,8 @@ export async function onRequestPost(context) {
     }
 }
 
-// Handle OPTIONS requests for CORS
-export async function onRequestOptions() {
+// Handle preflight requests
+export async function onRequestOptions(context) {
     return new Response(null, {
         headers: {
             'Access-Control-Allow-Origin': '*',
