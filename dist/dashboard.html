@@ -457,13 +457,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.4.3</strong> - New: Yearly donation breakdown in admin dashboard!
+        <strong>🎯 Charity Tracker v1.4.4</strong> - New: Stock donations with name & symbol tracking, horizontal layout!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.4.3</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.4.4</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -728,7 +728,7 @@
 
     <!-- Add Donation Modal -->
     <div id="donationModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 900px; width: 90%;">
             <div class="modal-header">
                 <h2 id="donationModalTitle">Add Cash Donation</h2>
             </div>
@@ -770,30 +770,31 @@
                         <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
                     </div>
 
-                    <!-- Step 1: Category Search with Autocomplete -->
-                    <div class="form-group">
-                        <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 1: Select or Search Category</label>
-                        <div style="position:relative;">
-                            <input type="text"
-                                   id="itemCategorySearch"
-                                   placeholder="Type to search categories (e.g., 'Women', 'Electronics', 'Furniture')..."
-                                   oninput="searchCategories(this.value)"
-                                   onfocus="showCategoryDropdown()"
-                                   style="font-size:0.875rem;width:100%;padding-right:2rem;">
-                            <span id="selectedCategoryIcon" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);font-size:1.25rem;"></span>
-                            <input type="hidden" id="itemCategory">
+                    <!-- Two column layout for steps -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <!-- Step 1: Category -->
+                        <div>
+                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 1: Select Category</label>
+                            <div style="position:relative;">
+                                <input type="text"
+                                       id="itemCategorySearch"
+                                       placeholder="Search categories..."
+                                       oninput="searchCategories(this.value)"
+                                       onfocus="showCategoryDropdown()"
+                                       style="font-size:0.875rem;width:100%;padding-right:2rem;">
+                                <span id="selectedCategoryIcon" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);font-size:1.25rem;"></span>
+                                <input type="hidden" id="itemCategory">
 
-                            <!-- Category Dropdown -->
-                            <div id="categoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
-                                <!-- Populated dynamically -->
+                                <!-- Category Dropdown -->
+                                <div id="categoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                    <!-- Populated dynamically -->
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Step 2: Item Search (shown after category selection) -->
-                    <div id="itemSearchSection" style="display:none;">
-                        <div class="form-group">
-                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search for Item in <span id="selectedCategoryName"></span></label>
+                        <!-- Step 2: Item Search (shown after category selection) -->
+                        <div id="itemSearchSection" style="display:none;">
+                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search Items</label>
                             <div style="position:relative;">
                                 <input type="text"
                                        id="itemSearch"
@@ -809,48 +810,48 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>  <!-- Close the grid -->
 
                     <!-- Step 3: Condition and Quantity (shown after item selection) -->
-                    <div id="itemDetailsSection" style="display:none;">
-                        <div style="background:#f9fafb;padding:1rem;border-radius:6px;margin-bottom:1rem;">
-                            <div style="font-size:0.875rem;color:#6b7280;margin-bottom:0.5rem;">Selected Item:</div>
-                            <div id="selectedItemDisplay" style="font-size:1rem;font-weight:600;color:#374151;margin-bottom:0.75rem;"></div>
+                    <div id="itemDetailsSection" style="display:none; margin-top: 1rem;">
+                        <div style="background:#f0f9ff;padding:0.75rem;border-radius:6px;border:1px solid #bae6fd;">
+                            <div style="font-size:0.875rem;color:#0369a1;margin-bottom:0.5rem;font-weight:600;">Selected Item:</div>
+                            <div id="selectedItemDisplay" style="font-size:0.95rem;color:#075985;margin-bottom:0.5rem;"></div>
 
-                            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:0.75rem;align-items:end;">
-                                <div class="form-group" style="margin-bottom:0;">
-                                    <label for="itemQuality" style="font-size:0.875rem;">Condition</label>
-                                    <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:center;">
+                                <div>
+                                    <label for="itemQuality" style="font-size:0.75rem;color:#6b7280;">Condition</label>
+                                    <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;padding:0.25rem;">
                                         <option value="good">Good</option>
                                         <option value="very_good">Very Good</option>
                                         <option value="excellent">Excellent</option>
                                     </select>
                                 </div>
 
-                                <div class="form-group" style="margin-bottom:0;">
-                                    <label for="itemQuantity" style="font-size:0.875rem;">Quantity</label>
-                                    <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem;">
+                                <div>
+                                    <label for="itemQuantity" style="font-size:0.75rem;color:#6b7280;">Qty</label>
+                                    <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem;width:60px;padding:0.25rem;">
                                 </div>
 
-                                <div style="text-align:right;">
-                                    <div style="font-size:0.75rem;color:#6b7280;">Item Value:</div>
-                                    <div id="itemValuePreview" style="font-size:1.25rem;font-weight:bold;color:#667eea;">$0.00</div>
+                                <div style="text-align:center;">
+                                    <div style="font-size:0.75rem;color:#6b7280;">Value:</div>
+                                    <div id="itemValuePreview" style="font-size:1rem;font-weight:bold;color:#667eea;">$0.00</div>
                                 </div>
+
+                                <button type="button" onclick="addItemToList()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.875rem;font-weight:600;white-space:nowrap;">
+                                    + Add
+                                </button>
                             </div>
-
-                            <button type="button" onclick="addItemToList()" style="width:100%;margin-top:1rem;padding:0.5rem;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.875rem;font-weight:600;">
-                                ➕ Add Item to Donation
-                            </button>
                         </div>
                     </div>
 
                     <!-- Receipt-Style Items Display -->
                     <div style="margin-top:1rem;">
-                        <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:0.75rem;">
-                            <div style="border-bottom:1px solid #e5e7eb; padding-bottom:0.5rem; margin-bottom:0.5rem;">
-                                <strong style="font-size:0.875rem;">📋 Donation Receipt</strong>
+                        <div style="background:white; border:1px solid #e5e7eb; border-radius:6px; padding:0.5rem;">
+                            <div style="border-bottom:1px solid #e5e7eb; padding-bottom:0.25rem; margin-bottom:0.25rem;">
+                                <strong style="font-size:0.75rem;color:#6b7280;">📋 Items List</strong>
                             </div>
-                            <div id="selectedItemsList" style="min-height:60px; max-height:150px; overflow-y:auto;">
+                            <div id="selectedItemsList" style="min-height:40px; max-height:120px; overflow-y:auto;font-size:0.875rem;">
                                 <div class="empty-state" style="color:#9ca3af; text-align:center; padding:1rem; font-size:0.875rem;">
                                     No items added yet
                                 </div>
@@ -869,7 +870,7 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                         <div class="form-group">
                             <label for="milesDriven">Miles Driven</label>
-                            <input type="number" id="milesDriven" step="0.1" min="0">
+                            <input type="number" id="milesDriven" step="0.1" min="0" onchange="calculateMileageDeduction()" oninput="calculateMileageDeduction()">
                         </div>
                         <div class="form-group">
                             <label for="mileagePurpose">Purpose</label>
@@ -884,18 +885,35 @@
                 <div id="stockFields" class="donation-type-fields" style="display:none;">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                         <div class="form-group">
+                            <label for="stockName">Stock Name</label>
+                            <input type="text" id="stockName" placeholder="e.g., Apple Inc." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stockSymbol">Stock Symbol</label>
+                            <input type="text" id="stockSymbol" placeholder="e.g., AAPL" style="text-transform:uppercase;" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
                             <label for="stockQuantity">Number of Shares</label>
-                            <input type="number" id="stockQuantity" step="0.001" min="0">
+                            <input type="number" id="stockQuantity" step="0.001" min="0" onchange="calculateStockTotal()" oninput="calculateStockTotal()" required>
                         </div>
                         <div class="form-group">
                             <label for="fairMarketValue">Closing Price per Share</label>
-                            <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="$ per share">
+                            <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="$ per share" onchange="calculateStockTotal()" oninput="calculateStockTotal()" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="costBasis">Cost Basis (optional)</label>
                         <input type="number" id="costBasis" step="0.01" min="0" placeholder="Total cost basis">
-                        <small style="color:#6b7280;">Price lookup feature coming soon</small>
+                        <small style="color:#6b7280;">Automatic price lookup coming soon</small>
+                    </div>
+                    <div style="background:#f0f9ff; padding:0.75rem; border-radius:6px; margin-top:1rem; border:1px solid #bae6fd;">
+                        <div style="font-size:0.875rem; color:#0369a1; font-weight:600;">Total Stock Donation:</div>
+                        <div id="stockTotalDisplay" style="font-size:1.5rem; font-weight:bold; color:#075985;">$0.00</div>
+                        <div style="font-size:0.75rem; color:#0c4a6e; margin-top:0.25rem;">
+                            <span id="stockCalculation">0 shares × $0.00 = $0.00</span>
+                        </div>
                     </div>
                 </div>
                 <!-- Crypto donation fields -->
@@ -1342,10 +1360,14 @@
                     formData.amount = miles * rate; // Calculate deduction amount
                     break;
                 case 'stock':
-                    formData.quantity = parseFloat(document.getElementById('stockQuantity').value);
-                    formData.fair_market_value = parseFloat(document.getElementById('fairMarketValue').value);
+                    const shares = parseFloat(document.getElementById('stockQuantity').value);
+                    const pricePerShare = parseFloat(document.getElementById('fairMarketValue').value);
+                    formData.stock_name = document.getElementById('stockName').value;
+                    formData.stock_symbol = document.getElementById('stockSymbol').value.toUpperCase();
+                    formData.shares_donated = shares;
+                    formData.fair_market_value = pricePerShare;
                     formData.cost_basis = parseFloat(document.getElementById('costBasis').value) || null;
-                    formData.amount = formData.fair_market_value;
+                    formData.amount = shares * pricePerShare; // Total donation = shares × price per share
                     break;
                 case 'crypto':
                     formData.crypto_type = document.getElementById('cryptoType').value;
@@ -1749,7 +1771,8 @@
                 case 'miles':
                     return `${donation.miles_driven || 0} miles @ $${donation.mileage_rate || 0.14}/mile - ${donation.mileage_purpose || 'Charity work'}`;
                 case 'stock':
-                    return `${donation.quantity || 0} shares (FMV: $${donation.fair_market_value || 0})`;
+                    const stockTotal = (donation.shares_donated || 0) * (donation.fair_market_value || 0);
+                    return `${donation.stock_symbol || 'Stock'}: ${donation.shares_donated || 0} shares @ $${donation.fair_market_value || 0}/share = $${stockTotal.toFixed(2)}`;
                 case 'crypto':
                     return `${donation.quantity || 0} ${donation.crypto_type || 'units'}`;
                 case 'cash':
@@ -1857,7 +1880,9 @@
                     amount = miles * 0.14;
                     break;
                 case 'stock':
-                    amount = parseFloat(document.getElementById('fairMarketValue').value) || 0;
+                    const stockShares = parseFloat(document.getElementById('stockQuantity').value) || 0;
+                    const stockPrice = parseFloat(document.getElementById('fairMarketValue').value) || 0;
+                    amount = stockShares * stockPrice; // Total = shares × price
                     break;
                 case 'crypto':
                     amount = parseFloat(document.getElementById('cryptoValue').value) || 0;
@@ -2253,7 +2278,7 @@
                 html = '<div style="padding:0.75rem;color:#6b7280;text-align:center;">No items found</div>';
             } else {
                 filteredItems.forEach(item => {
-                    const priceRange = `$${item.value_good || 0} - $${item.value_excellent || 0}`;
+                    const priceRange = `$${item.value_low || 0} - $${item.value_high || 0}`;
                     html += `
                         <div onclick="selectItem(${item.id}, '${item.name.replace(/'/g, "\\'")}')"
                              style="padding:0.75rem;cursor:pointer;border-bottom:1px solid #e5e7eb;transition:background 0.2s;"
@@ -2848,6 +2873,25 @@
                 });
             }
         });
+
+        // Calculate stock donation total
+        function calculateStockTotal() {
+            const shares = parseFloat(document.getElementById('stockQuantity').value) || 0;
+            const pricePerShare = parseFloat(document.getElementById('fairMarketValue').value) || 0;
+            const total = shares * pricePerShare;
+
+            document.getElementById('stockTotalDisplay').textContent = '$' + total.toFixed(2);
+            document.getElementById('stockCalculation').textContent =
+                `${shares} shares × $${pricePerShare.toFixed(2)} = $${total.toFixed(2)}`;
+        }
+
+        // Calculate mileage deduction
+        function calculateMileageDeduction() {
+            const miles = parseFloat(document.getElementById('milesDriven').value) || 0;
+            const rate = 0.14; // 2024 IRS rate
+            const deduction = miles * rate;
+            document.getElementById('mileageDeduction').textContent = deduction.toFixed(2);
+        }
 
         // Initialize everything when DOM is ready
         function initializeApp() {

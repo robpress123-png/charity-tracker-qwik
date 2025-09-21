@@ -79,7 +79,7 @@ export async function onRequestGet(context) {
       });
     } else if (categoryId) {
       const stmt = env.DB.prepare(`
-        SELECT id, name, description, value_good, value_very_good, value_excellent
+        SELECT id, name, description, value_low, value_high
         FROM donation_items
         WHERE category_id = ?
         ORDER BY name

@@ -107,7 +107,18 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Insert donation into database (note: simple schema only has basic columns)
+    // Insert donation into database
+    // Since the table doesn't have a donation_type column, we'll store it in notes as JSON
+    const notesData = {
+      donation_type: donation_type || 'cash',
+      miles_driven,
+      mileage_rate,
+      mileage_purpose,
+      item_description,
+      estimated_value,
+      notes: notes || ''
+    };
+
     const stmt = env.DB.prepare(`
       INSERT INTO donations (
         user_id, charity_id, amount, date, notes
@@ -116,7 +127,7 @@ export async function onRequestPost(context) {
     `);
 
     const result = await stmt.bind(
-      userId, charity_id, amount, donation_date, notes || ''
+      userId, charity_id, amount, donation_date, JSON.stringify(notesData)
     ).run();
 
     if (result.meta.last_row_id) {
@@ -259,6 +270,35 @@ export async function onRequestGet(context) {
     const stmt = env.DB.prepare(query);
     const result = await stmt.bind(...queryParams).all();
 
+    // Parse notes JSON to extract donation_type and other fields
+    const donations = (result.results || []).map(donation => {
+      let parsedNotes = {};
+      try {
+        if (donation.notes && donation.notes.startsWith('{')) {
+          parsedNotes = JSON.parse(donation.notes);
+        }
+      } catch (e) {
+        // If notes is not JSON, treat it as plain text
+        parsedNotes = { notes: donation.notes };
+      }
+
+      return {
+        ...donation,
+        donation_type: parsedNotes.donation_type || 'cash',
+        miles_driven: parsedNotes.miles_driven,
+        mileage_rate: parsedNotes.mileage_rate,
+        mileage_purpose: parsedNotes.mileage_purpose,
+        item_description: parsedNotes.item_description,
+        estimated_value: parsedNotes.estimated_value,
+        stock_name: parsedNotes.stock_name,
+        stock_symbol: parsedNotes.stock_symbol,
+        shares_donated: parsedNotes.shares_donated,
+        notes: parsedNotes.notes || donation.notes || '',
+        // Rename 'date' to 'donation_date' for consistency
+        donation_date: donation.date
+      };
+    });
+
     // Get total count (using 'date' column)
     let countQuery = 'SELECT COUNT(*) as total FROM donations WHERE user_id = ?';
     let countParams = [userId];
@@ -278,7 +318,7 @@ export async function onRequestGet(context) {
 
     return new Response(JSON.stringify({
       success: true,
-      donations: result.results || [],
+      donations: donations,
       total: countResult?.total || 0,
       limit,
       offset
