@@ -1540,23 +1540,24 @@
                         };
                         const typeIcon = typeIcons[donation.donation_type] || '💵';
 
-                        // Show meaningful description for special donation types
-                        let displayNotes = donation.notes || '';
-                        if (donation.donation_type === 'miles' && donation.mileage_purpose) {
-                            displayNotes = `${donation.miles_driven || 0} miles - ${donation.mileage_purpose}`;
+                        // Build type display with details
+                        let typeDisplay = `${typeIcon} ${donation.donation_type || 'cash'}`;
+                        if (donation.donation_type === 'miles') {
+                            typeDisplay = `${typeIcon} ${donation.miles_driven || 0} miles`;
                         } else if (donation.donation_type === 'stock' && donation.stock_symbol) {
-                            displayNotes = `${donation.stock_symbol}: ${donation.shares_donated || 0} shares`;
+                            typeDisplay = `${typeIcon} ${donation.stock_symbol}`;
                         } else if (donation.donation_type === 'crypto' && donation.crypto_symbol) {
-                            displayNotes = `${donation.crypto_symbol}: ${donation.crypto_quantity || 0} units`;
-                        } else if (donation.donation_type === 'items' && donation.item_description) {
-                            displayNotes = donation.item_description;
+                            typeDisplay = `${typeIcon} ${donation.crypto_symbol}`;
                         }
+
+                        // Only show user-entered notes, nothing else
+                        let displayNotes = donation.notes || '';
 
                         html += `
                             <tr>
                                 <td>${date}</td>
                                 <td>${donation.charity_name || 'Unknown'}</td>
-                                <td>${typeIcon} ${donation.donation_type || 'cash'}</td>
+                                <td>${typeDisplay}</td>
                                 <td>$${parseFloat(donation.amount).toFixed(2)}</td>
                                 <td>${displayNotes}</td>
                                 <td>
