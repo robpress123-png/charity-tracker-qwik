@@ -1,5 +1,5 @@
 # Charity Tracker Qwik - Comprehensive Continuation Context
-## Last Updated: 2025-01-20 (Version 1.4.6)
+## Last Updated: 2025-01-21 (Version 1.4.6)
 
 ## Project Overview
 **Charity Tracker Qwik** - A multi-user web application for tracking charitable donations with tax optimization features, built on Cloudflare Pages with D1 database.
@@ -88,10 +88,10 @@ All donation types store type-specific data in the notes field as JSON:
 
 ### 5. Known Issues & TODO
 
-#### Current Issues
-1. **Items Dropdown:** May not populate after category selection (500 error from API)
-2. **Item Values:** Using simplified calculation (average of value_low/value_high × quality multiplier)
-3. **Receipt Display:** Running receipt for items may not be visible
+#### Current Issues (Resolved)
+1. ~~**Items Dropdown:** May not populate after category selection~~ ✓ Fixed
+2. ~~**Item Values:** Using simplified calculation~~ ✓ Working with value_low/value_high
+3. ~~**Receipt Display:** Running receipt for items may not be visible~~ ✓ Receipt area is visible
 
 #### Pending Features
 1. Database normalization - donation_type should be a column, not stored in JSON
@@ -168,9 +168,9 @@ Visit: https://charity-tracker-qwik.pages.dev/api/auth/reset-test-user
 - `/api/debug-donations` - Check raw donation data
 - `/api/auth/debug-login` - Debug authentication issues
 
-### 10. Session Context from Today (2025-01-20)
+### 10. Session Context (Updated 2025-01-21)
 
-#### Major Accomplishments
+#### Major Accomplishments (2025-01-20)
 1. Fixed multi-user authentication system
 2. Resolved donation type display issues
 3. Cleaned up notes field to only show user input
@@ -179,6 +179,14 @@ Visit: https://charity-tracker-qwik.pages.dev/api/auth/reset-test-user
 6. Created cryptocurrencies reference table
 7. Fixed registration page errors
 8. Updated to version 1.4.6
+
+#### New Improvements (2025-01-21)
+1. **Redesigned Items Donation Form**
+   - Changed category from text search to dropdown select
+   - Horizontal layout: category, item, quality, quantity in one row
+   - Fixed items not loading from database (value_low/value_high columns)
+   - Quality selector properly enables after item selection
+   - Clear workflow with visual feedback (disabled/enabled states)
 
 #### Key Decisions
 - Store all type-specific data in notes field as JSON (temporary solution)
