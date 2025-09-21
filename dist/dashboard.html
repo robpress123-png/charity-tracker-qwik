@@ -674,9 +674,6 @@
                         <button class="btn-primary" onclick="showImportDonations()">
                             📥 Import Donations (CSV)
                         </button>
-                        <button class="btn-primary" onclick="showImportItems()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            📦 Import Donation Items Database (CSV)
-                        </button>
                         <button class="btn-primary" onclick="calculateTaxSavings()">
                             💰 Tax Savings Calculator
                         </button>
@@ -724,60 +721,6 @@
                         </div>
                     </div>
 
-                    <!-- Import Items Panel -->
-                    <div id="importItemsPanel" style="display:none; margin-top: 2rem;">
-                        <h3 style="color: #10b981; margin-bottom: 1rem;">Import Donation Items Database</h3>
-
-                        <div style="background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                            <div style="display: flex; align-items: start; gap: 0.5rem;">
-                                <span style="color: #f59e0b; font-size: 1.25rem;">⚠️</span>
-                                <div style="flex: 1;">
-                                    <strong style="color: #92400e;">Important:</strong>
-                                    <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem; color: #92400e;">
-                                        <li>CSV must have columns: category_id, name, value_good, value_very_good, value_excellent</li>
-                                        <li>Optional columns: description, unit, source_reference, min_condition_note</li>
-                                        <li>Category IDs: 1=Women's, 2=Men's, 3=Children's, 4=Household, 5=Electronics, 6=Furniture, 7=Books, 8=Sports, 9=Toys, 10=Appliances, 11=Jewelry, 12=Tools</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="itemsCsvDropZone" style="border: 2px dashed #10b981; border-radius: 12px; padding: 3rem; text-align: center; background: #f0fdf4; cursor: pointer;">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
-                            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 0.5rem;">Drag & Drop Items CSV File Here</p>
-                            <p style="color: #9ca3af;">or click to browse</p>
-                            <input type="file" id="itemsCsvFileInput" accept=".csv" style="display: none;" onchange="handleItemsCsvSelect(event)">
-                        </div>
-
-                        <div style="margin-top: 1rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="updateExistingItems" style="width: auto;">
-                                <span>Update existing items (if unchecked, duplicates will be skipped)</span>
-                            </label>
-                        </div>
-
-                        <div id="itemsImportPreview" style="display:none; margin-top: 2rem;">
-                            <h4 style="color: #374151; margin-bottom: 1rem;">Preview (First 10 items)</h4>
-                            <div id="itemsPreviewTable" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; max-height: 400px; overflow-y: auto;"></div>
-
-                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                                <button class="btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="confirmItemsImport()">
-                                    ✅ Import Items
-                                </button>
-                                <button class="btn-secondary" onclick="cancelItemsImport()">
-                                    ❌ Cancel
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="itemsImportResults" style="display:none; margin-top: 2rem;">
-                            <h4 style="color: #374151; margin-bottom: 1rem;">Import Results</h4>
-                            <div id="itemsResultsContent" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;"></div>
-                            <button class="btn-primary" style="margin-top: 1rem;" onclick="closeItemsImport()">
-                                Close
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1180,15 +1123,26 @@
             const dropdown = document.getElementById('charityDropdown');
             const hiddenInput = document.getElementById('selectedCharityId');
 
+            // Remove any existing listeners first to avoid duplicates
+            if (input._charityListenersAdded) {
+                return; // Already initialized
+            }
+
             // Setup event listeners
             input.addEventListener('input', handleCharitySearch);
             input.addEventListener('focus', handleCharitySearch);
             input.addEventListener('keydown', handleCharityKeydown);
+
+            // Mark as initialized
+            input._charityListenersAdded = true;
         }
 
         function handleCharitySearch(e) {
             const query = e.target.value.toLowerCase();
             const dropdown = document.getElementById('charityDropdown');
+
+            // Clear the selected charity ID when user is typing
+            document.getElementById('selectedCharityId').value = '';
 
             clearTimeout(searchTimeout);
             selectedCharityIndex = -1;
