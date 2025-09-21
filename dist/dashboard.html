@@ -764,7 +764,7 @@
                     </div>
                 </div>
                 <!-- Item donation fields -->
-                <div id="itemFields" class="donation-type-fields" style="display:none;">
+                <div id="itemsFields" class="donation-type-fields" style="display:none;">
                     <!-- IRS Compliance Warning -->
                     <div class="alert" style="background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:0.5rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.875rem;">
                         <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
@@ -1013,6 +1013,7 @@
         // Function to update donation fields based on type
         function updateDonationFields() {
             const donationType = document.getElementById('donationType').value;
+            console.log('Updating donation fields for type:', donationType);
 
             // Hide all type-specific fields
             document.querySelectorAll('.donation-type-fields').forEach(el => {
@@ -1025,8 +1026,10 @@
 
             // Show relevant fields and set required
             const fieldsToShow = document.getElementById(donationType + 'Fields');
+            console.log('Looking for element:', donationType + 'Fields', 'Found:', fieldsToShow);
             if (fieldsToShow) {
                 fieldsToShow.style.display = 'block';
+                console.log('Showing fields for', donationType);
                 // Add required to visible amount fields
                 if (donationType === 'cash') {
                     document.getElementById('donationAmount').setAttribute('required', '');
