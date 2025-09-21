@@ -1,47 +1,99 @@
 # Charity Tracker Qwik - Comprehensive Continuation Context
-## Last Updated: 2025-01-21 (Version 1.4.6)
+## Last Updated: 2025-01-20 (Version 1.4.7)
 
 ## Project Overview
 **Charity Tracker Qwik** - A multi-user web application for tracking charitable donations with tax optimization features, built on Cloudflare Pages with D1 database.
 
 ### Current Status
-- **Version:** 1.4.6
+- **Version:** 1.4.7
 - **Live URL:** https://charity-tracker-qwik.pages.dev
 - **GitHub:** https://github.com/robpress123-png/charity-tracker-qwik
 - **Auto-deployment:** Enabled via GitHub integration
 - **Database:** Cloudflare D1 (charity-tracker-qwik-db)
 - **Database ID:** 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d
 
-## Critical Technical Details
+## CRITICAL: Complete Database Schema
 
-### 1. Architecture
-- **Frontend:** Single HTML files (dashboard.html, login.html, register.html)
-- **Backend:** Cloudflare Pages Functions (serverless)
-- **Database:** Cloudflare D1 (SQLite)
-- **Authentication:** Token-based (format: `token-{userId}-{timestamp}`)
-- **Deployment:** Automatic via GitHub push to main branch
-
-### 2. Database Schema
+### 1. USERS TABLE
 ```sql
-Tables:
-- users (id, email, password [SHA-256 hashed], name, plan, created_at)
-- donations (id, user_id, charity_id, amount, date, notes [JSON])
-- charities (500+ records imported)
-- donation_items (497 items with value_low, value_high)
-- item_categories (12 categories)
-- cryptocurrencies (10 major cryptos for donations)
-- crypto_price_history (for IRS documentation)
+CREATE TABLE users (
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,  -- SHA-256 hashed
+    name TEXT NOT NULL,
+    plan TEXT DEFAULT 'free',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)
 ```
 
-### 3. Key Implementation Details
+### 2. DONATIONS TABLE
+```sql
+CREATE TABLE donations (
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    user_id TEXT NOT NULL,
+    charity_id TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATE NOT NULL,          -- NOTE: Column is 'date', not 'donation_date'
+    receipt_url TEXT,
+    notes TEXT,                  -- Currently stores JSON with donation type info
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (charity_id) REFERENCES charities(id) ON DELETE CASCADE
+)
+```
 
-#### Authentication
+### 3. CHARITIES TABLE
+```sql
+CREATE TABLE charities (
+    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    user_id TEXT NOT NULL,       -- NOTE: This suggests user-specific charities
+    name TEXT NOT NULL,
+    ein TEXT,
+    category TEXT,
+    website TEXT,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)
+```
+
+### 4. ITEM_CATEGORIES TABLE
+```sql
+CREATE TABLE item_categories (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    icon TEXT
+)
+-- Has 12 categories: Clothing (Women/Men/Children), Household, Electronics, Furniture, Books & Media, Sports, Toys, Appliances, Jewelry, Tools
+```
+
+### 5. DONATION_ITEMS TABLE (CRITICAL!)
+```sql
+CREATE TABLE donation_items (
+    id INTEGER PRIMARY KEY,
+    category_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    value_poor REAL,         -- Not used for IRS deductions
+    value_fair REAL,         -- Not used for IRS deductions
+    value_good REAL,         -- Used for IRS (minimum acceptable condition)
+    value_excellent REAL,    -- Used for IRS
+    FOREIGN KEY (category_id) REFERENCES item_categories(id)
+)
+-- Contains 497 items with IRS-approved valuations
+```
+
+## Key Implementation Details
+
+### Authentication
 - Passwords are SHA-256 hashed
 - Test account: test@example.com / password123
 - Multi-user support with data isolation by user_id
 - Token format: `token-{userId}-{timestamp}`
 
-#### Donation Types & Storage
+### Donation Types & Storage
 All donation types store type-specific data in the notes field as JSON:
 ```javascript
 {
@@ -57,7 +109,14 @@ All donation types store type-specific data in the notes field as JSON:
 }
 ```
 
-#### API Endpoints
+### Item Quality Mapping (IRS Standards)
+- **Fair**: Always $0 (not IRS deductible - below minimum condition requirement)
+- **Good**: Uses `value_good` from database (minimum IRS acceptable condition)
+- **Very Good**: Calculated as average of `value_good` and `value_excellent`
+- **Excellent**: Uses `value_excellent` from database
+- Note: IRS only accepts items in "Good" condition or better for tax deductions. Fair items can be tracked but have no deductible value.
+
+### API Endpoints
 - `/api/auth/login` - User authentication
 - `/api/auth/register` - User registration
 - `/api/donations` - CRUD operations for donations
@@ -65,44 +124,45 @@ All donation types store type-specific data in the notes field as JSON:
 - `/api/items` - Donation items by category
 - `/api/admin/stats` - Dashboard statistics
 
-### 4. Recent Fixes & Improvements (v1.4.6)
+## Recent Fixes (Session 2025-01-20)
 
-#### Fixed Issues
-1. **Authentication:** Fixed password hashing mismatch between register and login
-2. **Donation Types:** Fixed all donations showing as "cash" - now correctly shows miles, stock, crypto, items
-3. **Notes Field:** Fixed JSON appearing in notes - now only shows user-entered text
-4. **Items API:** Fixed column names (value_low, value_high instead of value_good, etc.)
-5. **UI Layout:** Redesigned item donation form to use horizontal layout
+### 1. Database Column Alignment
+- **Problem**: Items API was querying non-existent columns
+- **Fix**: Updated to use correct columns: `value_poor`, `value_fair`, `value_good`, `value_excellent`
 
-#### Working Features
-- Multi-user authentication with isolated data
-- Cash donations with amount tracking
-- Mileage donations with automatic IRS deduction ($0.14/mile)
-- Stock donations with symbol, shares, and price tracking
-- Crypto donations with exact timestamp for IRS compliance
-- Item donations with category selection and quality grading
-- Charity autocomplete (500+ charities)
-- Tax savings calculator
-- CSV export for tax filing
-- Admin dashboard with statistics
+### 2. Cash Donation Save Error
+- **Problem**: New donations treated as edits due to null/undefined check
+- **Fix**: Check both null AND undefined for `window.editingDonationId`
 
-### 5. Known Issues & TODO
+### 3. Items Donation Form
+- **Redesigned**: Changed category from text search to dropdown select
+- **Layout**: Horizontal layout for category, item, quality, quantity
+- **Quality Options**: Fair ($0), Good, Very Good, Excellent (IRS-compliant)
+- **Value Calculation**: Fair = $0, Very Good = average of Good and Excellent
 
-#### Current Issues (Resolved)
-1. ~~**Items Dropdown:** May not populate after category selection~~ ✓ Fixed
-2. ~~**Item Values:** Using simplified calculation~~ ✓ Working with value_low/value_high
-3. ~~**Receipt Display:** Running receipt for items may not be visible~~ ✓ Receipt area is visible
+### 4. Authorization in PUT Endpoint
+- **Problem**: PUT endpoint didn't extract userId from token
+- **Fix**: Added proper token parsing to donations.js PUT handler
 
-#### Pending Features
-1. Database normalization - donation_type should be a column, not stored in JSON
-2. Automatic price lookups for stocks and crypto
-3. Receipt photo uploads
-4. Bank transaction imports
-5. Recurring donation scheduling
+## Known Issues & TODO
 
-### 6. Important Configuration Files
+### Current Issues (Resolved)
+1. ✅ Items API column mismatch
+2. ✅ Cash donation save error
+3. ✅ Items dropdown not populating
+4. ✅ Quality options alignment
 
-#### wrangler.toml
+### Pending Features
+1. **Version Numbers**: Update all pages to 1.4.6 (index.html, login.html still show 1.4.3)
+2. **Database Normalization**: Add donation_type column instead of JSON in notes
+3. **Automatic Price Lookups**: For stocks and crypto
+4. **Receipt Uploads**: Photo storage capability
+5. **Bank Imports**: Transaction import feature
+6. **Recurring Donations**: Scheduling system
+
+## Important Configuration Files
+
+### wrangler.toml
 ```toml
 name = "charity-tracker-qwik"
 compatibility_date = "2023-12-01"
@@ -117,16 +177,17 @@ database_name = "charity-tracker-qwik-db"
 database_id = "4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d"
 ```
 
-### 7. Development Guidelines
+## Development Guidelines
 
-#### When Making Changes
-1. **Version Control:** Always update version in package.json and dashboard.html
-2. **Git Commits:** Use descriptive commit messages with emoji prefix
-3. **Database Changes:** Test with remote D1, not local mock data
-4. **Authentication:** Always include Authorization header with token
-5. **Notes Field:** ONLY store user-entered text, no automated data
+### When Making Changes
+1. **Database Schema**: Always check actual column names before querying
+2. **Quality Levels**: Use only Good, Very Good, Excellent for IRS compliance
+3. **Value Calculation**: Very Good = (value_good + value_excellent) / 2
+4. **Version Control**: Update version in all HTML files consistently
+5. **Git Commits**: Use descriptive messages with emoji prefix
+6. **Testing**: Always test with real D1 database, not mock data
 
-#### Testing Checklist
+### Testing Checklist
 - [ ] Login with test@example.com / password123
 - [ ] Create new user and verify isolated data
 - [ ] Test all donation types (cash, miles, stock, crypto, items)
@@ -134,103 +195,66 @@ database_id = "4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d"
 - [ ] Check donation type icons and descriptions
 - [ ] Test charity autocomplete
 - [ ] Verify tax calculations
+- [ ] Test item donation workflow (category → item → quality → add)
 
-### 8. User Requirements & Goals
+## User Requirements & Goals
 
-#### Primary Goals
+### Primary Goals
 1. Support 5000+ users with isolated data
 2. Track all IRS-deductible donation types
 3. Maximize tax deduction benefits
 4. Simplify tax filing with comprehensive reports
 5. Maintain IRS compliance for all donation types
 
-#### User Preferences
+### User Preferences
 - Clean, simple interface
 - No unnecessary alerts or popups
 - Toast notifications instead of modals
 - Horizontal layouts to minimize scrolling
 - Only show user-entered data in notes field
+- IRS-compliant quality levels for items
 
-### 9. Console Commands for Database Management
+## Console Commands for Database Management
 
-#### Check Database Tables
+### Check Database Schema
 ```sql
 -- In Cloudflare D1 Console
-SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;
+SELECT sql FROM sqlite_master WHERE type='table' ORDER BY name;
 ```
 
-#### Reset Test User (if needed)
+### Reset Test User (if needed)
 ```
 Visit: https://charity-tracker-qwik.pages.dev/api/auth/reset-test-user
 ```
 
-#### Debug Endpoints
+### Debug Endpoints
 - `/api/debug-donations` - Check raw donation data
 - `/api/auth/debug-login` - Debug authentication issues
 
-### 10. Session Context (Updated 2025-01-21)
+## Next Session Priorities
 
-#### Major Accomplishments (2025-01-20)
-1. Fixed multi-user authentication system
-2. Resolved donation type display issues
-3. Cleaned up notes field to only show user input
-4. Added stock name/symbol fields
-5. Implemented crypto donations with exact timestamp
-6. Created cryptocurrencies reference table
-7. Fixed registration page errors
-8. Updated to version 1.4.6
+1. **Update Version Numbers**
+   - index.html, login.html, admin.html → 1.4.6
+   - Ensure consistency across all pages
 
-#### New Improvements (2025-01-21)
-1. **Redesigned Items Donation Form**
-   - Changed category from text search to dropdown select
-   - Horizontal layout: category, item, quality, quantity in one row
-   - Fixed items not loading from database (value_low/value_high columns)
-   - Quality selector properly enables after item selection
-   - Clear workflow with visual feedback (disabled/enabled states)
+2. **Test Complete Workflows**
+   - Full item donation flow with new quality options
+   - Stock and crypto donations
+   - Verify all values calculate correctly
 
-#### Key Decisions
-- Store all type-specific data in notes field as JSON (temporary solution)
-- Use SHA-256 for password hashing
-- Calculate item values as: (value_low + value_high) / 2 × quality_multiplier
-- Quality multipliers: Good=0.8x, Very Good=1.0x, Excellent=1.2x
-
-#### User Feedback Addressed
-- Removed duplicate "Add Donation" button
-- Fixed annoying alert popups
-- Ensured notes field only shows user input
-- Added stock/crypto specific fields
-- Improved donation type display
-
-### 11. Next Session Priorities
-
-1. **Fix Items Donation Form**
-   - Ensure dropdown populates after category selection
-   - Make quality selector visible
-   - Display running receipt properly
-
-2. **Database Normalization**
+3. **Database Normalization (Future)**
    - Add donation_type column to donations table
-   - Add type-specific tables for better querying
+   - Move type-specific fields to separate tables
+   - Remove JSON storage from notes field
 
-3. **UI Improvements**
-   - Further optimize horizontal layouts
-   - Add better visual feedback for actions
-   - Improve mobile responsiveness
+## Important Notes for Next Session
 
-4. **Feature Additions**
-   - Receipt photo upload capability
-   - Bank transaction import
-   - Recurring donation management
-   - Advanced reporting features
-
-### 12. Important Notes for Next Session
-
-- **Authentication:** System is fully multi-user capable
-- **Database Binding:** Must be in env.production section of wrangler.toml
-- **Node Version:** Use Node 20+ for wrangler commands
-- **Auto-deploy:** All changes pushed to GitHub main branch deploy automatically
-- **Testing:** Always test with real database, not mock data
-- **Version:** Remember to increment version numbers consistently
+- **Column Names**: donation_items has value_poor, value_fair, value_good, value_excellent (NOT value_low/value_high or value_very_good)
+- **Quality Mapping**: Very Good is calculated, not stored in database
+- **IRS Compliance**: Only Good, Very Good, and Excellent are valid quality options
+- **Database Binding**: Must be in env.production section of wrangler.toml
+- **Node Version**: Use Node 20+ for wrangler commands
+- **Auto-deploy**: All changes pushed to GitHub main branch deploy automatically
 
 ## Contact & Resources
 - Production URL: https://charity-tracker-qwik.pages.dev
@@ -240,3 +264,4 @@ Visit: https://charity-tracker-qwik.pages.dev/api/auth/reset-test-user
 
 ---
 *This context should be provided at the start of the next session to maintain continuity.*
+*Database schema has been verified and aligned with frontend on 2025-01-20.*

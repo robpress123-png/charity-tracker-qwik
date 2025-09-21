@@ -378,13 +378,13 @@ export async function onRequestGet(context) {
 
 export async function onRequestPut(context) {
   const { request, env } = context;
-  
+
   try {
     // Extract donation ID from URL
     const url = new URL(request.url);
     const pathParts = url.pathname.split('/');
     const donationId = pathParts[pathParts.length - 1];
-    
+
     if (!donationId) {
       return new Response(JSON.stringify({
         success: false,
@@ -412,7 +412,36 @@ export async function onRequestPut(context) {
       fair_market_value,
       crypto_type
     } = body;
-    const userId = 'test-user-id';
+
+    // Get user ID from authorization header
+    const authHeader = request.headers.get('Authorization');
+    let userId = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        if (token.startsWith('token-')) {
+            const parts = token.split('-');
+            if (parts.length >= 2) {
+                userId = parts[1];
+            }
+        } else if (token === 'test-token' && env.DB) {
+            const testUserStmt = env.DB.prepare("SELECT id FROM users WHERE email = 'test@example.com'");
+            const testUser = await testUserStmt.first();
+            if (testUser) {
+                userId = testUser.id;
+            }
+        }
+    }
+
+    if (!userId) {
+        return new Response(JSON.stringify({
+            success: false,
+            error: 'Unauthorized - invalid or missing token'
+        }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
 
     if (!env.DB) {
       // Return mock response for local development

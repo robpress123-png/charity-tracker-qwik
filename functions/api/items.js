@@ -40,16 +40,17 @@ export async function onRequestGet(context) {
               id: 1,
               name: "Dress",
               description: "Women's dress",
+              value_poor: 0,   // Not IRS deductible
+              value_fair: 0,   // Not IRS deductible
               value_good: 15,
-              value_very_good: 20,
               value_excellent: 25
             },
             {
               id: 2,
               name: "Blouse",
               description: "Women's blouse or shirt",
-              value_poor: 2,
-              value_fair: 4,
+              value_poor: 0,   // Not IRS deductible
+              value_fair: 0,   // Not IRS deductible
               value_good: 7,
               value_excellent: 12
             }
@@ -79,7 +80,11 @@ export async function onRequestGet(context) {
       });
     } else if (categoryId) {
       const stmt = env.DB.prepare(`
-        SELECT id, name, description, value_low, value_high
+        SELECT id, name, description,
+               0 as value_poor,  -- Always $0 - not IRS deductible
+               0 as value_fair,  -- Always $0 - not IRS deductible
+               value_good,
+               value_excellent
         FROM donation_items
         WHERE category_id = ?
         ORDER BY name
