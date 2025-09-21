@@ -284,13 +284,26 @@ export async function onRequestGet(context) {
     // Parse notes JSON to extract donation_type and other fields
     const donations = (result.results || []).map(donation => {
       let parsedNotes = {};
+      let isJsonNotes = false;
+
       try {
         if (donation.notes && donation.notes.startsWith('{')) {
           parsedNotes = JSON.parse(donation.notes);
+          isJsonNotes = true;
         }
       } catch (e) {
         // If notes is not JSON, treat it as plain text
         parsedNotes = { notes: donation.notes };
+      }
+
+      // Extract the actual notes text
+      let notesText = '';
+      if (isJsonNotes) {
+        // If it was JSON, use the notes field from the parsed object
+        notesText = parsedNotes.notes || '';
+      } else {
+        // If it wasn't JSON, use the raw notes field
+        notesText = donation.notes || '';
       }
 
       return {
@@ -312,7 +325,7 @@ export async function onRequestGet(context) {
         crypto_cost_basis: parsedNotes.crypto_cost_basis,
         crypto_holding_period: parsedNotes.crypto_holding_period,
         crypto_donation_datetime: parsedNotes.crypto_donation_datetime,
-        notes: parsedNotes.notes || donation.notes || '',
+        notes: notesText,
         // Rename 'date' to 'donation_date' for consistency
         donation_date: donation.date
       };
