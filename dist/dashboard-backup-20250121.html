@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.5.0</title>
+    <title>Dashboard - Charity Tracker v1.4.9</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -16,22 +16,18 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             background: #f3f4f6;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            flex-shrink: 0;
         }
 
         .header-top {
-            padding: 0.5rem 1rem;
+            padding: 1rem 2rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -44,7 +40,7 @@
         }
 
         .header h1 {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -79,7 +75,7 @@
         /* Navigation menu */
         .nav-menu {
             background: rgba(0,0,0,0.1);
-            padding: 0 1rem;
+            padding: 0 2rem;
         }
 
         .nav-menu-content {
@@ -91,11 +87,11 @@
 
         .nav-item {
             color: white;
-            padding: 0.6rem 1rem;
+            padding: 1rem 1.5rem;
             cursor: pointer;
             border: none;
             background: none;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
             transition: background 0.2s;
             position: relative;
@@ -119,45 +115,34 @@
             background: white;
         }
 
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            height: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
         }
 
         .stats-grid {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
             background: white;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex: 1;
-            min-width: 150px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .stat-label {
             color: #6b7280;
-            font-size: 0.75rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -166,34 +151,31 @@
 
         .section {
             background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
         }
 
         .section h2 {
             color: #333;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.9rem;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -210,17 +192,15 @@
 
         .table th {
             text-align: left;
-            padding: 0.5rem;
+            padding: 0.75rem;
             border-bottom: 2px solid #e5e7eb;
             color: #6b7280;
             font-weight: 600;
-            font-size: 0.875rem;
         }
 
         .table td {
-            padding: 0.5rem;
+            padding: 0.75rem;
             border-bottom: 1px solid #e5e7eb;
-            font-size: 0.875rem;
         }
 
         .btn-action {
@@ -288,7 +268,7 @@
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
@@ -302,10 +282,10 @@
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
         }
 
         .form-group input:focus,
@@ -482,13 +462,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.5.0</strong> - Optimized UI with better screen real estate usage & compact layouts!
+        <strong>🎯 Charity Tracker v1.4.9</strong> - Multi-user support with secure authentication & improved donation tracking!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.5.0</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.4.9</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -527,34 +507,21 @@
         </nav>
     </header>
 
-    <main class="main-content">
     <div class="container">
         <!-- Dashboard Section -->
         <div id="dashboardSection" class="section-content">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div>
-                        <div class="stat-label" id="totalDonationsLabel">Total Donations (2025)</div>
-                        <div class="stat-value" id="totalDonations">$0</div>
-                    </div>
+                    <div class="stat-label" id="totalDonationsLabel">Total Donations (2025)</div>
+                    <div class="stat-value" id="totalDonations">$0</div>
                 </div>
                 <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Charities Supported</div>
-                        <div class="stat-value" id="charityCount">0</div>
-                    </div>
+                    <div class="stat-label">Charities Supported</div>
+                    <div class="stat-value" id="charityCount">0</div>
                 </div>
                 <div class="stat-card">
-                    <div>
-                        <div class="stat-label" id="taxSavingsLabel">Est. Tax Savings (2025)</div>
-                        <div class="stat-value" id="taxSavings">$0</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">Donation Count</div>
-                        <div class="stat-value" id="donationCount">0</div>
-                    </div>
+                    <div class="stat-label" id="taxSavingsLabel">Est. Tax Savings (2025)</div>
+                    <div class="stat-value" id="taxSavings">$0</div>
                 </div>
             </div>
 
@@ -1026,7 +993,7 @@
                 </div>
                 <div class="form-group">
                     <label for="donationDate">Date</label>
-                    <input type="date" id="donationDate" required style="max-width: 180px;">
+                    <input type="date" id="donationDate" required>
                 </div>
                 <div class="form-group">
                     <label for="donationNotes">Notes (optional)</label>
@@ -1871,7 +1838,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.5.0</p>
+                            <p>Generated by Charity Tracker v1.4.9</p>
                         </div>
                     </body>
                     </html>
@@ -3257,6 +3224,5 @@
             }, 4000);
         }
     </script>
-    </main>
 </body>
 </html>
