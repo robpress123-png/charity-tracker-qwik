@@ -1106,6 +1106,8 @@
         let searchTimeout;
 
         async function initCharityAutocomplete() {
+            console.log('Initializing charity autocomplete...');
+
             // Load top charities for quick access
             if (allCharities.length === 0) {
                 try {
@@ -1113,6 +1115,7 @@
                     const data = await response.json();
                     if (data.success && data.charities) {
                         allCharities = data.charities;
+                        console.log(`Loaded ${allCharities.length} charities`);
                     }
                 } catch (error) {
                     console.error('Failed to load charities:', error);
@@ -1123,8 +1126,14 @@
             const dropdown = document.getElementById('charityDropdown');
             const hiddenInput = document.getElementById('selectedCharityId');
 
+            if (!input || !dropdown) {
+                console.error('Charity input or dropdown not found');
+                return;
+            }
+
             // Remove any existing listeners first to avoid duplicates
             if (input._charityListenersAdded) {
+                console.log('Charity listeners already added');
                 return; // Already initialized
             }
 
@@ -1135,6 +1144,7 @@
 
             // Mark as initialized
             input._charityListenersAdded = true;
+            console.log('Charity autocomplete initialized');
         }
 
         function handleCharitySearch(e) {
@@ -2069,12 +2079,15 @@
 
         // Load categories on page load
         async function loadItemCategories() {
+            console.log('Loading item categories...');
             try {
                 const response = await fetch('/api/items?type=categories');
                 const data = await response.json();
+                console.log('Categories response:', data);
 
                 if (data.success) {
                     itemCategories = data.categories;
+                    console.log(`Loaded ${itemCategories.length} categories`);
                     // Categories are now loaded for search functionality
                 }
             } catch (error) {
@@ -2757,33 +2770,43 @@
             }
         });
 
-        // Load data on page load
-        loadTaxSettings();
-        loadCharities();
-        loadDonations();
-        loadStats();
-        loadItemCategories(); // Load item categories for donation form
+        // Initialize everything when DOM is ready
+        function initializeApp() {
+            // Load data
+            loadTaxSettings();
+            loadCharities();
+            loadDonations();
+            loadStats();
+            loadItemCategories(); // Load item categories for donation form
 
-        // Setup event listeners for item category search
-        const categorySearchInput = document.getElementById('itemCategorySearch');
-        if (categorySearchInput) {
-            categorySearchInput.addEventListener('input', function() {
-                showCategoryDropdown();
-            });
-            categorySearchInput.addEventListener('focus', function() {
-                showCategoryDropdown();
-            });
+            // Setup event listeners for item category search
+            const categorySearchInput = document.getElementById('itemCategorySearch');
+            if (categorySearchInput) {
+                categorySearchInput.addEventListener('input', function() {
+                    showCategoryDropdown();
+                });
+                categorySearchInput.addEventListener('focus', function() {
+                    showCategoryDropdown();
+                });
+            }
+
+            // Setup event listeners for item search
+            const itemSearchInput = document.getElementById('itemSearch');
+            if (itemSearchInput) {
+                itemSearchInput.addEventListener('input', function() {
+                    searchItems();
+                });
+                itemSearchInput.addEventListener('focus', function() {
+                    searchItems();
+                });
+            }
         }
 
-        // Setup event listeners for item search
-        const itemSearchInput = document.getElementById('itemSearch');
-        if (itemSearchInput) {
-            itemSearchInput.addEventListener('input', function() {
-                searchItems();
-            });
-            itemSearchInput.addEventListener('focus', function() {
-                searchItems();
-            });
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
         }
 
         // Close modals and dropdowns when clicking outside
