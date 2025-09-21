@@ -4,15 +4,47 @@
  * GET /api/charities?search=term - Search charities
  */
 
+// Helper function to get user from token
+function getUserFromToken(token) {
+    if (!token || !token.startsWith('Bearer ')) {
+        return null;
+    }
+
+    const tokenValue = token.replace('Bearer ', '');
+
+    // For demo/test mode
+    if (tokenValue === 'test-token' || tokenValue === 'demo-token') {
+        return { id: '1', email: 'test@example.com' };
+    }
+
+    // Parse real token format: token-{userId}-{timestamp}
+    if (tokenValue.startsWith('token-')) {
+        const parts = tokenValue.split('-');
+        if (parts.length >= 3) {
+            return { id: parts[1] };
+        }
+    }
+
+    return null;
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
 
   try {
+    // Get user from authorization header
+    const token = request.headers.get('Authorization');
+    const user = getUserFromToken(token);
+
+    // For charity listing, authentication is optional
+    // If authenticated, show user's charities
+    // If not authenticated, show global charities (for landing page)
+
     const url = new URL(request.url);
     const searchTerm = url.searchParams.get('search');
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
-    const withDonations = url.searchParams.get('with_donations') === 'true';
+    const withDonations = url.searchParams.get('with_donations') === 'true');
 
     // Check if D1 database is available
     if (!env.DB) {
@@ -58,27 +90,43 @@ export async function onRequestGet(context) {
     let queryParams = [];
 
     if (withDonations) {
-      // Only get charities that have donations
+      // Only get charities that have donations for this user
+      if (!user) {
+        // If not authenticated but requesting with_donations, return empty
+        return new Response(JSON.stringify({
+          success: true,
+          charities: [],
+          total: 0,
+          message: 'Authentication required for user-specific charities'
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+
       if (searchTerm) {
         query = `
           SELECT DISTINCT c.id, c.name, c.ein, c.category, c.website, c.description
           FROM charities c
           INNER JOIN donations d ON c.id = d.charity_id
-          WHERE (c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?)
+          WHERE d.user_id = ? AND (c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?)
           ORDER BY c.name
           LIMIT ? OFFSET ?
         `;
         const searchPattern = `%${searchTerm}%`;
-        queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+        queryParams = [user.id, searchPattern, searchPattern, searchPattern, limit, offset];
       } else {
         query = `
           SELECT DISTINCT c.id, c.name, c.ein, c.category, c.website, c.description
           FROM charities c
           INNER JOIN donations d ON c.id = d.charity_id
+          WHERE d.user_id = ?
           ORDER BY c.name
           LIMIT ? OFFSET ?
         `;
-        queryParams = [limit, offset];
+        queryParams = [user.id, limit, offset];
       }
     } else {
       // Get all charities (existing logic)
@@ -112,13 +160,16 @@ export async function onRequestGet(context) {
     let countParams = [];
 
     if (withDonations) {
+      // Count must also filter by user_id
       countQuery = searchTerm
-        ? 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id WHERE c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?'
-        : 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id';
+        ? 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id WHERE d.user_id = ? AND (c.name LIKE ? OR c.ein LIKE ? OR c.category LIKE ?)'
+        : 'SELECT COUNT(DISTINCT c.id) as total FROM charities c INNER JOIN donations d ON c.id = d.charity_id WHERE d.user_id = ?';
 
       if (searchTerm) {
         const searchPattern = `%${searchTerm}%`;
-        countParams = [searchPattern, searchPattern, searchPattern];
+        countParams = [user.id, searchPattern, searchPattern, searchPattern];
+      } else {
+        countParams = [user.id];
       }
     } else {
       countQuery = searchTerm
