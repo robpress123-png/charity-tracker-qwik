@@ -2389,10 +2389,12 @@
 
             dropdown.innerHTML = html;
             dropdown.style.display = 'block';
+            console.log('Showing dropdown with', filteredItems.length, 'items');
         }
 
         // Search items
         function searchItems(value) {
+            console.log('Searching items with value:', value);
             showItemDropdown();
         }
 
@@ -2428,15 +2430,19 @@
             const item = currentItems.find(i => i.id == itemId);
             if (!item) return;
 
-            // Map the quality values correctly
-            let valueKey;
-            if (quality === 'very_good') {
-                valueKey = 'value_very_good';
-            } else {
-                valueKey = `value_${quality}`;
+            // Use value_low and value_high from database
+            const baseValue = ((item.value_low || 0) + (item.value_high || 0)) / 2;
+            let qualityMultiplier = 1.0;
+
+            if (quality === 'good') {
+                qualityMultiplier = 0.8;
+            } else if (quality === 'very_good') {
+                qualityMultiplier = 1.0;
+            } else if (quality === 'excellent') {
+                qualityMultiplier = 1.2;
             }
 
-            const unitValue = item[valueKey] || item.value_good;
+            const unitValue = baseValue * qualityMultiplier;
             const totalValue = unitValue * quantity;
 
             // Update the preview
@@ -2458,21 +2464,23 @@
             const category = itemCategories.find(c => c.id == categoryId);
             const item = currentItems.find(i => i.id == itemId);
 
-            // Map the quality values correctly
-            let valueKey;
+            // Calculate value based on quality
             let qualityLabel;
+            let qualityMultiplier = 1.0;
             if (quality === 'good') {
-                valueKey = 'value_good';
                 qualityLabel = 'Good';
+                qualityMultiplier = 0.8;
             } else if (quality === 'very_good') {
-                valueKey = 'value_very_good';
                 qualityLabel = 'Very Good';
+                qualityMultiplier = 1.0;
             } else if (quality === 'excellent') {
-                valueKey = 'value_excellent';
                 qualityLabel = 'Excellent';
+                qualityMultiplier = 1.2;
             }
 
-            const unitValue = item[valueKey] || item.value_good;
+            // Use value_low and value_high from database
+            const baseValue = ((item.value_low || 0) + (item.value_high || 0)) / 2;
+            const unitValue = baseValue * qualityMultiplier;
 
             selectedDonationItems.push({
                 categoryName: category.name,
