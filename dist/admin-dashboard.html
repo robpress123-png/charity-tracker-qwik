@@ -417,21 +417,32 @@
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-title">Data Management</div>
+                <div class="sidebar-title">Charity Management</div>
+                <button class="sidebar-item" onclick="showSection('import-charities')">
+                    📥 Import/Export Charities
+                </button>
+                <button class="sidebar-item" onclick="showSection('charity-management')">
+                    🏢 Manage Charities
+                </button>
+                <button class="sidebar-item" onclick="showSection('charities')">
+                    ✅ Charity Verification
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Donated Items Management</div>
                 <button class="sidebar-item" onclick="showSection('import')">
                     📦 Import Items Database
                 </button>
-                <button class="sidebar-item" onclick="showSection('import-charities')">
-                    🏢 Import Charities
-                </button>
-                <button class="sidebar-item" onclick="showSection('users')">
-                    👥 User Management
-                </button>
-                <button class="sidebar-item" onclick="showSection('charities')">
-                    🏢 Charity Verification
-                </button>
                 <button class="sidebar-item" onclick="showSection('items')">
-                    📝 Item Management
+                    📝 Manage Items
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">User Management</div>
+                <button class="sidebar-item" onclick="showSection('users')">
+                    👥 Manage Users
                 </button>
             </div>
 
@@ -571,6 +582,54 @@
                     <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Results</h3>
                     <div id="charitiesResultsContent"></div>
                     <button class="tool-btn secondary" onclick="closeCharitiesImport()" style="margin-top: 1rem;">Close</button>
+                </div>
+            </div>
+
+            <!-- Charity Management Section -->
+            <div id="charity-management" class="content-section">
+                <div class="section-header">
+                    <h2>Charity Management</h2>
+                    <p>Manage your charity database</p>
+                </div>
+
+                <div class="alert alert-info">
+                    💡 <strong>Current Status:</strong> <span id="charityCount">Loading...</span> charities in database
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone</h3>
+                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
+                        <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Charities</h4>
+                        <p style="color: #fca5a5; margin-bottom: 1rem;">
+                            This will permanently delete ALL charities from the database. This action cannot be undone.
+                        </p>
+                        <button class="tool-btn" onclick="confirmDeleteAllCharities()" style="background: #dc2626;">
+                            🗑️ Delete All Charities
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Delete Confirmation Modal -->
+                <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px;">
+                        <h3 style="color: #dc2626; margin-bottom: 1rem;">⚠️ Confirm Deletion</h3>
+                        <p style="color: #f3f4f6; margin-bottom: 1rem;">
+                            Are you absolutely sure you want to delete ALL charities from the database?
+                        </p>
+                        <p style="color: #fca5a5; margin-bottom: 1.5rem;">
+                            Type <strong>DELETE ALL CHARITIES</strong> to confirm:
+                        </p>
+                        <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="tool-btn" onclick="executeDeleteAllCharities()" style="background: #dc2626;">
+                                Delete All
+                            </button>
+                            <button class="tool-btn secondary" onclick="cancelDelete()">
+                                Cancel
+                            </button>
+                        </div>
+                        <div id="deleteStatus" style="margin-top: 1rem; color: #f3f4f6;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -997,6 +1056,76 @@
             document.getElementById('itemsImportResults').classList.remove('active');
             document.getElementById('itemsCsvFileInput').value = '';
             itemsImportData = [];
+        }
+
+        // Charity Management Functions
+        function confirmDeleteAllCharities() {
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteStatus').textContent = '';
+        }
+
+        function cancelDelete() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+        }
+
+        async function executeDeleteAllCharities() {
+            const confirmText = document.getElementById('deleteConfirmInput').value;
+            const statusDiv = document.getElementById('deleteStatus');
+
+            if (confirmText !== 'DELETE ALL CHARITIES') {
+                statusDiv.style.color = '#fca5a5';
+                statusDiv.textContent = '❌ Please type exactly: DELETE ALL CHARITIES';
+                return;
+            }
+
+            statusDiv.style.color = '#f59e0b';
+            statusDiv.textContent = '⏳ Deleting all charities...';
+
+            try {
+                const response = await fetch('/api/charities/delete-all', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.style.color = '#10b981';
+                    statusDiv.textContent = `✅ Successfully deleted ${data.deletedCount} charities`;
+
+                    // Update charity count
+                    await loadCharityCount();
+
+                    setTimeout(() => {
+                        cancelDelete();
+                    }, 2000);
+                } else {
+                    statusDiv.style.color = '#dc2626';
+                    statusDiv.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (error) {
+                statusDiv.style.color = '#dc2626';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function loadCharityCount() {
+            try {
+                const response = await fetch('/api/charities?limit=1', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('charityCount').textContent = `${data.total || 0}`;
+                }
+            } catch (error) {
+                document.getElementById('charityCount').textContent = 'Error loading count';
+            }
         }
 
         // Charity Export Function
