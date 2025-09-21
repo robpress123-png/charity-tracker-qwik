@@ -769,80 +769,65 @@
                         <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
                     </div>
 
-                    <!-- Two column layout for steps -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                        <!-- Step 1: Category -->
+                    <!-- Horizontal layout for category, item, quality selection -->
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr 0.8fr 0.5fr auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem;">
+                        <!-- Category Dropdown -->
                         <div>
-                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 1: Select Category</label>
-                            <div style="position:relative;">
-                                <input type="text"
-                                       id="itemCategorySearch"
-                                       placeholder="Search categories..."
-                                       oninput="searchCategories(this.value)"
-                                       onfocus="showCategoryDropdown()"
-                                       style="font-size:0.875rem;width:100%;padding-right:2rem;">
-                                <span id="selectedCategoryIcon" style="position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);font-size:1.25rem;"></span>
-                                <input type="hidden" id="itemCategory">
-
-                                <!-- Category Dropdown -->
-                                <div id="categoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
-                                    <!-- Populated dynamically -->
-                                </div>
-                            </div>
+                            <label style="font-size:0.75rem;font-weight:600;color:#374151;">Category</label>
+                            <select id="itemCategory" onchange="categoryChanged()" style="font-size:0.875rem;width:100%;padding:0.375rem;">
+                                <option value="">Select category...</option>
+                            </select>
                         </div>
 
-                        <!-- Step 2: Item Search (shown after category selection) -->
-                        <div id="itemSearchSection" style="display:none;">
-                            <label style="font-size:0.875rem;font-weight:600;color:#374151;">Step 2: Search Items in <span id="selectedCategoryName" style="color:#667eea;"></span></label>
+                        <!-- Item Search -->
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:#374151;">Item</label>
                             <div style="position:relative;">
                                 <input type="text"
                                        id="itemSearch"
-                                       placeholder="Type to search items..."
+                                       placeholder="Search items (select category first)"
                                        oninput="searchItems(this.value)"
                                        onfocus="showItemDropdown()"
-                                       style="font-size:0.875rem;width:100%;">
+                                       disabled
+                                       style="font-size:0.875rem;width:100%;padding:0.375rem;">
                                 <input type="hidden" id="itemSelect">
-
                                 <!-- Item Dropdown -->
                                 <div id="itemDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
                         </div>
-                    </div>  <!-- Close the grid -->
 
-                    <!-- Step 3: Condition and Quantity (shown after item selection) -->
-                    <div id="itemDetailsSection" style="display:none; margin-top: 1rem;">
-                        <div style="background:#f0f9ff;padding:0.75rem;border-radius:6px;border:1px solid #bae6fd;">
-                            <div style="font-size:0.875rem;color:#0369a1;margin-bottom:0.5rem;font-weight:600;">Selected Item:</div>
-                            <div id="selectedItemDisplay" style="font-size:0.95rem;color:#075985;margin-bottom:0.5rem;"></div>
+                        <!-- Quality -->
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:#374151;">Condition</label>
+                            <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;width:100%;padding:0.375rem;" disabled>
+                                <option value="good">Good</option>
+                                <option value="very_good" selected>Very Good</option>
+                                <option value="excellent">Excellent</option>
+                            </select>
+                        </div>
 
-                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.75rem;align-items:center;">
-                                <div>
-                                    <label for="itemQuality" style="font-size:0.75rem;color:#6b7280;">Condition</label>
-                                    <select id="itemQuality" onchange="updateItemValue()" style="font-size:0.875rem;padding:0.25rem;">
-                                        <option value="good">Good</option>
-                                        <option value="very_good">Very Good</option>
-                                        <option value="excellent">Excellent</option>
-                                    </select>
-                                </div>
+                        <!-- Quantity -->
+                        <div>
+                            <label style="font-size:0.75rem;font-weight:600;color:#374151;">Qty</label>
+                            <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem;width:100%;padding:0.375rem;" disabled>
+                        </div>
 
-                                <div>
-                                    <label for="itemQuantity" style="font-size:0.75rem;color:#6b7280;">Qty</label>
-                                    <input type="number" id="itemQuantity" value="1" min="1" onchange="updateItemValue()" style="font-size:0.875rem;width:60px;padding:0.25rem;">
-                                </div>
-
-                                <div style="text-align:center;">
-                                    <div style="font-size:0.75rem;color:#6b7280;">Value:</div>
-                                    <div id="itemValuePreview" style="font-size:1rem;font-weight:bold;color:#667eea;">$0.00</div>
-                                </div>
-
-                                <button type="button" onclick="addItemToList()" style="padding:0.5rem 1rem;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:0.875rem;font-weight:600;white-space:nowrap;">
-                                    + Add
-                                </button>
-                            </div>
+                        <!-- Add Button -->
+                        <div>
+                            <button type="button" id="addItemBtn" onclick="addItemToList()" disabled style="padding:0.5rem 1rem;background:#9ca3af;color:white;border:none;border-radius:6px;cursor:not-allowed;font-size:0.875rem;font-weight:600;white-space:nowrap;">
+                                + Add Item
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Value Preview (shown when item selected) -->
+                    <div id="itemValueDisplay" style="display:none;background:#f0f9ff;padding:0.5rem;border-radius:6px;border:1px solid #bae6fd;margin-bottom:1rem;">
+                        <span id="selectedItemName" style="font-weight:600;color:#075985;"></span>
+                        <span style="margin-left:1rem;color:#0369a1;">Value: <strong id="itemValuePreview">$0.00</strong></span>
+                    </div>
+
 
                     <!-- Receipt-Style Items Display -->
                     <div style="margin-top:1rem;">
@@ -1143,11 +1128,12 @@
             // Reset item selection
             selectedDonationItems = [];
             updateSelectedItemsDisplay();
-            document.getElementById('itemCategorySearch').value = '';
             document.getElementById('itemCategory').value = '';
-            document.getElementById('selectedCategoryIcon').textContent = '';
-            document.getElementById('itemSearchSection').style.display = 'none';
-            document.getElementById('itemDetailsSection').style.display = 'none';
+            document.getElementById('itemSearch').value = '';
+            document.getElementById('itemSearch').disabled = true;
+            document.getElementById('itemQuality').disabled = true;
+            document.getElementById('itemQuantity').disabled = true;
+            document.getElementById('addItemBtn').disabled = true;
             document.getElementById('itemSearch').value = '';
             document.getElementById('itemSelect').value = '';
             // Clear editing flag
@@ -2273,17 +2259,76 @@
                 if (data.success) {
                     itemCategories = data.categories;
                     console.log(`Loaded ${itemCategories.length} categories`);
-                    // Categories are now loaded for search functionality
+
+                    // Populate the category dropdown
+                    const categorySelect = document.getElementById('itemCategory');
+                    if (categorySelect) {
+                        categorySelect.innerHTML = '<option value="">Select category...</option>';
+                        itemCategories.forEach(cat => {
+                            const option = document.createElement('option');
+                            option.value = cat.id;
+                            option.textContent = `${cat.icon || ''} ${cat.name}`;
+                            categorySelect.appendChild(option);
+                        });
+                    }
                 }
             } catch (error) {
                 console.error('Failed to load categories:', error);
             }
         }
 
-        // Show category dropdown
+        // Handle category selection change
+        async function categoryChanged() {
+            const categoryId = document.getElementById('itemCategory').value;
+            const itemSearch = document.getElementById('itemSearch');
+            const itemQuality = document.getElementById('itemQuality');
+            const itemQuantity = document.getElementById('itemQuantity');
+            const addBtn = document.getElementById('addItemBtn');
+
+            if (!categoryId) {
+                // No category selected, disable everything
+                itemSearch.disabled = true;
+                itemSearch.placeholder = 'Select category first';
+                itemSearch.value = '';
+                itemQuality.disabled = true;
+                itemQuantity.disabled = true;
+                addBtn.disabled = true;
+                addBtn.style.background = '#9ca3af';
+                addBtn.style.cursor = 'not-allowed';
+                currentItems = [];
+                document.getElementById('itemValueDisplay').style.display = 'none';
+                return;
+            }
+
+            // Category selected, enable item search
+            itemSearch.disabled = false;
+            itemSearch.placeholder = 'Type to search items...';
+
+            // Load items for this category
+            console.log(`Loading items for category ${categoryId}`);
+            try {
+                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                console.log('Items API response status:', response.status);
+                const data = await response.json();
+                console.log('Items data:', data);
+
+                if (data.success) {
+                    currentItems = data.items || [];
+                    console.log(`Loaded ${currentItems.length} items`);
+                } else {
+                    console.error('Failed to load items:', data.error);
+                    currentItems = [];
+                }
+            } catch (error) {
+                console.error('Failed to load items:', error);
+                currentItems = [];
+            }
+        }
+
+        // Show category dropdown (for backwards compatibility)
         function showCategoryDropdown() {
             const dropdown = document.getElementById('categoryDropdown');
-            const searchValue = document.getElementById('itemCategorySearch').value.toLowerCase();
+            const searchValue = document.getElementById('itemCategorySearch') ? document.getElementById('itemCategorySearch').value.toLowerCase() : '';
 
             let html = '';
             const filteredCategories = searchValue
@@ -2407,12 +2452,20 @@
             document.getElementById('itemSearch').value = itemName;
             document.getElementById('itemDropdown').style.display = 'none';
 
-            // Show details section
-            document.getElementById('itemDetailsSection').style.display = 'block';
-            document.getElementById('selectedItemDisplay').textContent = `${item.name} - ${item.description || ''}`;
+            // Enable quality, quantity, and add button
+            document.getElementById('itemQuality').disabled = false;
+            document.getElementById('itemQuantity').disabled = false;
+            const addBtn = document.getElementById('addItemBtn');
+            addBtn.disabled = false;
+            addBtn.style.background = '#667eea';
+            addBtn.style.cursor = 'pointer';
+
+            // Show value display
+            document.getElementById('itemValueDisplay').style.display = 'block';
+            document.getElementById('selectedItemName').textContent = `${item.name} - ${item.description || ''}`;
 
             // Reset quality and quantity
-            document.getElementById('itemQuality').value = 'good';
+            document.getElementById('itemQuality').value = 'very_good';
             document.getElementById('itemQuantity').value = '1';
 
             // Update value preview
@@ -2711,11 +2764,12 @@
             // Reset item selection
             selectedDonationItems = [];
             updateSelectedItemsDisplay();
-            document.getElementById('itemCategorySearch').value = '';
             document.getElementById('itemCategory').value = '';
-            document.getElementById('selectedCategoryIcon').textContent = '';
-            document.getElementById('itemSearchSection').style.display = 'none';
-            document.getElementById('itemDetailsSection').style.display = 'none';
+            document.getElementById('itemSearch').value = '';
+            document.getElementById('itemSearch').disabled = true;
+            document.getElementById('itemQuality').disabled = true;
+            document.getElementById('itemQuantity').disabled = true;
+            document.getElementById('addItemBtn').disabled = true;
 
             // Update modal header and type display
             document.getElementById('donationModalTitle').textContent = info.title;
@@ -3028,16 +3082,7 @@
             loadStats();
             loadItemCategories(); // Load item categories for donation form
 
-            // Setup event listeners for item category search
-            const categorySearchInput = document.getElementById('itemCategorySearch');
-            if (categorySearchInput) {
-                categorySearchInput.addEventListener('input', function() {
-                    showCategoryDropdown();
-                });
-                categorySearchInput.addEventListener('focus', function() {
-                    showCategoryDropdown();
-                });
-            }
+            // Categories are now handled by a select dropdown, no search listeners needed
 
             // Setup event listeners for item search
             const itemSearchInput = document.getElementById('itemSearch');
