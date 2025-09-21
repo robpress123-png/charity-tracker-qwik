@@ -1046,13 +1046,18 @@
                     </div>
 
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                        <div class="form-group">
+                        <div class="form-group" style="position:relative;">
                             <label for="cryptoName">Cryptocurrency Name</label>
-                            <input type="text" id="cryptoName" placeholder="e.g., Bitcoin" required>
+                            <input type="text" id="cryptoName" placeholder="Start typing to search..." required
+                                   oninput="searchCrypto(this.value)" onfocus="showCryptoDropdown()" autocomplete="off">
+                            <!-- Crypto Dropdown -->
+                            <div id="cryptoDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                <!-- Populated dynamically -->
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="cryptoSymbol">Symbol/Ticker</label>
-                            <input type="text" id="cryptoSymbol" placeholder="e.g., BTC" style="text-transform:uppercase;" required>
+                            <input type="text" id="cryptoSymbol" placeholder="Auto-populated or enter manually" style="text-transform:uppercase;" required>
                         </div>
                     </div>
 
@@ -3366,6 +3371,128 @@
                 ).join('');
             }
         }
+
+        // Common cryptocurrencies list
+        const cryptoList = [
+            { name: 'Bitcoin', symbol: 'BTC' },
+            { name: 'Ethereum', symbol: 'ETH' },
+            { name: 'Tether', symbol: 'USDT' },
+            { name: 'BNB', symbol: 'BNB' },
+            { name: 'Solana', symbol: 'SOL' },
+            { name: 'XRP', symbol: 'XRP' },
+            { name: 'USDC', symbol: 'USDC' },
+            { name: 'Cardano', symbol: 'ADA' },
+            { name: 'Avalanche', symbol: 'AVAX' },
+            { name: 'Dogecoin', symbol: 'DOGE' },
+            { name: 'TRON', symbol: 'TRX' },
+            { name: 'Chainlink', symbol: 'LINK' },
+            { name: 'Polygon', symbol: 'MATIC' },
+            { name: 'Polkadot', symbol: 'DOT' },
+            { name: 'Wrapped Bitcoin', symbol: 'WBTC' },
+            { name: 'Shiba Inu', symbol: 'SHIB' },
+            { name: 'Dai', symbol: 'DAI' },
+            { name: 'Litecoin', symbol: 'LTC' },
+            { name: 'Bitcoin Cash', symbol: 'BCH' },
+            { name: 'Uniswap', symbol: 'UNI' },
+            { name: 'Stellar', symbol: 'XLM' },
+            { name: 'Cosmos', symbol: 'ATOM' },
+            { name: 'Ethereum Classic', symbol: 'ETC' },
+            { name: 'Monero', symbol: 'XMR' },
+            { name: 'Internet Computer', symbol: 'ICP' },
+            { name: 'Aptos', symbol: 'APT' },
+            { name: 'Filecoin', symbol: 'FIL' },
+            { name: 'Hedera', symbol: 'HBAR' },
+            { name: 'Arbitrum', symbol: 'ARB' },
+            { name: 'VeChain', symbol: 'VET' },
+            { name: 'Near Protocol', symbol: 'NEAR' },
+            { name: 'Optimism', symbol: 'OP' },
+            { name: 'Aave', symbol: 'AAVE' },
+            { name: 'Algorand', symbol: 'ALGO' },
+            { name: 'The Graph', symbol: 'GRT' },
+            { name: 'Fantom', symbol: 'FTM' },
+            { name: 'Decentraland', symbol: 'MANA' },
+            { name: 'Axie Infinity', symbol: 'AXS' },
+            { name: 'The Sandbox', symbol: 'SAND' },
+            { name: 'Theta', symbol: 'THETA' },
+            { name: 'Tezos', symbol: 'XTZ' },
+            { name: 'Flow', symbol: 'FLOW' },
+            { name: 'Zcash', symbol: 'ZEC' },
+            { name: 'Enjin Coin', symbol: 'ENJ' },
+            { name: 'Maker', symbol: 'MKR' },
+            { name: 'Compound', symbol: 'COMP' },
+            { name: 'Curve', symbol: 'CRV' },
+            { name: 'Pancakeswap', symbol: 'CAKE' },
+            { name: 'Yearn Finance', symbol: 'YFI' },
+            { name: 'Basic Attention Token', symbol: 'BAT' }
+        ];
+
+        // Function to search cryptocurrencies
+        function searchCrypto(query) {
+            const dropdown = document.getElementById('cryptoDropdown');
+            if (!query) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const filtered = cryptoList.filter(crypto =>
+                crypto.name.toLowerCase().includes(query.toLowerCase()) ||
+                crypto.symbol.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div style="padding:0.5rem;color:#6b7280;">No cryptocurrencies found</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            dropdown.innerHTML = filtered.map(crypto => `
+                <div style="padding:0.5rem;cursor:pointer;hover:background:#f3f4f6;"
+                     onmouseover="this.style.background='#f3f4f6'"
+                     onmouseout="this.style.background='white'"
+                     onclick="selectCrypto('${crypto.name}', '${crypto.symbol}')">
+                    <strong>${crypto.name}</strong> (${crypto.symbol})
+                </div>
+            `).join('');
+            dropdown.style.display = 'block';
+        }
+
+        // Function to show all cryptos when field is focused
+        function showCryptoDropdown() {
+            const query = document.getElementById('cryptoName').value;
+            if (!query) {
+                // Show top cryptos if no query
+                const dropdown = document.getElementById('cryptoDropdown');
+                const topCryptos = cryptoList.slice(0, 10);
+                dropdown.innerHTML = topCryptos.map(crypto => `
+                    <div style="padding:0.5rem;cursor:pointer;"
+                         onmouseover="this.style.background='#f3f4f6'"
+                         onmouseout="this.style.background='white'"
+                         onclick="selectCrypto('${crypto.name}', '${crypto.symbol}')">
+                        <strong>${crypto.name}</strong> (${crypto.symbol})
+                    </div>
+                `).join('');
+                dropdown.style.display = 'block';
+            } else {
+                searchCrypto(query);
+            }
+        }
+
+        // Function to select a cryptocurrency
+        function selectCrypto(name, symbol) {
+            document.getElementById('cryptoName').value = name;
+            document.getElementById('cryptoSymbol').value = symbol;
+            document.getElementById('cryptoDropdown').style.display = 'none';
+            // Focus on next field
+            document.getElementById('cryptoDonationDate').focus();
+        }
+
+        // Hide crypto dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#cryptoName') && !e.target.closest('#cryptoDropdown')) {
+                const dropdown = document.getElementById('cryptoDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
 
         // Initialize everything when DOM is ready
         function initializeApp() {
