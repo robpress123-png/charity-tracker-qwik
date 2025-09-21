@@ -1114,7 +1114,12 @@
         // Modal functions
         function showAddDonation() {
             document.getElementById('donationModal').classList.add('active');
+            // Initialize charity autocomplete every time modal opens
             initCharityAutocomplete();
+            // Also initialize item categories if it's an item donation
+            if (document.getElementById('donationType').value === 'items') {
+                loadItemCategories();
+            }
         }
 
         function closeDonationModal() {
@@ -2523,6 +2528,21 @@
 
             const info = typeInfo[type] || typeInfo.cash;
 
+            // Clear the form including charity fields
+            document.getElementById('donationForm').reset();
+            document.getElementById('selectedCharityId').value = '';
+            document.getElementById('donationCharity').value = '';
+            document.getElementById('charityDropdown').classList.remove('show');
+
+            // Reset item selection
+            selectedDonationItems = [];
+            updateSelectedItemsDisplay();
+            document.getElementById('itemCategorySearch').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('selectedCategoryIcon').textContent = '';
+            document.getElementById('itemSearchSection').style.display = 'none';
+            document.getElementById('itemDetailsSection').style.display = 'none';
+
             // Update modal header and type display
             document.getElementById('donationModalTitle').textContent = info.title;
             document.getElementById('donationTypeIcon').textContent = info.icon;
@@ -2789,6 +2809,28 @@
         loadDonations();
         loadStats();
         loadItemCategories(); // Load item categories for donation form
+
+        // Setup event listeners for item category search
+        const categorySearchInput = document.getElementById('itemCategorySearch');
+        if (categorySearchInput) {
+            categorySearchInput.addEventListener('input', function() {
+                showCategoryDropdown();
+            });
+            categorySearchInput.addEventListener('focus', function() {
+                showCategoryDropdown();
+            });
+        }
+
+        // Setup event listeners for item search
+        const itemSearchInput = document.getElementById('itemSearch');
+        if (itemSearchInput) {
+            itemSearchInput.addEventListener('input', function() {
+                searchItems();
+            });
+            itemSearchInput.addEventListener('focus', function() {
+                searchItems();
+            });
+        }
 
         // Close modals and dropdowns when clicking outside
         window.onclick = function(event) {
