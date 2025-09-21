@@ -481,6 +481,11 @@
                     </div>
                 </div>
 
+                <h3 style="margin: 2rem 0 1rem; color: #f3f4f6;">Donations by Year</h3>
+                <div id="yearlyDonations" class="dashboard-grid">
+                    <!-- Will be populated dynamically -->
+                </div>
+
                 <h3 style="margin: 2rem 0 1rem; color: #f3f4f6;">Quick Actions</h3>
                 <div class="tools-grid">
                     <div class="tool-card">
@@ -705,6 +710,34 @@
                     document.getElementById('donationChange').textContent = donationChange;
                     document.getElementById('charityChange').textContent = charityChange;
                     document.getElementById('itemsChange').textContent = itemsChange;
+
+                    // Display yearly donations breakdown
+                    const yearlyContainer = document.getElementById('yearlyDonations');
+                    yearlyContainer.innerHTML = '';
+
+                    if (stats.yearlyDonations && stats.yearlyDonations.length > 0) {
+                        stats.yearlyDonations.forEach(yearData => {
+                            const yearCard = document.createElement('div');
+                            yearCard.className = 'stat-card';
+                            yearCard.innerHTML = `
+                                <h3>${yearData.year} Donations</h3>
+                                <div class="value">$${yearData.total.toLocaleString()}</div>
+                                <div class="change">${yearData.count} donation${yearData.count !== 1 ? 's' : ''}</div>
+                            `;
+                            yearlyContainer.appendChild(yearCard);
+                        });
+                    } else {
+                        // Show current year with 0 if no donations
+                        const currentYear = new Date().getFullYear();
+                        const yearCard = document.createElement('div');
+                        yearCard.className = 'stat-card';
+                        yearCard.innerHTML = `
+                            <h3>${currentYear} Donations</h3>
+                            <div class="value">$0</div>
+                            <div class="change">No donations yet</div>
+                        `;
+                        yearlyContainer.appendChild(yearCard);
+                    }
                 }
             } catch (error) {
                 console.error('Failed to load admin stats:', error);

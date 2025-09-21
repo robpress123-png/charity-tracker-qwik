@@ -83,6 +83,38 @@ export async function onRequestGet(context) {
             console.log('New charities query failed:', e);
         }
 
+        // Get donations by year
+        let yearlyDonations = [];
+        try {
+            const yearlyResult = await env.DB.prepare(`
+                SELECT
+                    strftime('%Y', donation_date) as year,
+                    COUNT(*) as count,
+                    SUM(amount) as total
+                FROM donations
+                GROUP BY strftime('%Y', donation_date)
+                ORDER BY year DESC
+                LIMIT 10
+            `).all();
+
+            if (yearlyResult && yearlyResult.results) {
+                yearlyDonations = yearlyResult.results.map(row => ({
+                    year: row.year || new Date().getFullYear(),
+                    count: row.count || 0,
+                    total: row.total || 0
+                }));
+            }
+        } catch (e) {
+            console.log('Yearly donations query failed:', e);
+            // If no donations exist yet, show current year with 0
+            const currentYear = new Date().getFullYear();
+            yearlyDonations = [{
+                year: currentYear,
+                count: 0,
+                total: 0
+            }];
+        }
+
         return new Response(JSON.stringify({
             success: true,
             stats: {
@@ -94,7 +126,8 @@ export async function onRequestGet(context) {
                 monthlyDonations: monthlyDonations?.total || 0,
                 monthlyDonationCount: monthlyDonations?.count || 0,
                 newUsersThisMonth: newUsersMonth?.count || 0,
-                newCharitiesThisMonth: newCharitiesMonth?.count || 0
+                newCharitiesThisMonth: newCharitiesMonth?.count || 0,
+                yearlyDonations: yearlyDonations
             }
         }), {
             headers: { 'Content-Type': 'application/json' }
