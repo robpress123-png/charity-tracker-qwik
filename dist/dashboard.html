@@ -525,11 +525,7 @@
                 <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem; padding-right: 1rem;">
                     <label style="color: white; font-size: 0.9rem; font-weight: 500;">Tax Year:</label>
                     <select id="globalYearFilter" onchange="updateYearFilter()" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; cursor: pointer;">
-                        <option value="2024">2024</option>
-                        <option value="2025" selected>2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="all">All Years</option>
+                        <!-- Will be populated dynamically -->
                     </select>
                 </div>
             </div>
@@ -543,7 +539,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div>
-                        <div class="stat-label" id="totalDonationsLabel">Total Donations (2025)</div>
+                        <div class="stat-label" id="totalDonationsLabel">Total Donations</div>
                         <div class="stat-value" id="totalDonations">$0</div>
                     </div>
                 </div>
@@ -555,7 +551,7 @@
                 </div>
                 <div class="stat-card">
                     <div>
-                        <div class="stat-label" id="taxSavingsLabel">Est. Tax Savings (2025)</div>
+                        <div class="stat-label" id="taxSavingsLabel">Est. Tax Savings</div>
                         <div class="stat-value" id="taxSavings">$0</div>
                     </div>
                 </div>
@@ -632,11 +628,7 @@
                 <div class="form-group">
                     <label>Report Tax Year</label>
                     <select id="reportYear" style="width: 200px;">
-                        <option value="2024">2024</option>
-                        <option value="2025" selected>2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="all">All Years</option>
+                        <!-- Will be populated dynamically -->
                     </select>
                 </div>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
@@ -1202,11 +1194,24 @@
         if (!user) {
             window.location.href = '/login.html';
         } else {
-            document.getElementById('userName').textContent = user.name || user.email;
+            // Try to get name from profile first, then fall back to user data
+            const savedProfile = localStorage.getItem('userProfile');
+            let displayName = user.email;
+            if (savedProfile) {
+                const profile = JSON.parse(savedProfile);
+                displayName = profile.name || user.name || user.email;
+            } else {
+                displayName = user.name || user.email;
+            }
+            document.getElementById('userName').textContent = displayName;
         }
 
-        // Set today's date as default for donation form
-        document.getElementById('donationDate').valueAsDate = new Date();
+        // Set today's date as default for donation form (use local date string to avoid timezone issues)
+        const today = new Date();
+        const localDate = today.getFullYear() + '-' +
+                         String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                         String(today.getDate()).padStart(2, '0');
+        document.getElementById('donationDate').value = localDate;
 
         // Format currency with commas and optional cents
         function formatCurrency(amount, includeCents = false) {
@@ -1250,9 +1255,13 @@
                     document.getElementById('stockQuantity').setAttribute('required', '');
                     document.getElementById('fairMarketValue').setAttribute('required', '');
                 } else if (donationType === 'crypto') {
-                    document.getElementById('cryptoType').setAttribute('required', '');
-                    document.getElementById('cryptoQuantity').setAttribute('required', '');
-                    document.getElementById('cryptoValue').setAttribute('required', '');
+                    // Fix: Use correct crypto field IDs
+                    const cryptoSymbol = document.getElementById('cryptoSymbol');
+                    const cryptoQty = document.getElementById('cryptoQuantity');
+                    const cryptoPricePerUnit = document.getElementById('cryptoPricePerUnit');
+                    if (cryptoSymbol) cryptoSymbol.setAttribute('required', '');
+                    if (cryptoQty) cryptoQty.setAttribute('required', '');
+                    if (cryptoPricePerUnit) cryptoPricePerUnit.setAttribute('required', '');
                 }
             }
         }
@@ -1273,6 +1282,15 @@
             // Also initialize item categories if it's an item donation
             if (document.getElementById('donationType').value === 'items') {
                 loadItemCategories();
+            }
+
+            // Set default date for crypto donations too
+            const today = new Date();
+            const localDate = today.getFullYear() + '-' +
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                           String(today.getDate()).padStart(2, '0');
+            if (document.getElementById('cryptoDonationDate')) {
+                document.getElementById('cryptoDonationDate').value = localDate;
             }
         }
 
@@ -1561,10 +1579,10 @@
                     formData.amount = shares * pricePerShare; // Total donation = shares × price per share
                     break;
                 case 'crypto':
-                    const cryptoQuantity = parseFloat(document.getElementById('cryptoQuantity').value);
-                    const cryptoPricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value);
+                    const cryptoQuantity = parseFloat(document.getElementById('cryptoQuantity').value) || 0;
+                    const cryptoPricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
                     const cryptoDate = document.getElementById('cryptoDonationDate').value || document.getElementById('donationDate').value;
-                    const cryptoTime = document.getElementById('cryptoDonationTime').value;
+                    const cryptoTime = document.getElementById('cryptoDonationTime').value || '12:00:00';
 
                     formData.crypto_name = document.getElementById('cryptoName').value;
                     formData.crypto_symbol = document.getElementById('cryptoSymbol').value.toUpperCase();
@@ -1575,7 +1593,7 @@
                     formData.crypto_holding_period = document.getElementById('cryptoHoldingPeriod').value;
                     formData.amount = cryptoQuantity * cryptoPricePerUnit;
                     // Store exact donation timestamp
-                    formData.crypto_donation_datetime = `${cryptoDate}T${cryptoTime}`;
+                    formData.crypto_donation_datetime = cryptoDate + 'T' + cryptoTime;
                     // Override the donation date with crypto-specific date
                     formData.donation_date = cryptoDate;
                     break;
@@ -1672,7 +1690,20 @@
                 if (data.success && data.donations && data.donations.length > 0) {
                     let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
                     data.donations.forEach(donation => {
-                        const date = new Date(donation.date || donation.donation_date).toLocaleDateString();
+                        // Parse date correctly to avoid timezone issues
+                        const dateStr = donation.date || donation.donation_date;
+                        let date;
+                        if (dateStr) {
+                            // If date is in YYYY-MM-DD format, parse it correctly
+                            if (dateStr.includes('-')) {
+                                const [year, month, day] = dateStr.split('-');
+                                date = `${month}/${day}/${year}`;
+                            } else {
+                                date = new Date(dateStr).toLocaleDateString();
+                            }
+                        } else {
+                            date = 'Unknown';
+                        }
                         const typeIcons = {
                             'cash': '💵',
                             'items': '📦',
@@ -2879,7 +2910,7 @@
                     document.getElementById('selectedCharityId').value = donation.charity_id;
                     document.getElementById('donationCharity').value = donation.charity_name || '';
                     document.getElementById('donationType').value = donation.donation_type || 'cash';
-                    document.getElementById('donationDate').value = donation.donation_date;
+                    document.getElementById('donationDate').value = donation.date || donation.donation_date;
                     document.getElementById('donationNotes').value = donation.notes || '';
 
                     // Set type-specific fields
@@ -3309,8 +3340,38 @@
             document.getElementById('mileageDeduction').textContent = deduction.toFixed(2);
         }
 
+        // Function to populate year dropdowns dynamically
+        function populateYearSelectors() {
+            const currentYear = new Date().getFullYear();
+            const years = [
+                { value: currentYear - 1, label: (currentYear - 1).toString() },
+                { value: currentYear, label: currentYear.toString() },
+                { value: currentYear + 1, label: (currentYear + 1).toString() },
+                { value: 'all', label: 'All Years' }
+            ];
+
+            // Populate global year filter
+            const globalFilter = document.getElementById('globalYearFilter');
+            if (globalFilter) {
+                globalFilter.innerHTML = years.map(year =>
+                    `<option value="${year.value}" ${year.value === currentYear ? 'selected' : ''}>${year.label}</option>`
+                ).join('');
+            }
+
+            // Populate report year filter
+            const reportFilter = document.getElementById('reportYear');
+            if (reportFilter) {
+                reportFilter.innerHTML = years.map(year =>
+                    `<option value="${year.value}" ${year.value === currentYear ? 'selected' : ''}>${year.label}</option>`
+                ).join('');
+            }
+        }
+
         // Initialize everything when DOM is ready
         function initializeApp() {
+            // Populate year selectors first
+            populateYearSelectors();
+
             // Load data
             loadTaxSettings();
             loadProfile(); // Load user profile
