@@ -40,9 +40,8 @@ export async function onRequestGet(context) {
               id: 1,
               name: "Dress",
               description: "Women's dress",
-              value_poor: 4,
-              value_fair: 8,
               value_good: 15,
+              value_very_good: 20,
               value_excellent: 25
             },
             {
@@ -80,7 +79,7 @@ export async function onRequestGet(context) {
       });
     } else if (categoryId) {
       const stmt = env.DB.prepare(`
-        SELECT id, name, description, value_poor, value_fair, value_good, value_excellent
+        SELECT id, name, description, value_good, value_very_good, value_excellent
         FROM donation_items
         WHERE category_id = ?
         ORDER BY name
