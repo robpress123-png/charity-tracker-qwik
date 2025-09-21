@@ -153,12 +153,11 @@ All donation types store type-specific data in the notes field as JSON:
 4. ✅ Quality options alignment
 
 ### Pending Features
-1. **Version Numbers**: Update all pages to 1.4.6 (index.html, login.html still show 1.4.3)
-2. **Database Normalization**: Add donation_type column instead of JSON in notes
-3. **Automatic Price Lookups**: For stocks and crypto
-4. **Receipt Uploads**: Photo storage capability
-5. **Bank Imports**: Transaction import feature
-6. **Recurring Donations**: Scheduling system
+1. **Database Normalization**: Add donation_type column instead of JSON in notes
+2. **Automatic Price Lookups**: For stocks and crypto
+3. **Receipt Uploads**: Photo storage capability
+4. **Bank Imports**: Transaction import feature
+5. **Recurring Donations**: Scheduling system
 
 ## Important Configuration Files
 
@@ -179,13 +178,23 @@ database_id = "4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d"
 
 ## Development Guidelines
 
+### CRITICAL: Deployment & Version Management
+1. **Auto-Deployment**: All pushes to GitHub main branch automatically deploy to Cloudflare Pages
+2. **Version Updates**: When making changes, ALWAYS:
+   - Increment version number (e.g., 1.4.7 → 1.4.8)
+   - Update in ALL locations:
+     - package.json
+     - All HTML files in /dist (index.html, login.html, dashboard.html, admin.html, etc.)
+     - CONTINUATION_CONTEXT.md
+3. **Deployment Command**: `git add -A && git commit -m "message" && git push origin main`
+4. **Check Deployment**: Visit https://charity-tracker-qwik.pages.dev after 1-2 minutes
+
 ### When Making Changes
 1. **Database Schema**: Always check actual column names before querying
-2. **Quality Levels**: Use only Good, Very Good, Excellent for IRS compliance
-3. **Value Calculation**: Very Good = (value_good + value_excellent) / 2
-4. **Version Control**: Update version in all HTML files consistently
-5. **Git Commits**: Use descriptive messages with emoji prefix
-6. **Testing**: Always test with real D1 database, not mock data
+2. **Quality Levels**: Use only Fair ($0), Good, Very Good, Excellent for IRS compliance
+3. **Value Calculation**: Fair = $0, Very Good = (value_good + value_excellent) / 2
+4. **Git Commits**: Use descriptive messages with emoji prefix
+5. **Testing**: Always test with real D1 database, not mock data
 
 ### Testing Checklist
 - [ ] Login with test@example.com / password123

@@ -295,6 +295,11 @@
             border-color: #667eea;
         }
 
+        /* Date input specific styling */
+        input[type="date"] {
+            max-width: 200px;
+        }
+
         /* Autocomplete styles */
         .autocomplete-wrapper {
             position: relative;
@@ -769,8 +774,12 @@
                         <strong>⚠️ IRS:</strong> Only "good condition or better" items qualify for tax deductions
                     </div>
 
-                    <!-- Horizontal layout for category, item, quality selection -->
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr 0.8fr 0.5fr auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem;">
+                    <!-- Two column layout: Entry on left, Receipt on right -->
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+                        <!-- Left Column: Item Entry -->
+                        <div>
+                            <!-- Horizontal layout for category, item, quality selection -->
+                            <div style="display: grid; grid-template-columns: 1.2fr 1.5fr 0.7fr 0.4fr auto; gap: 0.5rem; align-items: end; margin-bottom: 1rem;">
                         <!-- Category Dropdown -->
                         <div>
                             <label style="font-size:0.75rem;font-weight:600;color:#374151;">Category</label>
@@ -821,34 +830,36 @@
                                 + Add Item
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Value Preview (shown when item selected) -->
-                    <div id="itemValueDisplay" style="display:none;background:#f0f9ff;padding:0.5rem;border-radius:6px;border:1px solid #bae6fd;margin-bottom:1rem;">
-                        <span id="selectedItemName" style="font-weight:600;color:#075985;"></span>
-                        <span style="margin-left:1rem;color:#0369a1;">Value: <strong id="itemValuePreview">$0.00</strong></span>
-                    </div>
-
-
-                    <!-- Receipt-Style Items Display -->
-                    <div style="margin-top:1rem;">
-                        <div style="background:white; border:1px solid #e5e7eb; border-radius:6px; padding:0.5rem;">
-                            <div style="border-bottom:1px solid #e5e7eb; padding-bottom:0.25rem; margin-bottom:0.25rem;">
-                                <strong style="font-size:0.75rem;color:#6b7280;">📋 Items List</strong>
                             </div>
-                            <div id="selectedItemsList" style="min-height:40px; max-height:120px; overflow-y:auto;font-size:0.875rem;">
-                                <div class="empty-state" style="color:#9ca3af; text-align:center; padding:1rem; font-size:0.875rem;">
-                                    No items added yet
-                                </div>
-                            </div>
-                            <div style="border-top:2px solid #e5e7eb; margin-top:0.5rem; padding-top:0.5rem; display:flex; justify-content:between; align-items:center;">
-                                <strong>Total Value:</strong>
-                                <span style="font-size:1.25rem; font-weight:bold; color:#667eea;">$<span id="receiptTotal">0.00</span></span>
+
+                            <!-- Value Preview (shown when item selected) -->
+                            <div id="itemValueDisplay" style="display:none;background:#f0f9ff;padding:0.5rem;border-radius:6px;border:1px solid #bae6fd;margin-bottom:1rem;">
+                                <span id="selectedItemName" style="font-weight:600;color:#075985;"></span>
+                                <span style="margin-left:1rem;color:#0369a1;">Value: <strong id="itemValuePreview">$0.00</strong></span>
                             </div>
                         </div>
-                        <input type="hidden" id="estimatedValue">
-                        <input type="hidden" id="itemDescription">
+
+                        <!-- Right Column: Receipt Display -->
+                        <div>
+                            <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:1rem; min-height:300px;">
+                                <div style="border-bottom:2px dashed #d1d5db; padding-bottom:0.5rem; margin-bottom:0.75rem;">
+                                    <h4 style="font-size:1rem;font-weight:700;color:#374151;text-align:center;margin:0;">📋 DONATION RECEIPT</h4>
+                                    <p style="font-size:0.75rem;color:#6b7280;text-align:center;margin-top:0.25rem;">Items for Tax Deduction</p>
+                                </div>
+                                <div id="selectedItemsList" style="min-height:180px; max-height:250px; overflow-y:auto;font-size:0.875rem;">
+                                    <div class="empty-state" style="color:#9ca3af; text-align:center; padding:2rem; font-size:0.875rem;">
+                                        No items added yet
+                                    </div>
+                                </div>
+                                <div style="border-top:2px solid #374151; margin-top:0.75rem; padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+                                    <strong style="font-size:1rem;">Total Value:</strong>
+                                    <span style="font-size:1.5rem; font-weight:bold; color:#667eea;">$<span id="receiptTotal">0.00</span></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <input type="hidden" id="estimatedValue">
+                    <input type="hidden" id="itemDescription">
                 </div>
                 <!-- Mileage donation fields -->
                 <div id="milesFields" class="donation-type-fields" style="display:none;">
@@ -1062,6 +1073,16 @@
 
         // Set today's date as default for donation form
         document.getElementById('donationDate').valueAsDate = new Date();
+
+        // Format currency with commas and optional cents
+        function formatCurrency(amount, includeCents = false) {
+            const num = parseFloat(amount) || 0;
+            if (includeCents) {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+        }
 
         // Function to update donation fields based on type
         function updateDonationFields() {
@@ -1545,7 +1566,7 @@
                                 <td>${date}</td>
                                 <td>${donation.charity_name || 'Unknown'}</td>
                                 <td>${typeDisplay}</td>
-                                <td>$${parseFloat(donation.amount).toFixed(2)}</td>
+                                <td>$${formatCurrency(donation.amount, true)}</td>
                                 <td>${displayNotes}</td>
                                 <td>
                                     <button class="btn-action" onclick="editDonation('${donation.id}')">✏️</button>
@@ -1612,10 +1633,10 @@
                     const taxRate = currentTaxRate || 0.22;
                     const estimatedSavings = totalAmount * taxRate;
 
-                    // Update display
-                    document.getElementById('totalDonations').textContent = `$${totalAmount.toFixed(0)}`;
+                    // Update display with proper formatting
+                    document.getElementById('totalDonations').textContent = `$${formatCurrency(totalAmount)}`;
                     document.getElementById('charityCount').textContent = uniqueCharities.toString();
-                    document.getElementById('taxSavings').textContent = `$${estimatedSavings.toFixed(0)}`;
+                    document.getElementById('taxSavings').textContent = `$${formatCurrency(estimatedSavings)}`;
                 } else {
                     // No donations, show zeros
                     document.getElementById('totalDonations').textContent = '$0';
@@ -1799,7 +1820,7 @@
                             <td>${date}</td>
                             <td>${donation.charity_name || 'Unknown'}</td>
                             <td>${donation.donation_type || 'cash'}</td>
-                            <td>$${parseFloat(donation.amount).toFixed(2)}</td>
+                            <td>$${formatCurrency(donation.amount, true)}</td>
                             <td>${description}</td>
                             <td>${donation.notes || ''}</td>
                         </tr>
@@ -2301,9 +2322,12 @@
                 return;
             }
 
-            // Category selected, enable item search
+            // Category selected, enable item search and clear previous selection
             itemSearch.disabled = false;
             itemSearch.placeholder = 'Type to search items...';
+            itemSearch.value = '';  // Clear any previous item selection
+            document.getElementById('itemSelect').value = '';  // Clear hidden select
+            document.getElementById('itemValueDisplay').style.display = 'none';  // Hide value display
 
             // Load items for this category
             console.log(`Loading items for category ${categoryId}`);
@@ -2556,12 +2580,20 @@
 
             updateSelectedItemsDisplay();
 
-            // Reset form
+            // Reset form for next item
             document.getElementById('itemSelect').value = '';
-            document.getElementById('itemQuality').value = 'good';
+            document.getElementById('itemSearch').value = '';  // Clear item search field
+            document.getElementById('itemQuality').value = 'very_good';  // Reset to default
+            document.getElementById('itemQuality').disabled = true;  // Disable until next item selected
             document.getElementById('itemQuantity').value = '1';
-            document.getElementById('itemQualityGroup').style.display = 'none';
-            document.getElementById('itemQuantityGroup').style.display = 'none';
+            document.getElementById('itemQuantity').disabled = true;
+            document.getElementById('itemValueDisplay').style.display = 'none';  // Hide value display
+
+            // Disable add button until next item is selected
+            const addBtn = document.getElementById('addItemBtn');
+            addBtn.disabled = true;
+            addBtn.style.background = '#9ca3af';
+            addBtn.style.cursor = 'not-allowed';
         }
 
         function updateSelectedItemsDisplay() {
@@ -2572,7 +2604,7 @@
             if (selectedDonationItems.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="color:#9ca3af;text-align:center;padding:1rem;">No items added</div>';
                 document.getElementById('estimatedValue').value = '0.00';
-                if (receiptTotal) receiptTotal.textContent = '$0.00';
+                if (receiptTotal) receiptTotal.textContent = '0.00';  // No $ needed, already in HTML
                 if (addItemBtn) addItemBtn.style.display = 'block';
                 return;
             }
@@ -2619,7 +2651,7 @@
 
             container.innerHTML = html;
             document.getElementById('estimatedValue').value = totalValue.toFixed(2);
-            if (receiptTotal) receiptTotal.textContent = `$${totalValue.toFixed(2)}`;
+            if (receiptTotal) receiptTotal.textContent = totalValue.toFixed(2);  // No $ needed, already in HTML
 
             // Show add item button when there are items
             if (addItemBtn) addItemBtn.style.display = selectedDonationItems.length > 0 ? 'block' : 'none';
