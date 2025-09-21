@@ -44,7 +44,7 @@ export async function onRequestGet(context) {
     const searchTerm = url.searchParams.get('search');
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
-    const withDonations = url.searchParams.get('with_donations') === 'true');
+    const withDonations = url.searchParams.get('with_donations') === 'true';
 
     // Check if D1 database is available
     if (!env.DB) {
