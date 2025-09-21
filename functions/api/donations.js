@@ -87,24 +87,16 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Insert donation into database
+    // Insert donation into database (note: simple schema only has basic columns)
     const stmt = env.DB.prepare(`
       INSERT INTO donations (
-        user_id, charity_id, amount, donation_date, notes, donation_type,
-        miles_driven, mileage_rate, mileage_purpose,
-        item_description, estimated_value,
-        quantity, cost_basis, fair_market_value,
-        crypto_type
+        user_id, charity_id, amount, date, notes
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?)
     `);
 
     const result = await stmt.bind(
-      userId, charity_id, amount, donation_date, notes, donation_type,
-      miles_driven, mileage_rate, mileage_purpose,
-      item_description, estimated_value,
-      quantity, cost_basis, fair_market_value,
-      crypto_type
+      userId, charity_id, amount, donation_date, notes || ''
     ).run();
 
     if (result.meta.last_row_id) {
@@ -200,7 +192,7 @@ export async function onRequestGet(context) {
       });
     }
 
-    // Build query with filters
+    // Build query with filters (using 'date' column, not 'donation_date')
     let query = `
       SELECT d.*, c.name as charity_name, c.ein as charity_ein, c.category as charity_category
       FROM donations d
@@ -210,7 +202,7 @@ export async function onRequestGet(context) {
     let queryParams = [userId];
 
     if (year) {
-      query += ` AND strftime('%Y', d.donation_date) = ?`;
+      query += ` AND strftime('%Y', d.date) = ?`;
       queryParams.push(year);
     }
 
@@ -219,18 +211,18 @@ export async function onRequestGet(context) {
       queryParams.push(charityId);
     }
 
-    query += ` ORDER BY d.donation_date DESC LIMIT ? OFFSET ?`;
+    query += ` ORDER BY d.date DESC LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
 
     const stmt = env.DB.prepare(query);
     const result = await stmt.bind(...queryParams).all();
 
-    // Get total count
+    // Get total count (using 'date' column)
     let countQuery = 'SELECT COUNT(*) as total FROM donations WHERE user_id = ?';
     let countParams = [userId];
-    
+
     if (year) {
-      countQuery += ` AND strftime('%Y', donation_date) = ?`;
+      countQuery += ` AND strftime('%Y', date) = ?`;
       countParams.push(year);
     }
     
@@ -322,23 +314,15 @@ export async function onRequestPut(context) {
       });
     }
 
-    // Update donation
+    // Update donation (using simple schema columns)
     const stmt = env.DB.prepare(`
       UPDATE donations
-      SET amount = ?, donation_date = ?, notes = ?, donation_type = ?,
-          miles_driven = ?, mileage_rate = ?, mileage_purpose = ?,
-          item_description = ?, estimated_value = ?,
-          quantity = ?, cost_basis = ?, fair_market_value = ?,
-          crypto_type = ?, updated_at = CURRENT_TIMESTAMP
+      SET amount = ?, date = ?, notes = ?
       WHERE id = ? AND user_id = ?
     `);
 
     const result = await stmt.bind(
-      amount, donation_date, notes, donation_type,
-      miles_driven, mileage_rate, mileage_purpose,
-      item_description, estimated_value,
-      quantity, cost_basis, fair_market_value,
-      crypto_type,
+      amount, donation_date, notes || '',
       donationId, userId
     ).run();
 
@@ -497,11 +481,11 @@ async function handleStatsRequest(env, userId) {
     const charityStmt = env.DB.prepare('SELECT COUNT(DISTINCT charity_id) as count FROM donations WHERE user_id = ?');
     const charityResult = await charityStmt.bind(userId).first();
     
-    // Get current year total
+    // Get current year total (using 'date' column)
     const yearStmt = env.DB.prepare(`
-      SELECT SUM(amount) as total 
-      FROM donations 
-      WHERE user_id = ? AND strftime('%Y', donation_date) = ?
+      SELECT SUM(amount) as total
+      FROM donations
+      WHERE user_id = ? AND strftime('%Y', date) = ?
     `);
     const yearResult = await yearStmt.bind(userId, currentYear.toString()).first();
 
