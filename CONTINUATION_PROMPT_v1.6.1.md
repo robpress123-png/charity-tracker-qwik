@@ -1,13 +1,13 @@
-# Charity Tracker - Continuation Prompt v1.6.0
+# Charity Tracker - Continuation Prompt v1.6.1
 ## Date: 2025-01-21
 ## Last Session Summary
 
 ### PROJECT STATE
-The Charity Tracker is a functional multi-user donation tracking web application running on Cloudflare Pages with D1 database. Version 1.6.0 includes full CRUD operations, receipt management, and UI optimizations.
+The Charity Tracker is a functional multi-user donation tracking web application running on Cloudflare Pages with D1 database. Version 1.6.1 includes admin tools for charity import/export with IRS 501(c)(3) verification.
 
-### CURRENT VERSION: 1.6.0
+### CURRENT VERSION: 1.6.1
 
-### COMPLETED FEATURES (v1.6.0)
+### COMPLETED FEATURES (v1.6.1)
 - ✅ Full CRUD API endpoints for donations (GET/PUT/DELETE /api/donations/{id})
 - ✅ Edit donation functionality with proper form population
 - ✅ Receipt upload with image compression (max 1200px, 70% quality)
@@ -18,6 +18,12 @@ The Charity Tracker is a functional multi-user donation tracking web application
 - ✅ All donation types working: Cash, Stock, Crypto, Miles, Items
 - ✅ Dynamic year selection (current year ±1)
 - ✅ Profile with full address fields and state dropdown
+- ✅ Admin dashboard v1.6.1 with charity import/export tools
+- ✅ Charity CSV import with duplicate checking (by EIN)
+- ✅ Charity CSV export for verification
+- ✅ 10,000 IRS 501(c)(3) verified charities ready for import
+- ✅ Fixed donations by year display (shows 2024, 2025, 2026)
+- ✅ Scripts for IRS data extraction and verification
 
 ### TECHNICAL STACK
 - **Frontend**: HTML/JavaScript (no framework)
@@ -155,6 +161,7 @@ npx wrangler d1 execute charity-tracker-qwik-db --remote --command "SQL_HERE"
 - v1.4.9: Added all donation types
 - v1.5.0: UI optimization for no-scroll dashboard
 - v1.6.0: CRUD operations, receipt uploads, edit functionality
+- v1.6.1: Admin charity import/export, IRS 501(c)(3) verification
 
 ---
 *Use this prompt to continue development from where we left off*

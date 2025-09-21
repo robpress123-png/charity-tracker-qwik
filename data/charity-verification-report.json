@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-09-21T22:46:44.622Z",
+  "checkedEINs": 10,
+  "results": {
+    "deductible": [
+      {
+        "ein": "133433452",
+        "name": "Doctors Without Borders"
+      },
+      {
+        "ein": "131837418",
+        "name": "American Cancer Society"
+      },
+      {
+        "ein": "133727250",
+        "name": "March of Dimes"
+      }
+    ],
+    "notDeductible": [],
+    "notFound": [
+      {
+        "ein": "530196605",
+        "name": "American Red Cross"
+      },
+      {
+        "ein": "521693387",
+        "name": "World Wildlife Fund"
+      },
+      {
+        "ein": "131623888",
+        "name": "United Way Worldwide"
+      },
+      {
+        "ein": "362167817",
+        "name": "Salvation Army"
+      },
+      {
+        "ein": "135563422",
+        "name": "American Heart Association"
+      },
+      {
+        "ein": "581654536",
+        "name": "St. Jude Children's Research Hospital"
+      },
+      {
+        "ein": "237093289",
+        "name": "Shriners Hospitals for Children"
+      }
+    ]
+  },
+  "irsDataStats": {
+    "totalCharities": 270505,
+    "deductibleCount": 226496,
+    "percentage": "83.73%"
+  }
+}

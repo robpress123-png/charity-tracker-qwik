@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker</title>
+    <title>Admin Dashboard - Charity Tracker v1.6.1</title>
     <style>
         * {
             margin: 0;
@@ -421,6 +421,9 @@
                 <button class="sidebar-item" onclick="showSection('import')">
                     📦 Import Items Database
                 </button>
+                <button class="sidebar-item" onclick="showSection('import-charities')">
+                    🏢 Import Charities
+                </button>
                 <button class="sidebar-item" onclick="showSection('users')">
                     👥 User Management
                 </button>
@@ -518,7 +521,60 @@
                 </div>
             </div>
 
-            <!-- Import Section -->
+            <!-- Import Charities Section -->
+            <div id="import-charities" class="content-section">
+                <div class="section-header">
+                    <h2>Import/Export Charities Database</h2>
+                    <p>Bulk import charities from CSV file or export existing charities</p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <button class="tool-btn" onclick="exportCharities()" style="width: auto; padding: 0.75rem 1.5rem;">
+                        📥 Export Current Charities to CSV
+                    </button>
+                    <span id="exportStatus" style="margin-left: 1rem; color: #10b981;"></span>
+                </div>
+
+                <div class="alert alert-info">
+                    📝 <strong>CSV Format Required:</strong> name, ein, category, city, state, website (optional), description (optional)
+                </div>
+
+                <div id="charitiesCsvDropZone" class="drop-zone">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
+                    <h3 style="color: #f3f4f6; margin-bottom: 0.5rem;">Drop Charity CSV File Here</h3>
+                    <p style="color: #9ca3af;">or click to browse files</p>
+                    <input type="file" id="charitiesCsvFileInput" accept=".csv" style="display: none;" onchange="handleCharitiesCsvSelect(event)">
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #e5e7eb;">
+                        <input type="checkbox" id="skipDuplicateCharities" checked>
+                        <span>Skip duplicate charities (based on EIN)</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #e5e7eb; margin-top: 0.5rem;">
+                        <input type="checkbox" id="updateExistingCharities">
+                        <span>Update existing charities (if unchecked, duplicates will be skipped)</span>
+                    </label>
+                </div>
+
+                <div id="charitiesImportPreview" class="import-panel">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview (First 10 Rows)</h3>
+                    <div id="charitiesPreviewTable" style="overflow-x: auto;"></div>
+                    <div id="charitiesStats" style="margin-top: 1rem; color: #9ca3af;"></div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button class="tool-btn" onclick="importCharities()">Import Charities</button>
+                        <button class="tool-btn secondary" onclick="cancelCharitiesImport()">Cancel</button>
+                    </div>
+                </div>
+
+                <div id="charitiesImportResults" class="import-panel">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Results</h3>
+                    <div id="charitiesResultsContent"></div>
+                    <button class="tool-btn secondary" onclick="closeCharitiesImport()" style="margin-top: 1rem;">Close</button>
+                </div>
+            </div>
+
+            <!-- Import Items Section -->
             <div id="import" class="content-section">
                 <div class="section-header">
                     <h2>Import Items Database</h2>
@@ -711,33 +767,40 @@
                     document.getElementById('charityChange').textContent = charityChange;
                     document.getElementById('itemsChange').textContent = itemsChange;
 
-                    // Display yearly donations breakdown
+                    // Display yearly donations breakdown for 2024, 2025, 2026
                     const yearlyContainer = document.getElementById('yearlyDonations');
                     yearlyContainer.innerHTML = '';
 
+                    // Create a map of year data for easy lookup
+                    const yearDataMap = {};
                     if (stats.yearlyDonations && stats.yearlyDonations.length > 0) {
                         stats.yearlyDonations.forEach(yearData => {
-                            const yearCard = document.createElement('div');
-                            yearCard.className = 'stat-card';
-                            yearCard.innerHTML = `
-                                <h3>${yearData.year} Donations</h3>
-                                <div class="value">$${yearData.total.toLocaleString()}</div>
-                                <div class="change">${yearData.count} donation${yearData.count !== 1 ? 's' : ''}</div>
-                            `;
-                            yearlyContainer.appendChild(yearCard);
+                            yearDataMap[yearData.year] = yearData;
                         });
-                    } else {
-                        // Show current year with 0 if no donations
-                        const currentYear = new Date().getFullYear();
+                    }
+
+                    // Show 2024, 2025, 2026
+                    const yearsToShow = [2024, 2025, 2026];
+                    yearsToShow.forEach(year => {
                         const yearCard = document.createElement('div');
                         yearCard.className = 'stat-card';
-                        yearCard.innerHTML = `
-                            <h3>${currentYear} Donations</h3>
-                            <div class="value">$0</div>
-                            <div class="change">No donations yet</div>
-                        `;
+
+                        const data = yearDataMap[year];
+                        if (data) {
+                            yearCard.innerHTML = `
+                                <h3>${year} Donations</h3>
+                                <div class="value">$${data.total.toLocaleString()}</div>
+                                <div class="change">${data.count} donation${data.count !== 1 ? 's' : ''}</div>
+                            `;
+                        } else {
+                            yearCard.innerHTML = `
+                                <h3>${year} Donations</h3>
+                                <div class="value">$0</div>
+                                <div class="change">No donations yet</div>
+                            `;
+                        }
                         yearlyContainer.appendChild(yearCard);
-                    }
+                    });
                 }
             } catch (error) {
                 console.error('Failed to load admin stats:', error);
@@ -775,6 +838,7 @@
 
         // Items Import Functions
         let itemsImportData = [];
+        let charitiesImportData = [];
 
         function handleItemsCsvSelect(event) {
             const file = event.target.files[0];
@@ -935,31 +999,280 @@
             itemsImportData = [];
         }
 
+        // Charity Export Function
+        async function exportCharities() {
+            const exportStatus = document.getElementById('exportStatus');
+            exportStatus.textContent = 'Exporting...';
+
+            try {
+                const response = await fetch('/api/charities/export', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    // Get the CSV content
+                    const blob = await response.blob();
+
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `charities_export_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+
+                    exportStatus.textContent = '✅ Export successful!';
+
+                    // Save to a known location for verification
+                    const text = await blob.text();
+                    localStorage.setItem('exported_charities_csv', text);
+                    console.log('Charities exported. CSV saved to localStorage for verification.');
+
+                    setTimeout(() => {
+                        exportStatus.textContent = '';
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    exportStatus.textContent = `❌ Export failed: ${error.error}`;
+                    exportStatus.style.color = '#ef4444';
+                }
+            } catch (error) {
+                exportStatus.textContent = `❌ Export error: ${error.message}`;
+                exportStatus.style.color = '#ef4444';
+            }
+        }
+
+        // Charity Import Functions
+        function handleCharitiesCsvSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processCharitiesCsvFile(file);
+            }
+        }
+
+        function processCharitiesCsvFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const headers = lines[0].toLowerCase().split(',').map(h => h.trim());
+
+                // Validate headers
+                const requiredHeaders = ['name', 'ein'];
+                const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+
+                if (missingHeaders.length > 0) {
+                    alert(`Missing required columns: ${missingHeaders.join(', ')}`);
+                    return;
+                }
+
+                // Parse CSV data
+                charitiesImportData = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const values = line.split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+
+                    // Clean EIN (remove dashes)
+                    if (row.ein) {
+                        row.ein = row.ein.replace(/[^0-9]/g, '');
+                    }
+
+                    charitiesImportData.push(row);
+                }
+
+                // Show preview
+                showCharitiesPreview();
+            };
+            reader.readAsText(file);
+        }
+
+        function showCharitiesPreview() {
+            const previewTable = document.getElementById('charitiesPreviewTable');
+            const statsDiv = document.getElementById('charitiesStats');
+
+            // Show first 10 rows as table
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="background: #374151;">';
+
+            const headers = Object.keys(charitiesImportData[0]);
+            headers.forEach(header => {
+                html += `<th style="padding: 0.5rem; text-align: left; color: #f3f4f6;">${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            const previewCount = Math.min(10, charitiesImportData.length);
+            for (let i = 0; i < previewCount; i++) {
+                html += '<tr style="border-bottom: 1px solid #374151;">';
+                headers.forEach(header => {
+                    const value = charitiesImportData[i][header];
+                    const displayValue = value && value.length > 50 ? value.substring(0, 50) + '...' : value;
+                    html += `<td style="padding: 0.5rem; color: #e5e7eb;">${displayValue || '-'}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+
+            previewTable.innerHTML = html;
+
+            // Show statistics
+            const uniqueEINs = new Set(charitiesImportData.map(c => c.ein).filter(e => e));
+            const categories = new Set(charitiesImportData.map(c => c.category).filter(c => c));
+
+            statsDiv.innerHTML = `
+                <p>📊 Total Charities: <strong>${charitiesImportData.length}</strong></p>
+                <p>🔑 Unique EINs: <strong>${uniqueEINs.size}</strong></p>
+                <p>📁 Categories: <strong>${categories.size}</strong></p>
+                ${charitiesImportData.length !== uniqueEINs.size ?
+                    `<p style="color: #f59e0b;">⚠️ Found ${charitiesImportData.length - uniqueEINs.size} duplicate EINs</p>` : ''}
+            `;
+
+            document.getElementById('charitiesImportPreview').classList.add('active');
+        }
+
+        async function importCharities() {
+            const skipDuplicates = document.getElementById('skipDuplicateCharities').checked;
+            const updateExisting = document.getElementById('updateExistingCharities').checked;
+            const resultsContent = document.getElementById('charitiesResultsContent');
+
+            document.getElementById('charitiesImportResults').classList.add('active');
+            resultsContent.innerHTML = '<div class="loading">Importing charities... Please wait...</div>';
+
+            try {
+                const response = await fetch('/api/charities/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        charities: charitiesImportData,
+                        skipDuplicates: skipDuplicates,
+                        updateExisting: updateExisting
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultsContent.innerHTML = `
+                        <div class="alert alert-success">
+                            ✅ <strong>Import Successful!</strong>
+                        </div>
+                        <p>Processed: <strong>${data.results.processed}</strong> charities</p>
+                        <p>Added: <strong>${data.results.added}</strong> new charities</p>
+                        <p>Updated: <strong>${data.results.updated || 0}</strong> existing charities</p>
+                        <p>Skipped (duplicates): <strong>${data.results.skipped || 0}</strong> charities</p>
+                        <p>Failed: <strong>${data.results.failed || 0}</strong> charities</p>
+                        ${data.results.errors && data.results.errors.length > 0 ? `
+                            <div style="margin-top: 1rem; color: #ef4444;">
+                                <strong>Errors:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                    ${data.results.errors.slice(0, 10).map(e => `<li>${e}</li>`).join('')}
+                                    ${data.results.errors.length > 10 ? `<li>... and ${data.results.errors.length - 10} more errors</li>` : ''}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    `;
+
+                    // Reload stats
+                    await loadAdminStats();
+                } else {
+                    resultsContent.innerHTML = `
+                        <div class="alert alert-warning">
+                            ❌ <strong>Import Failed</strong>
+                            <p style="margin-top: 0.5rem;">${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="alert alert-warning">
+                        ❌ <strong>Import Error</strong>
+                        <p style="margin-top: 0.5rem;">${error.message}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('charitiesImportPreview').classList.remove('active');
+        }
+
+        function cancelCharitiesImport() {
+            document.getElementById('charitiesImportPreview').classList.remove('active');
+            document.getElementById('charitiesCsvFileInput').value = '';
+            charitiesImportData = [];
+        }
+
+        function closeCharitiesImport() {
+            document.getElementById('charitiesImportResults').classList.remove('active');
+            document.getElementById('charitiesCsvFileInput').value = '';
+            charitiesImportData = [];
+        }
+
         // Setup drag and drop
         document.addEventListener('DOMContentLoaded', function() {
-            const dropZone = document.getElementById('itemsCsvDropZone');
-            if (dropZone) {
-                dropZone.addEventListener('click', () => {
+            // Items drop zone
+            const itemsDropZone = document.getElementById('itemsCsvDropZone');
+            if (itemsDropZone) {
+                itemsDropZone.addEventListener('click', () => {
                     document.getElementById('itemsCsvFileInput').click();
                 });
 
-                dropZone.addEventListener('dragover', (e) => {
+                itemsDropZone.addEventListener('dragover', (e) => {
                     e.preventDefault();
-                    dropZone.classList.add('active');
+                    itemsDropZone.classList.add('active');
                 });
 
-                dropZone.addEventListener('dragleave', () => {
-                    dropZone.classList.remove('active');
+                itemsDropZone.addEventListener('dragleave', () => {
+                    itemsDropZone.classList.remove('active');
                 });
 
-                dropZone.addEventListener('drop', (e) => {
+                itemsDropZone.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    dropZone.classList.remove('active');
+                    itemsDropZone.classList.remove('active');
 
                     const files = e.dataTransfer.files;
                     if (files.length > 0 && files[0].name.endsWith('.csv')) {
                         document.getElementById('itemsCsvFileInput').files = files;
                         processItemsCsvFile(files[0]);
+                    }
+                });
+            }
+
+            // Charities drop zone
+            const charitiesDropZone = document.getElementById('charitiesCsvDropZone');
+            if (charitiesDropZone) {
+                charitiesDropZone.addEventListener('click', () => {
+                    document.getElementById('charitiesCsvFileInput').click();
+                });
+
+                charitiesDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    charitiesDropZone.classList.add('active');
+                });
+
+                charitiesDropZone.addEventListener('dragleave', () => {
+                    charitiesDropZone.classList.remove('active');
+                });
+
+                charitiesDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    charitiesDropZone.classList.remove('active');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        document.getElementById('charitiesCsvFileInput').files = files;
+                        processCharitiesCsvFile(files[0]);
                     }
                 });
             }
