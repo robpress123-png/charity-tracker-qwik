@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.4.2</title>
+    <title>Dashboard - Charity Tracker v1.4.3</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -457,13 +457,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.4.2</strong> - New: Yearly donation breakdown in admin dashboard!
+        <strong>🎯 Charity Tracker v1.4.3</strong> - New: Yearly donation breakdown in admin dashboard!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.4.2</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.4.3</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1319,7 +1319,7 @@
             const formData = {
                 charity_id: charityId,
                 donation_type: donationType,
-                donation_date: document.getElementById('donationDate').value,
+                donation_date: document.getElementById('donationDate').value,  // API will map this to 'date'
                 notes: document.getElementById('donationNotes').value
             };
 
@@ -1374,18 +1374,24 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(isEditing ? 'Donation updated successfully!' : 'Donation added successfully!');
                     closeDonationModal();
                     // Clear editing flag
                     delete window.editingDonationId;
                     // Reset modal title
                     document.querySelector('#donationModal .modal-header h2').textContent = 'Add Donation';
-                    // Refresh the dashboard
+
+                    // Show success message
+                    showToast(isEditing ? 'Donation updated successfully!' : '✅ Donation added successfully!', 'success');
+
+                    // Switch to dashboard view
+                    showSection('dashboard');
+
+                    // Refresh the dashboard to show new donation
                     loadDonations();
                     loadStats();
                     loadCharities(); // Refresh charities to show the one with donation
                 } else {
-                    alert(`Failed to ${isEditing ? 'update' : 'add'} donation: ` + data.error);
+                    showToast(`Failed to ${isEditing ? 'update' : 'add'} donation: ` + data.error, 'error');
                 }
             } catch (error) {
                 console.error(`Error ${isEditing ? 'updating' : 'adding'} donation:`, error);
@@ -1424,13 +1430,22 @@
                 if (year && year !== 'all') {
                     url += `&year=${year}`;
                 }
-                const response = await fetch(url);
+
+                // Get auth token
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
 
                 if (data.success && data.donations && data.donations.length > 0) {
                     let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
                     data.donations.forEach(donation => {
-                        const date = new Date(donation.donation_date).toLocaleDateString();
+                        const date = new Date(donation.date || donation.donation_date).toLocaleDateString();
                         const typeIcons = {
                             'cash': '💵',
                             'items': '📦',
@@ -1489,7 +1504,15 @@
                     url += `&year=${year}`;
                 }
 
-                const response = await fetch(url);
+                // Get auth token
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
 
                 if (data.success && data.donations) {
@@ -1570,12 +1593,21 @@
         async function exportCSV() {
             try {
                 // Fetch all donations for the selected year
-                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2025';
                 let url = '/api/donations?limit=10000';
                 if (selectedYear && selectedYear !== 'all') {
                     url = `/api/donations?year=${selectedYear}&limit=10000`;
                 }
-                const response = await fetch(url);
+
+                // Get auth token
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
 
                 if (!data.success || !data.donations || data.donations.length === 0) {
@@ -1613,12 +1645,21 @@
         async function exportPDF() {
             try {
                 // Fetch all donations for the selected year
-                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2025';
                 let url = '/api/donations?limit=10000';
                 if (selectedYear && selectedYear !== 'all') {
                     url = `/api/donations?year=${selectedYear}&limit=10000`;
                 }
-                const response = await fetch(url);
+
+                // Get auth token
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
 
                 if (!data.success || !data.donations || data.donations.length === 0) {
@@ -1684,7 +1725,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.4.2</p>
+                            <p>Generated by Charity Tracker v1.4.3</p>
                         </div>
                     </body>
                     </html>
@@ -1990,7 +2031,16 @@
                 if (selectedYear && selectedYear !== 'all') {
                     url = `/api/donations?year=${selectedYear}&limit=10000`;
                 }
-                const response = await fetch(url);
+
+                // Get auth token
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
 
                 if (!data.success || !data.donations || data.donations.length === 0) {
@@ -2862,6 +2912,48 @@
                 const dropdown = document.getElementById('charityDropdown');
                 if (dropdown) dropdown.style.display = 'none';
             }
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            // Create container if it doesn't exist
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+                document.body.appendChild(toastContainer);
+            }
+
+            const toast = document.createElement('div');
+
+            // Style based on type
+            const styles = {
+                success: 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;',
+                error: 'background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white;',
+                info: 'background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;'
+            };
+
+            toast.style.cssText = `
+                ${styles[type]}
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                animation: slideIn 0.3s ease-out;
+                min-width: 250px;
+            `;
+
+            toast.innerHTML = message;
+
+            toastContainer.appendChild(toast);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
     </script>
 </body>
