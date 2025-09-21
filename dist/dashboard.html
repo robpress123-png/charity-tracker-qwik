@@ -1061,16 +1061,10 @@
                         </div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                        <div class="form-group">
-                            <label for="cryptoDonationDate">Donation Date</label>
-                            <input type="date" id="cryptoDonationDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cryptoDonationTime">Exact Time (for price verification)</label>
-                            <input type="time" id="cryptoDonationTime" step="1" required>
-                            <small style="color:#6b7280;">Critical for IRS valuation</small>
-                        </div>
+                    <div class="form-group">
+                        <label for="cryptoDonationTime">Exact Time (for price verification)</label>
+                        <input type="time" id="cryptoDonationTime" step="1" required>
+                        <small style="color:#6b7280;">Critical for IRS valuation - use with date field below</small>
                     </div>
 
                     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
@@ -1294,9 +1288,7 @@
             const localDate = today.getFullYear() + '-' +
                            String(today.getMonth() + 1).padStart(2, '0') + '-' +
                            String(today.getDate()).padStart(2, '0');
-            if (document.getElementById('cryptoDonationDate')) {
-                document.getElementById('cryptoDonationDate').value = localDate;
-            }
+            // Crypto now uses the general date field
         }
 
         function closeDonationModal() {
@@ -1586,7 +1578,7 @@
                 case 'crypto':
                     const cryptoQuantity = parseFloat(document.getElementById('cryptoQuantity').value) || 0;
                     const cryptoPricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
-                    const cryptoDate = document.getElementById('cryptoDonationDate').value || document.getElementById('donationDate').value;
+                    const cryptoDate = document.getElementById('donationDate').value;
                     const cryptoTime = document.getElementById('cryptoDonationTime').value || '12:00:00';
 
                     formData.crypto_name = document.getElementById('cryptoName').value;
@@ -3326,6 +3318,9 @@
             document.getElementById('cryptoCalculation').textContent =
                 `${quantity} units × $${pricePerUnit.toFixed(2)} = $${total.toFixed(2)}`;
 
+            // Update tax savings display
+            updateTaxSavings();
+
             // Calculate tax deduction based on holding period
             let deduction = total;
             let note = '';
@@ -3483,7 +3478,7 @@
             document.getElementById('cryptoSymbol').value = symbol;
             document.getElementById('cryptoDropdown').style.display = 'none';
             // Focus on next field
-            document.getElementById('cryptoDonationDate').focus();
+            document.getElementById('cryptoDonationTime').focus();
         }
 
         // Hide crypto dropdown when clicking outside
