@@ -32,17 +32,37 @@ export async function onRequestPost(context) {
       crypto_type
     } = body;
 
-    // Get user ID from session or header (in production, validate session token)
+    // Get user ID from session or header
     const authHeader = request.headers.get('Authorization');
-    let userId = 'test-user-id'; // Default for backwards compatibility
+    let userId = null;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
-        // In production, validate token and get user ID from session
-        // For now, we'll use the token as user ID (simplified)
-        if (token && token !== 'test-token') {
-            userId = token;
+        // Parse the token to get user ID
+        // Token format is "token-{userId}-{timestamp}" from login.js
+        if (token.startsWith('token-')) {
+            const parts = token.split('-');
+            if (parts.length >= 2) {
+                userId = parts[1]; // Extract the user ID from token
+            }
+        } else if (token === 'test-token') {
+            // For test token, we need to look up the test user
+            const testUserStmt = env.DB.prepare("SELECT id FROM users WHERE email = 'test@example.com'");
+            const testUser = await testUserStmt.first();
+            if (testUser) {
+                userId = testUser.id;
+            }
         }
+    }
+
+    if (!userId) {
+        return new Response(JSON.stringify({
+            success: false,
+            error: 'Unauthorized - invalid or missing token'
+        }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 
     if (!charity_id || !amount || !donation_date) {
@@ -135,9 +155,31 @@ export async function onRequestPost(context) {
 export async function onRequestGet(context) {
   const { request, env, params } = context;
   const url = new URL(request.url);
-  
-  // For now, use test user ID
-  const userId = 'test-user-id';
+
+  // Get user ID from authorization header
+  const authHeader = request.headers.get('Authorization');
+  let userId = null;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      if (token.startsWith('token-')) {
+          const parts = token.split('-');
+          if (parts.length >= 2) {
+              userId = parts[1];
+          }
+      } else if (token === 'test-token' && env.DB) {
+          const testUserStmt = env.DB.prepare("SELECT id FROM users WHERE email = 'test@example.com'");
+          const testUser = await testUserStmt.first();
+          if (testUser) {
+              userId = testUser.id;
+          }
+      }
+  }
+
+  // Default to test for backwards compatibility if no auth
+  if (!userId) {
+      userId = 'test-user-id';
+  }
 
   try {
     // Check if this is a stats request
