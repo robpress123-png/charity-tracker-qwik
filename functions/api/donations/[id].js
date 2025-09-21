@@ -1,8 +1,6 @@
 // API endpoints for individual donation operations
 // Handles GET, PUT, DELETE for /api/donations/{id}
 
-import { createHash } from 'crypto';
-
 // Helper function to verify authentication
 function getUserFromToken(token) {
     if (!token || !token.startsWith('Bearer ')) {
