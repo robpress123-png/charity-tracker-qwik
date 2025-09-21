@@ -1153,6 +1153,7 @@
         function handleCharitySearch(e) {
             const query = e.target.value.toLowerCase();
             const dropdown = document.getElementById('charityDropdown');
+            console.log('Charity search for:', query);
 
             // Clear the selected charity ID when user is typing
             document.getElementById('selectedCharityId').value = '';
@@ -1162,12 +1163,14 @@
 
             if (query.length < 2) {
                 dropdown.classList.remove('show');
+                dropdown.style.display = 'none';
                 return;
             }
 
             // Show loading state
             dropdown.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
             dropdown.classList.add('show');
+            dropdown.style.display = 'block';
 
             // Debounce search
             searchTimeout = setTimeout(async () => {
@@ -1232,6 +1235,7 @@
             }
 
             dropdown.classList.add('show');
+            dropdown.style.display = 'block';
         }
 
         function handleCharityKeydown(e) {
@@ -1277,8 +1281,11 @@
         function selectCharity(id, name) {
             document.getElementById('selectedCharityId').value = id;
             document.getElementById('donationCharity').value = name;
-            document.getElementById('charityDropdown').classList.remove('show');
+            const dropdown = document.getElementById('charityDropdown');
+            dropdown.classList.remove('show');
+            dropdown.style.display = 'none';
             selectedCharityIndex = -1;
+            console.log('Selected charity:', name, 'ID:', id);
         }
 
         function showAddCharityFromSearch(searchQuery) {
