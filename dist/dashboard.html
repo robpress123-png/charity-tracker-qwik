@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.7.8</title>
+    <title>Dashboard - Charity Tracker v1.7.9</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -695,13 +695,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.7.8</strong> - Enhanced UI and My Charities improvements!
+        <strong>🎯 Charity Tracker v1.7.9</strong> - Quick Donation fixed with charity pre-population!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.7.8</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.7.9</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1203,9 +1203,7 @@
             <div class="modal-header">
                 <h2 id="donationModalTitle">Add Cash Donation</h2>
             </div>
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
-                <!-- Left Column: Donation Form -->
-                <div>
+            <div>
                     <form id="donationForm">
                 <input type="hidden" id="donationType" value="cash">
                 <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
@@ -1500,26 +1498,6 @@
                             <button type="submit" class="btn-primary">Add Donation</button>
                         </div>
                     </form>
-                </div>
-                <!-- Right Column: My Charities Quick Select -->
-                <div style="border-left: 1px solid #e5e7eb; padding-left: 2rem;">
-                    <h3 style="margin: 0 0 1rem 0; color: #374151;">My Charities - Quick Add</h3>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; display: block;">Select Donation Type:</label>
-                        <select id="quickDonationType" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;" onchange="updateQuickDonationType()">
-                            <option value="cash">💵 Cash/Check</option>
-                            <option value="stock">📈 Stock</option>
-                            <option value="crypto">₿ Cryptocurrency</option>
-                            <option value="items">📦 Items/Goods</option>
-                            <option value="miles">🚗 Mileage</option>
-                        </select>
-                    </div>
-                    <div id="myCharitiesQuickList" style="max-height: 400px; overflow-y: auto;">
-                        <div style="text-align: center; color: #9ca3af; padding: 2rem;">
-                            Loading your charities...
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -1825,8 +1803,7 @@
                            String(today.getDate()).padStart(2, '0');
             // Crypto now uses the general date field
 
-            // Load My Charities in the quick add section
-            loadMyCharitiesQuickAdd();
+            // Don't load My Charities in modal anymore - removed that section
         }
 
         // Load charities for quick add in donation modal
@@ -1918,13 +1895,8 @@
             // Get selected donation type from quick selector
             const donationType = document.getElementById('quickDonationType').value;
 
-            // Update the main form
-            document.getElementById('selectedCharityId').value = charityId;
-            document.getElementById('donationCharity').value = charityName;
-
-            // Update donation type
-            document.getElementById('donationType').value = donationType;
-            openDonationModal(donationType);
+            // Open donation modal with pre-filled charity
+            openDonationModal(donationType, charityId, charityName);
 
             // Focus on amount field for quick entry
             setTimeout(() => {
@@ -2326,12 +2298,8 @@
             const selector = document.getElementById('quickDonationSelector');
             if (selector) selector.remove();
 
-            // Set the charity
-            document.getElementById('selectedCharityId').value = charityId;
-            document.getElementById('donationCharity').value = charityName;
-
-            // Open the donation modal with the selected type
-            openDonationModal(type);
+            // Open the donation modal with the selected type and pre-filled charity
+            openDonationModal(type, charityId, charityName);
         }
 
         function showAddCharityFromSearch(searchQuery) {
@@ -3110,7 +3078,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.7.8</p>
+                            <p>Generated by Charity Tracker v1.7.9</p>
                         </div>
                     </body>
                     </html>
@@ -4383,7 +4351,7 @@
         }
 
         // Helper function to open donation modal with specific type
-        function openDonationModal(type) {
+        function openDonationModal(type, preselectedCharityId = null, preselectedCharityName = null) {
             const typeInfo = {
                 cash: {
                     title: 'Add Cash Donation',
@@ -4421,8 +4389,15 @@
 
             // Clear the form including charity fields
             document.getElementById('donationForm').reset();
-            document.getElementById('selectedCharityId').value = '';
-            document.getElementById('donationCharity').value = '';
+
+            // If charity was preselected, set it, otherwise clear
+            if (preselectedCharityId && preselectedCharityName) {
+                document.getElementById('selectedCharityId').value = preselectedCharityId;
+                document.getElementById('donationCharity').value = preselectedCharityName;
+            } else {
+                document.getElementById('selectedCharityId').value = '';
+                document.getElementById('donationCharity').value = '';
+            }
             document.getElementById('charityDropdown').classList.remove('show');
 
             // Reset item selection
