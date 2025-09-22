@@ -868,10 +868,13 @@
                         </div>
 
                         <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 8px;">
-                            <p style="font-size: 0.875rem; color: #92400e;"><strong>CSV Format Required:</strong></p>
-                            <code style="font-size: 0.75rem;">charity_id,amount,donation_date,donation_type,notes</code>
+                            <p style="font-size: 0.875rem; color: #92400e;"><strong>CSV Format:</strong></p>
+                            <code style="font-size: 0.75rem;">charity_name,donation_date,donation_type,amount,notes</code>
                             <p style="font-size: 0.75rem; color: #92400e; margin-top: 0.5rem;">
-                                Example: 1,500.00,2025-01-15,cash,New Year donation
+                                Example: American Red Cross,2025-01-15,cash,500.00,New Year donation
+                            </p>
+                            <p style="font-size: 0.75rem; color: #10b981; margin-top: 0.5rem;">
+                                ✅ Charity names are automatically matched to the database!
                             </p>
                         </div>
 
@@ -2363,15 +2366,43 @@
         }
 
         function parseCSV(csv) {
+            // Proper CSV parsing that handles quoted fields
+            function parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    const nextChar = line[i + 1];
+
+                    if (char === '"') {
+                        if (inQuotes && nextChar === '"') {
+                            current += '"';
+                            i++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            }
+
             const lines = csv.split('\n').filter(line => line.trim());
-            const headers = lines[0].split(',').map(h => h.trim());
+            const headers = parseCSVLine(lines[0].toLowerCase()).map(h => h.trim());
 
             importData = [];
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
+                const values = parseCSVLine(lines[i]);
                 const donation = {};
                 headers.forEach((header, index) => {
-                    donation[header] = values[index];
+                    donation[header] = values[index] || '';
                 });
                 importData.push(donation);
             }
@@ -2383,15 +2414,32 @@
             const preview = document.getElementById('importPreview');
             const table = document.getElementById('previewTable');
 
-            let html = '<table class="table"><thead><tr><th>Charity ID</th><th>Amount</th><th>Date</th><th>Type</th><th>Notes</th></tr></thead><tbody>';
+            // Calculate totals
+            let totalAmount = 0;
+            const typeCount = {};
+            importData.forEach(d => {
+                totalAmount += parseFloat(d.amount) || 0;
+                const type = d.donation_type || 'cash';
+                typeCount[type] = (typeCount[type] || 0) + 1;
+            });
+
+            let html = `
+                <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px;">
+                    <p><strong>Total Donations:</strong> ${importData.length}</p>
+                    <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
+                    <p><strong>Types:</strong> ${Object.entries(typeCount).map(([type, count]) => `${type} (${count})`).join(', ')}</p>
+                </div>
+            `;
+
+            html += '<table class="table"><thead><tr><th>Charity Name</th><th>Date</th><th>Type</th><th>Amount</th><th>Notes</th></tr></thead><tbody>';
 
             importData.slice(0, 10).forEach(donation => {
                 html += `<tr>
-                    <td>${donation.charity_id}</td>
-                    <td>$${parseFloat(donation.amount).toFixed(2)}</td>
-                    <td>${donation.donation_date}</td>
+                    <td>${donation.charity_name || 'Unknown'}</td>
+                    <td>${donation.donation_date || ''}</td>
                     <td>${donation.donation_type || 'cash'}</td>
-                    <td>${donation.notes || ''}</td>
+                    <td>$${(parseFloat(donation.amount) || 0).toFixed(2)}</td>
+                    <td>${(donation.notes || '').substring(0, 50)}${donation.notes && donation.notes.length > 50 ? '...' : ''}</td>
                 </tr>`;
             });
 
@@ -2405,42 +2453,84 @@
         }
 
         async function confirmImport() {
-            const successCount = { success: 0, failed: 0 };
+            const resultsDiv = document.getElementById('previewTable');
+            resultsDiv.innerHTML = `
+                <div style="padding: 2rem; text-align: center;">
+                    <div class="loading" style="display: inline-block;">
+                        <h3>Importing donations...</h3>
+                        <p>Matching charity names to database IDs...</p>
+                    </div>
+                </div>
+            `;
 
-            for (const donation of importData) {
-                try {
-                    const user = JSON.parse(localStorage.getItem('user') || '{}');
-                    const token = user.token || localStorage.getItem('token') || 'test-token';
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
 
-                    const response = await fetch('/api/donations', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            charity_id: donation.charity_id,
-                            amount: parseFloat(donation.amount),
-                            donation_date: donation.donation_date,
-                            donation_type: donation.donation_type || 'cash',
-                            notes: donation.notes || ''
-                        })
-                    });
+                // Use the smart import API
+                const response = await fetch('/api/donations/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        donations: importData
+                    })
+                });
 
-                    if (response.ok) {
-                        successCount.success++;
-                    } else {
-                        successCount.failed++;
+                const data = await response.json();
+
+                if (data.success) {
+                    let resultHtml = `
+                        <div style="padding: 1rem; background: #d1fae5; border-radius: 8px; margin-bottom: 1rem;">
+                            <h3 style="color: #065f46;">✅ Import Complete!</h3>
+                            <p>Successfully added: <strong>${data.results.added}</strong> donations</p>
+                            ${data.results.failed > 0 ? `<p style="color: #dc2626;">Failed: ${data.results.failed} donations</p>` : ''}
+                        </div>
+                    `;
+
+                    if (data.results.charityMatches?.notFound?.length > 0) {
+                        resultHtml += `
+                            <details style="margin-top: 1rem;">
+                                <summary style="color: #f59e0b; cursor: pointer;">
+                                    ⚠️ Unmatched Charities (${data.results.charityMatches.notFound.length})
+                                </summary>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                    ${data.results.charityMatches.notFound.map(name => `<li>${name}</li>`).join('')}
+                                </ul>
+                                <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">
+                                    These charities need to be added to your database first.
+                                </p>
+                            </details>
+                        `;
                     }
-                } catch (error) {
-                    successCount.failed++;
-                }
-            }
 
-            alert(`Import Complete!\nSuccessful: ${successCount.success}\nFailed: ${successCount.failed}`);
-            cancelImport();
-            loadDonations();
-            loadStats();
+                    resultsDiv.innerHTML = resultHtml;
+
+                    // Reload data after successful import
+                    setTimeout(() => {
+                        cancelImport();
+                        loadDonations();
+                        loadStats();
+                        loadCharities();
+                    }, 3000);
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div style="padding: 1rem; background: #fee2e2; border-radius: 8px;">
+                            <h3 style="color: #dc2626;">❌ Import Failed</h3>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div style="padding: 1rem; background: #fee2e2; border-radius: 8px;">
+                        <h3 style="color: #dc2626;">❌ Import Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
         }
 
         function cancelImport() {
