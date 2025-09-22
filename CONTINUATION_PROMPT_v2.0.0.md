@@ -1,6 +1,6 @@
-# Charity Tracker v2.0.0 - Continuation Prompt
+# Charity Tracker v2.0.1 - Continuation Prompt
 
-## Current State: v1.8.0 → v2.0.0 Migration
+## Current State: v2.0.0 → v2.0.1 Migration
 **Date:** January 22, 2025
 **Developer:** Assistant continuing from previous session
 **User:** Rob Pressman
