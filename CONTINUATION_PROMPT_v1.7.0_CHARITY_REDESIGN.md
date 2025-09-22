@@ -104,6 +104,9 @@ CREATE TABLE donations (
 - **No breaking changes**: Existing donations must continue working
 - **Be objective**: Always provide honest technical assessment, even if it contradicts suggestions. The user values objective analysis over agreement.
 
+### UI FIXES NEEDED (for next update)
+- **Admin Dashboard**: Change "Manage Charities" to "Delete All Charities" in left sidebar - it's misleading since that's all it does currently
+
 ### TEST CREDENTIALS
 - Regular user: test@example.com / password123
 - Admin: admin / admin123

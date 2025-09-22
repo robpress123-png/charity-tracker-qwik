@@ -1358,55 +1358,120 @@
             const resultsContent = document.getElementById('charitiesResultsContent');
 
             document.getElementById('charitiesImportResults').classList.add('active');
-            resultsContent.innerHTML = '<div class="loading">Importing charities... Please wait...</div>';
 
-            try {
-                const response = await fetch('/api/charities/import', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        charities: charitiesImportData,
-                        skipDuplicates: skipDuplicates,
-                        updateExisting: updateExisting
-                    })
-                });
+            // Auto-batching import to handle large datasets
+            const BATCH_SIZE = 400; // Safe under D1's 500 operation limit
+            let currentIndex = 0;
+            const totalCharities = charitiesImportData.length;
 
-                const data = await response.json();
+            // Cumulative results
+            const totalResults = {
+                processed: 0,
+                added: 0,
+                updated: 0,
+                skipped: 0,
+                failed: 0,
+                errors: []
+            };
 
-                if (data.success) {
-                    resultsContent.innerHTML = `
-                        <div class="alert alert-success">
-                            ✅ <strong>Import Successful!</strong>
-                        </div>
-                        <p>Processed: <strong>${data.results.processed}</strong> charities</p>
-                        <p>Added: <strong>${data.results.added}</strong> new charities</p>
-                        <p>Updated: <strong>${data.results.updated || 0}</strong> existing charities</p>
-                        <p>Skipped (duplicates): <strong>${data.results.skipped || 0}</strong> charities</p>
-                        <p>Failed: <strong>${data.results.failed || 0}</strong> charities</p>
-                        ${data.results.errors && data.results.errors.length > 0 ? `
-                            <div style="margin-top: 1rem; color: #ef4444;">
-                                <strong>Errors:</strong>
-                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                                    ${data.results.errors.slice(0, 10).map(e => `<li>${e}</li>`).join('')}
-                                    ${data.results.errors.length > 10 ? `<li>... and ${data.results.errors.length - 10} more errors</li>` : ''}
-                                </ul>
+            // Update progress display
+            function updateProgress() {
+                const percentage = Math.round((currentIndex / totalCharities) * 100);
+                resultsContent.innerHTML = `
+                    <div class="loading">
+                        <h3>Importing charities...</h3>
+                        <div style="margin: 1rem 0;">
+                            <div style="background: #374151; border-radius: 8px; height: 30px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: ${percentage}%; transition: width 0.3s; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: white; font-weight: bold;">${percentage}%</span>
+                                </div>
                             </div>
-                        ` : ''}
-                    `;
-
-                    // Reload stats
-                    await loadAdminStats();
-                } else {
-                    resultsContent.innerHTML = `
-                        <div class="alert alert-warning">
-                            ❌ <strong>Import Failed</strong>
-                            <p style="margin-top: 0.5rem;">${data.error}</p>
                         </div>
-                    `;
+                        <p>Processing batch: ${Math.ceil(currentIndex / BATCH_SIZE)} of ${Math.ceil(totalCharities / BATCH_SIZE)}</p>
+                        <p>Charities processed: ${currentIndex} of ${totalCharities}</p>
+                        <p style="color: #10b981;">Added so far: ${totalResults.added}</p>
+                        ${totalResults.failed > 0 ? `<p style="color: #f59e0b;">Failed: ${totalResults.failed}</p>` : ''}
+                    </div>
+                `;
+            }
+
+            // Process batches sequentially
+            while (currentIndex < totalCharities) {
+                updateProgress();
+
+                try {
+                    const response = await fetch('/api/charities/import-batch', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            charities: charitiesImportData,
+                            startIndex: currentIndex,
+                            batchSize: BATCH_SIZE,
+                            skipDuplicates: skipDuplicates,
+                            updateExisting: updateExisting
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.results) {
+                        // Update cumulative results
+                        totalResults.processed += data.results.processed;
+                        totalResults.added += data.results.added;
+                        totalResults.updated += data.results.updated || 0;
+                        totalResults.skipped += data.results.skipped || 0;
+                        totalResults.failed += data.results.failed || 0;
+
+                        if (data.results.errors) {
+                            totalResults.errors.push(...data.results.errors);
+                        }
+
+                        // Update index for next batch
+                        currentIndex = data.progress ? data.progress.current : currentIndex + BATCH_SIZE;
+
+                        // Small delay between batches to prevent overwhelming the server
+                        if (currentIndex < totalCharities) {
+                            await new Promise(resolve => setTimeout(resolve, 100));
+                        }
+                    } else {
+                        // Error in this batch
+                        totalResults.failed += BATCH_SIZE;
+                        break;
+                    }
+                } catch (error) {
+                    console.error('Batch import error:', error);
+                    totalResults.errors.push(`Batch ${Math.ceil(currentIndex / BATCH_SIZE)}: ${error.message}`);
+                    break;
                 }
+            }
+
+            // Show final results
+            resultsContent.innerHTML = `
+                <div class="alert ${totalResults.added > 0 ? 'alert-success' : 'alert-warning'}">
+                    <strong>${totalResults.added > 0 ? '✅ Import Complete!' : '⚠️ Import Finished with Issues'}</strong>
+                </div>
+                <h3>Final Results:</h3>
+                <p>Total Processed: <strong>${totalResults.processed}</strong> charities</p>
+                <p style="color: #10b981;">Successfully Added: <strong>${totalResults.added}</strong> new charities</p>
+                <p>Updated: <strong>${totalResults.updated}</strong> existing charities</p>
+                <p>Skipped (duplicates): <strong>${totalResults.skipped}</strong> charities</p>
+                ${totalResults.failed > 0 ? `<p style="color: #ef4444;">Failed: <strong>${totalResults.failed}</strong> charities</p>` : ''}
+                ${totalResults.errors.length > 0 ? `
+                    <details style="margin-top: 1rem;">
+                        <summary style="color: #f59e0b; cursor: pointer;">View Errors (${totalResults.errors.length})</summary>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #ef4444;">
+                            ${totalResults.errors.slice(0, 20).map(e => `<li>${e}</li>`).join('')}
+                            ${totalResults.errors.length > 20 ? `<li>... and ${totalResults.errors.length - 20} more errors</li>` : ''}
+                        </ul>
+                    </details>
+                ` : ''}
+            `;
+
+            // Reload stats
+            await loadAdminStats();
             } catch (error) {
                 resultsContent.innerHTML = `
                     <div class="alert alert-warning">
