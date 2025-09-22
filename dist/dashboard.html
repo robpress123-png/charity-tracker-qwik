@@ -835,13 +835,13 @@
         </div>
 
         <!-- Tools Section (hidden by default) -->
-        <div id="toolsSection" class="section-content" style="display:none;">
-            <div class="section">
+        <div id="toolsSection" class="section-content" style="display:none; max-width: 100%; overflow-x: hidden;">
+            <div class="section" style="max-width: 1200px; margin: 0 auto;">
                 <div class="section-header">
                     <h2>🛠️ Tools & Utilities</h2>
                 </div>
-                <div style="padding: 2rem;">
-                    <div style="display: grid; gap: 1rem; max-width: 600px;">
+                <div style="padding: 1rem;">
+                    <div style="display: grid; gap: 1rem; max-width: 100%; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
                         <button class="btn-primary" onclick="showImportDonations()">
                             📥 Import Donations (CSV)
                         </button>
@@ -3804,6 +3804,11 @@
             const typeFilter = document.getElementById('donationTypeFilter').value;
             const monthFilter = document.getElementById('donationMonthFilter').value;
 
+            // Use stored donations or get from localStorage
+            if (!allDonations || allDonations.length === 0) {
+                allDonations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
+            }
+
             let filtered = allDonations;
 
             // Filter by search term
@@ -3830,7 +3835,15 @@
                 });
             }
 
-            displayDonations(filtered);
+            // Reload donations with filter applied
+            loadDonations();
+        }
+
+        // Helper function to display donations
+        function displayDonations(donations) {
+            // For now, just reload the main donations view
+            // In the future, this could update just the table content
+            loadDonations();
         }
 
         // Function to add receipt to donation
