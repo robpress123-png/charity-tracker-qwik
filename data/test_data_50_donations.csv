@@ -1,0 +1,52 @@
+charity_name,donation_date,donation_type,amount,notes
+American Red Cross,2025-01-02,cash,500.00,Emergency disaster relief fund contribution
+United Way,2025-01-03,cash,250.00,Annual workplace giving campaign
+Salvation Army,2025-01-04,cash,150.00,Support for local shelter programs
+Food Bank,2025-01-05,cash,100.00,Weekend backpack program for children
+Doctors Without Borders,2025-01-06,cash,300.00,International medical aid support
+Make-A-Wish Foundation,2025-01-07,cash,225.00,Children's wish fulfillment program
+Cancer Research Institute,2025-01-08,cash,450.00,Medical research funding donation
+Nature Conservancy,2025-01-09,cash,180.00,Wildlife habitat preservation efforts
+ASPCA,2025-01-10,cash,125.00,Animal rescue and shelter support
+St. Jude Children's Hospital,2025-01-11,cash,750.00,Pediatric cancer research and treatment
+World Wildlife Fund,2025-01-12,cash,320.00,Endangered species protection program
+Feeding America,2025-01-13,cash,275.00,National hunger relief network support
+Habitat for Humanity,2025-01-14,cash,400.00,Home building program contribution
+UNICEF,2025-01-15,cash,550.00,Global children's emergency relief
+Goodwill Industries,2025-01-03,items,485.00,"ITEMS:[Men's Winter Coat|Clothing|excellent|1|85.00][Women's Designer Dress|Clothing|very_good|2|160.00][Leather Boots|Clothing|good|2|80.00][Professional Briefcase|Accessories|very_good|1|65.00][Silk Scarf Collection|Accessories|excellent|3|45.00][Vintage Hat Collection|Accessories|good|5|50.00]"
+Salvation Army,2025-01-05,items,725.00,"ITEMS:[Desktop Computer System|Electronics|good|1|250.00][27-inch Monitor|Electronics|very_good|2|200.00][Wireless Keyboard and Mouse|Electronics|excellent|2|50.00][Office Desk Chair|Furniture|very_good|1|125.00][Standing Desk|Furniture|good|1|100.00]"
+Habitat for Humanity ReStore,2025-01-07,items,620.00,"ITEMS:[Power Drill Set|Tools|excellent|1|120.00][Circular Saw|Tools|very_good|1|95.00][Tool Chest|Tools|good|1|105.00][Paint Supplies Kit|Household|excellent|2|80.00][Ladder 6ft|Tools|very_good|1|85.00][Work Bench|Furniture|good|1|135.00]"
+Public Library Foundation,2025-01-09,items,385.00,"ITEMS:[College Textbooks|Books|excellent|20|200.00][Fiction Hardcovers|Books|very_good|30|95.00][Children's Picture Books|Books|good|50|90.00]"
+Homeless Shelter,2025-01-11,items,565.00,"ITEMS:[Queen Mattress|Furniture|good|1|200.00][Bedding Sets|Household|excellent|4|120.00][Bath Towel Sets|Household|very_good|6|60.00][Kitchen Cookware Set|Household|good|1|85.00][Dinnerware for 8|Household|very_good|2|100.00]"
+Boys and Girls Club,2025-01-13,items,420.00,"ITEMS:[Basketball Equipment|Sports|excellent|1|95.00][Soccer Balls and Gear|Sports|very_good|2|85.00][Board Games Collection|Toys|good|15|120.00][Art Supply Kit|Household|excellent|2|75.00][Musical Instruments Set|Toys|good|1|45.00]"
+Thrift Store Charity,2025-01-15,items,340.00,"ITEMS:[Women's Clothing Lot|Clothing|very_good|25|150.00][Men's Shoes Collection|Clothing|good|10|80.00][Children's Toys|Toys|excellent|20|110.00]"
+Community Center,2025-01-17,items,290.00,"ITEMS:[Exercise Equipment|Sports|good|1|120.00][Yoga Mats Set|Sports|excellent|10|50.00][Dumbbells Set|Sports|very_good|1|70.00][Resistance Bands|Sports|excellent|5|50.00]"
+Veterans Foundation,2025-01-19,items,480.00,"ITEMS:[Business Suits|Clothing|excellent|3|240.00][Dress Shoes|Clothing|very_good|5|125.00][Ties and Accessories|Accessories|excellent|15|65.00][Laptop Bags|Accessories|good|3|50.00]"
+Animal Shelter,2025-01-21,items,195.00,"ITEMS:[Pet Supplies|Household|excellent|1|75.00][Dog Beds|Household|very_good|3|60.00][Cat Toys|Toys|good|20|30.00][Pet Carriers|Household|good|2|30.00]"
+Apple Inc,2025-01-04,stock,3500.00,AAPL - 14 shares at $250/share - Long-term capital gains
+Microsoft Corp,2025-01-08,stock,2250.00,MSFT - 6 shares at $375/share - Appreciated securities
+Amazon.com Inc,2025-01-12,stock,4000.00,AMZN - 25 shares at $160/share - Tech portfolio donation
+Google/Alphabet,2025-01-16,stock,1800.00,GOOGL - 12 shares at $150/share - Investment portfolio
+Tesla Inc,2025-01-20,stock,2800.00,TSLA - 10 shares at $280/share - Growth stock donation
+NVIDIA Corporation,2025-01-06,crypto,4500.00,Bitcoin (BTC) - 0.065 BTC at $69230/coin - Held 18 months
+Meta Platforms,2025-01-10,crypto,2100.00,Ethereum (ETH) - 0.875 ETH at $2400/coin - Long-term position
+PayPal Holdings,2025-01-14,crypto,850.00,Litecoin (LTC) - 10 LTC at $85/coin - Short-term holding
+Square Inc,2025-01-18,crypto,1650.00,Solana (SOL) - 15 SOL at $110/coin - DeFi portfolio
+Local Food Pantry,2025-01-02,mileage,14.00,Weekly food delivery route - 100 miles at $0.14/mile
+Habitat for Humanity,2025-01-05,mileage,42.00,Construction site volunteering - 300 miles at $0.14/mile
+Community Garden,2025-01-08,mileage,7.00,Produce delivery to seniors - 50 miles at $0.14/mile
+Youth Mentorship Program,2025-01-11,mileage,21.00,Tutoring sessions - 150 miles at $0.14/mile
+Elder Care Center,2025-01-14,mileage,28.00,Weekly visits and deliveries - 200 miles at $0.14/mile
+Soup Kitchen,2025-01-17,mileage,35.00,Meal preparation and delivery - 250 miles at $0.14/mile
+Church Food Drive,2025-01-20,mileage,14.00,Food collection and distribution - 100 miles at $0.14/mile
+Sierra Club,2025-01-16,cash,195.00,Environmental conservation programs
+Wikimedia Foundation,2025-01-17,cash,110.00,Free knowledge support donation
+Planned Parenthood,2025-01-18,cash,280.00,Women's health services support
+ACLU,2025-01-19,cash,350.00,Civil liberties protection fund
+Amnesty International,2025-01-20,cash,165.00,Human rights advocacy support
+Greenpeace,2025-01-21,cash,220.00,Environmental protection campaigns
+PBS Foundation,2025-01-22,cash,95.00,Public broadcasting support
+Local Community Garden,2025-01-01,cash,300.00,Annual membership and operational support - Personal charity
+Neighborhood Food Pantry,2025-01-15,cash,200.00,Monthly support for local families - Personal charity
+Youth Sports League,2025-01-22,cash,150.00,Equipment and uniform sponsorship - Personal charity
+Smithsonian Institution,2025-01-21,cash,185.00,Museum and research support donation
