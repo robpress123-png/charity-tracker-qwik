@@ -92,37 +92,7 @@ export async function onRequestPost(context) {
             });
         }
 
-        // Get or create a system user for charity imports
-        let systemUserId;
-        try {
-            // First try to get the test user
-            const testUser = await env.DB.prepare(
-                'SELECT id FROM users WHERE email = ?'
-            ).bind('test@example.com').first();
-
-            if (testUser) {
-                systemUserId = testUser.id;
-            } else {
-                // Create a system user if it doesn't exist
-                const newUserId = generateId();
-                await env.DB.prepare(
-                    'INSERT INTO users (id, email, password, name, plan, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-                ).bind(newUserId, 'system@charitytracker.com', 'system-import', 'System Import', 'system').run();
-                systemUserId = newUserId;
-            }
-        } catch (e) {
-            console.error('User lookup/creation error:', e);
-            return new Response(JSON.stringify({
-                success: false,
-                error: 'Failed to get or create system user: ' + e.message
-            }), {
-                status: 500,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
+        // No user_id needed anymore - charities are system-wide!
 
         // Process charities
         const results = {
@@ -201,22 +171,21 @@ export async function onRequestPost(context) {
                             results.skipped++;
                         }
                     } else {
-                        // Add new charity with all address fields
+                        // Add new charity (no user_id needed!)
                         const charityId = generateId();
 
                         await env.DB.prepare(`
                             INSERT INTO charities (
-                                id, user_id, name, ein, category,
+                                id, name, ein, category,
                                 address, city, state, zip_code,
-                                website, description, phone, created_at
+                                website, description, phone, is_verified, created_at
                             ) VALUES (
-                                ?, ?, ?, ?, ?,
                                 ?, ?, ?, ?,
-                                ?, ?, ?, CURRENT_TIMESTAMP
+                                ?, ?, ?, ?,
+                                ?, ?, ?, 1, CURRENT_TIMESTAMP
                             )
                         `).bind(
                             charityId,
-                            systemUserId,
                             charity.name,
                             cleanEIN,
                             charity.category || 'Other',
