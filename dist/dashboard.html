@@ -1457,14 +1457,14 @@
                     <label for="charityCategory">Category</label>
                     <select id="charityCategory">
                         <option value="">Select category...</option>
-                        <option value="Religion">Religion</option>
+                        <option value="Arts & Culture">Arts & Culture</option>
+                        <option value="Community">Community</option>
                         <option value="Education">Education</option>
+                        <option value="Environment">Environment</option>
                         <option value="Health">Health</option>
                         <option value="Human Services">Human Services</option>
-                        <option value="Community">Community</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Arts & Culture">Arts & Culture</option>
                         <option value="International">International</option>
+                        <option value="Religion">Religion</option>
                         <option value="Research">Research</option>
                         <option value="Other">Other</option>
                     </select>
@@ -1527,14 +1527,14 @@
                     <label for="editCharityCategory">Category</label>
                     <select id="editCharityCategory">
                         <option value="">Select category...</option>
-                        <option value="Religion">Religion</option>
+                        <option value="Arts & Culture">Arts & Culture</option>
+                        <option value="Community">Community</option>
                         <option value="Education">Education</option>
+                        <option value="Environment">Environment</option>
                         <option value="Health">Health</option>
                         <option value="Human Services">Human Services</option>
-                        <option value="Community">Community</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Arts & Culture">Arts & Culture</option>
                         <option value="International">International</option>
+                        <option value="Religion">Religion</option>
                         <option value="Research">Research</option>
                         <option value="Other">Other</option>
                     </select>
@@ -1610,6 +1610,53 @@
             } else {
                 return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
             }
+        }
+
+        // Helper function to parse donation notes safely
+        function parseNotesDisplay(notes) {
+            if (!notes) return '';
+
+            if (typeof notes === 'string' && notes.startsWith('{')) {
+                try {
+                    const notesObj = JSON.parse(notes);
+                    return notesObj.notes || '';
+                } catch (e) {
+                    // Use as-is if not valid JSON
+                    return notes;
+                }
+            }
+            return notes;
+        }
+
+        // Function to update donation type (for edit form)
+        function updateDonationType(type) {
+            // Update the hidden field
+            const donationType = document.getElementById('donationType');
+            if (donationType) {
+                donationType.value = type;
+            }
+
+            // Update the display elements
+            const typeIcon = document.getElementById('donationTypeIcon');
+            const typeLabel = document.getElementById('donationTypeLabel');
+            const modalTitle = document.getElementById('donationModalTitle');
+
+            const typeConfig = {
+                cash: { icon: '💵', label: 'Cash/Check Donation', title: 'Add Cash Donation' },
+                items: { icon: '📦', label: 'Item Donation', title: 'Add Item Donation' },
+                miles: { icon: '🚗', label: 'Mileage Donation', title: 'Add Mileage Donation' },
+                stock: { icon: '📈', label: 'Stock/Securities Donation', title: 'Add Stock Donation' },
+                crypto: { icon: '₿', label: 'Cryptocurrency Donation', title: 'Add Crypto Donation' }
+            };
+
+            const config = typeConfig[type] || typeConfig.cash;
+
+            if (typeIcon) typeIcon.textContent = config.icon;
+            if (typeLabel) typeLabel.textContent = config.label;
+            if (modalTitle) modalTitle.textContent = config.title;
+
+            // Update the form fields
+            updateDonationFields();
         }
 
         // Function to update donation fields based on type
@@ -2636,7 +2683,7 @@
                     const type = donation.donation_type || 'cash';
                     const amount = parseFloat(donation.amount).toFixed(2);
                     const description = getDescriptionForType(donation);
-                    const notes = (donation.notes || '').replace(/,/g, ';');
+                    const notes = parseNotesDisplay(donation.notes || '').replace(/,/g, ';');
 
                     csvContent += `${date},"${charity}",${type},${amount},"${description}","${notes}"\n`;
                 });
@@ -2727,7 +2774,7 @@
                             <td>${donation.donation_type || 'cash'}</td>
                             <td>$${formatCurrency(donation.amount, true)}</td>
                             <td>${description}</td>
-                            <td>${donation.notes || ''}</td>
+                            <td>${parseNotesDisplay(donation.notes)}</td>
                         </tr>
                     `;
                 });
@@ -3055,7 +3102,10 @@
                     <td>${donation.donation_date || ''}</td>
                     <td>${donation.donation_type || 'cash'}</td>
                     <td>$${(parseFloat(donation.amount) || 0).toFixed(2)}</td>
-                    <td>${(donation.notes || '').substring(0, 50)}${donation.notes && donation.notes.length > 50 ? '...' : ''}</td>
+                    <td>${(() => {
+                        const parsed = parseNotesDisplay(donation.notes);
+                        return parsed.length > 50 ? parsed.substring(0, 50) + '...' : parsed;
+                    })()}</td>
                 </tr>`;
             });
 
@@ -4481,7 +4531,7 @@
                         <td>${donation.charity_name || 'Unknown'}</td>
                         <td><span title="${donationType}">${typeIcon}</span></td>
                         <td>$${formatCurrency(donation.amount, true)}</td>
-                        <td>${donation.notes || '-'}</td>
+                        <td>${parseNotesDisplay(donation.notes) || '-'}</td>
                         <td>
                             <button onclick="viewDonationDetails('${donation.id}')" class="small-btn" title="View Details">👁️</button>
                             <button onclick="editDonation('${donation.id}')" class="small-btn" title="Edit">✏️</button>
