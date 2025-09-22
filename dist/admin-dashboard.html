@@ -1159,6 +1159,15 @@
             }
         }
 
+        // Clear Donations Modal (for specific users)
+        function showClearDonationsModal() {
+            // For now, just redirect to the delete all donations
+            // TODO: Implement user-specific clearing
+            if (confirm('Do you want to delete ALL donations from ALL users?')) {
+                confirmDeleteAllDonations();
+            }
+        }
+
         async function executeDeleteAllCharities() {
             const confirmText = document.getElementById('deleteConfirmInput').value;
             const statusDiv = document.getElementById('deleteStatus');
