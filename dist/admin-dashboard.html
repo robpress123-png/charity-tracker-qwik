@@ -635,11 +635,11 @@
                 <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
                     <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px;">
                         <h3 style="color: #dc2626; margin-bottom: 1rem;">⚠️ Confirm Deletion</h3>
-                        <p style="color: #f3f4f6; margin-bottom: 1rem;">
-                            Are you absolutely sure you want to delete ALL charities from the database?
+                        <p id="deleteConfirmMessage" style="color: #f3f4f6; margin-bottom: 1rem;">
+                            Are you absolutely sure you want to delete ALL items from the database?
                         </p>
                         <p style="color: #fca5a5; margin-bottom: 1.5rem;">
-                            Type <strong>DELETE ALL CHARITIES</strong> to confirm:
+                            Type <strong id="deleteConfirmText">DELETE ALL</strong> to confirm:
                         </p>
                         <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
                         <div style="display: flex; gap: 1rem;">
@@ -1086,6 +1086,8 @@
         // Charity Management Functions
         function confirmDeleteAllCharities() {
             document.getElementById('deleteConfirmModal').style.display = 'flex';
+            document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL charities from the database?';
+            document.getElementById('deleteConfirmText').textContent = 'DELETE ALL CHARITIES';
             document.getElementById('deleteConfirmInput').value = '';
             document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL CHARITIES';
             document.getElementById('deleteStatus').textContent = '';
@@ -1109,6 +1111,8 @@
         // Delete All Donations Functions
         function confirmDeleteAllDonations() {
             document.getElementById('deleteConfirmModal').style.display = 'flex';
+            document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records.';
+            document.getElementById('deleteConfirmText').textContent = 'DELETE ALL DONATIONS';
             document.getElementById('deleteConfirmInput').value = '';
             document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL DONATIONS';
             document.getElementById('deleteStatus').textContent = '';

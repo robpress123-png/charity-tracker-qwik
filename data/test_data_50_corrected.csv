@@ -1,0 +1,51 @@
+charity_name,donation_date,donation_type,amount,notes
+FIDELITY INVESTMENTS CHARITABLE GIFT FUND,2025-01-02,cash,500.00,Emergency disaster relief fund contribution
+MAYO CLINIC GROUP RETURN,2025-01-03,cash,250.00,Annual workplace giving campaign
+CLEVELAND CLINIC FOUNDATION,2025-01-04,cash,150.00,Support for local medical programs
+NEW YORK UNIVERSITY,2025-01-05,cash,100.00,Educational support fund
+JOHNS HOPKINS UNIVERSITY,2025-01-06,cash,300.00,Medical research support
+MEMORIAL SLOAN-KETTERING CANCER CENTER,2025-01-07,cash,225.00,Cancer research funding
+STANFORD HEALTH CARE 227,2025-01-08,cash,450.00,Medical facility support
+EMORY UNIVERSITY,2025-01-09,cash,180.00,Academic program support
+YALE UNIVERSITY,2025-01-10,cash,125.00,Educational excellence fund
+CORNELL UNIVERSITY,2025-01-11,cash,750.00,Research and development
+UNIVERSITY OF MIAMI,2025-01-12,cash,320.00,Student support services
+VANGUARD CHARITABLE ENDOWMENT PROGRAM,2025-01-13,cash,275.00,Charitable giving fund
+UNIVERSITY OF ROCHESTER,2025-01-14,cash,400.00,Academic programs contribution
+HARVARD COLLEGE,2025-01-15,cash,550.00,Educational endowment support
+NATIONAL PHILANTHROPIC TR,2025-01-02,items,485.00,"ITEMS:[Blouse|Clothing - Women|excellent|3|36.00][Dress|Clothing - Women|very_good|2|30.00][Suit|Clothing - Men|good|1|60.00][Pants|Clothing - Men|very_good|3|45.00][Coat|Clothing - Women|excellent|1|60.00][Shoes|Clothing - Men|good|2|36.00][Handbag|Clothing - Women|very_good|2|40.00][Sweater|Clothing - Men|excellent|2|30.00][Jeans|Clothing - Women|good|3|45.00][Belt|Clothing - Men|very_good|2|8.00][Shirt|Clothing - Children|excellent|5|20.00][Dress|Clothing - Children|very_good|3|24.00][Coat|Clothing - Children|good|1|15.00][Shoes|Clothing - Children|excellent|2|16.00]"
+DONOR ADVISED CHARITABLE GIVING,2025-01-05,items,725.00,"ITEMS:[Computer - Desktop|Electronics|good|1|200.00][Computer - Laptop|Electronics|very_good|1|300.00][Television|Electronics|good|1|150.00][Printer|Electronics|excellent|1|40.00][Camera|Electronics|very_good|1|35.00]"
+DIGNITY HEALTH,2025-01-07,items,620.00,"ITEMS:[Sofa|Furniture|excellent|1|200.00][Chair|Furniture|very_good|2|70.00][Dining Table|Furniture|good|1|150.00][Coffee Table|Furniture|excellent|1|50.00][Dresser|Furniture|very_good|1|100.00][Bookcase|Furniture|good|1|50.00]"
+BATTELLE MEMORIAL INSTITUTE,2025-01-09,items,385.00,"ITEMS:[Hardback Book|Books & Media|excellent|20|40.00][Paperback Book|Books & Media|very_good|50|50.00][Textbook|Books & Media|good|10|100.00][Children's Book|Books & Media|excellent|30|30.00][DVD|Books & Media|very_good|25|50.00][CD|Books & Media|good|40|40.00][Board Game|Books & Media|excellent|10|40.00][Video Game|Books & Media|very_good|5|35.00]"
+PROVIDENCE HEALTH & SERVICES WASHINGTON,2025-01-11,items,565.00,"ITEMS:[Pots & Pans|Household Items|good|1|15.00][Dishes (set)|Household Items|excellent|1|30.00][Glassware (set)|Household Items|very_good|1|15.00][Bedding (set)|Household Items|excellent|2|40.00][Towels|Household Items|very_good|5|20.00][Blanket|Household Items|good|2|30.00][Curtains|Household Items|excellent|3|30.00][Kitchen Utensils|Household Items|very_good|1|10.00][Small Appliances|Household Items|excellent|2|40.00][Microwave Oven|Appliances|very_good|1|75.00][Coffee Maker|Appliances|good|1|30.00][Toaster|Appliances|excellent|1|20.00][Blender|Appliances|very_good|1|25.00][Vacuum Cleaner|Appliances|good|1|80.00][Iron|Appliances|excellent|1|15.00][Hair Dryer|Appliances|very_good|2|20.00][Fan|Appliances|good|1|25.00][Space Heater|Appliances|excellent|1|40.00]"
+NORTHWESTERN MEMORIAL HEALTHCARE,2025-01-13,items,420.00,"ITEMS:[Bicycle|Sports & Recreation|excellent|1|100.00][Golf Clubs|Sports & Recreation|very_good|1|125.00][Tennis Racket|Sports & Recreation|good|2|50.00][Exercise Equipment|Sports & Recreation|excellent|1|75.00][Skateboard|Sports & Recreation|very_good|1|25.00][Sports Balls|Sports & Recreation|good|5|20.00][Camping Gear|Sports & Recreation|excellent|1|25.00]"
+IHC HEALTH SERVICES INC,2025-01-15,items,340.00,"ITEMS:[Stuffed Animal|Toys & Games|very_good|10|20.00][Doll|Toys & Games|excellent|5|40.00][Building Blocks|Toys & Games|good|3|75.00][Puzzle|Toys & Games|very_good|10|30.00][Toy Car/Truck|Toys & Games|excellent|8|24.00][Educational Toy|Toys & Games|good|4|48.00][Electronic Toy|Toys & Games|very_good|3|60.00][Outdoor Toy|Toys & Games|excellent|1|43.00]"
+BANNER HEALTH,2025-01-17,items,290.00,"ITEMS:[Power Drill Set|Tools & Equipment|good|1|120.00][Circular Saw|Tools & Equipment|very_good|1|85.00][Hammer|Tools & Equipment|excellent|3|15.00][Screwdriver Set|Tools & Equipment|good|2|20.00][Wrench Set|Tools & Equipment|very_good|1|30.00][Tool Box|Tools & Equipment|excellent|1|20.00]"
+NYU LANGONE HOSPITALS,2025-01-19,items,480.00,"ITEMS:[Necklace|Jewelry & Accessories|excellent|3|90.00][Watch|Jewelry & Accessories|very_good|2|140.00][Bracelet|Jewelry & Accessories|good|5|50.00][Earrings|Jewelry & Accessories|excellent|10|60.00][Ring|Jewelry & Accessories|very_good|2|80.00][Sunglasses|Jewelry & Accessories|good|4|60.00]"
+BON SECOURS MERCY HEALTH INC,2025-01-21,items,195.00,"ITEMS:[Winter Coat|Clothing - Women|excellent|1|45.00][Designer Handbag|Clothing - Women|very_good|1|40.00][Leather Boots|Clothing - Men|good|1|40.00][Business Suit|Clothing - Men|excellent|1|80.00]"
+KAISER FOUNDATION HEALTH PLAN INC,2025-01-04,stock,3500.00,Stock donation - 14 shares at $250/share - Long-term capital gains
+KAISER FOUNDATION HOSPITALS,2025-01-08,stock,2250.00,Stock donation - 6 shares at $375/share - Appreciated securities
+MASS GENERAL BRIGHAM INCORPORATED AND AFFILIATES GROUP RTN,2025-01-12,stock,4000.00,Stock donation - 25 shares at $160/share - Investment portfolio
+UPMC,2025-01-16,stock,1800.00,Stock donation - 12 shares at $150/share - Charitable contribution
+HEALTHFIRST PHSP INC,2025-01-20,stock,2800.00,Stock donation - 10 shares at $280/share - Growth stock donation
+CARESOURCE OHIO INC,2025-01-06,crypto,4500.00,Bitcoin (BTC) - 0.065 BTC at $69230/coin - Held 18 months
+MEMORIAL HERMANN HEALTH SYSTEM,2025-01-10,crypto,2100.00,Ethereum (ETH) - 0.875 ETH at $2400/coin - Long-term position
+NORTHSIDE HOSPITAL INC,2025-01-14,crypto,850.00,Litecoin (LTC) - 10 LTC at $85/coin - Short-term holding
+VANDERBILT UNIVERSITY MEDICAL CENTER,2025-01-18,crypto,1650.00,Solana (SOL) - 15 SOL at $110/coin - Digital asset donation
+HACKENSACK MERIDIAN HEALTH INC,2025-01-02,mileage,14.00,Volunteer delivery route - 100 miles at $0.14/mile
+TRUSTEES OF COLUMBIA UNIVERSITY,2025-01-05,mileage,42.00,Campus volunteer services - 300 miles at $0.14/mile
+RWJ BARNABAS HEALTH INC,2025-01-08,mileage,7.00,Medical supply delivery - 50 miles at $0.14/mile
+ADVENTIST HEALTH SYSTEM SUNBELT INC,2025-01-11,mileage,21.00,Patient transport assistance - 150 miles at $0.14/mile
+ADVOCATE HEALTH AND HOSPITALS CORPORATION,2025-01-14,mileage,28.00,Health screening events - 200 miles at $0.14/mile
+BJC HEALTH SYSTEM,2025-01-17,mileage,35.00,Community health outreach - 250 miles at $0.14/mile
+GLOBAL FUND TO FIGHT AIDS TUBERCULOSIS AND MALARIA,2025-01-20,mileage,14.00,Awareness campaign travel - 100 miles at $0.14/mile
+THRIVENT FINANCIAL FOR LUTHERANS,2025-01-16,cash,195.00,Community support programs
+COREWELL HEALTH,2025-01-17,cash,110.00,Healthcare accessibility fund
+THE NEW YORK AND PRESBYTERIAN HOSPITAL,2025-01-18,cash,280.00,Medical services support
+THE BOARD OF TRUSTEES OF THE LELAND STANFORD JUNIOR UNIVERSITY,2025-01-19,cash,350.00,Academic excellence fund
+THE CLEVELAND CLINIC FOUNDATION,2025-01-20,cash,165.00,Medical research support
+STANFORD HEALTH CARE 227,2025-01-21,cash,220.00,Patient care programs
+MAYO CLINIC,2025-01-22,cash,95.00,Medical innovation support
+Local Community Garden,2025-01-01,cash,300.00,Annual membership and operational support - Personal charity
+Neighborhood Food Pantry,2025-01-15,cash,200.00,Monthly support for local families - Personal charity
+Youth Sports League,2025-01-22,cash,150.00,Equipment and uniform sponsorship - Personal charity
