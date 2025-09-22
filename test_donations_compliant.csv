@@ -1,0 +1,31 @@
+charity_name,donation_date,donation_type,amount,notes
+American Red Cross,2024-03-15,stock,5000.00,Donated 25 shares of AAPL for disaster relief
+Doctors Without Borders,2024-04-20,stock,7500.00,30 shares of MSFT for medical programs
+World Wildlife Fund,2024-05-10,stock,3200.00,20 shares of TSLA for conservation efforts
+St. Jude Children's Research Hospital,2024-06-05,stock,4800.00,40 shares of AMZN for pediatric research
+Habitat for Humanity,2024-07-12,stock,2500.00,10 shares of GOOGL for housing projects
+The Nature Conservancy,2024-08-18,stock,6000.00,25 shares of BRK.B for environmental protection
+UNICEF USA,2024-09-22,stock,3500.00,20 shares of JNJ for children's health
+American Cancer Society,2024-10-08,stock,4200.00,100 shares of PFE for cancer research
+Feeding America,2024-11-14,stock,2800.00,20 shares of WMT for food programs
+Make-A-Wish Foundation,2024-12-01,stock,5500.00,50 shares of DIS for children's wishes
+Electronic Frontier Foundation,2024-02-10,crypto,3500.00,0.08 BTC donation for digital rights
+Wikimedia Foundation,2024-03-25,crypto,2000.00,1.2 ETH for supporting open knowledge
+Save the Children,2024-04-15,crypto,1500.00,3000 ADA for education programs
+Water.org,2024-05-20,crypto,2800.00,0.06 BTC for clean water projects
+Khan Academy,2024-06-30,crypto,1200.00,0.5 ETH for free education platform
+The Tor Project,2024-07-15,crypto,800.00,5 XMR for privacy protection
+Internet Archive,2024-08-22,crypto,1000.00,0.025 BTC for digital preservation
+Signal Foundation,2024-09-10,crypto,1500.00,20 LTC for secure messaging
+Mozilla Foundation,2024-10-18,crypto,2200.00,0.8 ETH for open web development
+Free Software Foundation,2024-11-25,crypto,900.00,0.02 BTC for free software advocacy
+Goodwill Industries,2024-01-20,items,500.00,Winter coats and boots for job training programs
+Salvation Army,2024-02-14,items,750.00,Living room furniture set for families in need
+Toys for Tots,2024-11-28,items,400.00,New toys and games for holiday distribution
+Books for Africa,2024-03-08,items,300.00,Textbooks and reference books for schools
+Dress for Success,2024-04-12,items,450.00,Professional business attire for women
+Community Food Bank,2024-05-18,items,600.00,Canned goods and dry foods for distribution
+Habitat ReStore,2024-06-25,items,800.00,Lumber and tools for building projects
+Big Brothers Big Sisters,2024-07-30,items,350.00,Sports equipment for youth programs
+Local Animal Shelter,2024-08-15,items,250.00,Pet food and supplies for shelter animals
+Veterans Foundation,2024-09-20,items,550.00,Computers and tablets for veteran programs

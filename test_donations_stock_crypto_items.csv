@@ -1,0 +1,31 @@
+charity_name,amount,donation_date,donation_type,notes,stock_symbol,stock_name,shares_donated,crypto_symbol,crypto_name,crypto_quantity,item_description,estimated_value
+"American Red Cross",5000.00,2024-03-15,stock,"Donated Apple shares for disaster relief",AAPL,"Apple Inc.",25,,,,,,
+"Doctors Without Borders",7500.00,2024-04-20,stock,"Microsoft shares for medical programs",MSFT,"Microsoft Corp.",30,,,,,,
+"World Wildlife Fund",3200.00,2024-05-10,stock,"Tesla shares for conservation",TSLA,"Tesla Inc.",20,,,,,,
+"St. Jude Children's Research Hospital",4800.00,2024-06-05,stock,"Amazon shares for pediatric research",AMZN,"Amazon.com Inc.",40,,,,,,
+"Habitat for Humanity",2500.00,2024-07-12,stock,"Google shares for housing projects",GOOGL,"Alphabet Inc.",10,,,,,,
+"The Nature Conservancy",6000.00,2024-08-18,stock,"Berkshire Hathaway shares",BRK.B,"Berkshire Hathaway",25,,,,,,
+"UNICEF USA",3500.00,2024-09-22,stock,"Johnson & Johnson shares for children's health",JNJ,"Johnson & Johnson",20,,,,,,
+"American Cancer Society",4200.00,2024-10-08,stock,"Pfizer shares for cancer research",PFE,"Pfizer Inc.",100,,,,,,
+"Feeding America",2800.00,2024-11-14,stock,"Walmart shares for food programs",WMT,"Walmart Inc.",20,,,,,,
+"Make-A-Wish Foundation",5500.00,2024-12-01,stock,"Disney shares for children's wishes",DIS,"Walt Disney Co.",50,,,,,,
+"Electronic Frontier Foundation",3500.00,2024-02-10,crypto,"Bitcoin donation for digital rights",BTC,Bitcoin,0.08,,,,,,
+"Wikimedia Foundation",2000.00,2024-03-25,crypto,"Ethereum for open knowledge",ETH,Ethereum,1.2,,,,,,
+"Save the Children",1500.00,2024-04-15,crypto,"Cardano for education programs",ADA,Cardano,3000,,,,,,
+"Water.org",2800.00,2024-05-20,crypto,"Bitcoin for clean water projects",BTC,Bitcoin,0.06,,,,,,
+"Khan Academy",1200.00,2024-06-30,crypto,"Ethereum for free education",ETH,Ethereum,0.5,,,,,,
+"The Tor Project",800.00,2024-07-15,crypto,"Monero for privacy protection",XMR,Monero,5,,,,,,
+"Internet Archive",1000.00,2024-08-22,crypto,"Bitcoin for digital preservation",BTC,Bitcoin,0.025,,,,,,
+"Signal Foundation",1500.00,2024-09-10,crypto,"Litecoin for secure messaging",LTC,Litecoin,20,,,,,,
+"Mozilla Foundation",2200.00,2024-10-18,crypto,"Ethereum for open web",ETH,Ethereum,0.8,,,,,,
+"Free Software Foundation",900.00,2024-11-25,crypto,"Bitcoin for free software",BTC,Bitcoin,0.02,,,,,,
+"Goodwill Industries",500.00,2024-01-20,items,"Winter clothing donation for job training",,,,,,,"Winter coats and boots",500
+"Salvation Army",750.00,2024-02-14,items,"Furniture for families in need",,,,,,,"Living room furniture set",750
+"Toys for Tots",400.00,2024-11-28,items,"Holiday toys for children",,,,,,,"New toys and games",400
+"Books for Africa",300.00,2024-03-08,items,"Educational books for schools",,,,,,,"Textbooks and reference books",300
+"Dress for Success",450.00,2024-04-12,items,"Professional clothing for women",,,,,,,"Business attire",450
+"Food Bank",600.00,2024-05-18,items,"Non-perishable food items",,,,,,,"Canned goods and dry foods",600
+"Habitat ReStore",800.00,2024-06-25,items,"Building materials donation",,,,,,,"Lumber and tools",800
+"Big Brothers Big Sisters",350.00,2024-07-30,items,"Sports equipment for youth programs",,,,,,,"Sports gear and equipment",350
+"Local Animal Shelter",250.00,2024-08-15,items,"Pet supplies for shelter animals",,,,,,,"Pet food and supplies",250
+"Veterans Foundation",550.00,2024-09-20,items,"Electronics for veteran programs",,,,,,,"Computers and tablets",550

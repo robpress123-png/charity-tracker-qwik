@@ -1044,6 +1044,38 @@
                             </div>
                         </div>
 
+                        <!-- Personal Charity Management Tool -->
+                        <div class="tool-card" onclick="showPersonalCharities()">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                                🏛️
+                            </div>
+                            <div class="tool-content">
+                                <h4 class="tool-title">Personal Charities</h4>
+                                <p class="tool-description">Manage your personal charity list. Add, edit, and track charities not in our database.</p>
+                                <div class="tool-features">
+                                    <span class="feature-tag">Add Custom</span>
+                                    <span class="feature-tag">Edit Details</span>
+                                    <span class="feature-tag">Track Status</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Verify Charity Tool -->
+                        <div class="tool-card" onclick="showCharityVerification()">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                                🔍
+                            </div>
+                            <div class="tool-content">
+                                <h4 class="tool-title">Verify Charity</h4>
+                                <p class="tool-description">Check if a charity is IRS-approved and eligible for tax-deductible donations.</p>
+                                <div class="tool-features">
+                                    <span class="feature-tag">IRS Database</span>
+                                    <span class="feature-tag">EIN Lookup</span>
+                                    <span class="feature-tag">Instant Verify</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Tax Calculator Tool -->
                         <div class="tool-card" onclick="calculateTaxSavings()">
                             <div class="tool-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
@@ -1092,6 +1124,28 @@
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- Personal Charities Panel -->
+                    <div id="personalCharitiesPanel" style="display:none; margin-top: 2rem;">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">🏛️ Manage Personal Charities</h3>
+                        <div style="margin-bottom: 1.5rem;">
+                            <button class="btn-primary" onclick="showAddPersonalCharity()">+ Add Personal Charity</button>
+                        </div>
+                        <div id="personalCharitiesList"></div>
+                    </div>
+
+                    <!-- Charity Verification Panel -->
+                    <div id="charityVerificationPanel" style="display:none; margin-top: 2rem;">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">🔍 Verify Charity Status</h3>
+                        <div class="form-group">
+                            <label>Enter Charity Name or EIN</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="verifyCharityInput" placeholder="e.g., Red Cross or 53-0196605" style="flex: 1;">
+                                <button class="btn-primary" onclick="performCharityVerification()">Verify</button>
+                            </div>
+                        </div>
+                        <div id="verificationResults" style="margin-top: 1.5rem;"></div>
                     </div>
 
                     <!-- Import Donations Panel -->
@@ -1829,7 +1883,7 @@
                 // Get auth token
                 const token = localStorage.getItem('token');
 
-                const response = await fetch(`/api/charities/personal/${charityId}`, {
+                const response = await fetch(`/api/charities/delete-personal/${charityId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1840,9 +1894,15 @@
 
                 if (data.success) {
                     showToast('Charity deleted successfully!', 'success');
-                    loadCharities(); // Refresh the charity list
+                    loadCharities(); // Refresh the main charity list
+                    loadPersonalCharities(); // Refresh the personal charities panel if open
                 } else {
-                    showToast('Failed to delete charity: ' + (data.error || 'Unknown error'), 'error');
+                    // Show more detailed error message for donation conflicts
+                    if (data.error && data.error.includes('existing donation')) {
+                        showToast(data.error, 'warning');
+                    } else {
+                        showToast('Failed to delete charity: ' + (data.error || 'Unknown error'), 'error');
+                    }
                 }
             } catch (error) {
                 console.error('Error deleting charity:', error);
@@ -2547,95 +2607,120 @@
             }
         }
 
-        // Load and display personal charities with enhanced information
+        // Load and display all charities with donations
         async function loadCharities() {
             const container = document.getElementById('charitiesContent');
+            const year = document.getElementById('globalYearFilter')?.value || '2025';
 
             try {
                 // Get auth token
                 const token = localStorage.getItem('token');
 
-                // Fetch personal charities with enhanced data
-                const response = await fetch('/api/charities/personal', {
+                // Fetch all donations to get unique charities
+                let url = '/api/donations?limit=10000';
+                if (year && year !== 'all') {
+                    url += `&year=${year}`;
+                }
+
+                const response = await fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
                 const data = await response.json();
 
-                if (data.success && data.charities && data.charities.length > 0) {
+                if (data.success && data.donations && data.donations.length > 0) {
+                    // Group donations by charity
+                    const charitiesMap = new Map();
+                    data.donations.forEach(donation => {
+                        const charityId = donation.charity_id;
+                        if (!charitiesMap.has(charityId)) {
+                            charitiesMap.set(charityId, {
+                                id: charityId,
+                                name: donation.charity_name || 'Unknown',
+                                ein: donation.charity_ein,
+                                category: donation.charity_category || 'Other',
+                                source: donation.charity_source || 'system',
+                                total: 0,
+                                count: 0,
+                                lastDonation: donation.date || donation.donation_date
+                            });
+                        }
+                        const charity = charitiesMap.get(charityId);
+                        charity.total += parseFloat(donation.amount || 0);
+                        charity.count++;
+                        if ((donation.date || donation.donation_date) > charity.lastDonation) {
+                            charity.lastDonation = donation.date || donation.donation_date;
+                        }
+                    });
+
+                    // Convert to array and sort by total donations
+                    const charities = Array.from(charitiesMap.values())
+                        .sort((a, b) => b.total - a.total);
+
                     let html = '<div class="charity-grid">';
-                    data.charities.forEach(charity => {
-                        // Format approval status with color coding
-                        const approvalStatus = charity.approval_status || 'pending';
-                        const statusColor = {
-                            'approved': '#10b981',
-                            'pending': '#f59e0b',
-                            'rejected': '#ef4444'
-                        }[approvalStatus] || '#6b7280';
+                    charities.forEach(charity => {
+                        // Indicate if it's a personal charity
+                        const personalBadge = charity.source === 'personal'
+                            ? '<span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">Personal</span>'
+                            : '';
 
-                        const statusIcon = {
-                            'approved': '✅',
-                            'pending': '⏳',
-                            'rejected': '❌'
-                        }[approvalStatus] || '❓';
-
-                        // Format donation stats
-                        const donationCount = charity.donation_count || 0;
-                        const totalDonated = charity.total_donated || 0;
+                        // Parse last donation date
+                        let lastDonationDate = '';
+                        if (charity.lastDonation) {
+                            if (charity.lastDonation.includes('-')) {
+                                const [year, month, day] = charity.lastDonation.split('-');
+                                lastDonationDate = `${month}/${day}/${year}`;
+                            } else {
+                                lastDonationDate = new Date(charity.lastDonation).toLocaleDateString();
+                            }
+                        }
 
                         html += `
                             <div class="charity-card enhanced">
                                 <div class="charity-header">
-                                    <h3 class="charity-name">${charity.name}</h3>
-                                    <div class="charity-status" style="color: ${statusColor}; font-weight: 600;">
-                                        ${statusIcon} ${approvalStatus.charAt(0).toUpperCase() + approvalStatus.slice(1)}
-                                    </div>
+                                    <h3 class="charity-name">${charity.name}${personalBadge}</h3>
                                 </div>
 
                                 ${charity.ein ? `<p class="charity-ein"><strong>EIN:</strong> ${charity.ein}</p>` : ''}
                                 ${charity.category ? `<p class="charity-category"><strong>Category:</strong> ${charity.category}</p>` : ''}
-                                ${charity.description ? `<p class="charity-description">${charity.description}</p>` : ''}
 
                                 <div class="charity-stats">
                                     <div class="stat-item">
                                         <span class="stat-label">Donations:</span>
-                                        <span class="stat-value">${donationCount}</span>
+                                        <span class="stat-value">${charity.count}</span>
                                     </div>
                                     <div class="stat-item">
                                         <span class="stat-label">Total Donated:</span>
-                                        <span class="stat-value">$${totalDonated.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                        <span class="stat-value">$${formatCurrency(charity.total, true)}</span>
                                     </div>
+                                    ${lastDonationDate ? `
+                                    <div class="stat-item">
+                                        <span class="stat-label">Last Donation:</span>
+                                        <span class="stat-value">${lastDonationDate}</span>
+                                    </div>` : ''}
                                 </div>
 
                                 <div class="charity-actions" style="display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end;">
-                                    <button class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editPersonalCharity(${charity.id})">
-                                        Edit
-                                    </button>
-                                    <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem; background-color: #ef4444; color: white; border: none; border-radius: 0.375rem; cursor: pointer;" onclick="deletePersonalCharity(${charity.id})">
-                                        Delete
-                                    </button>
+                                    <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="openAddDonation('cash'); selectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">Add Donation</button>
                                 </div>
                             </div>
                         `;
                     });
                     html += '</div>';
-                    if (data.total > data.charities.length) {
-                        html += `<p class="charity-count">Showing ${data.charities.length} of ${data.total} personal charities</p>`;
-                    }
                     container.innerHTML = html;
                 } else {
-                    // Show empty state when no personal charities exist
+                    // Show empty state when no donations exist
                     container.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">🏛️</div>
-                            <p>No personal charities yet. Add your first charity to get started!</p>
+                            <p>No charities with donations yet. Add your first donation to get started!</p>
                         </div>
                     `;
                 }
 
-                // Update charity count in stats
-                document.getElementById('charityCount').textContent = data.total || '0';
+                // Update charity count in stats if not already updated
+                // This is handled in loadStats() so we don't need to do it again
 
             } catch (error) {
                 console.error('Failed to load charities:', error);
@@ -2990,7 +3075,131 @@
         let importData = [];
 
         function showImportDonations() {
+            // Hide other panels
+            document.getElementById('personalCharitiesPanel').style.display = 'none';
+            document.getElementById('charityVerificationPanel').style.display = 'none';
+            // Show import panel
             document.getElementById('importDonationsPanel').style.display = 'block';
+        }
+
+        function showPersonalCharities() {
+            // Hide other panels
+            document.getElementById('importDonationsPanel').style.display = 'none';
+            document.getElementById('charityVerificationPanel').style.display = 'none';
+            // Show personal charities panel
+            document.getElementById('personalCharitiesPanel').style.display = 'block';
+            // Load personal charities
+            loadPersonalCharities();
+        }
+
+        function showCharityVerification() {
+            // Hide other panels
+            document.getElementById('importDonationsPanel').style.display = 'none';
+            document.getElementById('personalCharitiesPanel').style.display = 'none';
+            // Show verification panel
+            document.getElementById('charityVerificationPanel').style.display = 'block';
+        }
+
+        async function loadPersonalCharities() {
+            const container = document.getElementById('personalCharitiesList');
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/api/charities/personal', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success && data.charities && data.charities.length > 0) {
+                    let html = '<div style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">';
+                    data.charities.forEach(charity => {
+                        const statusColor = charity.is_approved ? '#10b981' : '#f59e0b';
+                        const statusText = charity.is_approved ? 'Approved' : 'Pending';
+                        html += `
+                            <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; background: white;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                    <h4 style="margin: 0; color: #1f2937;">${charity.name}</h4>
+                                    <span style="background: ${statusColor}22; color: ${statusColor}; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">${statusText}</span>
+                                </div>
+                                ${charity.ein ? `<p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0;">EIN: ${charity.ein}</p>` : ''}
+                                ${charity.category ? `<p style="font-size: 0.875rem; color: #6b7280; margin: 0.25rem 0;">Category: ${charity.category}</p>` : ''}
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                    <button class="btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="editPersonalCharity('${charity.id}')">Edit</button>
+                                    <button class="btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;" onclick="deletePersonalCharity('${charity.id}')">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #6b7280;">No personal charities yet. Click "Add Personal Charity" to get started!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading personal charities:', error);
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">Failed to load personal charities</div>';
+            }
+        }
+
+        function showAddPersonalCharity() {
+            // Open the add charity modal
+            document.getElementById('addCharityModal').style.display = 'flex';
+        }
+
+        async function performCharityVerification() {
+            const input = document.getElementById('verifyCharityInput').value.trim();
+            const resultsDiv = document.getElementById('verificationResults');
+
+            if (!input) {
+                showToast('Please enter a charity name or EIN', 'warning');
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div style="padding: 1rem; background: #f3f4f6; border-radius: 8px;">🔍 Verifying...</div>';
+
+            try {
+                const response = await fetch(`/api/charities/verify?name=${encodeURIComponent(input)}`);
+                const data = await response.json();
+
+                if (data.success && data.verification) {
+                    const v = data.verification;
+                    if (v.isVerified) {
+                        resultsDiv.innerHTML = `
+                            <div style="padding: 1.5rem; background: #d1fae5; border: 1px solid #10b981; border-radius: 8px;">
+                                <h4 style="color: #065f46; margin: 0 0 1rem 0;">✅ Charity Verified!</h4>
+                                <div style="color: #047857;">
+                                    <p><strong>Name:</strong> ${v.name}</p>
+                                    <p><strong>EIN:</strong> ${v.ein}</p>
+                                    <p><strong>City:</strong> ${v.city}, ${v.state}</p>
+                                    <p><strong>Status:</strong> IRS 501(c)(3) Approved</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        let html = `
+                            <div style="padding: 1.5rem; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px;">
+                                <h4 style="color: #92400e; margin: 0 0 1rem 0;">⚠️ Not Found in IRS Database</h4>
+                                <p style="color: #92400e;">This charity was not found in the IRS Publication 78 database.</p>
+                        `;
+                        if (v.suggestions && v.suggestions.length > 0) {
+                            html += '<p style="color: #92400e; margin-top: 1rem;"><strong>Did you mean:</strong></p><ul style="color: #92400e;">';
+                            v.suggestions.forEach(s => {
+                                html += `<li>${s.name} (${s.city}, ${s.state})</li>`;
+                            });
+                            html += '</ul>';
+                        }
+                        html += '</div>';
+                        resultsDiv.innerHTML = html;
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<div style="padding: 1rem; background: #fee; color: #c00; border-radius: 8px;">Verification failed. Please try again.</div>';
+                }
+            } catch (error) {
+                console.error('Error verifying charity:', error);
+                resultsDiv.innerHTML = '<div style="padding: 1rem; background: #fee; color: #c00; border-radius: 8px;">Error verifying charity. Please try again.</div>';
+            }
         }
 
         // Setup drag and drop
@@ -4469,15 +4678,31 @@
             if (searchTerm) {
                 filtered = filtered.filter(d =>
                     (d.charity_name && d.charity_name.toLowerCase().includes(searchTerm)) ||
-                    (d.notes && d.notes.toLowerCase().includes(searchTerm)) ||
+                    (parseNotesDisplay(d.notes) && parseNotesDisplay(d.notes).toLowerCase().includes(searchTerm)) ||
                     (d.crypto_symbol && d.crypto_symbol.toLowerCase().includes(searchTerm)) ||
                     (d.stock_symbol && d.stock_symbol.toLowerCase().includes(searchTerm))
                 );
             }
 
-            // Filter by type
+            // Filter by type - handle both donation_type field and parsed JSON notes
             if (typeFilter !== 'all') {
-                filtered = filtered.filter(d => d.donation_type === typeFilter);
+                filtered = filtered.filter(d => {
+                    // First check if donation_type is directly available
+                    if (d.donation_type) {
+                        return d.donation_type === typeFilter;
+                    }
+                    // Otherwise try to parse from notes JSON
+                    if (d.notes && d.notes.startsWith('{')) {
+                        try {
+                            const notesObj = JSON.parse(d.notes);
+                            return notesObj.donation_type === typeFilter;
+                        } catch (e) {
+                            return false;
+                        }
+                    }
+                    // Default to cash if no type specified
+                    return typeFilter === 'cash';
+                });
             }
 
             // Filter by month

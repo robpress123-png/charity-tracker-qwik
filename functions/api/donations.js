@@ -257,10 +257,20 @@ export async function onRequestGet(context) {
     }
 
     // Build query with filters (using 'date' column, not 'donation_date')
+    // Join with both system charities and user's personal charities
     let query = `
-      SELECT d.*, c.name as charity_name, c.ein as charity_ein, c.category as charity_category
+      SELECT d.*,
+        COALESCE(c.name, uc.name) as charity_name,
+        COALESCE(c.ein, uc.ein) as charity_ein,
+        COALESCE(c.category, uc.category) as charity_category,
+        CASE
+          WHEN c.id IS NOT NULL THEN 'system'
+          WHEN uc.id IS NOT NULL THEN 'personal'
+          ELSE NULL
+        END as charity_source
       FROM donations d
       LEFT JOIN charities c ON d.charity_id = c.id
+      LEFT JOIN user_charities uc ON d.charity_id = uc.id AND uc.user_id = d.user_id
       WHERE d.user_id = ?
     `;
     let queryParams = [userId];
@@ -675,7 +685,7 @@ async function handleGetDonation(env, donationId, userId) {
         notes: 'Mock donation'
       }
     }), {
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
@@ -683,10 +693,19 @@ async function handleGetDonation(env, donationId, userId) {
   }
 
   try {
+    // Join with both system charities and user's personal charities
     const stmt = env.DB.prepare(`
-      SELECT d.*, c.name as charity_name, c.ein as charity_ein 
+      SELECT d.*,
+        COALESCE(c.name, uc.name) as charity_name,
+        COALESCE(c.ein, uc.ein) as charity_ein,
+        CASE
+          WHEN c.id IS NOT NULL THEN 'system'
+          WHEN uc.id IS NOT NULL THEN 'personal'
+          ELSE NULL
+        END as charity_source
       FROM donations d
       LEFT JOIN charities c ON d.charity_id = c.id
+      LEFT JOIN user_charities uc ON d.charity_id = uc.id AND uc.user_id = d.user_id
       WHERE d.id = ? AND d.user_id = ?
     `);
     const donation = await stmt.bind(donationId, userId).first();
