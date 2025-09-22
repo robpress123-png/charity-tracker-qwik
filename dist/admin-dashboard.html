@@ -597,14 +597,36 @@
                 </div>
 
                 <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">User Management</h3>
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear User Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Remove all donations for a specific user or all users
+                        </p>
+                        <button class="tool-btn" onclick="showClearDonationsModal()" style="background: #f59e0b;">
+                            🧹 Clear Donations
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
                     <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone</h3>
-                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
+                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
                         <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Charities</h4>
                         <p style="color: #fca5a5; margin-bottom: 1rem;">
                             This will permanently delete ALL charities from the database. This action cannot be undone.
                         </p>
                         <button class="tool-btn" onclick="confirmDeleteAllCharities()" style="background: #dc2626;">
                             🗑️ Delete All Charities
+                        </button>
+                    </div>
+                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
+                        <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Donations</h4>
+                        <p style="color: #fca5a5; margin-bottom: 1rem;">
+                            This will permanently delete ALL donations from ALL users. This action cannot be undone.
+                        </p>
+                        <button class="tool-btn" onclick="confirmDeleteAllDonations()" style="background: #dc2626;">
+                            🗑️ Delete All Donations
                         </button>
                     </div>
                 </div>
@@ -621,7 +643,7 @@
                         </p>
                         <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
                         <div style="display: flex; gap: 1rem;">
-                            <button class="tool-btn" onclick="executeDeleteAllCharities()" style="background: #dc2626;">
+                            <button class="tool-btn" onclick="executeDelete()" style="background: #dc2626;">
                                 Delete All
                             </button>
                             <button class="tool-btn secondary" onclick="cancelDelete()">
@@ -1062,11 +1084,72 @@
         function confirmDeleteAllCharities() {
             document.getElementById('deleteConfirmModal').style.display = 'flex';
             document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL CHARITIES';
             document.getElementById('deleteStatus').textContent = '';
+            document.getElementById('deleteConfirmModal').dataset.deleteType = 'charities';
+        }
+
+        // Generic execute delete that routes to the right function
+        function executeDelete() {
+            const deleteType = document.getElementById('deleteConfirmModal').dataset.deleteType;
+            if (deleteType === 'donations') {
+                executeDeleteAllDonations();
+            } else {
+                executeDeleteAllCharities();
+            }
         }
 
         function cancelDelete() {
             document.getElementById('deleteConfirmModal').style.display = 'none';
+        }
+
+        // Delete All Donations Functions
+        function confirmDeleteAllDonations() {
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL DONATIONS';
+            document.getElementById('deleteStatus').textContent = '';
+            document.getElementById('deleteConfirmModal').dataset.deleteType = 'donations';
+        }
+
+        async function executeDeleteAllDonations() {
+            const confirmText = document.getElementById('deleteConfirmInput').value;
+            const statusDiv = document.getElementById('deleteStatus');
+
+            if (confirmText !== 'DELETE ALL DONATIONS') {
+                statusDiv.style.color = '#fca5a5';
+                statusDiv.textContent = '❌ Please type exactly: DELETE ALL DONATIONS';
+                return;
+            }
+
+            statusDiv.style.color = '#f59e0b';
+            statusDiv.textContent = '⏳ Deleting all donations...';
+
+            try {
+                const response = await fetch('/api/donations/delete-all', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusDiv.style.color = '#10b981';
+                    statusDiv.textContent = `✅ Successfully deleted ${data.deletedCount || 'all'} donations`;
+
+                    setTimeout(() => {
+                        document.getElementById('deleteConfirmModal').style.display = 'none';
+                    }, 2000);
+                } else {
+                    statusDiv.style.color = '#ef4444';
+                    statusDiv.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (error) {
+                statusDiv.style.color = '#ef4444';
+                statusDiv.textContent = '❌ Failed to delete donations';
+            }
         }
 
         async function executeDeleteAllCharities() {
