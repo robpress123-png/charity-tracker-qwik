@@ -1472,14 +1472,6 @@
 
             // Reload stats
             await loadAdminStats();
-            } catch (error) {
-                resultsContent.innerHTML = `
-                    <div class="alert alert-warning">
-                        ❌ <strong>Import Error</strong>
-                        <p style="margin-top: 0.5rem;">${error.message}</p>
-                    </div>
-                `;
-            }
 
             document.getElementById('charitiesImportPreview').classList.remove('active');
         }
