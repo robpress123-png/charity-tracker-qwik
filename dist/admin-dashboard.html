@@ -597,36 +597,27 @@
                 </div>
 
                 <div style="margin-top: 2rem;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">User Management</h3>
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Charity Tools</h3>
                     <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
-                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear User Donations</h4>
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Search and Manage Charities</h4>
                         <p style="color: #6b7280; margin-bottom: 1rem;">
-                            Remove all donations for a specific user or all users
+                            Search, edit, and manage charity records in the database
                         </p>
-                        <button class="tool-btn" onclick="showClearDonationsModal()" style="background: #f59e0b;">
-                            🧹 Clear Donations
+                        <button class="tool-btn" onclick="showCharitySearch()" style="background: #3b82f6;">
+                            🔍 Search Charities
                         </button>
                     </div>
                 </div>
 
                 <div style="margin-top: 2rem;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone</h3>
-                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone - Charities Only</h3>
+                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
                         <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Charities</h4>
                         <p style="color: #fca5a5; margin-bottom: 1rem;">
                             This will permanently delete ALL charities from the database. This action cannot be undone.
                         </p>
                         <button class="tool-btn" onclick="confirmDeleteAllCharities()" style="background: #dc2626;">
                             🗑️ Delete All Charities
-                        </button>
-                    </div>
-                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
-                        <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Donations</h4>
-                        <p style="color: #fca5a5; margin-bottom: 1rem;">
-                            This will permanently delete ALL donations from ALL users. This action cannot be undone.
-                        </p>
-                        <button class="tool-btn" onclick="confirmDeleteAllDonations()" style="background: #dc2626;">
-                            🗑️ Delete All Donations
                         </button>
                     </div>
                 </div>
@@ -756,10 +747,49 @@
             <div id="database" class="content-section">
                 <div class="section-header">
                     <h2>Database Management</h2>
-                    <p>Monitor and optimize database performance</p>
+                    <p>Monitor and manage database operations</p>
                 </div>
-                <div class="alert alert-warning">
-                    This feature is coming soon. It will show database statistics and optimization tools.
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Donation Management</h3>
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear User Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Remove all donations for a specific user or all users
+                        </p>
+                        <button class="tool-btn" onclick="showClearDonationsModal()" style="background: #f59e0b;">
+                            🧹 Clear Donations
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone - Donations</h3>
+                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
+                        <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Donations</h4>
+                        <p style="color: #fca5a5; margin-bottom: 1rem;">
+                            This will permanently delete ALL donations from ALL users. Donation items will also be deleted.
+                        </p>
+                        <button class="tool-btn" onclick="confirmDeleteAllDonations()" style="background: #dc2626;">
+                            🗑️ Delete All Donations
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Database Statistics</h3>
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <p style="color: #9ca3af;">Total Donations:</p>
+                                <p style="color: #f3f4f6; font-size: 1.5rem;" id="dbDonationCount">Loading...</p>
+                            </div>
+                            <div>
+                                <p style="color: #9ca3af;">Total Charities:</p>
+                                <p style="color: #f3f4f6; font-size: 1.5rem;" id="dbCharityCount">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1166,6 +1196,11 @@
             if (confirm('Do you want to delete ALL donations from ALL users?')) {
                 confirmDeleteAllDonations();
             }
+        }
+
+        // Placeholder for charity search
+        function showCharitySearch() {
+            alert('Charity search feature coming soon!');
         }
 
         async function executeDeleteAllCharities() {
