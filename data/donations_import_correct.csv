@@ -1,0 +1,26 @@
+charity_name,donation_date,donation_type,amount,notes
+American Red Cross,2025-01-05,cash,250.00,Year-end tax deductible donation
+Salvation Army,2025-01-08,cash,100.00,Monthly recurring donation
+Goodwill Industries,2025-01-10,cash,500.00,Special campaign contribution
+United Way,2025-01-12,cash,75.00,Emergency relief fund
+Food Bank,2025-01-15,cash,150.00,General operating support
+St. Jude Children's Hospital,2025-01-07,stock,2500.00,AAPL stock donation - 10 shares
+Mayo Clinic,2025-01-14,stock,1750.00,MSFT stock donation - 5 shares
+Children's Hospital Foundation,2025-01-18,stock,3200.00,AMZN stock donation - 20 shares
+Electronic Frontier Foundation,2025-01-09,crypto,3500.00,BTC donation - 0.05 BTC held over 1 year
+World Wildlife Fund,2025-01-16,crypto,1200.00,ETH donation - 0.5 ETH short term
+Habitat for Humanity,2025-01-06,mileage,7.00,Weekly food pantry delivery - 50 miles
+Boys and Girls Club,2025-01-13,mileage,28.00,Habitat build volunteer - 200 miles
+Local Elementary School,2025-01-20,mileage,14.00,Weekly tutoring - 100 miles
+Goodwill Industries,2025-01-11,items,245.00,Spring cleaning donation - clothing and accessories
+Salvation Army,2025-01-17,items,520.00,Office equipment and furniture donation
+Public Library,2025-01-19,items,185.00,Books and educational materials donation
+Homeless Shelter,2025-01-21,items,380.00,Household goods and electronics
+Local Community Garden,2025-01-04,cash,300.00,Annual membership and donation
+Neighborhood Food Pantry,2025-01-22,cash,200.00,Support for local families
+ASPCA,2025-01-03,cash,125.00,Animal welfare support
+Cancer Research Institute,2025-01-09,cash,450.00,Research funding donation
+Doctors Without Borders,2025-01-14,cash,350.00,International medical aid
+Make-A-Wish Foundation,2025-01-16,cash,275.00,Children's wish fulfillment
+Nature Conservancy,2025-01-18,cash,180.00,Environmental protection
+Feeding America,2025-01-20,cash,220.00,National hunger relief

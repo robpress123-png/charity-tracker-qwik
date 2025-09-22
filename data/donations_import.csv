@@ -1,0 +1,20 @@
+charity_name,donation_type,amount,date,notes,miles_driven,mileage_rate,stock_symbol,shares_donated,crypto_symbol,crypto_quantity
+American Red Cross,cash,250.00,2025-01-05,Year-end tax deductible donation,,,,,
+Salvation Army,cash,100.00,2025-01-08,Monthly recurring donation,,,,,
+Goodwill Industries,cash,500.00,2025-01-10,Special campaign contribution,,,,,
+United Way,cash,75.00,2025-01-12,Emergency relief fund,,,,,
+Food Bank Network,cash,150.00,2025-01-15,General operating support,,,,,
+St. Jude Children's Hospital,stock,2500.00,2025-01-07,Long-term capital gains - AAPL held 2 years,,,AAPL,10,,
+Mayo Clinic,stock,1750.00,2025-01-14,Appreciated stock donation - MSFT,,,MSFT,5,,
+Children's Hospital Foundation,stock,3200.00,2025-01-18,Tech stock donation - AMZN,,,AMZN,20,,
+Electronic Frontier Foundation,crypto,3500.00,2025-01-09,BTC donation - held over 1 year,,,,,BTC,0.05
+World Wildlife Fund,crypto,1200.00,2025-01-16,ETH donation - short term,,,,,ETH,0.5
+Habitat for Humanity,mileage,7.00,2025-01-06,Weekly food pantry delivery,50,0.14,,,,
+Boys and Girls Club,mileage,28.00,2025-01-13,Habitat for Humanity build,200,0.14,,,,
+Local Elementary School,mileage,14.00,2025-01-20,Weekly tutoring at local school,100,0.14,,,,
+Goodwill Industries,items,245.00,2025-01-11,Spring cleaning donation - 5 items (see receipt),,,,,
+Salvation Army,items,520.00,2025-01-17,Office equipment donation - 5 items (see receipt),,,,,
+Public Library Foundation,items,185.00,2025-01-19,Books and educational materials - 4 items (see receipt),,,,,
+Homeless Shelter,items,380.00,2025-01-21,Household goods and electronics - 7 items (see receipt),,,,,
+Local Community Garden,cash,300.00,2025-01-04,Annual membership and donation to community garden,,,,,
+Neighborhood Food Pantry,cash,200.00,2025-01-22,Support for neighborhood food pantry,,,,

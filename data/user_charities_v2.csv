@@ -1,0 +1,6 @@
+id,user_id,name,ein,category,address,city,state,zip_code,website,description,phone,is_approved
+pc-001,f5c8cf6be42d4da14cec091ca2ddb4df,Local Community Garden,99-1234567,Community,123 Garden Way,Springfield,IL,62701,www.springfieldgarden.org,Community-run vegetable garden providing fresh produce to local families,217-555-0101,1
+pc-002,f5c8cf6be42d4da14cec091ca2ddb4df,Neighborhood Food Pantry,99-2345678,Food,456 Main Street,Springfield,IL,62702,www.neighborhoodfoodpantry.org,Emergency food assistance for families in need,217-555-0202,1
+pc-003,f5c8cf6be42d4da14cec091ca2ddb4df,Youth Sports League,99-3456789,Recreation,789 Sports Ave,Springfield,IL,62703,www.youthsportsleague.org,Providing sports programs for underprivileged youth,217-555-0303,0
+pc-004,f5c8cf6be42d4da14cec091ca2ddb4df,Local Animal Shelter,99-4567890,Animals,321 Pet Lane,Springfield,IL,62704,www.localanimalshelter.org,No-kill shelter for abandoned pets,217-555-0404,1
+pc-005,f5c8cf6be42d4da14cec091ca2ddb4df,Community Arts Center,99-5678901,Arts,654 Culture Blvd,Springfield,IL,62705,www.communityartscenter.org,Free art classes for children and seniors,217-555-0505,0

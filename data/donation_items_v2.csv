@@ -1,0 +1,22 @@
+id,donation_id,item_name,category,condition,quantity,unit_value,total_value
+item-001-1,items-001,Winter Coat,Clothing,very_good,1,45.00,45.00
+item-001-2,items-001,Men's Suit,Clothing,excellent,1,80.00,80.00
+item-001-3,items-001,Dress Shirts,Clothing,good,5,12.00,60.00
+item-001-4,items-001,Leather Shoes,Clothing,very_good,2,25.00,50.00
+item-001-5,items-001,Designer Handbag,Accessories,good,1,10.00,10.00
+item-002-1,items-002,Laptop Computer,Electronics,good,1,200.00,200.00
+item-002-2,items-002,Office Chair,Furniture,very_good,2,75.00,150.00
+item-002-3,items-002,Desk Lamp,Household,excellent,3,20.00,60.00
+item-002-4,items-002,Laser Printer,Electronics,good,1,50.00,50.00
+item-002-5,items-002,File Cabinet,Furniture,good,1,60.00,60.00
+item-003-1,items-003,Hardcover Books,Books,excellent,20,3.00,60.00
+item-003-2,items-003,Children's Books,Books,very_good,30,2.00,60.00
+item-003-3,items-003,Educational Games,Toys,good,5,8.00,40.00
+item-003-4,items-003,Art Supplies,Household,excellent,1,25.00,25.00
+item-004-1,items-004,Microwave Oven,Appliances,very_good,1,75.00,75.00
+item-004-2,items-004,Coffee Maker,Appliances,good,1,30.00,30.00
+item-004-3,items-004,Television 32 inch,Electronics,good,1,125.00,125.00
+item-004-4,items-004,DVD Player,Electronics,good,1,20.00,20.00
+item-004-5,items-004,Kitchen Utensils Set,Household,excellent,2,25.00,50.00
+item-004-6,items-004,Dinnerware Set,Household,very_good,1,40.00,40.00
+item-004-7,items-004,Bedding Set,Household,excellent,1,40.00,40.00
