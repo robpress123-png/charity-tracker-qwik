@@ -1577,6 +1577,8 @@
         }
 
         function showAddCharityFromSearch(searchQuery) {
+            // Mark that we're adding from donation modal
+            window.addingCharityFromDonation = true;
             // Close donation modal
             closeDonationModal();
             // Open charity modal with pre-filled name
@@ -1711,9 +1713,49 @@
 
         document.getElementById('charityForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // TODO: Implement charity submission to API
-            alert('Charity management will be fully implemented once all APIs are connected!');
-            closeCharityModal();
+
+            const formData = {
+                name: document.getElementById('charityName').value,
+                ein: document.getElementById('charityEIN').value,
+                category: document.getElementById('charityCategory').value,
+                website: document.getElementById('charityWebsite').value,
+                description: document.getElementById('charityDescription').value
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                const response = await fetch('/api/charities/add-personal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Personal charity added successfully! It\'s now available for your donations.', 'success');
+                    closeCharityModal();
+
+                    // If we came from the donation modal, re-open it with the new charity selected
+                    if (window.addingCharityFromDonation) {
+                        showAddDonation();
+                        // Pre-select the new charity
+                        document.getElementById('charitySearch').value = formData.name;
+                        document.getElementById('selectedCharityId').value = data.charity.id;
+                        window.addingCharityFromDonation = false;
+                    }
+                } else {
+                    showToast('Failed to add charity: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding charity:', error);
+                showToast('Failed to add charity. Please try again.', 'error');
+            }
         });
 
         // Update year filter

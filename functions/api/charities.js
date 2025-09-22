@@ -129,25 +129,59 @@ export async function onRequestGet(context) {
         queryParams = [user.id, limit, offset];
       }
     } else {
-      // Get all charities (existing logic)
+      // Get both system charities AND user's personal charities
       if (searchTerm) {
-        query = `
-          SELECT id, name, ein, category, website, description
-          FROM charities
-          WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
-          ORDER BY name
-          LIMIT ? OFFSET ?
-        `;
-        const searchPattern = `%${searchTerm}%`;
-        queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+        if (user) {
+          // If authenticated, include user's personal charities
+          query = `
+            SELECT id, name, ein, category, website, description, 'system' as source
+            FROM charities
+            WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
+            UNION ALL
+            SELECT id, name, ein, category, website, description, 'personal' as source
+            FROM user_charities
+            WHERE user_id = ? AND (name LIKE ? OR ein LIKE ? OR category LIKE ?)
+            ORDER BY name
+            LIMIT ? OFFSET ?
+          `;
+          const searchPattern = `%${searchTerm}%`;
+          queryParams = [searchPattern, searchPattern, searchPattern, user.id, searchPattern, searchPattern, searchPattern, limit, offset];
+        } else {
+          // Not authenticated - only show system charities
+          query = `
+            SELECT id, name, ein, category, website, description
+            FROM charities
+            WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
+            ORDER BY name
+            LIMIT ? OFFSET ?
+          `;
+          const searchPattern = `%${searchTerm}%`;
+          queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+        }
       } else {
-        query = `
-          SELECT id, name, ein, category, website, description
-          FROM charities
-          ORDER BY name
-          LIMIT ? OFFSET ?
-        `;
-        queryParams = [limit, offset];
+        if (user) {
+          // If authenticated, include user's personal charities
+          query = `
+            SELECT id, name, ein, category, website, description, 'system' as source
+            FROM charities
+            UNION ALL
+            SELECT id, name, ein, category, website, description, 'personal' as source
+            FROM user_charities
+            WHERE user_id = ?
+            ORDER BY name
+            LIMIT ? OFFSET ?
+          `;
+          queryParams = [user.id, limit, offset];
+        } else {
+          // Not authenticated - only show system charities
+          query = `
+            SELECT id, name, ein, category, website, description
+            FROM charities
+            ORDER BY name
+            LIMIT ? OFFSET ?
+          `;
+          queryParams = [limit, offset];
+        }
       }
     }
 
