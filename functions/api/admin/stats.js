@@ -35,17 +35,22 @@ export async function onRequestGet(context) {
             'SELECT COUNT(*) as count FROM charities'
         ).first();
 
-        // Get database items count - try with is_active first, fallback to without
+        // Get database items count from the items pricing table
         let itemsResult;
         try {
             itemsResult = await env.DB.prepare(
-                'SELECT COUNT(*) as count FROM donation_items WHERE is_active = 1'
+                'SELECT COUNT(*) as count FROM items'
             ).first();
         } catch (e) {
-            // Fallback if is_active column doesn't exist
-            itemsResult = await env.DB.prepare(
-                'SELECT COUNT(*) as count FROM donation_items'
-            ).first();
+            // If items table doesn't exist, count donation_items instead
+            console.log('Items table not found, counting donation_items:', e);
+            try {
+                itemsResult = await env.DB.prepare(
+                    'SELECT COUNT(*) as count FROM donation_items'
+                ).first();
+            } catch (e2) {
+                itemsResult = { count: 0 };
+            }
         }
 
         // Get monthly statistics - simplified queries
