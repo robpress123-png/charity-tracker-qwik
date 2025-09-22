@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.7.7</title>
+    <title>Dashboard - Charity Tracker v1.7.8</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -239,10 +239,12 @@
             background: #f3f4f6;
             border: 1px solid #d1d5db;
             padding: 0.25rem 0.5rem;
-            margin: 0 0.25rem;
+            margin: 0 0.125rem;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
+            display: inline-block;
+            font-size: 0.875rem;
         }
 
         .btn-action:hover {
@@ -693,13 +695,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.7.7</strong> - Bug fixes and improvements!
+        <strong>🎯 Charity Tracker v1.7.8</strong> - Enhanced UI and My Charities improvements!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.7.7</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.7.8</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -809,28 +811,41 @@
 
         <!-- Add Donation Section (hidden by default) -->
         <div id="addDonationSection" class="section-content" style="display:none;">
-            <div class="section">
-                <div class="section-header">
-                    <h2>➕ Add New Donation</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem;">
+                <!-- Left: Donation Type Selection -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2>➕ Add New Donation</h2>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <p style="margin-bottom: 1.5rem;">Select the type of donation:</p>
+                        <div style="display: grid; gap: 1rem;">
+                            <button class="btn-primary" onclick="openDonationModal('cash')">
+                                💵 Cash Donation
+                            </button>
+                            <button class="btn-primary" onclick="openDonationModal('items')">
+                                📦 Donated Items
+                            </button>
+                            <button class="btn-primary" onclick="openDonationModal('miles')">
+                                🚗 Mileage
+                            </button>
+                            <button class="btn-primary" onclick="openDonationModal('stock')">
+                                📈 Stock/Securities
+                            </button>
+                            <button class="btn-primary" onclick="openDonationModal('crypto')">
+                                ₿ Cryptocurrency
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div style="padding: 2rem; text-align: center;">
-                    <p style="margin-bottom: 2rem;">Select the type of donation you want to record:</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-                        <button class="btn-primary" onclick="openDonationModal('cash')">
-                            💵 Cash Donation
-                        </button>
-                        <button class="btn-primary" onclick="openDonationModal('items')">
-                            📦 Donated Items
-                        </button>
-                        <button class="btn-primary" onclick="openDonationModal('miles')">
-                            🚗 Mileage
-                        </button>
-                        <button class="btn-primary" onclick="openDonationModal('stock')">
-                            📈 Stock/Securities
-                        </button>
-                        <button class="btn-primary" onclick="openDonationModal('crypto')">
-                            ₿ Cryptocurrency
-                        </button>
+
+                <!-- Right: My Charities Quick Select -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2>⚡ Quick Add from My Charities</h2>
+                    </div>
+                    <div id="myCharitiesQuickAdd" style="padding: 1rem; max-height: 400px; overflow-y: auto;">
+                        <p style="text-align: center; color: #6b7280;">Loading your charities...</p>
                     </div>
                 </div>
             </div>
@@ -1184,7 +1199,7 @@
 
     <!-- Add Donation Modal -->
     <div id="donationModal" class="modal">
-        <div class="modal-content" style="max-width: 1200px; width: 95%;">
+        <div class="modal-content" style="max-width: 1400px; width: 95%;">
             <div class="modal-header">
                 <h2 id="donationModalTitle">Add Cash Donation</h2>
             </div>
@@ -1244,7 +1259,7 @@
                         <!-- Left Column: Item Entry -->
                         <div>
                             <!-- Horizontal layout for category, item, quality selection -->
-                            <div style="display: grid; grid-template-columns: 1.2fr 1.5fr 0.7fr 0.4fr auto; gap: 0.5rem; align-items: end; margin-bottom: 1rem;">
+                            <div style="display: grid; grid-template-columns: 1.8fr 2.2fr 1.2fr 0.6fr auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem;">
                         <!-- Category Dropdown -->
                         <div>
                             <label style="font-size:0.75rem;font-weight:600;color:#374151;">Category</label>
@@ -1816,7 +1831,12 @@
 
         // Load charities for quick add in donation modal
         async function loadMyCharitiesQuickAdd() {
-            const container = document.getElementById('myCharitiesQuickList');
+            // Can be called for either the modal or the Add Donation page
+            const containerModal = document.getElementById('myCharitiesQuickList');
+            const containerPage = document.getElementById('myCharitiesQuickAdd');
+            const container = containerModal || containerPage;
+
+            if (!container) return;
             const year = document.getElementById('globalYearFilter')?.value || '2025';
 
             try {
@@ -1860,6 +1880,10 @@
                     const charities = Array.from(charitiesMap.values())
                         .sort((a, b) => a.name.localeCompare(b.name));
 
+                    // Check if we're in the modal or the page
+                    const isModal = container.id === 'myCharitiesQuickList';
+                    const onClickFunc = isModal ? 'quickSelectCharity' : 'quickAddDonation';
+
                     let html = '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
                     charities.forEach(charity => {
                         const personalBadge = charity.source === 'personal'
@@ -1870,7 +1894,7 @@
                             <div style="padding: 0.75rem; background: #f9fafb; border-radius: 6px; cursor: pointer; transition: background 0.2s;"
                                  onmouseover="this.style.background='#f3f4f6'"
                                  onmouseout="this.style.background='#f9fafb'"
-                                 onclick="quickSelectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">
+                                 onclick="${onClickFunc}('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">
                                 <div style="font-weight: 500; color: #111827;">${charity.name}${personalBadge}</div>
                                 <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
                                     ${charity.count} donation${charity.count !== 1 ? 's' : ''} · $${formatCurrency(charity.total, true)}
@@ -2245,6 +2269,69 @@
             dropdown.style.display = 'none';
             selectedCharityIndex = -1;
             console.log('Selected charity:', name, 'ID:', id);
+        }
+
+        // Quick add donation from My Charities
+        function quickAddDonation(charityId, charityName) {
+            // Store the selected charity
+            document.getElementById('selectedCharityId').value = charityId;
+            document.getElementById('donationCharity').value = charityName;
+
+            // Show a quick donation type selector
+            const donationTypes = [
+                { type: 'cash', label: '💵 Cash', desc: 'Cash/Check' },
+                { type: 'items', label: '📦 Items', desc: 'Donated Items' },
+                { type: 'miles', label: '🚗 Miles', desc: 'Mileage' },
+                { type: 'stock', label: '📈 Stock', desc: 'Securities' },
+                { type: 'crypto', label: '₿ Crypto', desc: 'Cryptocurrency' }
+            ];
+
+            let html = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 10001; max-width: 400px;">
+                    <h3 style="margin-bottom: 1rem; color: #333;">Quick Donation to ${charityName}</h3>
+                    <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Select donation type:</p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+            `;
+
+            donationTypes.forEach(dt => {
+                html += `
+                    <button onclick="quickSelectType('${dt.type}', '${charityId}', '${charityName.replace(/'/g, "\\\\'")}')"
+                            style="padding: 0.75rem; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center;"
+                            onmouseover="this.style.background='#e5e7eb'"
+                            onmouseout="this.style.background='#f3f4f6'">
+                        <div style="font-size: 1.5rem;">${dt.label.split(' ')[0]}</div>
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 0.25rem;">${dt.desc}</div>
+                    </button>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <button onclick="document.getElementById('quickDonationSelector').remove()"
+                            style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; width: 100%;">
+                        Cancel
+                    </button>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000;" onclick="document.getElementById('quickDonationSelector').remove()"></div>
+            `;
+
+            const selector = document.createElement('div');
+            selector.id = 'quickDonationSelector';
+            selector.innerHTML = html;
+            document.body.appendChild(selector);
+        }
+
+        function quickSelectType(type, charityId, charityName) {
+            // Remove the selector
+            const selector = document.getElementById('quickDonationSelector');
+            if (selector) selector.remove();
+
+            // Set the charity
+            document.getElementById('selectedCharityId').value = charityId;
+            document.getElementById('donationCharity').value = charityName;
+
+            // Open the donation modal with the selected type
+            openDonationModal(type);
         }
 
         function showAddCharityFromSearch(searchQuery) {
@@ -2668,7 +2755,7 @@
                                 <td>${typeDisplay}</td>
                                 <td>$${formatCurrency(donation.amount, true)}</td>
                                 <td>${displayNotes}</td>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <button class="btn-action" onclick="editDonation('${donation.id}')" title="Edit">✏️</button>
                                     <button class="btn-action" onclick="addReceipt('${donation.id}')" title="Add Receipt">📎</button>
                                     <button class="btn-action btn-danger" onclick="deleteDonation('${donation.id}')" title="Delete">🗑️</button>
@@ -2831,11 +2918,17 @@
                         html += `
                             <div class="charity-card enhanced">
                                 <div class="charity-header">
-                                    <h3 class="charity-name">${charity.name}${personalBadge}</h3>
+                                    <h3 class="charity-name">
+                                        ${charity.name}
+                                        ${charity.category ? `<span style="background: #3b82f6; color: white; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.7rem; margin-left: 0.5rem; font-weight: normal;">${charity.category}</span>` : ''}
+                                        ${personalBadge}
+                                    </h3>
                                 </div>
 
-                                ${charity.ein ? `<p class="charity-ein"><strong>EIN:</strong> ${charity.ein}</p>` : ''}
-                                ${charity.category ? `<p class="charity-category"><strong>Category:</strong> ${charity.category}</p>` : ''}
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.75rem 0;">
+                                    ${charity.ein ? `<p class="charity-ein" style="margin: 0; font-size: 0.875rem;"><strong>EIN:</strong> ${charity.ein}</p>` : '<span></span>'}
+                                    <button class="btn-primary" style="padding: 0.375rem 0.75rem; font-size: 0.8rem;" onclick="quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">+ Quick Donation</button>
+                                </div>
 
                                 <div class="charity-stats">
                                     <div class="stat-item">
@@ -2851,10 +2944,6 @@
                                         <span class="stat-label">Last Donation:</span>
                                         <span class="stat-value">${lastDonationDate}</span>
                                     </div>` : ''}
-                                </div>
-
-                                <div class="charity-actions" style="display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: flex-end;">
-                                    <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="openDonationModal('cash'); selectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">Add Donation</button>
                                 </div>
                             </div>
                         `;
@@ -3021,7 +3110,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.7.7</p>
+                            <p>Generated by Charity Tracker v1.7.8</p>
                         </div>
                     </body>
                     </html>
@@ -4406,6 +4495,11 @@
                 const navItem = document.querySelector(`.nav-item[onclick*="${sectionName}"]`);
                 if (navItem) {
                     navItem.classList.add('active');
+                }
+
+                // Load My Charities when showing Add Donation section
+                if (sectionId === 'addDonationSection') {
+                    loadMyCharitiesQuickAdd();
                 }
             }
 
