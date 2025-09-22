@@ -916,16 +916,26 @@
                 </div>
                 <div class="form-group">
                     <label for="donationCharity">Charity *</label>
-                    <div class="autocomplete-wrapper">
-                        <input type="text"
-                               id="donationCharity"
-                               class="autocomplete-input"
-                               placeholder="Start typing to search charities..."
-                               required
-                               autocomplete="off">
-                        <input type="hidden" id="selectedCharityId">
-                        <div id="charityDropdown" class="autocomplete-dropdown"></div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                        <div class="autocomplete-wrapper" style="flex: 1;">
+                            <input type="text"
+                                   id="donationCharity"
+                                   class="autocomplete-input"
+                                   placeholder="Start typing to search charities..."
+                                   required
+                                   autocomplete="off">
+                            <input type="hidden" id="selectedCharityId">
+                            <div id="charityDropdown" class="autocomplete-dropdown"></div>
+                        </div>
+                        <button type="button"
+                                onclick="verifyCharity()"
+                                class="btn btn-secondary"
+                                style="padding: 0.5rem 1rem; white-space: nowrap;"
+                                title="Verify if this charity is IRS-approved">
+                            🔍 Verify
+                        </button>
                     </div>
+                    <div id="charityVerificationResult" style="margin-top: 0.5rem; display: none;"></div>
                 </div>
                 <!-- Cash donation fields -->
                 <div id="cashFields" class="donation-type-fields">
@@ -1941,7 +1951,7 @@
 
                     // Update display with proper formatting
                     document.getElementById('totalDonations').textContent = `$${formatCurrency(totalAmount)}`;
-                    document.getElementById('donationCount').textContent = data.donations.length.toString();
+                    document.getElementById('donationCount').textContent = (data.total || data.donations.length).toString();
                     document.getElementById('charityCount').textContent = uniqueCharities.toString();
                     document.getElementById('taxSavings').textContent = `$${formatCurrency(estimatedSavings)}`;
                 } else {
@@ -3850,15 +3860,60 @@
                 });
             }
 
-            // Reload donations with filter applied
-            loadDonations();
+            // Display filtered donations
+            displayFilteredDonations(filtered);
         }
 
-        // Helper function to display donations
-        function displayDonations(donations) {
-            // For now, just reload the main donations view
-            // In the future, this could update just the table content
-            loadDonations();
+        // Helper function to display filtered donations
+        function displayFilteredDonations(donations) {
+            const container = document.getElementById('donationsContent');
+
+            if (!donations || donations.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>No donations found matching your search criteria.</p></div>';
+                return;
+            }
+
+            let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
+            donations.forEach(donation => {
+                // Parse date correctly to avoid timezone issues
+                const dateStr = donation.date || donation.donation_date;
+                let date;
+                if (dateStr) {
+                    if (dateStr.includes('-')) {
+                        const [year, month, day] = dateStr.split('-');
+                        date = `${month}/${day}/${year}`;
+                    } else {
+                        date = new Date(dateStr).toLocaleDateString();
+                    }
+                }
+
+                const donationType = donation.donation_type || 'cash';
+                const typeIcon = {
+                    cash: '💵',
+                    items: '📦',
+                    miles: '🚗',
+                    stock: '📈',
+                    crypto: '🪙'
+                }[donationType] || '💰';
+
+                html += `
+                    <tr>
+                        <td>${date || 'N/A'}</td>
+                        <td>${donation.charity_name || 'Unknown'}</td>
+                        <td><span title="${donationType}">${typeIcon}</span></td>
+                        <td>$${formatCurrency(donation.amount, true)}</td>
+                        <td>${donation.notes || '-'}</td>
+                        <td>
+                            <button onclick="viewDonationDetails('${donation.id}')" class="small-btn" title="View Details">👁️</button>
+                            <button onclick="editDonation('${donation.id}')" class="small-btn" title="Edit">✏️</button>
+                            <button onclick="deleteDonation('${donation.id}')" class="small-btn danger" title="Delete">🗑️</button>
+                            <button onclick="addReceipt('${donation.id}')" class="small-btn" title="Add Receipt">📎</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
         }
 
         // Function to add receipt to donation
@@ -4187,6 +4242,115 @@
                 const dropdown = document.getElementById('charityDropdown');
                 if (dropdown) dropdown.style.display = 'none';
             }
+        }
+
+        // Verify charity function
+        async function verifyCharity() {
+            const charityName = document.getElementById('donationCharity').value.trim();
+            const resultDiv = document.getElementById('charityVerificationResult');
+
+            if (!charityName) {
+                showToast('Please enter a charity name to verify', 'warning');
+                return;
+            }
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">🔍 Verifying charity...</div>';
+
+            try {
+                const response = await fetch(`/api/charities/verify?name=${encodeURIComponent(charityName)}`);
+                const data = await response.json();
+
+                if (data.success && data.verification) {
+                    const verification = data.verification;
+
+                    if (verification.isVerified) {
+                        // Charity is verified
+                        resultDiv.innerHTML = `
+                            <div style="padding: 0.75rem; background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; color: #065f46;">
+                                <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                    <span style="font-size: 1.25rem;">✅</span>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Verified 501(c)(3) Organization</div>
+                                        <div style="font-size: 0.875rem;">
+                                            <strong>${verification.charity.name}</strong><br>
+                                            EIN: ${verification.charity.ein}<br>
+                                            Category: ${verification.charity.category || 'Not specified'}<br>
+                                            ${verification.charity.city && verification.charity.state ? `Location: ${verification.charity.city}, ${verification.charity.state}` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Auto-select the verified charity
+                        document.getElementById('selectedCharityId').value = verification.charity.id;
+                        document.getElementById('donationCharity').value = verification.charity.name;
+
+                    } else if (verification.suggestions && verification.suggestions.length > 0) {
+                        // Show suggestions
+                        let suggestionsHtml = verification.suggestions.map(s => `
+                            <div style="padding: 0.5rem; background: white; border: 1px solid #e5e7eb; border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer;"
+                                 onclick="selectSuggestedCharity('${s.id}', '${s.name.replace(/'/g, "\\'")}')">
+                                <strong>${s.name}</strong><br>
+                                <span style="font-size: 0.875rem; color: #6b7280;">
+                                    EIN: ${s.ein} | ${s.category || 'Category not specified'} | ${s.location}
+                                </span>
+                            </div>
+                        `).join('');
+
+                        resultDiv.innerHTML = `
+                            <div style="padding: 0.75rem; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; color: #92400e;">
+                                    ⚠️ No exact match found
+                                </div>
+                                <div style="font-size: 0.875rem; color: #78350f; margin-bottom: 0.5rem;">
+                                    ${verification.message}
+                                </div>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                                    ${suggestionsHtml}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Not found
+                        resultDiv.innerHTML = `
+                            <div style="padding: 0.75rem; background: #fee2e2; border: 1px solid #ef4444; border-radius: 6px; color: #991b1b;">
+                                <div style="display: flex; align-items: start; gap: 0.5rem;">
+                                    <span style="font-size: 1.25rem;">❌</span>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; margin-bottom: 0.25rem;">Not Found in IRS Database</div>
+                                        <div style="font-size: 0.875rem;">
+                                            ${verification.message}<br><br>
+                                            <strong>Tips:</strong>
+                                            <ul style="margin: 0.25rem 0 0 1rem; padding: 0;">
+                                                <li>Check the spelling of the charity name</li>
+                                                <li>Try searching with the EIN if you have it</li>
+                                                <li>The charity may be new or use a different legal name</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                resultDiv.innerHTML = `
+                    <div style="padding: 0.75rem; background: #fee2e2; border: 1px solid #ef4444; border-radius: 6px; color: #991b1b;">
+                        ❌ Error verifying charity. Please try again.
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to select a suggested charity
+        function selectSuggestedCharity(id, name) {
+            document.getElementById('selectedCharityId').value = id;
+            document.getElementById('donationCharity').value = name;
+            document.getElementById('charityVerificationResult').style.display = 'none';
+            showToast('Charity selected: ' + name, 'success');
         }
 
         // Toast notification function

@@ -54,13 +54,15 @@ export async function onRequestGet(context) {
         let newCharitiesMonth = { count: 0 };
 
         try {
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+            // Get donations from the current month
+            const now = new Date();
+            const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+            const currentYear = now.getFullYear();
+            const monthPattern = `${currentYear}-${currentMonth}-%`;
 
             monthlyDonations = await env.DB.prepare(
-                'SELECT COUNT(*) as count, SUM(amount) as total FROM donations WHERE donation_date >= ?'
-            ).bind(thirtyDaysAgoStr).first();
+                'SELECT COUNT(*) as count, SUM(amount) as total FROM donations WHERE date LIKE ?'
+            ).bind(monthPattern).first();
         } catch (e) {
             console.log('Monthly donations query failed:', e);
         }
@@ -88,11 +90,11 @@ export async function onRequestGet(context) {
         try {
             const yearlyResult = await env.DB.prepare(`
                 SELECT
-                    strftime('%Y', donation_date) as year,
+                    strftime('%Y', date) as year,
                     COUNT(*) as count,
                     SUM(amount) as total
                 FROM donations
-                GROUP BY strftime('%Y', donation_date)
+                GROUP BY strftime('%Y', date)
                 ORDER BY year DESC
                 LIMIT 10
             `).all();
