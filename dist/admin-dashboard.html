@@ -1360,7 +1360,7 @@
             document.getElementById('charitiesImportResults').classList.add('active');
 
             // Auto-batching import to handle large datasets
-            const BATCH_SIZE = 400; // Safe under D1's 500 operation limit
+            const BATCH_SIZE = 200; // Reduced to avoid Cloudflare 10-second CPU limit
             let currentIndex = 0;
             const totalCharities = charitiesImportData.length;
 
@@ -1444,7 +1444,15 @@
                 } catch (error) {
                     console.error('Batch import error:', error);
                     totalResults.errors.push(`Batch ${Math.ceil(currentIndex / BATCH_SIZE)}: ${error.message}`);
-                    break;
+
+                    // Try to continue with next batch instead of stopping
+                    totalResults.failed += Math.min(BATCH_SIZE, totalCharities - currentIndex);
+                    currentIndex += BATCH_SIZE;
+
+                    // Add longer delay after error
+                    if (currentIndex < totalCharities) {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
                 }
             }
 

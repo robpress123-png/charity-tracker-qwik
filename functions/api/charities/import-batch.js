@@ -47,7 +47,7 @@ export async function onRequestPost(context) {
         }
 
         const body = await request.json();
-        const { charities, startIndex = 0, batchSize = 400 } = body;
+        const { charities, startIndex = 0, batchSize = 200 } = body;
 
         if (!charities || !Array.isArray(charities)) {
             return new Response(JSON.stringify({
@@ -102,15 +102,8 @@ export async function onRequestPost(context) {
                 // Clean EIN
                 const cleanEIN = charity.ein.replace(/[^0-9]/g, '').padStart(9, '0');
 
-                // Check for existing charity by EIN
-                const existing = await env.DB.prepare(
-                    'SELECT id FROM charities WHERE ein = ?'
-                ).bind(cleanEIN).first();
-
-                if (existing) {
-                    results.skipped++;
-                    continue;
-                }
+                // Skip duplicate check for speed - rely on UNIQUE constraint
+                // This saves ~200 DB queries per batch
 
                 // Add new charity (no user_id needed!)
                 const charityId = generateId();
