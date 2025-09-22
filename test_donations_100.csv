@@ -1,0 +1,101 @@
+charity_name,donation_date,donation_type,amount,item_description,estimated_value,miles_driven,stock_symbol,shares,crypto_symbol,crypto_amount,notes
+Salvation Army,2024-01-12,cash,1500,,,,,,,,Emergency relief fund
+UNICEF USA,2024-01-13,crypto,250,,,,,,BTC,0.00625,Donated 0.00625 BTC
+Habitat for Humanity,2024-01-15,stock,416,,,,V,1,,,Donated 1 shares of V at $416/share
+United Way,2024-01-17,cash,1000,,,,,,,,Annual contribution
+United Way,2024-01-18,cash,250,,,,,,,,
+Wounded Warrior Project,2024-02-07,items,1501,Tools donation - 4 item(s),1501,,,,,,"Donated items: Garden tools ($356), Workbench ($246), Tool set ($411), Lawn mower ($488)"
+American Red Cross,2024-02-07,cash,50,,,,,,,,Monthly donation
+Make-A-Wish Foundation,2024-02-09,items,1101,Kitchen Items donation - 5 item(s),1101,,,,,,"Donated items: Dinnerware set ($379), Dinnerware set ($323), Dinnerware set ($104), Pots and pans ($61), Coffee maker ($234)"
+World Wildlife Fund,2024-02-09,crypto,5000,,,,,,SOL,27.74,Donated 27.74 SOL
+St. Jude Children's Research Hospital,2024-02-15,cash,300,,,,,,,,In memory of loved one
+American Cancer Society,2024-02-17,cash,25,,,,,,,,Holiday donation
+Boys & Girls Clubs of America,2024-02-23,cash,100,,,,,,,,Annual contribution
+St. Jude Children's Research Hospital,2024-02-27,cash,25,,,,,,,,In memory of loved one
+Wounded Warrior Project,2024-03-05,cash,1500,,,,,,,,General support
+American Cancer Society,2024-03-14,miles,4.2,,,30,,,,,Volunteer driving - delivering meals
+United Way,2024-03-15,items,1205,Kitchen Items donation - 3 item(s),1205,,,,,,"Donated items: Utensils ($391), Utensils ($428), Blender ($386)"
+United Way,2024-03-15,miles,5.6,,,40,,,,,Transportation for charity event
+Doctors Without Borders,2024-03-23,cash,100,,,,,,,,Annual contribution
+Special Olympics,2024-03-30,cash,1000,,,,,,,,Year-end giving
+Feeding America,2024-03-31,items,161,Sports Equipment donation - 2 item(s),161,,,,,,"Donated items: Tennis racket ($108), Bicycle ($53)"
+Habitat for Humanity,2024-04-14,cash,2500,,,,,,,,Monthly donation
+Habitat for Humanity,2024-04-16,stock,1800,,,,TSLA,5,,,Donated 5 shares of TSLA at $360/share
+American Cancer Society,2024-04-24,stock,3030,,,,AAPL,15,,,Donated 15 shares of AAPL at $202/share
+Special Olympics,2024-04-28,items,676,Jewelry donation - 4 item(s),676,,,,,,"Donated items: Ring ($40), Watch ($230), Earrings ($277), Watch ($129)"
+St. Jude Children's Research Hospital,2024-04-29,items,579,Sports Equipment donation - 3 item(s),579,,,,,,"Donated items: Yoga mat ($97), Yoga mat ($204), Tennis racket ($278)"
+Special Olympics,2024-05-06,miles,2.1,,,15,,,,,Charity fundraiser transportation
+United Way,2024-05-30,miles,4.2,,,30,,,,,
+American Red Cross,2024-06-08,stock,1130,,,,META,5,,,Donated 5 shares of META at $226/share
+Feeding America,2024-06-16,miles,2.1,,,15,,,,,Driving to volunteer location
+United Way,2024-06-24,cash,5000,,,,,,,,General support
+American Red Cross,2024-06-27,cash,300,,,,,,,,Emergency relief fund
+UNICEF USA,2024-07-01,cash,100,,,,,,,,Holiday donation
+Doctors Without Borders,2024-07-08,miles,3.5,,,25,,,,,Transportation for charity event
+Doctors Without Borders,2024-07-30,cash,400,,,,,,,,Monthly donation
+World Wildlife Fund,2024-08-09,cash,150,,,,,,,,Holiday donation
+UNICEF USA,2024-09-08,items,981,Electronics donation - 4 item(s),981,,,,,,"Donated items: Smartphone ($264), Laptop ($267), Gaming console ($185), TV ($265)"
+St. Jude Children's Research Hospital,2024-09-09,cash,2000,,,,,,,,Matching gift from employer
+World Wildlife Fund,2024-09-10,items,1423,Office Supplies donation - 5 item(s),1423,,,,,,"Donated items: Desk lamp ($130), Office supplies lot ($446), Filing cabinet ($348), Chair ($336), Printer ($163)"
+Special Olympics,2024-09-19,stock,212,,,,GOOGL,1,,,Donated 1 shares of GOOGL at $212/share
+Wounded Warrior Project,2024-09-29,items,1169,Books donation - 4 item(s),1169,,,,,,"Donated items: Children's books ($379), Cookbooks ($410), Cookbooks ($236), Children's books ($144)"
+Boys & Girls Clubs of America,2024-10-09,miles,1.4,,,10,,,,,
+Nature Conservancy,2024-10-10,cash,250,,,,,,,,In memory of loved one
+UNICEF USA,2024-10-17,cash,50,,,,,,,,
+Special Olympics,2024-10-26,cash,1500,,,,,,,,Monthly donation
+Habitat for Humanity,2024-10-28,cash,1500,,,,,,,,Annual contribution
+American Cancer Society,2024-10-30,miles,2.8,,,20,,,,,Volunteer driving - delivering meals
+St. Jude Children's Research Hospital,2024-11-01,cash,750,,,,,,,,Birthday donation
+St. Jude Children's Research Hospital,2024-11-05,miles,7.0,,,50,,,,,Volunteer driving - delivering meals
+American Cancer Society,2024-11-22,cash,5000,,,,,,,,Annual contribution
+United Way,2024-11-29,items,620,Electronics donation - 3 item(s),620,,,,,,"Donated items: Gaming console ($297), Tablet ($184), Laptop ($139)"
+Feeding America,2024-12-02,cash,150,,,,,,,,Annual contribution
+St. Jude Children's Research Hospital,2024-12-07,cash,100,,,,,,,,Monthly donation
+World Wildlife Fund,2024-12-10,cash,5000,,,,,,,,Emergency relief fund
+Habitat for Humanity,2024-12-13,cash,100,,,,,,,,Annual contribution
+Boys & Girls Clubs of America,2024-12-22,cash,1000,,,,,,,,In memory of loved one
+Make-A-Wish Foundation,2024-12-27,cash,5000,,,,,,,,In memory of loved one
+Make-A-Wish Foundation,2025-01-04,cash,1000,,,,,,,,Emergency relief fund
+American Red Cross,2025-01-09,items,1174,Electronics donation - 4 item(s),1174,,,,,,"Donated items: TV ($301), Tablet ($239), Camera ($361), Camera ($273)"
+Doctors Without Borders,2025-02-03,items,1301,Sports Equipment donation - 4 item(s),1301,,,,,,"Donated items: Golf clubs ($274), Golf clubs ($222), Yoga mat ($476), Yoga mat ($329)"
+UNICEF USA,2025-02-10,cash,300,,,,,,,,Annual contribution
+Boys & Girls Clubs of America,2025-02-10,cash,500,,,,,,,,Birthday donation
+United Way,2025-02-14,stock,570,,,,GOOGL,10,,,Donated 10 shares of GOOGL at $57/share
+Habitat for Humanity,2025-02-15,items,377,Tools donation - 4 item(s),377,,,,,,"Donated items: Tool set ($145), Lawn mower ($135), Power drill ($74), Power drill ($23)"
+Doctors Without Borders,2025-02-17,cash,2000,,,,,,,,In memory of loved one
+Wounded Warrior Project,2025-03-10,crypto,100,,,,,,MATIC,787.23,Donated 787.23 MATIC
+Feeding America,2025-03-15,cash,200,,,,,,,,Matching gift from employer
+American Cancer Society,2025-03-26,cash,50,,,,,,,,Monthly donation
+World Wildlife Fund,2025-03-27,cash,25,,,,,,,,In memory of loved one
+Habitat for Humanity,2025-03-29,cash,1000,,,,,,,,General support
+UNICEF USA,2025-04-06,cash,300,,,,,,,,Birthday donation
+Wounded Warrior Project,2025-04-20,miles,5.6,,,40,,,,,Moving donated goods
+Doctors Without Borders,2025-05-05,stock,434,,,,WMT,1,,,Donated 1 shares of WMT at $434/share
+American Red Cross,2025-05-06,cash,100,,,,,,,,General support
+Nature Conservancy,2025-05-23,items,835,Tools donation - 3 item(s),835,,,,,,"Donated items: Lawn mower ($261), Lawn mower ($348), Tool set ($226)"
+Feeding America,2025-05-24,crypto,1000,,,,,,DOT,225.0,Donated 225.0 DOT
+Nature Conservancy,2025-06-05,cash,750,,,,,,,,Emergency relief fund
+American Cancer Society,2025-06-13,cash,750,,,,,,,,Matching gift from employer
+Habitat for Humanity,2025-06-18,miles,28.0,,,200,,,,,Transportation for charity event
+Feeding America,2025-06-20,items,584,Office Supplies donation - 2 item(s),584,,,,,,"Donated items: Chair ($407), Desk lamp ($177)"
+Boys & Girls Clubs of America,2025-06-24,cash,300,,,,,,,,Monthly donation
+Habitat for Humanity,2025-07-01,cash,100,,,,,,,,Holiday donation
+American Red Cross,2025-07-06,miles,28.0,,,200,,,,,Charity fundraiser transportation
+World Wildlife Fund,2025-07-15,cash,2000,,,,,,,,Holiday donation
+Make-A-Wish Foundation,2025-07-18,items,408,Kitchen Items donation - 1 item(s),408,,,,,,Donated items: Dinnerware set ($408)
+Wounded Warrior Project,2025-08-02,items,1029,Tools donation - 5 item(s),1029,,,,,,"Donated items: Garden tools ($263), Power drill ($13), Workbench ($226), Tool set ($395), Garden tools ($132)"
+Doctors Without Borders,2025-08-16,miles,7.0,,,50,,,,,
+Salvation Army,2025-08-19,cash,250,,,,,,,,Annual contribution
+World Wildlife Fund,2025-09-11,cash,2000,,,,,,,,In memory of loved one
+American Red Cross,2025-09-22,cash,400,,,,,,,,Emergency relief fund
+Boys & Girls Clubs of America,2025-10-04,crypto,500,,,,,,ADA,498.26,Donated 498.26 ADA
+Habitat for Humanity,2025-10-11,miles,4.2,,,30,,,,,Transportation for charity event
+Feeding America,2025-10-19,cash,500,,,,,,,,Monthly donation
+Make-A-Wish Foundation,2025-10-31,items,1156,Sports Equipment donation - 5 item(s),1156,,,,,,"Donated items: Tennis racket ($254), Tennis racket ($466), Exercise weights ($302), Exercise weights ($38), Yoga mat ($96)"
+Doctors Without Borders,2025-11-03,stock,7200,,,,JPM,20,,,Donated 20 shares of JPM at $360/share
+Habitat for Humanity,2025-11-16,cash,750,,,,,,,,General support
+American Cancer Society,2025-11-26,miles,4.2,,,30,,,,,Moving donated goods
+UNICEF USA,2025-12-04,items,1237,Sports Equipment donation - 4 item(s),1237,,,,,,"Donated items: Golf clubs ($148), Yoga mat ($354), Exercise weights ($490), Yoga mat ($245)"
+Doctors Without Borders,2025-12-09,items,909,Books donation - 3 item(s),909,,,,,,"Donated items: Children's books ($316), Art books ($328), Textbooks ($265)"
+Special Olympics,2025-12-18,stock,6325,,,,GOOGL,25,,,Donated 25 shares of GOOGL at $253/share
+Boys & Girls Clubs of America,2025-12-20,stock,22150,,,,META,50,,,Donated 50 shares of META at $443/share
