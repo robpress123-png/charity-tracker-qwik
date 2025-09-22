@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.7.9</title>
+    <title>Dashboard - Charity Tracker v1.8.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -695,13 +695,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.7.9</strong> - Quick Donation fixed with charity pre-population!
+        <strong>🎯 Charity Tracker v1.8.0</strong> - Enhanced donation management with dropdown actions!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.7.9</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.8.0</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1495,7 +1495,7 @@
                 </div>
                         <div class="modal-footer">
                             <button type="button" class="btn-secondary" onclick="closeDonationModal()">Cancel</button>
-                            <button type="submit" class="btn-primary">Add Donation</button>
+                            <button type="submit" class="btn-primary" id="donationSubmitBtn">Add Donation</button>
                         </div>
                     </form>
             </div>
@@ -1920,6 +1920,9 @@
             document.getElementById('donationForm').reset();
             document.getElementById('selectedCharityId').value = '';
             document.getElementById('charityDropdown').classList.remove('show');
+            // Clear edit mode
+            window.editingDonationId = null;
+            window.isEditing = false;
             // Reset item selection
             selectedDonationItems = [];
             updateSelectedItemsDisplay();
@@ -2723,10 +2726,17 @@
                                 <td>${typeDisplay}</td>
                                 <td>$${formatCurrency(donation.amount, true)}</td>
                                 <td>${displayNotes}</td>
-                                <td style="white-space: nowrap;">
-                                    <button class="btn-action" onclick="editDonation('${donation.id}')" title="Edit">✏️</button>
-                                    <button class="btn-action" onclick="addReceipt('${donation.id}')" title="Add Receipt">📎</button>
-                                    <button class="btn-action btn-danger" onclick="deleteDonation('${donation.id}')" title="Delete">🗑️</button>
+                                <td style="white-space: nowrap; position: relative;">
+                                    <div class="dropdown" style="display: inline-block;">
+                                        <button class="btn-action" onclick="toggleActionMenu(event, '${donation.id}')" title="Actions">⋮</button>
+                                        <div id="actionMenu-${donation.id}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100; min-width: 150px;">
+                                            <button onclick="viewDonationDetails('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; hover: background: #f3f4f6;">👁️ View Details</button>
+                                            <button onclick="editDonation('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">✏️ Edit</button>
+                                            <button onclick="addReceipt('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">📎 Add Receipt</button>
+                                            <hr style="margin: 0; border: none; border-top: 1px solid #e5e7eb;">
+                                            <button onclick="deleteDonation('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; color: #ef4444;">🗑️ Delete</button>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         `;
@@ -3078,7 +3088,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.7.9</p>
+                            <p>Generated by Charity Tracker v1.8.0</p>
                         </div>
                     </body>
                     </html>
@@ -4218,25 +4228,22 @@
                     window.editingDonationId = donationId;
                     window.isEditing = true;
 
-                    // Open the donation modal for editing
-                    showAddDonation();
+                    // Open the donation modal with the correct type and pre-filled charity
+                    const donationType = donation.donation_type || 'cash';
+                    const charityId = donation.charity_id || donation.user_charity_id || '';
+                    const charityName = donation.charity_name || '';
 
-                    // Wait for the section to be visible
+                    // Open modal with pre-filled data
+                    openDonationModal(donationType, charityId, charityName);
+
+                    // Wait for the modal to be ready
                     setTimeout(() => {
-                        // Populate the form with existing data
-                        const charityInput = document.getElementById('donationCharity');
-                        const selectedCharityId = document.getElementById('selectedCharityId');
-                        const donationType = document.getElementById('donationType');
+                        // Populate the date field
                         const donationDate = document.getElementById('donationDate');
-                        const donationNotes = document.getElementById('donationNotes');
-
-                        if (selectedCharityId) selectedCharityId.value = donation.charity_id || '';
-                        if (charityInput) charityInput.value = donation.charity_name || donation.charity?.name || '';
-                        if (donationType) {
-                            donationType.value = donation.donation_type || 'cash';
-                            updateDonationType(donation.donation_type || 'cash');
-                        }
                         if (donationDate) donationDate.value = donation.date || donation.donation_date || '';
+
+                        // Populate the notes field
+                        const donationNotes = document.getElementById('donationNotes');
                         if (donationNotes) {
                             // Parse notes if it's a JSON string
                             let notes = donation.notes;
@@ -4418,6 +4425,13 @@
             document.getElementById('donationType').value = type;
 
             updateDonationFields();
+
+            // Update submit button text based on edit mode
+            const submitBtn = document.getElementById('donationSubmitBtn');
+            if (submitBtn) {
+                submitBtn.textContent = window.editingDonationId ? 'Update Donation' : 'Add Donation';
+            }
+
             showAddDonation();
         }
 
@@ -4990,11 +5004,17 @@
                         <td><span title="${donationType}">${typeIcon}</span></td>
                         <td>$${formatCurrency(donation.amount, true)}</td>
                         <td>${parseNotesDisplay(donation.notes) || '-'}</td>
-                        <td>
-                            <button onclick="viewDonationDetails('${donation.id}')" class="small-btn" title="View Details">👁️</button>
-                            <button onclick="editDonation('${donation.id}')" class="small-btn" title="Edit">✏️</button>
-                            <button onclick="deleteDonation('${donation.id}')" class="small-btn danger" title="Delete">🗑️</button>
-                            <button onclick="addReceipt('${donation.id}')" class="small-btn" title="Add Receipt">📎</button>
+                        <td style="position: relative;">
+                            <div class="dropdown" style="display: inline-block;">
+                                <button class="small-btn" onclick="toggleActionMenu(event, '${donation.id}')" title="Actions">⋮</button>
+                                <div id="actionMenu-${donation.id}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100; min-width: 150px;">
+                                    <button onclick="viewDonationDetails('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">👁️ View Details</button>
+                                    <button onclick="editDonation('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">✏️ Edit</button>
+                                    <button onclick="addReceipt('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer;">📎 Add Receipt</button>
+                                    <hr style="margin: 0; border: none; border-top: 1px solid #e5e7eb;">
+                                    <button onclick="deleteDonation('${donation.id}')" style="display: block; width: 100%; text-align: left; padding: 0.5rem 1rem; border: none; background: none; cursor: pointer; color: #ef4444;">🗑️ Delete</button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -5060,6 +5080,95 @@
         }
 
         // Function to add receipt to donation
+        // Toggle action dropdown menu
+        function toggleActionMenu(event, donationId) {
+            event.stopPropagation();
+            const menu = document.getElementById(`actionMenu-${donationId}`);
+
+            // Close all other menus
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+
+            // Toggle this menu
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.style.display = 'none';
+            });
+        });
+
+        // View donation details
+        async function viewDonationDetails(donationId) {
+            const donations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
+            const donation = donations.find(d => d.id === donationId);
+
+            if (!donation) {
+                alert('Donation details not found');
+                return;
+            }
+
+            // Parse the donation type and notes
+            let details = `
+                <strong>Date:</strong> ${donation.date || donation.donation_date}<br>
+                <strong>Charity:</strong> ${donation.charity_name}<br>
+                <strong>Type:</strong> ${donation.donation_type}<br>
+                <strong>Amount:</strong> $${formatCurrency(donation.amount, true)}<br>
+            `;
+
+            // Add type-specific details
+            if (donation.donation_type === 'items' && donation.notes) {
+                try {
+                    const notesData = JSON.parse(donation.notes);
+                    if (notesData.items && notesData.items.length > 0) {
+                        details += '<br><strong>Items Donated:</strong><ul>';
+                        notesData.items.forEach(item => {
+                            details += `<li>${item.quantity}x ${item.name} (${item.condition}) - $${item.value}</li>`;
+                        });
+                        details += '</ul>';
+                    }
+                    if (notesData.notes) {
+                        details += `<strong>Notes:</strong> ${notesData.notes}<br>`;
+                    }
+                } catch (e) {
+                    if (donation.notes) {
+                        details += `<strong>Notes:</strong> ${donation.notes}<br>`;
+                    }
+                }
+            } else if (donation.donation_type === 'stock') {
+                if (donation.stock_symbol) details += `<strong>Stock Symbol:</strong> ${donation.stock_symbol}<br>`;
+                if (donation.stock_quantity) details += `<strong>Shares:</strong> ${donation.stock_quantity}<br>`;
+            } else if (donation.donation_type === 'crypto') {
+                if (donation.crypto_symbol) details += `<strong>Crypto:</strong> ${donation.crypto_symbol}<br>`;
+                if (donation.crypto_quantity) details += `<strong>Amount:</strong> ${donation.crypto_quantity}<br>`;
+            } else if (donation.donation_type === 'miles') {
+                if (donation.miles_driven) details += `<strong>Miles Driven:</strong> ${donation.miles_driven}<br>`;
+                if (donation.mileage_purpose) details += `<strong>Purpose:</strong> ${donation.mileage_purpose}<br>`;
+            } else if (donation.notes) {
+                details += `<strong>Notes:</strong> ${donation.notes}<br>`;
+            }
+
+            // Show in a modal
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h2 style="margin-bottom: 1rem;">Donation Details</h2>
+                        <div style="line-height: 1.6;">
+                            ${details}
+                        </div>
+                        <div style="margin-top: 1.5rem; text-align: right;">
+                            <button onclick="this.closest('div').parentElement.remove()" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
         async function addReceipt(donationId) {
             // Store the donation ID for later use
             window.currentDonationId = donationId;
