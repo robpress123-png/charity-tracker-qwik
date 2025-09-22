@@ -737,17 +737,7 @@
             <div id="items" class="content-section">
                 <div class="section-header">
                     <h2>Item Management</h2>
-                    <p>Edit and manage donation item values</p>
-                </div>
-                <div class="alert alert-warning">
-                    This feature is coming soon. Import items first using the Import Tool.
-                </div>
-            </div>
-
-            <div id="database" class="content-section">
-                <div class="section-header">
-                    <h2>Database Management</h2>
-                    <p>Monitor and manage database operations</p>
+                    <p>Edit and manage donation items and donations</p>
                 </div>
 
                 <div style="margin-top: 2rem;">
@@ -759,6 +749,16 @@
                         </p>
                         <button class="tool-btn" onclick="showClearDonationsModal()" style="background: #f59e0b;">
                             🧹 Clear Donations
+                        </button>
+                    </div>
+
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear Donation Items Only</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Remove all itemized donation details while keeping donation records intact
+                        </p>
+                        <button class="tool-btn" onclick="showClearDonationItemsModal()" style="background: #8b5cf6;">
+                            📦 Clear Items Only
                         </button>
                     </div>
                 </div>
@@ -774,6 +774,13 @@
                             🗑️ Delete All Donations
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <div id="database" class="content-section">
+                <div class="section-header">
+                    <h2>Database Management</h2>
+                    <p>Monitor and manage database operations</p>
                 </div>
 
                 <div style="margin-top: 2rem;">
@@ -1195,6 +1202,33 @@
             // TODO: Implement user-specific clearing
             if (confirm('Do you want to delete ALL donations from ALL users?')) {
                 confirmDeleteAllDonations();
+            }
+        }
+
+        function showClearDonationItemsModal() {
+            if (confirm('This will delete all donation items but keep the donation records. Continue?')) {
+                clearAllDonationItems();
+            }
+        }
+
+        async function clearAllDonationItems() {
+            try {
+                const response = await fetch('/api/donations/clear-items', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert('✅ All donation items have been cleared successfully!');
+                    loadDatabaseStats(); // Refresh stats
+                } else {
+                    const error = await response.text();
+                    alert('❌ Failed to clear donation items: ' + error);
+                }
+            } catch (error) {
+                alert('❌ Error clearing donation items: ' + error.message);
             }
         }
 
