@@ -1785,8 +1785,12 @@
                     if (window.addingCharityFromDonation) {
                         showAddDonation();
                         // Pre-select the new charity
-                        document.getElementById('charitySearch').value = formData.name;
-                        document.getElementById('selectedCharityId').value = data.charity.id;
+                        const charityInput = document.getElementById('donationCharity');
+                        const charityIdInput = document.getElementById('selectedCharityId');
+                        if (charityInput && charityIdInput) {
+                            charityInput.value = formData.name;
+                            charityIdInput.value = data.charity.id;
+                        }
                         window.addingCharityFromDonation = false;
                     }
                 } else {
@@ -3165,7 +3169,7 @@
                     // Wait for the section to be visible
                     setTimeout(() => {
                         // Populate the form with existing data
-                        const charityInput = document.getElementById('charitySearch');
+                        const charityInput = document.getElementById('donationCharity');
                         const selectedCharityId = document.getElementById('selectedCharityId');
                         const donationType = document.getElementById('donationType');
                         const donationDate = document.getElementById('donationDate');
@@ -4238,7 +4242,7 @@
             }
 
             // Close charity search dropdown
-            if (!event.target.closest('#charitySearch') && !event.target.closest('#charityDropdown')) {
+            if (!event.target.closest('#donationCharity') && !event.target.closest('#charityDropdown')) {
                 const dropdown = document.getElementById('charityDropdown');
                 if (dropdown) dropdown.style.display = 'none';
             }
