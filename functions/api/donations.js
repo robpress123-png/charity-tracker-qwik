@@ -115,7 +115,14 @@ export async function onRequestPost(context) {
     );
     const isPersonalCharity = await personalCharityCheck.bind(charity_id, userId).first();
 
-    if (!isPersonalCharity) {
+    let systemCharityId = null;
+    let userCharityId = null;
+
+    if (isPersonalCharity) {
+      // It's a personal charity
+      userCharityId = charity_id;
+      console.log('[DEBUG] Personal charity verified:', userCharityId);
+    } else {
       // Check if it's a system charity
       const systemCharityCheck = env.DB.prepare('SELECT id FROM charities WHERE id = ?');
       const isSystemCharity = await systemCharityCheck.bind(charity_id).first();
@@ -130,9 +137,9 @@ export async function onRequestPost(context) {
           headers: { 'Content-Type': 'application/json' }
         });
       }
+      systemCharityId = charity_id;
+      console.log('[DEBUG] System charity verified:', systemCharityId);
     }
-
-    console.log('[DEBUG] Charity verified, type:', isPersonalCharity ? 'personal' : 'system');
 
     // Insert donation into database
     // Since the table doesn't have a donation_type column, we'll store it in notes as JSON
@@ -157,72 +164,39 @@ export async function onRequestPost(context) {
       notes: notes || ''
     };
 
-    // We need to temporarily disable foreign key constraints for personal charities
-    if (isPersonalCharity) {
-      console.log('[DEBUG] Inserting donation for personal charity');
-      // For personal charities, we'll use a different approach
-      // Store the charity_id but without the foreign key constraint
-      const stmt = env.DB.prepare(`
-        INSERT INTO donations (
-          user_id, charity_id, amount, date, notes
-        )
-        VALUES (?, ?, ?, ?, ?)
-      `);
+    // Insert donation with the correct charity reference
+    // The database has separate columns: charity_id for system, user_charity_id for personal
+    const stmt = env.DB.prepare(`
+      INSERT INTO donations (
+        user_id, charity_id, user_charity_id, amount, date, notes
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
 
-      try {
-        // Try with PRAGMA to disable foreign keys temporarily
-        await env.DB.prepare('PRAGMA foreign_keys = OFF').run();
-        const result = await stmt.bind(
-          userId, charity_id, amount, donation_date, JSON.stringify(notesData)
-        ).run();
-        await env.DB.prepare('PRAGMA foreign_keys = ON').run();
+    console.log('[DEBUG] Inserting donation - System charity:', systemCharityId, 'Personal charity:', userCharityId);
 
-        if (result.meta.last_row_id) {
-          const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
-          const donation = await getDonation.bind(result.meta.last_row_id).first();
+    const result = await stmt.bind(
+      userId,
+      systemCharityId,  // Will be NULL for personal charities
+      userCharityId,     // Will be NULL for system charities
+      amount,
+      donation_date,
+      JSON.stringify(notesData)
+    ).run();
 
-          return new Response(JSON.stringify({
-            success: true,
-            donation
-          }), {
-            headers: {
-              'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            }
-          });
+    if (result.meta.last_row_id) {
+      const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
+      const donation = await getDonation.bind(result.meta.last_row_id).first();
+
+      return new Response(JSON.stringify({
+        success: true,
+        donation
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         }
-      } catch (error) {
-        console.error('[DEBUG] Error inserting with PRAGMA:', error);
-        await env.DB.prepare('PRAGMA foreign_keys = ON').run();
-        throw error;
-      }
-    } else {
-      // For system charities, normal insert
-      const stmt = env.DB.prepare(`
-        INSERT INTO donations (
-          user_id, charity_id, amount, date, notes
-        )
-        VALUES (?, ?, ?, ?, ?)
-      `);
-
-      const result = await stmt.bind(
-        userId, charity_id, amount, donation_date, JSON.stringify(notesData)
-      ).run();
-
-      if (result.meta.last_row_id) {
-        const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
-        const donation = await getDonation.bind(result.meta.last_row_id).first();
-
-        return new Response(JSON.stringify({
-          success: true,
-          donation
-        }), {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          }
-        });
-      }
+      });
     }
 
     throw new Error('Failed to create donation');
@@ -326,19 +300,21 @@ export async function onRequestGet(context) {
 
     // Build query with filters (using 'date' column, not 'donation_date')
     // Join with both system charities and user's personal charities
+    // Note: donations table has TWO columns: charity_id (system) and user_charity_id (personal)
     let query = `
       SELECT d.*,
         COALESCE(c.name, uc.name) as charity_name,
         COALESCE(c.ein, uc.ein) as charity_ein,
         COALESCE(c.category, uc.category) as charity_category,
         CASE
-          WHEN c.id IS NOT NULL THEN 'system'
-          WHEN uc.id IS NOT NULL THEN 'personal'
+          WHEN d.charity_id IS NOT NULL THEN 'system'
+          WHEN d.user_charity_id IS NOT NULL THEN 'personal'
           ELSE NULL
-        END as charity_source
+        END as charity_source,
+        COALESCE(d.charity_id, d.user_charity_id) as unified_charity_id
       FROM donations d
       LEFT JOIN charities c ON d.charity_id = c.id
-      LEFT JOIN user_charities uc ON d.charity_id = uc.id AND uc.user_id = d.user_id
+      LEFT JOIN user_charities uc ON d.user_charity_id = uc.id
       WHERE d.user_id = ?
     `;
     let queryParams = [userId];
@@ -767,13 +743,14 @@ async function handleGetDonation(env, donationId, userId) {
         COALESCE(c.name, uc.name) as charity_name,
         COALESCE(c.ein, uc.ein) as charity_ein,
         CASE
-          WHEN c.id IS NOT NULL THEN 'system'
-          WHEN uc.id IS NOT NULL THEN 'personal'
+          WHEN d.charity_id IS NOT NULL THEN 'system'
+          WHEN d.user_charity_id IS NOT NULL THEN 'personal'
           ELSE NULL
-        END as charity_source
+        END as charity_source,
+        COALESCE(d.charity_id, d.user_charity_id) as unified_charity_id
       FROM donations d
       LEFT JOIN charities c ON d.charity_id = c.id
-      LEFT JOIN user_charities uc ON d.charity_id = uc.id AND uc.user_id = d.user_id
+      LEFT JOIN user_charities uc ON d.user_charity_id = uc.id
       WHERE d.id = ? AND d.user_id = ?
     `);
     const donation = await stmt.bind(donationId, userId).first();
