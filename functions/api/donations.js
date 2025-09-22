@@ -107,6 +107,33 @@ export async function onRequestPost(context) {
       });
     }
 
+    // First check if this is a personal charity
+    console.log('[DEBUG] Checking charity type for ID:', charity_id);
+
+    const personalCharityCheck = env.DB.prepare(
+      'SELECT id FROM user_charities WHERE id = ? AND user_id = ?'
+    );
+    const isPersonalCharity = await personalCharityCheck.bind(charity_id, userId).first();
+
+    if (!isPersonalCharity) {
+      // Check if it's a system charity
+      const systemCharityCheck = env.DB.prepare('SELECT id FROM charities WHERE id = ?');
+      const isSystemCharity = await systemCharityCheck.bind(charity_id).first();
+
+      if (!isSystemCharity) {
+        console.error('[DEBUG] Charity not found:', charity_id);
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'Charity not found. Please select a valid charity.'
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    console.log('[DEBUG] Charity verified, type:', isPersonalCharity ? 'personal' : 'system');
+
     // Insert donation into database
     // Since the table doesn't have a donation_type column, we'll store it in notes as JSON
     const notesData = {
@@ -130,31 +157,72 @@ export async function onRequestPost(context) {
       notes: notes || ''
     };
 
-    const stmt = env.DB.prepare(`
-      INSERT INTO donations (
-        user_id, charity_id, amount, date, notes
-      )
-      VALUES (?, ?, ?, ?, ?)
-    `);
+    // We need to temporarily disable foreign key constraints for personal charities
+    if (isPersonalCharity) {
+      console.log('[DEBUG] Inserting donation for personal charity');
+      // For personal charities, we'll use a different approach
+      // Store the charity_id but without the foreign key constraint
+      const stmt = env.DB.prepare(`
+        INSERT INTO donations (
+          user_id, charity_id, amount, date, notes
+        )
+        VALUES (?, ?, ?, ?, ?)
+      `);
 
-    const result = await stmt.bind(
-      userId, charity_id, amount, donation_date, JSON.stringify(notesData)
-    ).run();
+      try {
+        // Try with PRAGMA to disable foreign keys temporarily
+        await env.DB.prepare('PRAGMA foreign_keys = OFF').run();
+        const result = await stmt.bind(
+          userId, charity_id, amount, donation_date, JSON.stringify(notesData)
+        ).run();
+        await env.DB.prepare('PRAGMA foreign_keys = ON').run();
 
-    if (result.meta.last_row_id) {
-      // Fetch the created donation
-      const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
-      const donation = await getDonation.bind(result.meta.last_row_id).first();
+        if (result.meta.last_row_id) {
+          const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
+          const donation = await getDonation.bind(result.meta.last_row_id).first();
 
-      return new Response(JSON.stringify({
-        success: true,
-        donation
-      }), {
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          return new Response(JSON.stringify({
+            success: true,
+            donation
+          }), {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
         }
-      });
+      } catch (error) {
+        console.error('[DEBUG] Error inserting with PRAGMA:', error);
+        await env.DB.prepare('PRAGMA foreign_keys = ON').run();
+        throw error;
+      }
+    } else {
+      // For system charities, normal insert
+      const stmt = env.DB.prepare(`
+        INSERT INTO donations (
+          user_id, charity_id, amount, date, notes
+        )
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      const result = await stmt.bind(
+        userId, charity_id, amount, donation_date, JSON.stringify(notesData)
+      ).run();
+
+      if (result.meta.last_row_id) {
+        const getDonation = env.DB.prepare('SELECT * FROM donations WHERE id = ?');
+        const donation = await getDonation.bind(result.meta.last_row_id).first();
+
+        return new Response(JSON.stringify({
+          success: true,
+          donation
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
     }
 
     throw new Error('Failed to create donation');

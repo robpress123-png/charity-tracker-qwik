@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v1.7.2</title>
+    <title>Dashboard - Charity Tracker v1.7.3</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -693,13 +693,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v1.7.2</strong> - Enhanced search functionality and UI improvements!
+        <strong>🎯 Charity Tracker v1.7.3</strong> - Fixed personal charity donations and improved Tools section!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v1.7.2</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v1.7.3</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -794,24 +794,7 @@
                 </div>
             </div>
 
-            <div class="section" style="display: flex; flex-direction: column; min-height: 0; max-height: calc(40vh - 80px);">
-                <div class="section-header" style="flex-shrink: 0;">
-                    <h2>View/Edit Personal Charities</h2>
-                    <button class="btn-primary" onclick="showAddCharity()">Add Charity</button>
-                </div>
-                <!-- Search Bar for Personal Charities -->
-                <div style="padding: 0.75rem; background: #f9fafb; border-radius: 8px; margin-bottom: 1rem;">
-                    <input type="text" id="charitySearch" placeholder="Search by charity name or EIN..."
-                           style="width: 100%; padding: 0.4rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem;"
-                           oninput="filterPersonalCharities()">
-                </div>
-                <div id="charitiesContent" style="overflow-y: auto; flex: 1; min-height: 0;">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🏛️</div>
-                        <p>No charities added yet. Add your favorite charities!</p>
-                    </div>
-                </div>
-            </div>
+            <!-- Personal Charity management moved to Tools section -->
         </div>
 
         <!-- Add Donation Section (hidden by default) -->
@@ -2137,6 +2120,9 @@
             e.preventDefault();
 
             const charityId = document.getElementById('selectedCharityId').value;
+            console.log('[DEBUG] Selected charity ID:', charityId);
+            console.log('[DEBUG] Selected charity name:', document.getElementById('donationCharity').value);
+
             if (!charityId) {
                 alert('Please select a charity from the dropdown');
                 return;
@@ -2150,6 +2136,9 @@
                 donation_date: document.getElementById('donationDate').value,  // API will map this to 'date'
                 notes: document.getElementById('donationNotes').value
             };
+
+            console.log('[DEBUG] Form data being submitted:', formData);
+            console.log('[DEBUG] Is editing?', isEditing);
 
             // Add type-specific data
             switch(donationType) {
@@ -2208,6 +2197,10 @@
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const token = user.token || localStorage.getItem('token') || 'test-token';
 
+                console.log('[DEBUG] Sending request to:', url);
+                console.log('[DEBUG] Request method:', method);
+                console.log('[DEBUG] Request body:', JSON.stringify(formData, null, 2));
+
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -2216,6 +2209,8 @@
                     },
                     body: JSON.stringify(formData)
                 });
+
+                console.log('[DEBUG] Response status:', response.status);
 
                 // Check if response is JSON (API available) or HTML (404)
                 const contentType = response.headers.get("content-type");
@@ -2249,11 +2244,13 @@
                     loadStats();
                     loadCharities(); // Refresh charities to show the one with donation
                 } else {
+                    console.error('[DEBUG] API error response:', data);
                     showToast(`Failed to ${isEditing ? 'update' : 'add'} donation: ` + data.error, 'error');
                 }
             } catch (error) {
-                console.error(`Error ${isEditing ? 'updating' : 'adding'} donation:`, error);
-                alert(`Failed to ${isEditing ? 'update' : 'add'} donation. Please try again.`);
+                console.error(`[DEBUG] Error ${isEditing ? 'updating' : 'adding'} donation:`, error);
+                console.error('[DEBUG] Error stack:', error.stack);
+                alert(`Failed to ${isEditing ? 'update' : 'add'} donation. Check console for details.`);
             }
         });
 
@@ -2869,7 +2866,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v1.7.2</p>
+                            <p>Generated by Charity Tracker v1.7.3</p>
                         </div>
                     </body>
                     </html>
@@ -3075,14 +3072,20 @@
         let importData = [];
 
         function showImportDonations() {
+            // Navigate to tools section first
+            showSection('tools');
             // Hide other panels
             document.getElementById('personalCharitiesPanel').style.display = 'none';
             document.getElementById('charityVerificationPanel').style.display = 'none';
             // Show import panel
             document.getElementById('importDonationsPanel').style.display = 'block';
+            // Scroll to the panel
+            document.getElementById('importDonationsPanel').scrollIntoView({ behavior: 'smooth' });
         }
 
         function showPersonalCharities() {
+            // Navigate to tools section first
+            showSection('tools');
             // Hide other panels
             document.getElementById('importDonationsPanel').style.display = 'none';
             document.getElementById('charityVerificationPanel').style.display = 'none';
@@ -3090,14 +3093,20 @@
             document.getElementById('personalCharitiesPanel').style.display = 'block';
             // Load personal charities
             loadPersonalCharities();
+            // Scroll to the panel
+            document.getElementById('personalCharitiesPanel').scrollIntoView({ behavior: 'smooth' });
         }
 
         function showCharityVerification() {
+            // Navigate to tools section first
+            showSection('tools');
             // Hide other panels
             document.getElementById('importDonationsPanel').style.display = 'none';
             document.getElementById('personalCharitiesPanel').style.display = 'none';
             // Show verification panel
             document.getElementById('charityVerificationPanel').style.display = 'block';
+            // Scroll to the panel
+            document.getElementById('charityVerificationPanel').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function loadPersonalCharities() {
