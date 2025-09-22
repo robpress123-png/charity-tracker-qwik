@@ -1749,6 +1749,23 @@
         document.getElementById('charityForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            console.log('=== ADD CHARITY FORM SUBMISSION ===');
+
+            // Check for missing form elements
+            const requiredFields = ['charityName', 'charityEIN', 'charityCategory', 'charityAddress',
+                                   'charityCity', 'charityState', 'charityZip', 'charityPhone',
+                                   'charityWebsite', 'charityDescription'];
+
+            for (const fieldId of requiredFields) {
+                const element = document.getElementById(fieldId);
+                if (!element) {
+                    const errorMsg = `ERROR: Missing form element with ID: ${fieldId}`;
+                    console.error(errorMsg);
+                    showToast(`Form error: Missing field ${fieldId}. Please refresh the page.`, 'error');
+                    return;
+                }
+            }
+
             const formData = {
                 name: document.getElementById('charityName').value,
                 ein: document.getElementById('charityEIN').value,
@@ -1762,9 +1779,14 @@
                 description: document.getElementById('charityDescription').value
             };
 
+            console.log('Form data collected:', formData);
+
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                console.log('Sending request to /api/charities/add-personal');
+                console.log('Auth token:', token ? 'Present' : 'Missing');
 
                 const response = await fetch('/api/charities/add-personal', {
                     method: 'POST',
@@ -1775,9 +1797,24 @@
                     body: JSON.stringify(formData)
                 });
 
-                const data = await response.json();
+                console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse response as JSON:', parseError);
+                    console.error('Response was:', responseText);
+                    showToast('Server error: Invalid response format', 'error');
+                    return;
+                }
+
+                console.log('Parsed response data:', data);
 
                 if (data.success) {
+                    console.log('SUCCESS: Charity added successfully');
                     showToast('Personal charity added successfully! It\'s now available for your donations.', 'success');
                     closeCharityModal();
 
