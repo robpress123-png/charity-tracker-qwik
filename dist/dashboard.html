@@ -1219,12 +1219,34 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="charityAddress">Street Address</label>
+                    <input type="text" id="charityAddress" placeholder="123 Main St">
+                </div>
+                <div class="form-group" style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem;">
+                    <div>
+                        <label for="charityCity">City</label>
+                        <input type="text" id="charityCity" placeholder="New York">
+                    </div>
+                    <div>
+                        <label for="charityState">State</label>
+                        <input type="text" id="charityState" placeholder="NY" maxlength="2">
+                    </div>
+                    <div>
+                        <label for="charityZip">ZIP Code</label>
+                        <input type="text" id="charityZip" placeholder="10001" pattern="[0-9]{5}(-[0-9]{4})?">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="charityPhone">Phone Number</label>
+                    <input type="tel" id="charityPhone" placeholder="(555) 123-4567">
+                </div>
+                <div class="form-group">
                     <label for="charityWebsite">Website (optional)</label>
-                    <input type="url" id="charityWebsite">
+                    <input type="url" id="charityWebsite" placeholder="https://example.org">
                 </div>
                 <div class="form-group">
                     <label for="charityDescription">Description (optional)</label>
-                    <textarea id="charityDescription" rows="3"></textarea>
+                    <textarea id="charityDescription" rows="3" placeholder="Brief description of the charity's mission"></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeCharityModal()">Cancel</button>
@@ -1721,6 +1743,11 @@
                 name: document.getElementById('charityName').value,
                 ein: document.getElementById('charityEIN').value,
                 category: document.getElementById('charityCategory').value,
+                address: document.getElementById('charityAddress').value,
+                city: document.getElementById('charityCity').value,
+                state: document.getElementById('charityState').value,
+                zip_code: document.getElementById('charityZip').value,
+                phone: document.getElementById('charityPhone').value,
                 website: document.getElementById('charityWebsite').value,
                 description: document.getElementById('charityDescription').value
             };

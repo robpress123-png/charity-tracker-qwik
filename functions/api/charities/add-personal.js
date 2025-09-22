@@ -54,7 +54,7 @@ export async function onRequestPost(context) {
         }
 
         const body = await request.json();
-        const { name, ein, category, website, description, address, city, state, zip_code } = body;
+        const { name, ein, category, website, description, address, city, state, zip_code, phone } = body;
 
         // Validate required fields
         if (!name) {
@@ -131,11 +131,11 @@ export async function onRequestPost(context) {
             INSERT INTO user_charities (
                 id, user_id, name, ein, category,
                 address, city, state, zip_code,
-                website, description, is_approved, created_at
+                phone, website, description, is_approved, created_at
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
-                ?, ?, 0, CURRENT_TIMESTAMP
+                ?, ?, ?, 0, CURRENT_TIMESTAMP
             )
         `).bind(
             charityId,
@@ -147,6 +147,7 @@ export async function onRequestPost(context) {
             city || '',
             state || '',
             zip_code || '',
+            phone || '',
             website || '',
             description || ''
         ).run();
