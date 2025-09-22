@@ -6,7 +6,7 @@
 **User:** Rob Pressman
 
 ## Project Overview
-Charity Tracker is a web application for tracking charitable donations and maximizing tax benefits. Built with vanilla JavaScript/HTML/CSS, deployed on Cloudflare Pages with D1 (SQLite) database.
+Charity Tracker is a web application for tracking charitable donations and maximizing tax benefits. Built with Qwik framework, deployed on Cloudflare Pages with D1 (SQLite) database.
 
 ## Critical Infrastructure - DO NOT CHANGE
 
@@ -14,14 +14,14 @@ Charity Tracker is a web application for tracking charitable donations and maxim
 ```bash
 # WORKING - DO NOT MODIFY
 git add -A && git commit -m "commit message" && git push origin main
-# Auto-deploys to: charity-tracker-auto.pages.dev
+# Auto-deploys to Cloudflare Pages via GitHub integration
 # GitHub repo: https://github.com/robpress123-png/charity-tracker-qwik
 ```
 
 ### Project Structure
 ```
-/charity-tracker-qwik/
-├── dist/                 # Frontend HTML files
+/charity-tracker-qwik/   # Qwik-based application
+├── dist/                 # Static HTML files (temporary until full Qwik migration)
 │   ├── dashboard.html    # Main user interface (5000+ lines)
 │   ├── login.html       # User login
 │   ├── register.html    # User registration
@@ -34,7 +34,8 @@ git add -A && git commit -m "commit message" && git push origin main
 │   ├── charities/      # Charity management
 │   └── users/          # User management
 ├── sql/                # Database schemas
-└── package.json        # Version 2.0.0
+├── src/                # Qwik source files (to be migrated)
+└── package.json        # Version 2.0.0 (Qwik dependencies)
 ```
 
 ## Authentication System - WORKING
@@ -250,5 +251,6 @@ git add -A && git commit -m "v2.0.0: Implement proper donation_items table" && g
 
 ## Contact
 - Repository: https://github.com/robpress123-png/charity-tracker-qwik
-- Deployment: https://charity-tracker-auto.pages.dev
+- Deployment: Cloudflare Pages (connected via GitHub)
 - Database: Cloudflare D1 (SQLite)
+- Framework: Qwik with Cloudflare Pages adapter
