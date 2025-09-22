@@ -1,0 +1,29 @@
+charity_name,donation_date,donation_type,amount,notes
+American Red Cross,2025-01-03,cash,500.00,Emergency disaster relief fund
+Salvation Army,2025-01-05,cash,250.00,Monthly recurring donation for local programs
+United Way,2025-01-08,cash,150.00,Annual workplace giving campaign
+Food Bank,2025-01-10,cash,100.00,Support for weekend backpack program
+Doctors Without Borders,2025-01-12,cash,300.00,International medical aid support
+Make-A-Wish Foundation,2025-01-15,cash,225.00,Children's wish fulfillment program
+Cancer Research Institute,2025-01-18,cash,450.00,Research funding donation
+Nature Conservancy,2025-01-20,cash,180.00,Wildlife habitat preservation
+ASPCA,2025-01-22,cash,125.00,Animal rescue and shelter support
+Goodwill Industries,2025-01-06,items,385.00,"ITEMS:[Men's Winter Coat|Clothing|excellent|1|85.00][Women's Designer Dress|Clothing|very_good|1|120.00][Leather Boots|Clothing|good|2|80.00][Professional Briefcase|Accessories|very_good|1|55.00][Silk Scarf Collection|Accessories|excellent|3|45.00]"
+Salvation Army,2025-01-11,items,645.00,"ITEMS:[Desktop Computer System|Electronics|good|1|250.00][27-inch Monitor|Electronics|very_good|1|150.00][Wireless Keyboard and Mouse|Electronics|excellent|1|45.00][Office Desk Chair|Furniture|very_good|1|125.00][Standing Desk|Furniture|good|1|75.00]"
+Habitat for Humanity ReStore,2025-01-14,items,520.00,"ITEMS:[Power Drill Set|Tools|excellent|1|120.00][Circular Saw|Tools|very_good|1|85.00][Tool Chest|Tools|good|1|95.00][Paint Supplies Kit|Household|excellent|1|60.00][Ladder 6ft|Tools|very_good|1|75.00][Work Bench|Furniture|good|1|85.00]"
+Public Library Foundation,2025-01-17,items,285.00,"ITEMS:[College Textbooks|Books|excellent|15|150.00][Fiction Hardcovers|Books|very_good|25|75.00][Children's Picture Books|Books|good|40|60.00]"
+Homeless Shelter,2025-01-19,items,465.00,"ITEMS:[Queen Mattress|Furniture|good|1|200.00][Bedding Sets|Household|excellent|3|90.00][Bath Towel Sets|Household|very_good|5|50.00][Kitchen Cookware Set|Household|good|1|75.00][Dinnerware for 8|Household|very_good|1|50.00]"
+Boys and Girls Club,2025-01-21,items,320.00,"ITEMS:[Basketball Equipment|Sports|excellent|1|85.00][Soccer Balls and Gear|Sports|very_good|1|65.00][Board Games Collection|Toys|good|10|80.00][Art Supply Kit|Household|excellent|1|55.00][Musical Instruments Set|Toys|good|1|35.00]"
+St. Jude Children's Hospital,2025-01-04,stock,3500.00,Apple Inc (AAPL) - 14 shares at $250 per share - Long-term holding
+Mayo Clinic,2025-01-09,stock,2250.00,Microsoft Corp (MSFT) - 6 shares at $375 per share - Appreciated stock
+Children's Hospital Foundation,2025-01-13,stock,4000.00,Amazon.com Inc (AMZN) - 25 shares at $160 per share - Tech portfolio
+Electronic Frontier Foundation,2025-01-16,stock,1800.00,Google/Alphabet (GOOGL) - 12 shares at $150 per share
+World Wildlife Fund,2025-01-07,crypto,4500.00,Bitcoin (BTC) - 0.065 BTC at $69230 per coin - Held 18 months
+Sierra Club,2025-01-14,crypto,2100.00,Ethereum (ETH) - 0.875 ETH at $2400 per coin - Long-term position
+Wikimedia Foundation,2025-01-18,crypto,850.00,Litecoin (LTC) - 10 LTC at $85 per coin - Short-term holding
+Local Food Pantry,2025-01-02,mileage,14.00,Weekly food delivery route - 100 miles at $0.14/mile
+Habitat for Humanity,2025-01-09,mileage,42.00,Construction site volunteering - 300 miles at $0.14/mile for 3 days
+Community Garden,2025-01-16,mileage,7.00,Produce delivery to seniors - 50 miles at $0.14/mile
+Youth Mentorship Program,2025-01-23,mileage,21.00,Weekly tutoring sessions - 150 miles at $0.14/mile this month
+Local Community Garden,2025-01-01,cash,300.00,Annual membership and operational support - Personal charity
+Neighborhood Food Pantry,2025-01-24,cash,200.00,Monthly support for local families - Personal charity

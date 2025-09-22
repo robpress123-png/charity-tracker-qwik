@@ -271,29 +271,71 @@ export async function onRequestPost(context) {
                     JSON.stringify(notesData)
                 ).run();
 
-                // For items donations, create sample items (since CSV doesn't have item details)
+                // For items donations, parse items from notes or create defaults
                 if (donationType === 'items') {
-                    // Parse item count from notes if available
-                    const itemCountMatch = donation.notes ? donation.notes.match(/(\d+)\s*items/i) : null;
-                    const itemCount = itemCountMatch ? parseInt(itemCountMatch[1]) : 3;
+                    const itemsCreated = [];
 
-                    // Create generic items based on amount
-                    const avgValue = amount / itemCount;
+                    // Check if notes contains structured items data
+                    if (donation.notes && donation.notes.includes('ITEMS:')) {
+                        // Parse format: ITEMS:[name|category|condition|qty|value][name|category|condition|qty|value]
+                        const itemsMatch = donation.notes.match(/ITEMS:\[(.+)\]/g);
+                        if (itemsMatch) {
+                            const itemsString = itemsMatch[0].replace('ITEMS:', '');
+                            const itemMatches = itemsString.match(/\[([^\]]+)\]/g);
 
-                    for (let i = 1; i <= Math.min(itemCount, 10); i++) {
-                        await env.DB.prepare(`
-                            INSERT INTO donation_items (
-                                donation_id, item_name, category, condition, quantity, unit_value, total_value
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-                        `).bind(
-                            donationId,
-                            `Item ${i} from import`,
-                            'General',
-                            'good',
-                            1,
-                            avgValue,
-                            avgValue
-                        ).run();
+                            if (itemMatches) {
+                                for (const itemMatch of itemMatches) {
+                                    const itemData = itemMatch.replace(/\[|\]/g, '').split('|');
+                                    if (itemData.length >= 5) {
+                                        const [itemName, category, condition, quantity, value] = itemData;
+                                        const qty = parseInt(quantity) || 1;
+                                        const unitValue = parseFloat(value) / qty;
+
+                                        await env.DB.prepare(`
+                                            INSERT INTO donation_items (
+                                                donation_id, item_name, category, condition, quantity, unit_value, total_value
+                                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                                        `).bind(
+                                            donationId,
+                                            itemName,
+                                            category,
+                                            condition,
+                                            qty,
+                                            unitValue,
+                                            parseFloat(value)
+                                        ).run();
+
+                                        itemsCreated.push(itemName);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // If no structured items found, create generic items
+                    if (itemsCreated.length === 0) {
+                        // Parse item count from notes if available
+                        const itemCountMatch = donation.notes ? donation.notes.match(/(\d+)\s*items/i) : null;
+                        const itemCount = itemCountMatch ? parseInt(itemCountMatch[1]) : 3;
+
+                        // Create generic items based on amount
+                        const avgValue = amount / itemCount;
+
+                        for (let i = 1; i <= Math.min(itemCount, 10); i++) {
+                            await env.DB.prepare(`
+                                INSERT INTO donation_items (
+                                    donation_id, item_name, category, condition, quantity, unit_value, total_value
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                            `).bind(
+                                donationId,
+                                `Donated Item ${i}`,
+                                'General',
+                                'good',
+                                1,
+                                avgValue,
+                                avgValue
+                            ).run();
+                        }
                     }
                 }
 
