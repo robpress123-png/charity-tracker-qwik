@@ -110,43 +110,46 @@ export async function onRequestGet(context) {
         }
       });
     } else if (categoryId) {
-      // Try multiple approaches to find the items table
-      let stmt;
-      let result = { results: [] };
-
+      // Query the donation_items table that has the 497 IRS-based valuations
+      // Try without any type checking - just get items by category_id
       try {
-        // First try: The original donation_items table with INTEGER id and valuation columns
-        stmt = env.DB.prepare(`
+        const stmt = env.DB.prepare(`
           SELECT
-            CAST(id AS TEXT) as id,
+            id,
             name,
-            COALESCE(description, '') as description,
-            COALESCE(value_poor, 0) as value_poor,
-            COALESCE(value_fair, 0) as value_fair,
-            COALESCE(value_good, 0) as value_good,
-            COALESCE(value_excellent, 0) as value_excellent
+            description,
+            value_poor,
+            value_fair,
+            value_good,
+            value_excellent
           FROM donation_items
           WHERE category_id = ?
-            AND name IS NOT NULL
-            AND id < 1000
           ORDER BY name
         `);
-        result = await stmt.bind(categoryId).all();
-      } catch (error) {
-        console.error('Error querying donation_items:', error);
-        // If the first query fails, the table structure might be different
-        result = { results: [] };
-      }
+        const result = await stmt.bind(parseInt(categoryId)).all();
 
-      return new Response(JSON.stringify({
-        success: true,
-        items: result.results || []
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+        return new Response(JSON.stringify({
+          success: true,
+          items: result.results || []
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching items for category:', error);
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'Failed to fetch items: ' + error.message
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
     }
 
     // Return all items if no specific request
