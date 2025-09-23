@@ -114,10 +114,28 @@ export async function onRequestPost(context) {
                     continue;
                 }
 
+                // Map category_id to category name
+                const categoryMap = {
+                    1: "Clothing - Women",
+                    2: "Clothing - Men",
+                    3: "Clothing - Children",
+                    4: "Electronics",
+                    5: "Furniture",
+                    6: "Household Items",
+                    7: "Appliances",
+                    8: "Books & Media",
+                    9: "Sports & Recreation",
+                    10: "Toys & Games",
+                    11: "Tools & Equipment",
+                    12: "Jewelry & Accessories"
+                };
+
+                const categoryName = categoryMap[item.category_id] || `Category ${item.category_id}`;
+
                 // Check if item exists
                 const existingCheck = await env.DB.prepare(
-                    'SELECT id FROM donation_items WHERE name = ? AND category_id = ?'
-                ).bind(item.name, item.category_id).first();
+                    'SELECT id FROM items WHERE name = ? AND category = ?'
+                ).bind(item.name, categoryName).first();
 
                 if (existingCheck && !updateExisting) {
                     results.failed++;
@@ -126,19 +144,14 @@ export async function onRequestPost(context) {
                 }
 
                 if (existingCheck && updateExisting) {
-                    // Update existing item - simplified for basic schema
+                    // Update existing item
                     await env.DB.prepare(`
-                        UPDATE donation_items
-                        SET description = ?,
-                            value_poor = ?,
-                            value_fair = ?,
-                            value_good = ?,
-                            value_excellent = ?
+                        UPDATE items
+                        SET low_value = ?,
+                            high_value = ?,
+                            updated_at = CURRENT_TIMESTAMP
                         WHERE id = ?
                     `).bind(
-                        item.description || item.name,
-                        0, // value_poor - not used
-                        parseFloat(item.value_very_good) || parseFloat(item.value_good) * 1.5,
                         parseFloat(item.value_good) || 0,
                         parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2,
                         existingCheck.id
@@ -146,20 +159,17 @@ export async function onRequestPost(context) {
 
                     results.updated++;
                 } else if (!existingCheck) {
-                    // Insert new item - simplified for basic schema
+                    // Insert new item into items table
                     await env.DB.prepare(`
-                        INSERT INTO donation_items (
-                            category_id, name, description,
-                            value_poor, value_fair, value_good, value_excellent
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO items (
+                            name, category, low_value, high_value, tax_deductible
+                        ) VALUES (?, ?, ?, ?, ?)
                     `).bind(
-                        parseInt(item.category_id),
                         item.name,
-                        item.description || item.name,
-                        0, // value_poor - not used but in schema
-                        parseFloat(item.value_very_good) || parseFloat(item.value_good) * 1.5, // use very_good for fair column
+                        categoryName,
                         parseFloat(item.value_good) || 0,
-                        parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2
+                        parseFloat(item.value_excellent) || parseFloat(item.value_good) * 2,
+                        1  // tax_deductible = true
                     ).run();
 
                     results.added++;
