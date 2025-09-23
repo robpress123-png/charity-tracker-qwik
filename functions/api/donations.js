@@ -235,9 +235,9 @@ export async function onRequestPost(context) {
     if (donation_type === 'items' && items && Array.isArray(items)) {
       const itemStmt = env.DB.prepare(`
         INSERT INTO donation_items (
-          donation_id, item_name, category, condition, quantity, unit_value, total_value
+          donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       for (const item of items) {
@@ -248,7 +248,8 @@ export async function onRequestPost(context) {
           item.condition,
           item.quantity || 1,
           item.unit_value || item.value,
-          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0),
+          item.value_source || null
         ).run();
       }
     }
