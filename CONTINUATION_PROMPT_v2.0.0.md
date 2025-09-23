@@ -8,6 +8,36 @@
 ## Project Overview
 Charity Tracker is a web application for tracking charitable donations and maximizing tax benefits. Built with Qwik framework, deployed on Cloudflare Pages with D1 (SQLite) database.
 
+## 🚨 CRITICAL: Version Management Protocol
+**THIS IS CORE FUNCTIONALITY - MUST BE MAINTAINED**
+
+### Automatic Version Bumping Required
+**Every time you make changes and deploy, you MUST run the version bump command:**
+
+```bash
+npm run bump        # For bug fixes and minor changes (2.0.3 → 2.0.4)
+npm run bump:minor  # For new features (2.0.3 → 2.1.0)
+npm run bump:major  # For breaking changes (2.0.3 → 3.0.0)
+```
+
+This automated command will:
+1. Update version in package.json (single source of truth)
+2. Inject new version into ALL HTML files automatically
+3. Update VERSION.json tracking file
+4. Commit all changes with proper message
+5. Push to GitHub (triggers Cloudflare Pages auto-deployment)
+
+### Why This Is Critical
+- User specifically requested this on 2025-09-23
+- Prevents version mismatch issues across different pages
+- Ensures all deployments are properly versioned
+- Package.json is the ONLY place version needs to be updated
+
+### Implementation Details
+- Script location: `/scripts/auto-version-bump.js`
+- Injection script: `/scripts/inject-version.js`
+- Current version: 2.0.3 (as of 2025-09-23)
+
 ## Critical Infrastructure - DO NOT CHANGE
 
 ### Auto-Deployment Configuration
