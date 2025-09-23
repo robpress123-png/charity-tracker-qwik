@@ -1305,19 +1305,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="donationCharity">Charity *</label>
-                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
-                        <div class="autocomplete-wrapper" style="flex: 1;">
-                            <input type="text"
-                                   id="donationCharity"
-                                   class="autocomplete-input"
-                                   placeholder="Start typing to search charities..."
-                                   required
-                                   autocomplete="off">
-                            <input type="hidden" id="selectedCharityId">
-                            <div id="charityDropdown" class="autocomplete-dropdown"></div>
+                <!-- Charity and Donation Date side-by-side -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="donationCharity">Charity *</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                            <div class="autocomplete-wrapper" style="flex: 1;">
+                                <input type="text"
+                                       id="donationCharity"
+                                       class="autocomplete-input"
+                                       placeholder="Start typing to search charities..."
+                                       required
+                                       autocomplete="off">
+                                <input type="hidden" id="selectedCharityId">
+                                <div id="charityDropdown" class="autocomplete-dropdown"></div>
+                            </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationDate">Donation Date *</label>
+                        <input type="date" id="donationDate" required style="width: 100%;">
                     </div>
                 </div>
                 <!-- Cash donation fields -->
@@ -1550,10 +1557,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="donationDate">Date</label>
-                    <input type="date" id="donationDate" required style="max-width: 180px;">
-                </div>
+                <!-- Date field moved to be side-by-side with Charity above -->
                 <div class="form-group">
                     <label for="donationNotes">Notes (optional)</label>
                     <textarea id="donationNotes" rows="3"></textarea>
@@ -1612,7 +1616,7 @@
                         </div>
                     </div>
                     <div>
-                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Date</label>
+                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Donation Date</label>
                         <input type="date" id="editItemDate" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
                     </div>
                 </div>
@@ -2973,7 +2977,7 @@
 
                     // Display ALL donations for the selected year (no limit)
                     let html = `<div style="margin-bottom: 0.5rem; color: #6b7280; font-size: 0.875rem;">Showing ${data.donations.length} donation${data.donations.length !== 1 ? 's' : ''} for ${year === 'all' ? 'all years' : year}</div>`;
-                    html += '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
+                    html += '<table class="table"><thead><tr><th>Donation Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
                     data.donations.forEach(donation => {
                         // Parse date correctly to avoid timezone issues
                         const dateStr = donation.date || donation.donation_date;
@@ -3375,7 +3379,7 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Date</th>
+                                    <th>Donation Date</th>
                                     <th>Charity</th>
                                     <th>Type</th>
                                     <th>Amount</th>
@@ -3882,7 +3886,7 @@
                     <tr style="background: #f3f4f6;">
                         <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Row</th>
                         <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Charity</th>
-                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Date</th>
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Donation Date</th>
                         <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Type</th>
                         <th style="padding: 0.5rem; text-align: right; border-bottom: 2px solid #e5e7eb;">Amount</th>
                         <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Notes</th>
@@ -5669,7 +5673,7 @@
                 return;
             }
 
-            let html = '<table class="table"><thead><tr><th>Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
+            let html = '<table class="table"><thead><tr><th>Donation Date</th><th>Charity</th><th>Type</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody>';
             donations.forEach(donation => {
                 // Parse date correctly to avoid timezone issues
                 const dateStr = donation.date || donation.donation_date;
