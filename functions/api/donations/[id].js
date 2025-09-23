@@ -162,9 +162,8 @@ export async function onRequestPut(context) {
                 notes.crypto_datetime = data.crypto_datetime;
                 break;
             case 'items':
-                notes.item_description = data.item_description;
-                notes.estimated_value = data.estimated_value;
-                notes.item_details = data.item_details;
+                // For items, we'll handle the items array separately
+                // Just store the plain text notes
                 break;
         }
 
@@ -198,6 +197,35 @@ export async function onRequestPut(context) {
                 success: false,
                 error: 'No changes made'
             }, { status: 400 });
+        }
+
+        // If this is an items donation, update the items in donation_items table
+        if (donationType === 'items' && data.items && Array.isArray(data.items)) {
+            // First, delete existing items for this donation
+            await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
+                .bind(donationId)
+                .run();
+
+            // Then insert the new items
+            const itemStmt = env.DB.prepare(`
+                INSERT INTO donation_items (
+                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+
+            for (const item of data.items) {
+                const itemId = crypto.randomUUID();
+                await itemStmt.bind(
+                    itemId,
+                    donationId,
+                    item.item_name || item.name,
+                    item.category,
+                    item.condition,
+                    item.quantity || 1,
+                    item.unit_value || item.value,
+                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+                ).run();
+            }
         }
 
         return Response.json({
