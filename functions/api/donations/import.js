@@ -220,38 +220,8 @@ export async function onRequestPost(context) {
                 const amount = parseFloat(donation.amount) || 0;
                 const donationDate = donation.donation_date || donation.date || new Date().toISOString().split('T')[0];
 
-                // Build notes object based on donation type
-                const notesData = {
-                    notes: donation.notes || '',
-                    donation_type: donationType
-                };
-
-                // Add type-specific fields from notes
-                if (donation.notes) {
-                    // Parse stock info from notes
-                    if (donationType === 'stock' && donation.notes.includes('shares')) {
-                        const sharesMatch = donation.notes.match(/(\d+)\s*shares/i);
-                        const symbolMatch = donation.notes.match(/([A-Z]{1,5})\s+stock/i);
-                        if (sharesMatch) notesData.shares_donated = parseInt(sharesMatch[1]);
-                        if (symbolMatch) notesData.stock_symbol = symbolMatch[1];
-                    }
-                    // Parse crypto info from notes
-                    else if (donationType === 'crypto' && (donation.notes.includes('BTC') || donation.notes.includes('ETH'))) {
-                        const amountMatch = donation.notes.match(/([\d.]+)\s*(BTC|ETH)/i);
-                        if (amountMatch) {
-                            notesData.crypto_quantity = parseFloat(amountMatch[1]);
-                            notesData.crypto_symbol = amountMatch[2].toUpperCase();
-                        }
-                    }
-                    // Parse mileage info from notes
-                    else if (donationType === 'mileage' && donation.notes.includes('miles')) {
-                        const milesMatch = donation.notes.match(/(\d+)\s*miles/i);
-                        if (milesMatch) {
-                            notesData.miles_driven = parseInt(milesMatch[1]);
-                            notesData.mileage_rate = 0.14;
-                        }
-                    }
-                }
+                // Notes will be stored as plain text in the database
+                // For items donations, the ITEMS:[...] format in notes will be parsed separately
 
                 // Insert donation with v2.0.0 structure
                 await env.DB.prepare(`
@@ -268,7 +238,7 @@ export async function onRequestPost(context) {
                     donationType,   // Now stored in its own column
                     amount,
                     donationDate,
-                    JSON.stringify(notesData)
+                    donation.notes || ''  // Store plain text notes, not JSON
                 ).run();
 
                 // For items donations, parse items from notes or create defaults
