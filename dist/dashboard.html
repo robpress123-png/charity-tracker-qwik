@@ -2589,8 +2589,8 @@
                     formData.amount = parseFloat(document.getElementById('donationAmount').value);
                     break;
                 case 'items':
-                    // For items donation, send the items array from selectedItems or selectedDonationItems
-                    const itemsArray = window.selectedItems || window.selectedDonationItems || [];
+                    // For items donation, use the selectedDonationItems array (not on window object)
+                    const itemsArray = selectedDonationItems || [];
                     if (itemsArray.length === 0) {
                         alert('Please add at least one item to the donation');
                         return;
