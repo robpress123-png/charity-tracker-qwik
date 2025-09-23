@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.0.5</title>
+    <title>Admin Dashboard - Charity Tracker v2.0.6</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.0.5</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.0.6</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -472,14 +472,19 @@
                     <p>Monitor system health and key metrics</p>
                 </div>
 
-                <div class="dashboard-grid">
+                <div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                     <div class="stat-card">
                         <h3>Total Users</h3>
                         <div class="value" id="totalUsers">0</div>
                         <div class="change" id="userChange">Loading...</div>
                     </div>
                     <div class="stat-card">
-                        <h3>Total Donations</h3>
+                        <h3>Donation Count</h3>
+                        <div class="value" id="donationCount">0</div>
+                        <div class="change" id="donationCountChange">Loading...</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Amount</h3>
                         <div class="value" id="totalDonations">$0</div>
                         <div class="change" id="donationChange">Loading...</div>
                     </div>
@@ -876,17 +881,20 @@
 
                     // Update stat cards with real values
                     document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
+                    document.getElementById('donationCount').textContent = (stats.totalDonationCount || 0).toLocaleString();
                     document.getElementById('totalDonations').textContent = `$${(stats.totalDonations || 0).toLocaleString()}`;
                     document.getElementById('activeCharities').textContent = stats.activeCharities.toLocaleString();
                     document.getElementById('databaseItems').textContent = stats.databaseItems.toLocaleString();
 
                     // Calculate percentage changes (simplified - would need historical data for real percentages)
                     const userChange = stats.newUsersThisMonth > 0 ? `↑ ${stats.newUsersThisMonth} new this month` : 'No new users this month';
-                    const donationChange = stats.monthlyDonations > 0 ? `↑ $${stats.monthlyDonations.toLocaleString()} this month` : 'No donations this month';
+                    const donationCountChange = stats.monthlyDonationCount > 0 ? `↑ ${stats.monthlyDonationCount} this month` : 'No donations this month';
+                    const donationChange = stats.monthlyDonations > 0 ? `↑ $${stats.monthlyDonations.toLocaleString()} this month` : 'No amount this month';
                     const charityChange = stats.newCharitiesThisMonth > 0 ? `↑ ${stats.newCharitiesThisMonth} new this month` : 'No new charities';
                     const itemsChange = stats.databaseItems === 0 ? 'Import CSV to populate' : `${stats.databaseItems} items loaded`;
 
                     document.getElementById('userChange').textContent = userChange;
+                    document.getElementById('donationCountChange').textContent = donationCountChange;
                     document.getElementById('donationChange').textContent = donationChange;
                     document.getElementById('charityChange').textContent = charityChange;
                     document.getElementById('itemsChange').textContent = itemsChange;
@@ -1170,17 +1178,19 @@
             }
 
             statusDiv.style.color = '#f59e0b';
-            statusDiv.textContent = '⏳ Deleting all donations...';
+            statusDiv.textContent = '⏳ Deleting all donations... Please wait...';
 
-            try {
-                const response = await fetch('/api/donations/delete-all', {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
-                    }
-                });
+            // Use setTimeout to prevent UI blocking
+            setTimeout(async () => {
+                try {
+                    const response = await fetch('/api/donations/delete-all', {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        }
+                    });
 
-                const data = await response.json();
+                    const data = await response.json();
 
                 if (data.success) {
                     statusDiv.style.color = '#10b981';
@@ -1199,18 +1209,83 @@
                     statusDiv.style.color = '#ef4444';
                     statusDiv.textContent = `❌ Error: ${data.error}`;
                 }
-            } catch (error) {
-                statusDiv.style.color = '#ef4444';
-                statusDiv.textContent = '❌ Failed to delete donations';
-            }
+                } catch (error) {
+                    statusDiv.style.color = '#ef4444';
+                    statusDiv.textContent = '❌ Failed to delete donations: ' + error.message;
+                }
+            }, 100); // Small delay to allow UI to update
         }
 
         // Clear Donations Modal (for specific users)
-        function showClearDonationsModal() {
-            // For now, just redirect to the delete all donations
-            // TODO: Implement user-specific clearing
-            if (confirm('Do you want to delete ALL donations from ALL users?')) {
+        async function showClearDonationsModal() {
+            // Create a modal to select user
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;';
+            modal.innerHTML = `
+                <div style="background: #111827; border: 2px solid #f59e0b; border-radius: 12px; padding: 2rem; max-width: 500px;">
+                    <h3 style="color: #f59e0b; margin-bottom: 1rem;">Clear User Donations</h3>
+                    <p style="color: #f3f4f6; margin-bottom: 1.5rem;">Select a user to clear their donations, or clear all:</p>
+                    <select id="userSelectForClear" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <option value="all">All Users - Clear Everything</option>
+                    </select>
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="executeClearUserDonations()" style="flex: 1; padding: 0.75rem; background: #f59e0b; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Clear Donations
+                        </button>
+                        <button onclick="this.closest('div[style]').parentElement.remove()" style="flex: 1; padding: 0.75rem; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                    <div id="clearStatus" style="margin-top: 1rem; text-align: center;"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Load users list
+            try {
+                const response = await fetch('/api/users', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.users) {
+                        const select = document.getElementById('userSelectForClear');
+                        data.users.forEach(user => {
+                            const option = document.createElement('option');
+                            option.value = user.id;
+                            option.textContent = `${user.email} (${user.name || 'No name'})`;
+                            select.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function executeClearUserDonations() {
+            const select = document.getElementById('userSelectForClear');
+            const userId = select.value;
+            const statusDiv = document.getElementById('clearStatus');
+
+            if (!confirm(`Are you sure you want to clear donations for ${userId === 'all' ? 'ALL USERS' : 'this user'}?`)) {
+                return;
+            }
+
+            statusDiv.style.color = '#f59e0b';
+            statusDiv.textContent = 'Clearing donations...';
+
+            if (userId === 'all') {
+                // Use the existing delete all function
+                document.querySelector('div[style*="z-index: 9999"]').remove();
                 confirmDeleteAllDonations();
+            } else {
+                // Clear for specific user (API endpoint needs to be created)
+                alert('User-specific clearing coming soon. For now, use Delete All Donations.');
+                statusDiv.style.color = '#ef4444';
+                statusDiv.textContent = 'Feature not yet implemented';
             }
         }
 
