@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.1.23</title>
+    <title>Dashboard - Charity Tracker v2.1.24</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -695,13 +695,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.1.23</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.1.24</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.1.23</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.1.24</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1156,38 +1156,128 @@
                         <div id="verificationResults" style="margin-top: 1.5rem;"></div>
                     </div>
 
-                    <!-- Import Donations Panel -->
-                    <div id="importDonationsPanel" style="display:none; margin-top: 2rem;">
-                        <h3 style="color: #667eea; margin-bottom: 1rem;">Import Donations from CSV</h3>
+                    <!-- Import Donations Panel - Full Screen Experience -->
+                    <div id="importDonationsPanel" style="display:none; margin-top: 1rem; position: fixed; top: 100px; left: 0; right: 0; bottom: 0; background: white; z-index: 100; overflow: auto;">
+                        <div style="max-width: 1400px; margin: 0 auto; padding: 2rem; height: 100%; display: flex; flex-direction: column;">
+                            <!-- Header with close button -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h2 style="color: #1e293b; margin: 0;">📥 Import Donations from CSV</h2>
+                                <button class="btn-secondary" onclick="closeImportPanel()" style="padding: 0.5rem 1rem;">✕ Close</button>
+                            </div>
 
-                        <div id="csvDropZone" style="border: 2px dashed #667eea; border-radius: 12px; padding: 3rem; text-align: center; background: #f9fafb; cursor: pointer;">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
-                            <p style="font-size: 1.1rem; color: #4b5563; margin-bottom: 0.5rem;">Drag & Drop CSV File Here</p>
-                            <p style="color: #9ca3af;">or click to browse</p>
-                            <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-                        </div>
+                            <!-- Main content area - horizontal layout to minimize scrolling -->
+                            <div style="flex: 1; display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; min-height: 0;">
 
-                        <div style="margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 8px;">
-                            <p style="font-size: 0.875rem; color: #92400e;"><strong>CSV Format:</strong></p>
-                            <code style="font-size: 0.75rem;">charity_name,donation_date,donation_type,amount,notes</code>
-                            <p style="font-size: 0.75rem; color: #92400e; margin-top: 0.5rem;">
-                                Example: American Red Cross,2025-01-15,cash,500.00,New Year donation
-                            </p>
-                            <p style="font-size: 0.75rem; color: #10b981; margin-top: 0.5rem;">
-                                ✅ Charity names are automatically matched to the database!
-                            </p>
-                        </div>
+                                <!-- Left Column: Upload & Instructions -->
+                                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                    <!-- Drop Zone -->
+                                    <div id="csvDropZone" style="border: 2px dashed #667eea; border-radius: 12px; padding: 2rem; text-align: center; background: #f9fafb; cursor: pointer;">
+                                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📁</div>
+                                        <p style="font-size: 1rem; color: #4b5563; margin-bottom: 0.25rem;">Drag & Drop CSV File</p>
+                                        <p style="color: #9ca3af; font-size: 0.875rem;">or click to browse</p>
+                                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                                    </div>
 
-                        <div id="importPreview" style="display:none; margin-top: 1rem;">
-                            <h4>Preview</h4>
-                            <div id="previewTable" style="max-height: 300px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;"></div>
-                            <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-                                <button class="btn-primary" onclick="confirmImport()">
-                                    ✅ Import Donations
-                                </button>
-                                <button class="btn-secondary" onclick="cancelImport()">
-                                    Cancel
-                                </button>
+                                    <!-- Format Guide -->
+                                    <div style="background: #f0f9ff; border-radius: 8px; padding: 1rem; border: 1px solid #bfdbfe;">
+                                        <h4 style="color: #1e40af; margin: 0 0 0.5rem 0; font-size: 0.95rem;">CSV Format Guide</h4>
+                                        <div style="font-size: 0.8rem; color: #1e40af;">
+                                            <p style="margin: 0.25rem 0;"><strong>Required columns:</strong></p>
+                                            <code style="background: white; padding: 0.25rem; border-radius: 4px; display: block; margin: 0.25rem 0;">charity_name, donation_date, amount, donation_type</code>
+
+                                            <p style="margin: 0.5rem 0 0.25rem 0;"><strong>Optional columns:</strong></p>
+                                            <code style="background: white; padding: 0.25rem; border-radius: 4px; display: block; margin: 0.25rem 0; font-size: 0.75rem;">notes, receipt_url, miles_driven, stock_symbol, crypto_symbol, items</code>
+
+                                            <p style="margin: 0.5rem 0 0.25rem 0;"><strong>Donation types:</strong></p>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.25rem;">
+                                                <span style="background: #dbeafe; padding: 0.125rem 0.5rem; border-radius: 4px;">cash</span>
+                                                <span style="background: #dbeafe; padding: 0.125rem 0.5rem; border-radius: 4px;">stock</span>
+                                                <span style="background: #dbeafe; padding: 0.125rem 0.5rem; border-radius: 4px;">crypto</span>
+                                                <span style="background: #dbeafe; padding: 0.125rem 0.5rem; border-radius: 4px;">miles</span>
+                                                <span style="background: #dbeafe; padding: 0.125rem 0.5rem; border-radius: 4px;">items</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Features -->
+                                    <div style="background: #f0fdf4; border-radius: 8px; padding: 1rem; border: 1px solid #bbf7d0;">
+                                        <h4 style="color: #166534; margin: 0 0 0.5rem 0; font-size: 0.95rem;">✨ Smart Features</h4>
+                                        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.8rem; color: #166534;">
+                                            <li>Automatic charity name matching</li>
+                                            <li>Fuzzy search for similar names</li>
+                                            <li>Confirmation before import</li>
+                                            <li>Support for all donation types</li>
+                                            <li>Bulk import capability</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Import Stats (shown after file selection) -->
+                                    <div id="importStats" style="display: none; background: #fef3c7; border-radius: 8px; padding: 1rem; border: 1px solid #fde047;">
+                                        <h4 style="color: #713f12; margin: 0 0 0.5rem 0; font-size: 0.95rem;">📊 Import Summary</h4>
+                                        <div id="importStatsContent" style="font-size: 0.8rem; color: #713f12;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Preview & Results -->
+                                <div style="display: flex; flex-direction: column; min-height: 0;">
+                                    <!-- Status Bar -->
+                                    <div id="importStatusBar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; display: none;">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <span id="importStatusIcon">⏳</span>
+                                            <span id="importStatusText">Ready to import...</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Main Preview Area -->
+                                    <div id="importPreview" style="flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; overflow: hidden; display: flex; flex-direction: column;">
+                                        <!-- Default State -->
+                                        <div id="importEmptyState" style="flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem;">
+                                            <div>
+                                                <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">📋</div>
+                                                <h3 style="color: #9ca3af; margin: 0;">No file selected</h3>
+                                                <p style="color: #9ca3af; margin-top: 0.5rem;">Upload a CSV file to preview donations</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Preview Table (hidden by default) -->
+                                        <div id="previewContent" style="display: none; flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                                            <div style="padding: 1rem; background: white; border-bottom: 1px solid #e5e7eb;">
+                                                <h3 style="margin: 0; color: #1e293b;">Preview Donations</h3>
+                                            </div>
+                                            <div id="previewTable" style="flex: 1; overflow: auto; padding: 1rem;"></div>
+                                        </div>
+
+                                        <!-- Charity Matching (hidden by default) -->
+                                        <div id="charityMatchingContent" style="display: none; flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+                                            <div style="padding: 1rem; background: white; border-bottom: 1px solid #e5e7eb;">
+                                                <h3 style="margin: 0; color: #1e293b;">🔍 Confirm Charity Matches</h3>
+                                                <p style="margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.875rem;">Review and confirm charity selections before importing</p>
+                                            </div>
+                                            <div id="charityMatchTable" style="flex: 1; overflow: auto; padding: 1rem;"></div>
+                                        </div>
+
+                                        <!-- Import Results (hidden by default) -->
+                                        <div id="importResultsContent" style="display: none; flex: 1; overflow: auto; padding: 1rem;">
+                                            <div id="importResultsDetails"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div id="importActions" style="margin-top: 1rem; display: none; gap: 1rem;">
+                                        <button id="validateBtn" class="btn-primary" onclick="validateImport()" style="display: none;">
+                                            🔍 Validate & Match Charities
+                                        </button>
+                                        <button id="confirmBtn" class="btn-primary" onclick="confirmImport()" style="display: none;">
+                                            ✅ Confirm Import
+                                        </button>
+                                        <button id="cancelBtn" class="btn-secondary" onclick="cancelImport()">
+                                            Cancel
+                                        </button>
+                                        <button id="doneBtn" class="btn-primary" onclick="closeImportPanel()" style="display: none;">
+                                            ✓ Done
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3307,7 +3397,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.1.23</p>
+                            <p>Generated by Charity Tracker v2.1.24</p>
                         </div>
                     </body>
                     </html>
@@ -3518,10 +3608,14 @@
             // Hide other panels
             document.getElementById('personalCharitiesPanel').style.display = 'none';
             document.getElementById('charityVerificationPanel').style.display = 'none';
-            // Show import panel
+            // Show import panel as full-screen overlay
             document.getElementById('importDonationsPanel').style.display = 'block';
-            // Scroll to the panel
-            document.getElementById('importDonationsPanel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeImportPanel() {
+            document.getElementById('importDonationsPanel').style.display = 'none';
+            // Reset the import state
+            cancelImport();
         }
 
         function showPersonalCharities() {
@@ -3733,67 +3827,90 @@
         }
 
         function showPreview() {
-            const preview = document.getElementById('importPreview');
-            const table = document.getElementById('previewTable');
+            // Hide empty state, show preview content
+            document.getElementById('importEmptyState').style.display = 'none';
+            document.getElementById('previewContent').style.display = 'flex';
+            document.getElementById('charityMatchingContent').style.display = 'none';
+            document.getElementById('importResultsContent').style.display = 'none';
 
-            // Calculate totals
+            // Show action buttons
+            document.getElementById('importActions').style.display = 'flex';
+            document.getElementById('validateBtn').style.display = 'inline-block';
+            document.getElementById('confirmBtn').style.display = 'none';
+            document.getElementById('doneBtn').style.display = 'none';
+
+            // Show status bar
+            document.getElementById('importStatusBar').style.display = 'block';
+            document.getElementById('importStatusIcon').textContent = '📋';
+            document.getElementById('importStatusText').textContent = `${importData.length} donations ready for validation`;
+
+            // Calculate and show stats
             let totalAmount = 0;
             const typeCount = {};
+            const charityCount = {};
+
             importData.forEach(d => {
                 totalAmount += parseFloat(d.amount) || 0;
-                const type = d.donation_type || 'cash';
+                const type = d.donation_type || d.type || 'cash';
                 typeCount[type] = (typeCount[type] || 0) + 1;
+                const charity = d.charity_name || 'Unknown';
+                charityCount[charity] = (charityCount[charity] || 0) + 1;
             });
 
-            let html = `
-                <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px;">
-                    <p><strong>Total Donations:</strong> ${importData.length}</p>
-                    <p><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
-                    <p><strong>Types:</strong> ${Object.entries(typeCount).map(([type, count]) => `${type} (${count})`).join(', ')}</p>
-                </div>
+            // Update import stats
+            document.getElementById('importStats').style.display = 'block';
+            document.getElementById('importStatsContent').innerHTML = `
+                <p style="margin: 0.25rem 0;"><strong>Total Rows:</strong> ${importData.length}</p>
+                <p style="margin: 0.25rem 0;"><strong>Total Amount:</strong> $${totalAmount.toFixed(2)}</p>
+                <p style="margin: 0.25rem 0;"><strong>Unique Charities:</strong> ${Object.keys(charityCount).length}</p>
+                <p style="margin: 0.25rem 0;"><strong>Types:</strong> ${Object.entries(typeCount).map(([type, count]) => `${type} (${count})`).join(', ')}</p>
             `;
 
-            html += '<table class="table"><thead><tr><th>Charity Name</th><th>Date</th><th>Type</th><th>Amount</th><th>Notes</th></tr></thead><tbody>';
+            // Create preview table
+            const table = document.getElementById('previewTable');
+            let html = `<table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f3f4f6;">
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Row</th>
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Charity</th>
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Date</th>
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Type</th>
+                        <th style="padding: 0.5rem; text-align: right; border-bottom: 2px solid #e5e7eb;">Amount</th>
+                        <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid #e5e7eb;">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
-            importData.slice(0, 10).forEach(donation => {
-                html += `<tr>
-                    <td>${donation.charity_name || 'Unknown'}</td>
-                    <td>${donation.donation_date || ''}</td>
-                    <td>${donation.donation_type || 'cash'}</td>
-                    <td>$${(parseFloat(donation.amount) || 0).toFixed(2)}</td>
-                    <td>${(() => {
-                        const parsed = parseNotesDisplay(donation.notes);
-                        return parsed.length > 50 ? parsed.substring(0, 50) + '...' : parsed;
-                    })()}</td>
+            importData.forEach((donation, index) => {
+                const rowColor = index % 2 === 0 ? 'white' : '#f9fafb';
+                html += `<tr style="background: ${rowColor};">
+                    <td style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
+                    <td style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">${donation.charity_name || 'Unknown'}</td>
+                    <td style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">${donation.donation_date || donation.date || ''}</td>
+                    <td style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">${donation.donation_type || donation.type || 'cash'}</td>
+                    <td style="padding: 0.5rem; text-align: right; border-bottom: 1px solid #e5e7eb;">$${(parseFloat(donation.amount) || 0).toFixed(2)}</td>
+                    <td style="padding: 0.5rem; border-bottom: 1px solid #e5e7eb; font-size: 0.875rem;">${donation.notes || ''}</td>
                 </tr>`;
             });
 
-            if (importData.length > 10) {
-                html += `<tr><td colspan="5" style="text-align: center; font-style: italic;">... and ${importData.length - 10} more</td></tr>`;
-            }
-
             html += '</tbody></table>';
             table.innerHTML = html;
-            preview.style.display = 'block';
         }
 
-        async function confirmImport() {
-            const resultsDiv = document.getElementById('previewTable');
-            resultsDiv.innerHTML = `
-                <div style="padding: 2rem; text-align: center;">
-                    <div class="loading" style="display: inline-block;">
-                        <h3>Importing donations...</h3>
-                        <p>Matching charity names to database IDs...</p>
-                    </div>
-                </div>
-            `;
+        let charityMappings = {}; // Store user's charity selections
+        let validationData = null; // Store validation results
+
+        async function validateImport() {
+            // Update status
+            document.getElementById('importStatusIcon').textContent = '🔍';
+            document.getElementById('importStatusText').textContent = 'Validating donations and matching charities...';
 
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const token = user.token || localStorage.getItem('token') || 'test-token';
 
-                // Use the smart import API
-                const response = await fetch('/api/donations/import', {
+                // Call validation API
+                const response = await fetch('/api/donations/validate-import', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3807,25 +3924,216 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    validationData = data.validation;
+
+                    if (validationData.requiresUserAction) {
+                        showCharityMatching(validationData);
+                    } else if (validationData.canAutoImport) {
+                        // All charities matched with high confidence
+                        document.getElementById('importStatusIcon').textContent = '✅';
+                        document.getElementById('importStatusText').textContent = 'All charities matched! Ready to import.';
+                        document.getElementById('validateBtn').style.display = 'none';
+                        document.getElementById('confirmBtn').style.display = 'inline-block';
+                    }
+                } else {
+                    showToast('Validation failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showToast('Error validating import: ' + error.message, 'error');
+            }
+        }
+
+        function showCharityMatching(validation) {
+            // Hide preview, show charity matching
+            document.getElementById('previewContent').style.display = 'none';
+            document.getElementById('charityMatchingContent').style.display = 'flex';
+
+            // Update status
+            document.getElementById('importStatusIcon').textContent = '⚠️';
+            document.getElementById('importStatusText').textContent = `${validation.rowsNeedingConfirmation} donations need charity confirmation`;
+
+            // Build matching interface
+            const matchTable = document.getElementById('charityMatchTable');
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+
+            Object.entries(validation.charityMatches).forEach(([rowNum, matchData]) => {
+                if (matchData.needsConfirmation) {
+                    html += `
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 0.75rem;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0; color: #1e293b;">Row ${rowNum}: "${matchData.searchName}"</h4>
+                                    <p style="margin: 0.25rem 0 0 0; color: #64748b; font-size: 0.875rem;">
+                                        Select the matching charity or create as personal charity
+                                    </p>
+                                </div>
+                            </div>`;
+
+                    if (matchData.matches && matchData.matches.length > 0) {
+                        html += '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+                        matchData.matches.forEach((match, index) => {
+                            const isSelected = index === 0; // Default to first match
+                            html += `
+                                <label style="display: flex; align-items: center; padding: 0.75rem; background: ${isSelected ? '#eff6ff' : '#f9fafb'}; border: 1px solid ${isSelected ? '#3b82f6' : '#e5e7eb'}; border-radius: 6px; cursor: pointer;">
+                                    <input type="radio" name="charity_${rowNum}" value="${match.charity.id}" ${isSelected ? 'checked' : ''}
+                                           onchange="selectCharity(${rowNum}, '${match.charity.id}', '${match.charity.type}')"
+                                           style="margin-right: 0.75rem;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: #1e293b;">${match.charity.name}</div>
+                                        <div style="font-size: 0.75rem; color: #64748b;">
+                                            ${match.charity.ein ? `EIN: ${match.charity.ein} • ` : ''}
+                                            ${match.matchType} match • ${match.confidence}% confidence
+                                        </div>
+                                    </div>
+                                    <span style="background: ${match.charity.type === 'system' ? '#10b981' : '#8b5cf6'}22;
+                                                 color: ${match.charity.type === 'system' ? '#10b981' : '#8b5cf6'};
+                                                 padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;">
+                                        ${match.charity.type === 'system' ? 'IRS Registered' : 'Personal'}
+                                    </span>
+                                </label>`;
+                        });
+                        html += '</div>';
+
+                        // Auto-select first match
+                        if (matchData.matches[0]) {
+                            charityMappings[rowNum] = matchData.matches[0].charity;
+                        }
+                    }
+
+                    // Option to create as personal charity
+                    html += `
+                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb;">
+                            <label style="display: flex; align-items: center; padding: 0.75rem; background: #fef3c7; border: 1px solid #fbbf24; border-radius: 6px; cursor: pointer;">
+                                <input type="radio" name="charity_${rowNum}" value="personal_${matchData.searchName}"
+                                       onchange="selectPersonalCharity(${rowNum}, '${matchData.searchName}')"
+                                       style="margin-right: 0.75rem;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 500; color: #92400e;">Create as Personal Charity</div>
+                                    <div style="font-size: 0.75rem; color: #92400e;">
+                                        "${matchData.searchName}" will be added to your personal charities
+                                    </div>
+                                </div>
+                            </label>
+                        </div>`;
+
+                    html += '</div>';
+                }
+            });
+
+            html += '</div>';
+            matchTable.innerHTML = html;
+
+            // Update buttons
+            document.getElementById('validateBtn').style.display = 'none';
+            document.getElementById('confirmBtn').style.display = 'inline-block';
+        }
+
+        function selectCharity(rowNum, charityId, charityType) {
+            charityMappings[rowNum] = { id: charityId, type: charityType };
+        }
+
+        function selectPersonalCharity(rowNum, charityName) {
+            charityMappings[rowNum] = { name: charityName, type: 'personal_new' };
+        }
+
+        async function confirmImport() {
+            // Update status
+            document.getElementById('importStatusIcon').textContent = '⏳';
+            document.getElementById('importStatusText').textContent = 'Importing donations...';
+
+            // Hide charity matching if visible, show results
+            document.getElementById('previewContent').style.display = 'none';
+            document.getElementById('charityMatchingContent').style.display = 'none';
+            document.getElementById('importResultsContent').style.display = 'block';
+
+            const resultsDiv = document.getElementById('importResultsDetails');
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || localStorage.getItem('token') || 'test-token';
+
+                // Apply charity mappings from user selections
+                const mappedData = importData.map((donation, index) => {
+                    const rowNum = index + 1;
+                    if (charityMappings[rowNum]) {
+                        const mapping = charityMappings[rowNum];
+                        if (mapping.type === 'personal_new') {
+                            // Will be created as personal charity
+                            return { ...donation, charity_name: mapping.name, create_personal: true };
+                        } else {
+                            // Use the mapped charity ID
+                            return { ...donation, charity_id: mapping.id };
+                        }
+                    }
+                    return donation;
+                });
+
+                // Use the smart import API
+                const response = await fetch('/api/donations/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        donations: mappedData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update status
+                    document.getElementById('importStatusIcon').textContent = '✅';
+                    document.getElementById('importStatusText').textContent = `Import complete! ${data.results.added} donations added.`;
+
                     let resultHtml = `
-                        <div style="padding: 1rem; background: #d1fae5; border-radius: 8px; margin-bottom: 1rem;">
-                            <h3 style="color: #065f46;">✅ Import Complete!</h3>
-                            <p>Successfully added: <strong>${data.results.added}</strong> donations</p>
-                            ${data.results.failed > 0 ? `<p style="color: #dc2626;">Failed: ${data.results.failed} donations</p>` : ''}
+                        <div style="padding: 2rem; background: #d1fae5; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #10b981;">
+                            <h2 style="color: #065f46; margin: 0 0 1rem 0;">✅ Import Successful!</h2>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div style="background: white; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #065f46;">${data.results.added}</div>
+                                    <div style="font-size: 0.875rem; color: #047857;">Successfully Imported</div>
+                                </div>
+                                ${data.results.failed > 0 ? `
+                                <div style="background: #fee2e2; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #dc2626;">${data.results.failed}</div>
+                                    <div style="font-size: 0.875rem; color: #b91c1c;">Failed to Import</div>
+                                </div>` : ''}
+                                ${data.results.skipped > 0 ? `
+                                <div style="background: #fef3c7; padding: 1rem; border-radius: 8px;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #d97706;">${data.results.skipped}</div>
+                                    <div style="font-size: 0.875rem; color: #92400e;">Skipped</div>
+                                </div>` : ''}
+                            </div>
                         </div>
                     `;
 
+                    if (data.results.errors && data.results.errors.length > 0) {
+                        resultHtml += `
+                            <details style="margin-bottom: 1rem; background: #fee2e2; padding: 1rem; border-radius: 8px;">
+                                <summary style="color: #dc2626; cursor: pointer; font-weight: 500;">
+                                    ❌ Import Errors (${data.results.errors.length})
+                                </summary>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #b91c1c;">
+                                    ${data.results.errors.slice(0, 10).map(error => `<li style="margin: 0.25rem 0;">${error}</li>`).join('')}
+                                    ${data.results.errors.length > 10 ? `<li style="font-style: italic;">... and ${data.results.errors.length - 10} more errors</li>` : ''}
+                                </ul>
+                            </details>
+                        `;
+                    }
+
                     if (data.results.charityMatches?.notFound?.length > 0) {
                         resultHtml += `
-                            <details style="margin-top: 1rem;">
-                                <summary style="color: #f59e0b; cursor: pointer;">
+                            <details style="background: #fef3c7; padding: 1rem; border-radius: 8px;">
+                                <summary style="color: #d97706; cursor: pointer; font-weight: 500;">
                                     ⚠️ Unmatched Charities (${data.results.charityMatches.notFound.length})
                                 </summary>
-                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #92400e;">
                                     ${data.results.charityMatches.notFound.map(name => `<li>${name}</li>`).join('')}
                                 </ul>
-                                <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">
-                                    These charities need to be added to your database first.
+                                <p style="font-size: 0.875rem; color: #92400e; margin-top: 0.5rem;">
+                                    Tip: Add these as personal charities first, then retry the import.
                                 </p>
                             </details>
                         `;
@@ -3833,14 +4141,11 @@
 
                     resultsDiv.innerHTML = resultHtml;
 
-                    // Always require user acknowledgment - no auto-close
-                    resultsDiv.innerHTML += `
-                        <div style="margin-top: 1.5rem; text-align: center;">
-                            <button class="btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;" onclick="cancelImport(); loadDonations(); loadStats(); loadCharities();">
-                                ${data.results.failed > 0 ? 'Continue (Review Errors Above)' : 'Continue'}
-                            </button>
-                        </div>
-                    `;
+                    // Update buttons
+                    document.getElementById('validateBtn').style.display = 'none';
+                    document.getElementById('confirmBtn').style.display = 'none';
+                    document.getElementById('cancelBtn').style.display = 'none';
+                    document.getElementById('doneBtn').style.display = 'inline-block';
                 } else {
                     resultsDiv.innerHTML = `
                         <div style="padding: 1rem; background: #fee2e2; border-radius: 8px;">
@@ -3860,10 +4165,29 @@
         }
 
         function cancelImport() {
-            document.getElementById('importDonationsPanel').style.display = 'none';
-            document.getElementById('importPreview').style.display = 'none';
+            // Reset all UI states
+            document.getElementById('importEmptyState').style.display = 'flex';
+            document.getElementById('previewContent').style.display = 'none';
+            document.getElementById('charityMatchingContent').style.display = 'none';
+            document.getElementById('importResultsContent').style.display = 'none';
+            document.getElementById('importStatusBar').style.display = 'none';
+            document.getElementById('importStats').style.display = 'none';
+            document.getElementById('importActions').style.display = 'none';
+
+            // Reset file input
             document.getElementById('csvFileInput').value = '';
+
+            // Clear data
             importData = [];
+            charityMappings = {};
+            validationData = null;
+
+            // Reload main data if on dashboard
+            if (document.getElementById('dashboardSection').style.display !== 'none') {
+                loadDonations();
+                loadStats();
+                loadCharities();
+            }
         }
 
         // Load saved tax settings
