@@ -1342,11 +1342,24 @@
             const confirmText = document.getElementById('deleteConfirmInput').value;
             const statusDiv = document.getElementById('deleteStatus');
 
+            console.log('=== DELETE ALL DONATIONS DEBUG ===');
+            console.log('Confirm text entered:', confirmText);
+
             if (confirmText !== 'DELETE ALL DONATIONS') {
                 statusDiv.style.color = '#fca5a5';
                 statusDiv.textContent = '❌ Please type exactly: DELETE ALL DONATIONS';
+                console.log('❌ Confirmation text did not match');
                 return;
             }
+
+            // Log token information
+            const adminToken = localStorage.getItem('adminToken');
+            const userToken = localStorage.getItem('token');
+            const tokenToUse = adminToken || userToken;
+
+            console.log('Admin token:', adminToken);
+            console.log('User token:', userToken);
+            console.log('Token being sent:', tokenToUse);
 
             statusDiv.style.color = '#f59e0b';
             statusDiv.textContent = '⏳ Deleting all donations... Please wait...';
@@ -1354,18 +1367,29 @@
             // Use setTimeout to prevent UI blocking
             setTimeout(async () => {
                 try {
+                    console.log('Sending DELETE request to /api/donations/delete-all');
+                    console.log('Authorization header:', `Bearer ${tokenToUse}`);
+
                     const response = await fetch('/api/donations/delete-all', {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${tokenToUse}`
                         }
                     });
 
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+
                     const data = await response.json();
+                    console.log('Response data:', data);
 
                 if (data.success) {
                     statusDiv.style.color = '#10b981';
                     statusDiv.textContent = `✅ Successfully deleted ${data.deletedCount || 'all'} donations and ${data.deletedItemsCount || 'all'} donation items`;
+
+                    console.log('✅ Delete successful!');
+                    console.log('Deleted donations:', data.deletedCount);
+                    console.log('Deleted items:', data.deletedItemsCount);
 
                     // Show success alert
                     alert(`✅ Success!\n\nDeleted ${data.deletedCount || 'all'} donations\nDeleted ${data.deletedItemsCount || 'all'} donation items\n\nThe database has been cleared.`);
@@ -1380,10 +1404,14 @@
                 } else {
                     statusDiv.style.color = '#ef4444';
                     statusDiv.textContent = `❌ Error: ${data.error}`;
+                    console.error('❌ Delete failed:', data.error);
+                    console.log('Full error response:', data);
                 }
                 } catch (error) {
                     statusDiv.style.color = '#ef4444';
                     statusDiv.textContent = '❌ Failed to delete donations: ' + error.message;
+                    console.error('❌ Exception during delete:', error);
+                    console.error('Error details:', error.stack);
                 }
             }, 100); // Small delay to allow UI to update
         }
