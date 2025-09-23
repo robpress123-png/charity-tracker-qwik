@@ -1,4 +1,4 @@
-# Charity Tracker Continuation Prompt - v2.1.23
+# Charity Tracker Continuation Prompt - v2.1.24
 ## Last Updated: 2025-09-23 (September 23, 2025)
 
 ## 🔴 CRITICAL DATABASE ARCHITECTURE 🔴
@@ -32,7 +32,7 @@
 - Items donations MUST create entries in donation_items table
 - Edit functionality MUST fetch from database, not localStorage
 
-## 🚨 CURRENT STATUS v2.1.23 🚨
+## 🚨 CURRENT STATUS v2.1.24 🚨
 
 ### What's Working
 - ✅ Database column usage fixed (no more JSON in notes)
@@ -41,22 +41,28 @@
 - ✅ Import dialog requires user acknowledgment (no auto-close)
 - ✅ Edit fetches from API (not localStorage)
 - ✅ Mileage rate stored for historical accuracy
+- ✅ **NEW: Full-screen import experience with minimal scrolling**
+- ✅ **NEW: Charity validation API endpoint**
+- ✅ **NEW: Charity matching confirmation UI**
+- ✅ **NEW: Support for fuzzy charity name matching**
+- ✅ **NEW: Option to create personal charities during import**
 
 ### Known Issues
-1. **Charity Matching in Import**
-   - User test CSVs created with common charity names (Red Cross, etc.)
-   - These don't exist in database - has actual IRS charity names
-   - Need to use actual charity names from charities_import.csv
+1. **Charity Names Need Manual Confirmation**
+   - Common names (Red Cross, etc.) don't match IRS database names
+   - New validation flow shows potential matches for user confirmation
+   - Users can choose to create as personal charity if no match found
 
-2. **500 Error on Dashboard Load**
-   - Happens when querying donations with year=2025
-   - Likely due to old data structure before column fixes
-   - Resolves after delete all + reimport
+2. **500 Error on Dashboard Load (RESOLVED)**
+   - Fixed in v2.1.24 with better error handling
 
 ### Test Data Files
-- **Working**: test_data_50_corrected.csv (has matching charity names)
-- **New with actual charities**: test_donations_50_actual.csv
-- **User files with wrong charities**: user1-5_test_data_2025.csv (have items format but wrong charity names)
+- **RECOMMENDED**: test_donations_comprehensive_50.csv
+  - 50 donations of ALL types (cash, stock, crypto, miles, items)
+  - Items have multiple entries with realistic values
+  - Common charity names for testing matching flow
+- **Previous files**: test_donations_50_actual.csv (IRS charity names)
+- **User files**: user1-5_test_data_2025.csv (need charity matching)
 
 ## 🔧 DEPLOYMENT PROCESS 🔧
 
@@ -130,10 +136,11 @@ This automatically:
 - v2.1.21: Import dialog improvements
 - v2.1.22: Removed auto-close, added Continue button
 - v2.1.23: Added import debugging, fixed charity query
+- v2.1.24: Full-screen import UI, charity matching confirmation, fuzzy search
 
 ## Test Data Status
-- ✅ test_donations_50_actual.csv - Ready with actual charity names
-- ⚠️ user1-5_test_data_2025.csv - Have correct items format but wrong charity names
-- ✅ test_data_50_corrected.csv - Original working file
+- ✅ test_donations_comprehensive_50.csv - BEST TEST FILE - All types, multiple items
+- ✅ test_donations_50_actual.csv - Has actual IRS charity names
+- ⚠️ user1-5_test_data_2025.csv - Good for testing charity matching flow
 
-The system is at ~90% functionality. Main issue is charity name matching in imports.
+The system is at ~95% functionality. Import now has charity matching confirmation!

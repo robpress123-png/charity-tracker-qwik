@@ -178,9 +178,9 @@ export async function onRequestPost(context) {
         // Get all charities for matching
         let allCharities = { results: [] };
         try {
-            // Get system charities
+            // Get system charities - get ALL of them for better matching
             const systemCharities = await env.DB.prepare(`
-                SELECT id, name, ein, 'system' as type FROM charities LIMIT 2000
+                SELECT id, name, ein, 'system' as type FROM charities
             `).all();
 
             // Get user charities

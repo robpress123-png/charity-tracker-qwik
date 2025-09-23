@@ -50,7 +50,9 @@ export const charityAliases = {
   'salvation army': [
     'THE SALVATION ARMY',
     'SALVATION ARMY NATIONAL CORPORATION',
-    'SALVATION ARMY USA'
+    'SALVATION ARMY USA',
+    'SALVATION ARMY',
+    'THE SALVATION ARMY NATIONAL CORPORATION'
   ],
 
   // UNICEF
@@ -78,15 +80,24 @@ export const charityAliases = {
     'UNITED WAY'
   ],
 
-  // Make-A-Wish
+  // Make-A-Wish (note the database has spaces around hyphens)
   'make a wish': [
     'MAKE A WISH FOUNDATION OF AMERICA',
     'MAKE A WISH FOUNDATION',
-    'MAKE A WISH AMERICA'
+    'MAKE A WISH AMERICA',
+    'MAKE- A- WISH FOUNDATION OF AMERICA',
+    'MAKE-A-WISH FOUNDATION OF AMERICA'
   ],
   'make-a-wish': [
     'MAKE A WISH FOUNDATION OF AMERICA',
-    'MAKE A WISH FOUNDATION'
+    'MAKE A WISH FOUNDATION',
+    'MAKE- A- WISH FOUNDATION OF AMERICA',
+    'MAKE-A-WISH FOUNDATION OF AMERICA'
+  ],
+  'make-a-wish foundation': [
+    'MAKE A WISH FOUNDATION OF AMERICA',
+    'MAKE- A- WISH FOUNDATION OF AMERICA',
+    'MAKE-A-WISH FOUNDATION OF AMERICA'
   ],
 
   // Goodwill
