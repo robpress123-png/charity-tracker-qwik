@@ -64,7 +64,7 @@ export async function onRequestPost(context) {
         }
 
         const body = await request.json();
-        const { donations } = body;
+        const { donations, charityMappings } = body;
 
         if (!donations || !Array.isArray(donations)) {
             return new Response(JSON.stringify({
@@ -164,12 +164,24 @@ export async function onRequestPost(context) {
                 let userCharityId = null;
                 let charityType = null;
 
-                // First try: direct ID if provided
-                if (donation.charity_id) {
+                // First try: Use validated mappings if provided
+                if (charityMappings && charityMappings[donation.charity_name]) {
+                    const mapping = charityMappings[donation.charity_name];
+                    if (mapping.type === 'personal') {
+                        userCharityId = mapping.id;
+                        charityType = 'personal';
+                    } else {
+                        charityId = mapping.id;
+                        charityType = 'system';
+                    }
+                    results.charityMatches.found++;
+                }
+                // Second try: direct ID if provided
+                else if (donation.charity_id) {
                     charityId = donation.charity_id;
                     charityType = 'system';
                 }
-                // Second try: match by name
+                // Third try: match by name
                 else if (donation.charity_name) {
                     const searchName = donation.charity_name.toLowerCase();
                     const match = charityMap.get(searchName);
