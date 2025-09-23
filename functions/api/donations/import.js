@@ -223,22 +223,86 @@ export async function onRequestPost(context) {
                 // Notes will be stored as plain text in the database
                 // For items donations, the ITEMS:[...] format in notes will be parsed separately
 
-                // Insert donation with v2.0.0 structure
+                // Parse type-specific fields from CSV
+                let miles_driven = null, mileage_rate = null, mileage_purpose = null;
+                let stock_symbol = null, stock_quantity = null, fair_market_value = null;
+                let crypto_symbol = null, crypto_quantity = null, crypto_type = null;
+                let item_description = null, estimated_value = null;
+
+                // Extract type-specific data based on donation type
+                if (donationType === 'miles') {
+                    miles_driven = parseFloat(donation.miles_driven) || parseFloat(donation.miles) || null;
+                    mileage_rate = parseFloat(donation.mileage_rate) || 0.14;
+                    mileage_purpose = donation.mileage_purpose || donation.purpose || null;
+
+                    // Try to parse from description if fields not provided
+                    if (!miles_driven && donation.description) {
+                        const milesMatch = donation.description.match(/(\d+\.?\d*)\s*miles/i);
+                        if (milesMatch) miles_driven = parseFloat(milesMatch[1]);
+                        const purposeMatch = donation.description.match(/- (.+)$/);
+                        if (purposeMatch) mileage_purpose = purposeMatch[1];
+                    }
+                } else if (donationType === 'stock') {
+                    stock_symbol = donation.stock_symbol || donation.symbol || null;
+                    stock_quantity = parseFloat(donation.stock_quantity) || parseFloat(donation.shares) || null;
+                    fair_market_value = parseFloat(donation.fair_market_value) || parseFloat(donation.price_per_share) || null;
+
+                    // Try to parse from description if fields not provided
+                    if (!stock_symbol && donation.description) {
+                        const symbolMatch = donation.description.match(/^([A-Z]+):/);
+                        if (symbolMatch) stock_symbol = symbolMatch[1];
+                        const sharesMatch = donation.description.match(/(\d+\.?\d*)\s*shares/i);
+                        if (sharesMatch) stock_quantity = parseFloat(sharesMatch[1]);
+                        const priceMatch = donation.description.match(/@\s*\$(\d+\.?\d*)/);
+                        if (priceMatch) fair_market_value = parseFloat(priceMatch[1]);
+                    }
+                } else if (donationType === 'crypto') {
+                    crypto_symbol = donation.crypto_symbol || donation.symbol || null;
+                    crypto_quantity = parseFloat(donation.crypto_quantity) || parseFloat(donation.quantity) || null;
+                    crypto_type = donation.crypto_type || donation.crypto_name || null;
+
+                    // Try to parse from description if fields not provided
+                    if (!crypto_symbol && donation.description) {
+                        const symbolMatch = donation.description.match(/^([A-Z]+):/);
+                        if (symbolMatch) crypto_symbol = symbolMatch[1];
+                        const qtyMatch = donation.description.match(/(\d+\.?\d*)\s*units/i);
+                        if (qtyMatch) crypto_quantity = parseFloat(qtyMatch[1]);
+                    }
+                } else if (donationType === 'items') {
+                    item_description = donation.item_description || donation.description || null;
+                    estimated_value = parseFloat(donation.estimated_value) || amount || null;
+                }
+
+                // Insert donation with ALL proper columns
                 await env.DB.prepare(`
                     INSERT INTO donations (
-                        id, user_id, charity_id, user_charity_id, donation_type, amount, date, notes, created_at
+                        id, user_id, charity_id, user_charity_id, donation_type, amount, date, notes,
+                        miles_driven, mileage_rate, mileage_purpose,
+                        stock_symbol, stock_quantity, fair_market_value,
+                        crypto_symbol, crypto_quantity, crypto_type,
+                        item_description, estimated_value,
+                        created_at
                     ) VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+                        ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?,
+                        ?, ?, ?,
+                        ?, ?, ?,
+                        ?, ?,
+                        CURRENT_TIMESTAMP
                     )
                 `).bind(
                     donationId,
                     user.id,
                     charityId,      // Will be NULL for personal charities
                     userCharityId,  // Will be NULL for system charities
-                    donationType,   // Now stored in its own column
+                    donationType,
                     amount,
                     donationDate,
-                    donation.notes || ''  // Store plain text notes, not JSON
+                    donation.notes || '',  // User notes only
+                    miles_driven, mileage_rate, mileage_purpose,
+                    stock_symbol, stock_quantity, fair_market_value,
+                    crypto_symbol, crypto_quantity, crypto_type,
+                    item_description, estimated_value
                 ).run();
 
                 // For items donations, parse items from notes or create defaults
