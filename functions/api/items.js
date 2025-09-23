@@ -111,22 +111,29 @@ export async function onRequestGet(context) {
       });
     } else if (categoryId) {
       // Query the donation_items table that has the 497 IRS-based valuations
-      // Try without any type checking - just get items by category_id
+      // This is the original table with INTEGER PRIMARY KEY
       try {
+        // Log for debugging
+        console.log('Fetching items for category_id:', categoryId);
+
         const stmt = env.DB.prepare(`
           SELECT
             id,
             name,
             description,
-            value_poor,
-            value_fair,
-            value_good,
-            value_excellent
+            COALESCE(value_poor, 0) as value_poor,
+            COALESCE(value_fair, 0) as value_fair,
+            COALESCE(value_good, 0) as value_good,
+            COALESCE(value_excellent, 0) as value_excellent
           FROM donation_items
-          WHERE category_id = ?
+          WHERE category_id = ? AND id <= 500
           ORDER BY name
         `);
-        const result = await stmt.bind(parseInt(categoryId)).all();
+        // Don't parse if already a number
+        const catId = typeof categoryId === 'string' ? parseInt(categoryId) : categoryId;
+        const result = await stmt.bind(catId).all();
+
+        console.log('Items found:', result.results?.length || 0);
 
         return new Response(JSON.stringify({
           success: true,
