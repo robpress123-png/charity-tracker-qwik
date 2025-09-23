@@ -156,6 +156,47 @@ export async function onRequestPost(context) {
     // Generate donation ID
     const donationId = crypto.randomUUID();
 
+    // Set type-specific fields based on donation type
+    let typeSpecificFields = {
+      miles_driven: null,
+      mileage_rate: null,
+      mileage_purpose: null,
+      item_description: null,
+      estimated_value: null,
+      stock_symbol: null,
+      stock_quantity: null,
+      fair_market_value: null,
+      crypto_symbol: null,
+      crypto_quantity: null,
+      crypto_type: null
+    };
+
+    // Only set relevant fields for each donation type
+    switch(donation_type) {
+      case 'miles':
+        typeSpecificFields.miles_driven = miles_driven || null;
+        typeSpecificFields.mileage_rate = mileage_rate || null;
+        typeSpecificFields.mileage_purpose = mileage_purpose || null;
+        break;
+      case 'stock':
+        typeSpecificFields.stock_symbol = stock_symbol || null;
+        typeSpecificFields.stock_quantity = shares_donated || null;
+        typeSpecificFields.fair_market_value = fair_market_value || null;
+        break;
+      case 'crypto':
+        typeSpecificFields.crypto_symbol = crypto_symbol || null;
+        typeSpecificFields.crypto_quantity = crypto_quantity || null;
+        // crypto_type could be set here if needed
+        break;
+      case 'items':
+        // Items are stored in separate table, not in main donations table
+        break;
+      case 'cash':
+      default:
+        // Cash donations don't need any type-specific fields
+        break;
+    }
+
     // Insert main donation record with proper columns
     const stmt = env.DB.prepare(`
       INSERT INTO donations (
@@ -177,17 +218,17 @@ export async function onRequestPost(context) {
       amount,
       donation_date,
       notes || '',  // Just the actual user notes, not JSON
-      miles_driven || null,
-      mileage_rate || null,
-      mileage_purpose || null,
-      null, // item_description - deprecated, using donation_items table instead
-      null, // estimated_value - deprecated, calculated from items
-      stock_symbol || null,
-      shares_donated || null, // stock_quantity field
-      fair_market_value || null,
-      crypto_symbol || null,
-      crypto_quantity || null,
-      null // crypto_type - not currently used
+      typeSpecificFields.miles_driven,
+      typeSpecificFields.mileage_rate,
+      typeSpecificFields.mileage_purpose,
+      typeSpecificFields.item_description,
+      typeSpecificFields.estimated_value,
+      typeSpecificFields.stock_symbol,
+      typeSpecificFields.stock_quantity,
+      typeSpecificFields.fair_market_value,
+      typeSpecificFields.crypto_symbol,
+      typeSpecificFields.crypto_quantity,
+      typeSpecificFields.crypto_type
     ).run();
 
     // If this is an items donation, insert the items
@@ -541,6 +582,47 @@ export async function onRequestPut(context) {
 
     // Notes is now just user-entered text
 
+    // Set type-specific fields based on donation type for update
+    let typeSpecificFields = {
+      miles_driven: null,
+      mileage_rate: null,
+      mileage_purpose: null,
+      item_description: null,
+      estimated_value: null,
+      stock_symbol: null,
+      stock_quantity: null,
+      fair_market_value: null,
+      crypto_symbol: null,
+      crypto_quantity: null,
+      crypto_type: null
+    };
+
+    // Only set relevant fields for each donation type
+    switch(donation_type) {
+      case 'miles':
+        typeSpecificFields.miles_driven = miles_driven || null;
+        typeSpecificFields.mileage_rate = mileage_rate || null;
+        typeSpecificFields.mileage_purpose = mileage_purpose || null;
+        break;
+      case 'stock':
+        typeSpecificFields.stock_symbol = stock_symbol || null;
+        typeSpecificFields.stock_quantity = shares_donated || null;
+        typeSpecificFields.fair_market_value = fair_market_value || null;
+        break;
+      case 'crypto':
+        typeSpecificFields.crypto_symbol = crypto_symbol || null;
+        typeSpecificFields.crypto_quantity = crypto_quantity || null;
+        // crypto_type could be set here if needed
+        break;
+      case 'items':
+        // Items are stored in separate table, not in main donations table
+        break;
+      case 'cash':
+      default:
+        // Cash donations don't need any type-specific fields
+        break;
+    }
+
     // Update the donation with proper columns
     const updateStmt = env.DB.prepare(`
       UPDATE donations
@@ -571,17 +653,17 @@ export async function onRequestPut(context) {
       amount,
       donation_date,
       notes || '',  // Just the actual user notes, not JSON
-      miles_driven || null,
-      mileage_rate || null,
-      mileage_purpose || null,
-      null, // item_description - deprecated, using donation_items table instead
-      null, // estimated_value - deprecated, calculated from items
-      stock_symbol || null,
-      shares_donated || null, // stock_quantity field
-      fair_market_value || null,
-      crypto_symbol || null,
-      crypto_quantity || null,
-      null // crypto_type - not currently used,
+      typeSpecificFields.miles_driven,
+      typeSpecificFields.mileage_rate,
+      typeSpecificFields.mileage_purpose,
+      typeSpecificFields.item_description,
+      typeSpecificFields.estimated_value,
+      typeSpecificFields.stock_symbol,
+      typeSpecificFields.stock_quantity,
+      typeSpecificFields.fair_market_value,
+      typeSpecificFields.crypto_symbol,
+      typeSpecificFields.crypto_quantity,
+      typeSpecificFields.crypto_type,
       donationId,
       userId
     ).run();
