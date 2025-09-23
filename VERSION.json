@@ -1,16 +1,6 @@
 {
-  "version": "2.0.2",
-  "previousVersion": "2.0.1",
-  "timestamp": "2025-09-23T09:39:09.023Z",
-  "bumpType": "patch",
-  "changes": [
-    "package.json",
-    "dist/dashboard.html",
-    "dist/index.html",
-    "dist/login.html",
-    "dist/register.html",
-    "dist/admin-dashboard.html",
-    "dist/admin-login.html",
-    "CONTINUATION_PROMPT_v2.0.0.md"
-  ]
+  "version": "2.0.3",
+  "previousVersion": "2.0.2",
+  "timestamp": "2025-09-23T09:47:13.433Z",
+  "bumpType": "patch"
 }
