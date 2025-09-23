@@ -151,37 +151,21 @@ export async function onRequestPost(context) {
       systemCharityId = charity_id;
     }
 
-    // Build notes object for non-items fields
-    const notesData = {
-      donation_type: donation_type || 'cash',
-      miles_driven,
-      mileage_rate,
-      mileage_purpose,
-      stock_name,
-      stock_symbol,
-      shares_donated,
-      cost_basis,
-      fair_market_value,
-      crypto_name,
-      crypto_symbol,
-      crypto_quantity,
-      crypto_price_per_unit,
-      crypto_exchange,
-      crypto_cost_basis,
-      crypto_holding_period,
-      crypto_donation_datetime,
-      notes: notes || ''
-    };
+    // Notes is now just user-entered text
 
     // Generate donation ID
     const donationId = crypto.randomUUID();
 
-    // Insert main donation record
+    // Insert main donation record with proper columns
     const stmt = env.DB.prepare(`
       INSERT INTO donations (
-        id, user_id, charity_id, user_charity_id, donation_type, amount, date, notes
+        id, user_id, charity_id, user_charity_id, donation_type, amount, date, notes,
+        miles_driven, mileage_rate, mileage_purpose,
+        item_description, estimated_value,
+        stock_symbol, stock_quantity, fair_market_value,
+        crypto_symbol, crypto_quantity, crypto_type
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = await stmt.bind(
@@ -192,7 +176,18 @@ export async function onRequestPost(context) {
       donation_type,
       amount,
       donation_date,
-      JSON.stringify(notesData)
+      notes || '',  // Just the actual user notes, not JSON
+      miles_driven || null,
+      mileage_rate || null,
+      mileage_purpose || null,
+      item_description || null,
+      estimated_value || null,
+      stock_symbol || null,
+      stock_quantity || null,
+      fair_market_value || null,
+      crypto_symbol || null,
+      crypto_quantity || null,
+      crypto_type || null
     ).run();
 
     // If this is an items donation, insert the items
@@ -321,6 +316,17 @@ export async function onRequestGet(context) {
         d.notes,
         d.receipt_url,
         d.created_at,
+        d.miles_driven,
+        d.mileage_rate,
+        d.mileage_purpose,
+        d.item_description,
+        d.estimated_value,
+        d.stock_symbol,
+        d.stock_quantity,
+        d.fair_market_value,
+        d.crypto_symbol,
+        d.crypto_quantity,
+        d.crypto_type,
         COALESCE(c.name, uc.name) as charity_name,
         COALESCE(c.ein, uc.ein) as charity_ein,
         COALESCE(c.category, uc.category) as charity_category,
@@ -499,29 +505,9 @@ export async function onRequestPut(context) {
       systemCharityId = charity_id;
     }
 
-    // Build notes object
-    const notesData = {
-      donation_type: donation_type || 'cash',
-      miles_driven,
-      mileage_rate,
-      mileage_purpose,
-      stock_name,
-      stock_symbol,
-      shares_donated,
-      cost_basis,
-      fair_market_value,
-      crypto_name,
-      crypto_symbol,
-      crypto_quantity,
-      crypto_price_per_unit,
-      crypto_exchange,
-      crypto_cost_basis,
-      crypto_holding_period,
-      crypto_donation_datetime,
-      notes: notes || ''
-    };
+    // Notes is now just user-entered text
 
-    // Update the donation
+    // Update the donation with proper columns
     const updateStmt = env.DB.prepare(`
       UPDATE donations
       SET charity_id = ?,
@@ -529,7 +515,18 @@ export async function onRequestPut(context) {
           donation_type = ?,
           amount = ?,
           date = ?,
-          notes = ?
+          notes = ?,
+          miles_driven = ?,
+          mileage_rate = ?,
+          mileage_purpose = ?,
+          item_description = ?,
+          estimated_value = ?,
+          stock_symbol = ?,
+          stock_quantity = ?,
+          fair_market_value = ?,
+          crypto_symbol = ?,
+          crypto_quantity = ?,
+          crypto_type = ?
       WHERE id = ? AND user_id = ?
     `);
 
@@ -539,7 +536,18 @@ export async function onRequestPut(context) {
       donation_type,
       amount,
       donation_date,
-      JSON.stringify(notesData),
+      notes || '',  // Just the actual user notes, not JSON
+      miles_driven || null,
+      mileage_rate || null,
+      mileage_purpose || null,
+      item_description || null,
+      estimated_value || null,
+      stock_symbol || null,
+      stock_quantity || null,
+      fair_market_value || null,
+      crypto_symbol || null,
+      crypto_quantity || null,
+      crypto_type || null,
       donationId,
       userId
     ).run();

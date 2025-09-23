@@ -54,6 +54,17 @@ export async function onRequestGet(context) {
                 d.receipt_url,
                 d.notes,
                 d.created_at,
+                d.miles_driven,
+                d.mileage_rate,
+                d.mileage_purpose,
+                d.item_description,
+                d.estimated_value,
+                d.stock_symbol,
+                d.stock_quantity,
+                d.fair_market_value,
+                d.crypto_symbol,
+                d.crypto_quantity,
+                d.crypto_type,
                 c.name as charity_name,
                 c.ein as charity_ein
             FROM donations d
@@ -68,20 +79,7 @@ export async function onRequestGet(context) {
             }, { status: 404 });
         }
 
-        // Parse notes field if it contains JSON (for donation type specific data)
-        if (donation.notes) {
-            try {
-                const notesData = JSON.parse(donation.notes);
-                // Spread the notes data into the donation object
-                Object.assign(donation, notesData);
-                // Keep original notes if it was just a string
-                if (typeof notesData === 'object') {
-                    donation.notes = notesData.userNotes || '';
-                }
-            } catch (e) {
-                // Notes is just a plain string, leave it as is
-            }
-        }
+        // Notes is now just user-entered text, no JSON parsing needed
 
         return Response.json({
             success: true,

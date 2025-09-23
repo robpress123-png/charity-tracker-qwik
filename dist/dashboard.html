@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.1.18</title>
+    <title>Dashboard - Charity Tracker v2.1.19</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -1350,7 +1350,7 @@
                         </div>
                     </div>
                     <div style="background:#f3f4f6; padding:0.5rem; border-radius:8px; margin-top:0.5rem;">
-                        <small>2024 IRS Rate: $0.14/mile | Deduction: $<span id="mileageDeduction">0.00</span></small>
+                        <small>IRS Rate: $<span id="mileageRateDisplay">0.14</span>/mile | Deduction: $<span id="mileageDeduction">0.00</span></small>
                     </div>
                 </div>
                 <!-- Stock donation fields -->
@@ -4418,16 +4418,35 @@
 
         // Edit donation function
         async function editDonation(donationId) {
-            // NOTE: For production, this should fetch from database:
-            // GET /api/donations/{donationId} to retrieve full record
-            // Currently using localStorage as a workaround since the API endpoint isn't implemented yet
-
             try {
                 let donation = null;
+                const token = localStorage.getItem('token');
 
-                // Get from localStorage (temporary solution - should be API call in production)
-                const storedDonations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
-                donation = storedDonations.find(d => d.id === donationId);
+                // First try to fetch from API for the most accurate data
+                try {
+                    const response = await fetch(`/api/donations/${donationId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.donation) {
+                            donation = data.donation;
+                            console.log('[DEBUG] Fetched donation from API:', donation);
+                        }
+                    }
+                } catch (apiError) {
+                    console.log('[DEBUG] API fetch failed, falling back to localStorage:', apiError);
+                }
+
+                // Fallback to localStorage if API fails
+                if (!donation) {
+                    const storedDonations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
+                    donation = storedDonations.find(d => d.id === donationId);
+                    console.log('[DEBUG] Using donation from localStorage:', donation);
+                }
 
                 if (donation) {
                     // Store the donation ID for update
@@ -4488,17 +4507,26 @@
                         } else if (donation.donation_type === 'miles') {
                             const milesDriven = document.getElementById('milesDriven');
                             const mileagePurpose = document.getElementById('mileagePurpose');
+                            // Debug: log what we're trying to populate
+                            console.log('[DEBUG] Editing mileage donation:', {
+                                miles_driven: donation.miles_driven,
+                                mileage_rate: donation.mileage_rate,
+                                mileage_purpose: donation.mileage_purpose,
+                                amount: donation.amount
+                            });
                             if (milesDriven) milesDriven.value = donation.miles_driven || '';
                             if (mileagePurpose) mileagePurpose.value = donation.mileage_purpose || '';
+                            // Trigger calculation to show rate and deduction
+                            calculateMileageDeduction();
                         } else if (donation.donation_type === 'stock') {
                             const stockName = document.getElementById('stockName');
                             const stockSymbol = document.getElementById('stockSymbol');
-                            const stockShares = document.getElementById('stockShares');
-                            const stockPrice = document.getElementById('stockPrice');
+                            const stockQuantity = document.getElementById('stockQuantity');
+                            const fairMarketValue = document.getElementById('fairMarketValue');
                             if (stockName) stockName.value = donation.stock_name || '';
                             if (stockSymbol) stockSymbol.value = donation.stock_symbol || '';
-                            if (stockShares) stockShares.value = donation.shares_donated || '';
-                            if (stockPrice) stockPrice.value = donation.price_per_share || '';
+                            if (stockQuantity) stockQuantity.value = donation.stock_quantity || donation.shares_donated || '';
+                            if (fairMarketValue) fairMarketValue.value = donation.fair_market_value || donation.price_per_share || '';
                         } else if (donation.donation_type === 'crypto') {
                             const cryptoName = document.getElementById('cryptoName');
                             const cryptoSymbol = document.getElementById('cryptoSymbol');
@@ -4999,9 +5027,22 @@
         // Calculate mileage deduction
         function calculateMileageDeduction() {
             const miles = parseFloat(document.getElementById('milesDriven').value) || 0;
-            const rate = 0.14; // 2024 IRS rate
+            // Use stored rate if editing, otherwise use current IRS rate
+            let rate = 0.14; // 2024 IRS rate
+            if (window.editingDonationId) {
+                const storedDonations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
+                const donation = storedDonations.find(d => d.id === window.editingDonationId);
+                if (donation && donation.mileage_rate) {
+                    rate = donation.mileage_rate;
+                }
+            }
             const deduction = miles * rate;
             document.getElementById('mileageDeduction').textContent = deduction.toFixed(2);
+            // Update the rate display
+            const rateDisplay = document.getElementById('mileageRateDisplay');
+            if (rateDisplay) {
+                rateDisplay.textContent = rate.toFixed(2);
+            }
         }
 
         // Function to populate year dropdowns dynamically
