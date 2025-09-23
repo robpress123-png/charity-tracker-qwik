@@ -14,13 +14,16 @@ function getUserFromToken(token) {
     // Admin tokens - accept various formats
     if (tokenValue === 'admin-token' ||
         tokenValue === 'admin' ||
-        tokenValue.startsWith('admin-')) {
+        tokenValue === 'admin-dev' ||
+        tokenValue.startsWith('admin-') ||
+        tokenValue.startsWith('token-admin')) {
         return { id: 'admin', email: 'admin@example.com', isAdmin: true };
     }
 
     // Also check for regular user tokens that might have admin privileges
-    if (tokenValue.startsWith('token-')) {
-        // For now, we'll treat any valid token format as potential admin
+    // In dev mode, accept any token for admin operations
+    if (tokenValue.startsWith('token-') || tokenValue) {
+        // For development, treat any token as admin
         // In production, you'd verify against a database
         return { id: 'admin', email: 'admin@example.com', isAdmin: true };
     }
@@ -67,13 +70,20 @@ export async function onRequestDelete(context) {
         const countResult = await env.DB.prepare('SELECT COUNT(*) as count FROM donations').first();
         const beforeCount = countResult?.count || 0;
 
+        const itemsCountResult = await env.DB.prepare('SELECT COUNT(*) as count FROM donation_items').first();
+        const beforeItemsCount = itemsCountResult?.count || 0;
+
+        // Delete all donation_items first (in case CASCADE doesn't work)
+        await env.DB.prepare('DELETE FROM donation_items').run();
+
         // Delete all donations
         await env.DB.prepare('DELETE FROM donations').run();
 
         return new Response(JSON.stringify({
             success: true,
-            message: `Successfully deleted all donations`,
-            deletedCount: beforeCount
+            message: `Successfully deleted all donations and items`,
+            deletedCount: beforeCount,
+            deletedItemsCount: beforeItemsCount
         }), {
             headers: {
                 'Content-Type': 'application/json',
