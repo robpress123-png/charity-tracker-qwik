@@ -1,4 +1,4 @@
-# Charity Tracker v2.0.1 - Continuation Prompt
+# Charity Tracker v2.0.2 - Continuation Prompt
 
 ## Current State: v2.0.0 → v2.0.1 Migration
 **Date:** January 22, 2025
