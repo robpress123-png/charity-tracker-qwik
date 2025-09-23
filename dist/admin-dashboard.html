@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.0.7</title>
+    <title>Admin Dashboard - Charity Tracker v2.1.0</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.0.7</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.1.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -430,12 +430,25 @@
             </div>
 
             <div class="sidebar-section">
+                <div class="sidebar-title">Donations Management</div>
+                <button class="sidebar-item" onclick="showSection('donations-management')">
+                    💰 Manage All Donations
+                </button>
+                <button class="sidebar-item" onclick="showSection('donations-backup')">
+                    💾 Backup/Restore Donations
+                </button>
+            </div>
+
+            <div class="sidebar-section">
                 <div class="sidebar-title">Donated Items Management</div>
                 <button class="sidebar-item" onclick="showSection('import')">
                     📦 Import Items Database
                 </button>
                 <button class="sidebar-item" onclick="showSection('items')">
                     📝 Manage Items
+                </button>
+                <button class="sidebar-item" onclick="showSection('items-history')">
+                    📊 Price History
                 </button>
             </div>
 
@@ -719,6 +732,149 @@
                 </table>
             </div>
 
+            <!-- Donations Management Section -->
+            <div id="donations-management" class="content-section">
+                <div class="section-header">
+                    <h2>Donations Management</h2>
+                    <p>Manage all user donations</p>
+                </div>
+
+                <div class="alert alert-info">
+                    💡 <strong>Current Status:</strong> <span id="totalDonationCount">Loading...</span> total donations in database
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Donation Tools</h3>
+
+                    <!-- Clear Specific User Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear User Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Remove all donations for a specific user
+                        </p>
+                        <button class="tool-btn" onclick="showClearUserDonationsModal()" style="background: #f59e0b;">
+                            🗑️ Clear User Donations
+                        </button>
+                    </div>
+
+                    <!-- Delete All Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Delete All Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Remove ALL donations from the database for ALL users. This action cannot be undone.
+                        </p>
+                        <button class="tool-btn" onclick="confirmDeleteAllDonations()" style="background: #dc2626;">
+                            🗑️ Delete All Donations
+                        </button>
+                    </div>
+
+                    <!-- Clear Donation Items Only -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear Donation Items</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Delete all donation_items records but keep donation records
+                        </p>
+                        <button class="tool-btn secondary" onclick="showClearDonationItemsModal()">
+                            📦 Clear Items Only
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donations Backup/Restore Section -->
+            <div id="donations-backup" class="content-section">
+                <div class="section-header">
+                    <h2>Backup & Restore Donations</h2>
+                    <p>Create and restore donation backups</p>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Backup Tools</h3>
+
+                    <!-- Export All Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Export All Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Download all donations as JSON backup file
+                        </p>
+                        <button class="tool-btn" onclick="exportAllDonations()" style="background: #10b981;">
+                            💾 Export All Donations
+                        </button>
+                        <span id="exportDonationsStatus" style="margin-left: 1rem; color: #10b981;"></span>
+                    </div>
+
+                    <!-- Export User Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Export User Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Download donations for a specific user as JSON
+                        </p>
+                        <button class="tool-btn" onclick="showExportUserDonationsModal()" style="background: #10b981;">
+                            💾 Export User Donations
+                        </button>
+                    </div>
+
+                    <h3 style="color: #f3f4f6; margin: 2rem 0 1rem;">Restore Tools</h3>
+
+                    <!-- Restore All Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Restore All Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Restore donations from a JSON backup file (replaces existing data)
+                        </p>
+                        <input type="file" id="restoreAllFile" accept=".json" style="display: none;" onchange="handleRestoreAllFile(event)">
+                        <button class="tool-btn secondary" onclick="document.getElementById('restoreAllFile').click()">
+                            📂 Select Backup File
+                        </button>
+                    </div>
+
+                    <!-- Restore User Donations -->
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Restore User Donations</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Restore donations for a specific user from backup
+                        </p>
+                        <input type="file" id="restoreUserFile" accept=".json" style="display: none;" onchange="handleRestoreUserFile(event)">
+                        <button class="tool-btn secondary" onclick="document.getElementById('restoreUserFile').click()">
+                            📂 Select User Backup
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Price History Section -->
+            <div id="items-history" class="content-section">
+                <div class="section-header">
+                    <h2>Items Price History</h2>
+                    <p>Track and query historical item prices</p>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Query Historical Prices</h3>
+
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 200px; gap: 1rem; margin-bottom: 1rem;">
+                            <input type="text" id="historyItemName" placeholder="Item name..."
+                                   style="padding: 0.75rem; background: #111827; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px;">
+                            <input type="date" id="historyDate"
+                                   style="padding: 0.75rem; background: #111827; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px;">
+                            <button class="tool-btn" onclick="queryPriceHistory()">
+                                🔍 Search History
+                            </button>
+                        </div>
+
+                        <div id="priceHistoryResults" style="margin-top: 1rem;">
+                            <!-- Results will appear here -->
+                        </div>
+                    </div>
+
+                    <h3 style="color: #f3f4f6; margin: 2rem 0 1rem;">Recent Price Changes</h3>
+                    <div id="recentPriceChanges" style="background: #1f2937; padding: 1.5rem; border-radius: 12px;">
+                        <p style="color: #6b7280;">Loading recent changes...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Other Placeholder Sections -->
             <div id="charities" class="content-section">
                 <div class="section-header">
@@ -733,43 +889,42 @@
             <div id="items" class="content-section">
                 <div class="section-header">
                     <h2>Item Management</h2>
-                    <p>Edit and manage donation items and donations</p>
+                    <p>Manage the items pricing database</p>
+                </div>
+
+                <div class="alert alert-info">
+                    💡 <strong>Current Status:</strong> <span id="itemsCount">Loading...</span> items in pricing database
                 </div>
 
                 <div style="margin-top: 2rem;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Donation Management</h3>
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Items Database Tools</h3>
+
                     <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
-                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear User Donations</h4>
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Search Items</h4>
                         <p style="color: #6b7280; margin-bottom: 1rem;">
-                            Remove all donations for a specific user or all users
+                            Search and edit items in the pricing database
                         </p>
-                        <button class="tool-btn" onclick="showClearDonationsModal()" style="background: #f59e0b;">
-                            🧹 Clear Donations
+                        <input type="text" id="itemSearchInput" placeholder="Search items by name or category..."
+                               style="width: 100%; padding: 0.75rem; background: #111827; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1rem;">
+                        <button class="tool-btn" onclick="searchItems()">
+                            🔍 Search Items
                         </button>
                     </div>
 
-                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
-                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clear Donation Items Only</h4>
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Export Items Database</h4>
                         <p style="color: #6b7280; margin-bottom: 1rem;">
-                            Remove all itemized donation details while keeping donation records intact
+                            Download the current items pricing database as CSV
                         </p>
-                        <button class="tool-btn" onclick="showClearDonationItemsModal()" style="background: #8b5cf6;">
-                            📦 Clear Items Only
+                        <button class="tool-btn secondary" onclick="exportItemsDatabase()">
+                            📥 Export Items CSV
                         </button>
+                        <span id="exportItemsStatus" style="margin-left: 1rem; color: #10b981;"></span>
                     </div>
                 </div>
 
-                <div style="margin-top: 2rem;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Danger Zone - Donations</h3>
-                    <div style="background: #7f1d1d; border: 2px solid #dc2626; padding: 1.5rem; border-radius: 12px;">
-                        <h4 style="color: #fca5a5; margin-bottom: 0.5rem;">Delete All Donations</h4>
-                        <p style="color: #fca5a5; margin-bottom: 1rem;">
-                            This will permanently delete ALL donations from ALL users. Donation items will also be deleted.
-                        </p>
-                        <button class="tool-btn" onclick="confirmDeleteAllDonations()" style="background: #dc2626;">
-                            🗑️ Delete All Donations
-                        </button>
-                    </div>
+                <div id="itemSearchResults" style="margin-top: 2rem;">
+                    <!-- Search results will appear here -->
                 </div>
             </div>
 
@@ -966,6 +1121,15 @@
                 } else if (sectionName === 'database') {
                     // Update database stats when showing database management
                     loadDatabaseStats();
+                } else if (sectionName === 'donations-management') {
+                    // Load donation count for donations management
+                    loadTotalDonationCount();
+                } else if (sectionName === 'items') {
+                    // Load items count for items management
+                    loadItemsCount();
+                } else if (sectionName === 'items-history') {
+                    // Load recent price changes
+                    loadRecentPriceChanges();
                 }
             }
 
@@ -1224,8 +1388,8 @@
             }, 100); // Small delay to allow UI to update
         }
 
-        // Clear Donations Modal (for specific users)
-        async function showClearDonationsModal() {
+        // New function for clearing specific user donations (renamed to avoid conflict)
+        async function showClearUserDonationsModal() {
             // Create a modal to select user
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;';
@@ -1416,6 +1580,459 @@
                     button.textContent = originalText;
                     button.disabled = false;
                 }, 2000);
+            }
+        }
+
+        // Export all donations as JSON backup
+        async function exportAllDonations() {
+            const statusEl = document.getElementById('exportDonationsStatus');
+            statusEl.textContent = 'Exporting...';
+
+            try {
+                const response = await fetch('/api/donations/export-all', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Create download link
+                    const blob = new Blob([JSON.stringify(data.donations, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `donations_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    statusEl.textContent = `✅ Exported ${data.donations.length} donations`;
+                } else {
+                    statusEl.textContent = '❌ Export failed';
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ Export error';
+                console.error('Export error:', error);
+            }
+        }
+
+        // Show modal to export specific user donations
+        async function showExportUserDonationsModal() {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;';
+            modal.innerHTML = `
+                <div style="background: #111827; border: 2px solid #10b981; border-radius: 12px; padding: 2rem; max-width: 500px;">
+                    <h3 style="color: #10b981; margin-bottom: 1rem;">Export User Donations</h3>
+                    <p style="color: #f3f4f6; margin-bottom: 1.5rem;">Select a user to export their donations:</p>
+                    <select id="userSelectForExport" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <option value="">Loading users...</option>
+                    </select>
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="executeExportUserDonations()" style="flex: 1; padding: 0.75rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Export Donations
+                        </button>
+                        <button onclick="this.closest('div[style]').parentElement.remove()" style="flex: 1; padding: 0.75rem; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                    <div id="exportUserStatus" style="margin-top: 1rem; text-align: center;"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Load users
+            try {
+                const response = await fetch('/api/users', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success && data.users) {
+                    const select = document.getElementById('userSelectForExport');
+                    select.innerHTML = '<option value="">Select a user...</option>';
+                    data.users.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = `${user.email} (${user.name || 'No name'})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Execute export for specific user
+        async function executeExportUserDonations() {
+            const userId = document.getElementById('userSelectForExport').value;
+            const statusEl = document.getElementById('exportUserStatus');
+
+            if (!userId) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = 'Please select a user';
+                return;
+            }
+
+            statusEl.style.color = '#f59e0b';
+            statusEl.textContent = 'Exporting...';
+
+            try {
+                const response = await fetch(`/api/donations/export-user/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Create download link
+                    const blob = new Blob([JSON.stringify(data.donations, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `donations_user_${userId}_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    statusEl.style.color = '#10b981';
+                    statusEl.textContent = `✅ Exported ${data.donations.length} donations`;
+                } else {
+                    statusEl.style.color = '#ef4444';
+                    statusEl.textContent = '❌ Export failed';
+                }
+            } catch (error) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = '❌ Export error';
+            }
+        }
+
+        // Handle restore all donations from file
+        async function handleRestoreAllFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('This will REPLACE all existing donations with the backup. Continue?')) {
+                event.target.value = '';
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const donations = JSON.parse(text);
+
+                const response = await fetch('/api/donations/restore-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ donations })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Successfully restored ${result.count} donations`);
+                    loadAdminStats();
+                    loadDatabaseStats();
+                } else {
+                    alert('❌ Restore failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Error reading backup file: ' + error.message);
+            }
+
+            event.target.value = '';
+        }
+
+        // Handle restore user donations from file
+        async function handleRestoreUserFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const donations = JSON.parse(text);
+
+                // Get user ID from the first donation or ask user
+                const userId = donations[0]?.user_id;
+
+                if (!userId) {
+                    alert('❌ Invalid backup file: No user ID found');
+                    event.target.value = '';
+                    return;
+                }
+
+                if (!confirm(`This will restore ${donations.length} donations for user ${userId}. Continue?`)) {
+                    event.target.value = '';
+                    return;
+                }
+
+                const response = await fetch('/api/donations/restore-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ userId, donations })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`✅ Successfully restored ${result.count} donations for user`);
+                    loadAdminStats();
+                    loadDatabaseStats();
+                } else {
+                    alert('❌ Restore failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('❌ Error reading backup file: ' + error.message);
+            }
+
+            event.target.value = '';
+        }
+
+        // Query price history for items
+        async function queryPriceHistory() {
+            const itemName = document.getElementById('historyItemName').value;
+            const date = document.getElementById('historyDate').value;
+            const resultsEl = document.getElementById('priceHistoryResults');
+
+            if (!itemName) {
+                resultsEl.innerHTML = '<p style="color: #ef4444;">Please enter an item name</p>';
+                return;
+            }
+
+            resultsEl.innerHTML = '<p style="color: #f59e0b;">Searching...</p>';
+
+            try {
+                const params = new URLSearchParams({ item: itemName });
+                if (date) params.append('date', date);
+
+                const response = await fetch(`/api/items/price-history?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.history) {
+                    if (data.history.length === 0) {
+                        resultsEl.innerHTML = '<p style="color: #6b7280;">No price history found for this item</p>';
+                    } else {
+                        let html = '<table style="width: 100%; color: #f3f4f6;">';
+                        html += '<thead><tr style="border-bottom: 1px solid #374151;">';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Date</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Item</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Low Value</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">High Value</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Changed By</th>';
+                        html += '</tr></thead><tbody>';
+
+                        data.history.forEach(record => {
+                            html += '<tr style="border-bottom: 1px solid #1f2937;">';
+                            html += `<td style="padding: 0.5rem;">${new Date(record.changed_at).toLocaleDateString()}</td>`;
+                            html += `<td style="padding: 0.5rem;">${record.item_name}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${record.new_low_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${record.new_high_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">${record.changed_by || 'System'}</td>`;
+                            html += '</tr>';
+                        });
+
+                        html += '</tbody></table>';
+                        resultsEl.innerHTML = html;
+                    }
+                } else {
+                    resultsEl.innerHTML = '<p style="color: #ef4444;">Failed to load price history</p>';
+                }
+            } catch (error) {
+                resultsEl.innerHTML = '<p style="color: #ef4444;">Error loading price history</p>';
+                console.error('Price history error:', error);
+            }
+        }
+
+        // Search items in pricing database
+        async function searchItems() {
+            const searchTerm = document.getElementById('itemSearchInput').value;
+            const resultsEl = document.getElementById('itemSearchResults');
+
+            if (!searchTerm) {
+                resultsEl.innerHTML = '';
+                return;
+            }
+
+            resultsEl.innerHTML = '<p style="color: #f59e0b;">Searching...</p>';
+
+            try {
+                const response = await fetch(`/api/items/search?q=${encodeURIComponent(searchTerm)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.items) {
+                    if (data.items.length === 0) {
+                        resultsEl.innerHTML = '<p style="color: #6b7280;">No items found</p>';
+                    } else {
+                        let html = '<h3 style="color: #f3f4f6; margin-bottom: 1rem;">Search Results</h3>';
+                        html += '<div style="background: #1f2937; padding: 1rem; border-radius: 12px;">';
+                        html += '<table style="width: 100%; color: #f3f4f6;">';
+                        html += '<thead><tr style="border-bottom: 1px solid #374151;">';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Name</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Category</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Low Value</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">High Value</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Actions</th>';
+                        html += '</tr></thead><tbody>';
+
+                        data.items.forEach(item => {
+                            html += '<tr style="border-bottom: 1px solid #1f2937;">';
+                            html += `<td style="padding: 0.5rem;">${item.name}</td>`;
+                            html += `<td style="padding: 0.5rem;">${item.category}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${item.low_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${item.high_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">
+                                <button onclick="editItem('${item.id}')" style="padding: 0.25rem 0.5rem; background: #4b5563; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+                            </td>`;
+                            html += '</tr>';
+                        });
+
+                        html += '</tbody></table></div>';
+                        resultsEl.innerHTML = html;
+                    }
+                } else {
+                    resultsEl.innerHTML = '<p style="color: #ef4444;">Search failed</p>';
+                }
+            } catch (error) {
+                resultsEl.innerHTML = '<p style="color: #ef4444;">Search error</p>';
+                console.error('Search error:', error);
+            }
+        }
+
+        // Export items database as CSV
+        async function exportItemsDatabase() {
+            const statusEl = document.getElementById('exportItemsStatus');
+            statusEl.textContent = 'Exporting...';
+
+            try {
+                const response = await fetch('/api/items/export', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `items_database_${new Date().toISOString().split('T')[0]}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    statusEl.textContent = '✅ Export complete';
+                } else {
+                    statusEl.textContent = '❌ Export failed';
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ Export error';
+                console.error('Export error:', error);
+            }
+        }
+
+        // Edit item placeholder
+        function editItem(itemId) {
+            alert('Edit item feature coming soon. Item ID: ' + itemId);
+        }
+
+        // Load items count
+        async function loadItemsCount() {
+            try {
+                const response = await fetch('/api/items/count', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const el = document.getElementById('itemsCount');
+                    if (el) el.textContent = `${data.count || 0} items in pricing database`;
+                }
+            } catch (error) {
+                console.error('Error loading items count:', error);
+            }
+        }
+
+        // Load total donation count for Donations Management
+        async function loadTotalDonationCount() {
+            try {
+                const response = await fetch('/api/donations/count', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const el = document.getElementById('totalDonationCount');
+                    if (el) el.textContent = `${data.count || 0} total donations in database`;
+                }
+            } catch (error) {
+                console.error('Error loading donation count:', error);
+            }
+        }
+
+        // Load recent price changes for items
+        async function loadRecentPriceChanges() {
+            const el = document.getElementById('recentPriceChanges');
+            if (!el) return;
+
+            try {
+                const response = await fetch('/api/items/recent-price-changes', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success && data.changes) {
+                    if (data.changes.length === 0) {
+                        el.innerHTML = '<p style="color: #6b7280;">No recent price changes</p>';
+                    } else {
+                        let html = '<table style="width: 100%; color: #f3f4f6;">';
+                        html += '<thead><tr style="border-bottom: 1px solid #374151;">';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Date</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Item</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Old Price</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">New Price</th>';
+                        html += '<th style="padding: 0.5rem; text-align: left;">Changed By</th>';
+                        html += '</tr></thead><tbody>';
+
+                        data.changes.slice(0, 10).forEach(change => {
+                            html += '<tr style="border-bottom: 1px solid #1f2937;">';
+                            html += `<td style="padding: 0.5rem;">${new Date(change.changed_at).toLocaleDateString()}</td>`;
+                            html += `<td style="padding: 0.5rem;">${change.item_name}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${change.old_low_value || 0}-$${change.old_high_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">$${change.new_low_value || 0}-$${change.new_high_value || 0}</td>`;
+                            html += `<td style="padding: 0.5rem;">${change.changed_by || 'System'}</td>`;
+                            html += '</tr>';
+                        });
+
+                        html += '</tbody></table>';
+                        el.innerHTML = html;
+                    }
+                } else {
+                    el.innerHTML = '<p style="color: #6b7280;">Unable to load recent changes</p>';
+                }
+            } catch (error) {
+                el.innerHTML = '<p style="color: #ef4444;">Error loading recent changes</p>';
+                console.error('Error loading recent price changes:', error);
             }
         }
 
