@@ -1,29 +1,23 @@
-# Charity Tracker Continuation Context - v2.1.59
+# Charity Tracker Continuation Context - v2.1.60
 
 ## Current Status
-- **Version:** 2.1.59
+- **Version:** 2.1.60
 - **Last Updated:** 2025-09-23
 - **Date/Time Context:** September 23, 2025
 
 ## 🚨 CURRENT ISSUES (CHANGE THIS SECTION):
 
-### 1. 500 Error When Saving Donations:
-- **Problem**: Server returns 500 when trying to save donations
-- **Cause**: Added `value_source` column to INSERT but migration not run on production D1
-- **Fix**: Remove value_source from INSERT until migration is run
-
-### 2. Category-Item Misalignment:
-- **Problem**: Items showing in wrong categories (exercise bikes in Books & Media, cookbooks in Appliances)
-- **Root Cause**: Mismatch between items.category and item_categories.name
-- **Location**: `/functions/api/items.js` line 132-133
+### 1. Pending Migration:
+- **Status**: Need to run `migration_add_value_source.sql` on production D1
+- **API Token**: Invalid - need valid CLOUDFLARE_API_TOKEN
+- **Next**: After migration, re-enable value_source in INSERT statements
 
 ## 📌 NEXT STEPS ON RESTART:
-1. **Ask for CLOUDFLARE_API_TOKEN** to query D1 database directly
-2. Run migration `migration_add_value_source.sql` on production D1
-3. Query D1 to verify actual category names match between tables
-4. Re-enable value_source in INSERT statements after migration
+1. Run migration `migration_add_value_source.sql` on production D1
+2. Re-enable value_source in INSERT statements after migration
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
+- Fixed category-item misalignment by mapping category ID to name (v2.1.60)
 - Edit donation now fetches items from donation_items table (v2.1.54)
 - Edit modal fields read-only except Condition (v2.1.55)
 - Added "Other item in [category]" option with value_source (v2.1.55)

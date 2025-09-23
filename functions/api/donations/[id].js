@@ -223,11 +223,10 @@ export async function onRequestPut(context) {
                 .bind(donationId)
                 .run();
 
-            // TODO: Add value_source after migration is run on production
             const itemStmt = env.DB.prepare(`
                 INSERT INTO donation_items (
-                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
 
             for (const item of data.items) {
@@ -240,8 +239,8 @@ export async function onRequestPut(context) {
                     item.condition,
                     item.quantity || 1,
                     item.unit_value || item.value,
-                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
-                    // item.value_source || null  // TODO: Add after migration
+                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0),
+                    item.value_source || null
                 ).run();
             }
         }

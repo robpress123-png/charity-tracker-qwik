@@ -1,6 +1,6 @@
 {
-  "version": "2.1.60",
-  "previousVersion": "2.1.59",
-  "timestamp": "2025-09-23T20:04:16.326Z",
-  "bumpType": "patch"
+  "version": "2.2.0",
+  "previousVersion": "2.1.60",
+  "timestamp": "2025-09-23T20:12:31.292Z",
+  "bumpType": "minor"
 }
