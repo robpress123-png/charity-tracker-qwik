@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.1.6</title>
+    <title>Dashboard - Charity Tracker v2.1.7</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -695,13 +695,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.1.6</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.1.7</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.1.6</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.1.7</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1498,6 +1498,66 @@
                             <button type="submit" class="btn-primary" id="donationSubmitBtn">Add Donation</button>
                         </div>
                     </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Item Donation Modal -->
+    <div id="editItemDonationModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>✏️ Edit Item Donation</h2>
+                <button class="close-btn" onclick="closeEditItemModal()">&times;</button>
+            </div>
+            <div style="padding: 1.5rem;">
+                <!-- Charity and Date Section -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Charity</label>
+                        <input type="text" id="editItemCharity" readonly style="background: #f3f4f6; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Date</label>
+                        <input type="date" id="editItemDate" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                    </div>
+                </div>
+
+                <!-- Items List Section -->
+                <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Donated Items</h3>
+                    <div id="editItemsList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Items will be loaded here -->
+                    </div>
+
+                    <!-- Add New Item Button -->
+                    <button type="button" onclick="addNewItemRow()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        + Add New Item
+                    </button>
+                </div>
+
+                <!-- Notes Section -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
+                    <textarea id="editItemNotes" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
+                </div>
+
+                <!-- Total Section -->
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 1.125rem; font-weight: 600;">Total Donation Value:</span>
+                        <span style="font-size: 1.5rem; font-weight: bold; color: #0284c7;">$<span id="editItemTotal">0.00</span></span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeEditItemModal()" style="padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="saveEditedItemDonation()" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        💾 Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -3141,7 +3201,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.1.6</p>
+                            <p>Generated by Charity Tracker v2.1.7</p>
                         </div>
                     </body>
                     </html>
@@ -4281,8 +4341,15 @@
                     window.editingDonationId = donationId;
                     window.isEditing = true;
 
-                    // Open the donation modal with the correct type and pre-filled charity
                     const donationType = donation.donation_type || 'cash';
+
+                    // Use special edit modal for item donations
+                    if (donationType === 'items') {
+                        openEditItemDonationModal(donation);
+                        return;
+                    }
+
+                    // For other types, use the regular modal
                     const charityId = donation.charity_id || donation.user_charity_id || '';
                     const charityName = donation.charity_name || '';
 
@@ -4348,65 +4415,6 @@
                             if (cryptoSymbol) cryptoSymbol.value = donation.crypto_symbol || '';
                             if (cryptoQuantity) cryptoQuantity.value = donation.crypto_quantity || '';
                             if (cryptoPricePerUnit) cryptoPricePerUnit.value = donation.crypto_price_per_unit || '';
-                        } else if (donation.donation_type === 'items') {
-                            // Handle items donation editing
-                            if (donation.items && donation.items.length > 0) {
-                                // Clear the existing items list
-                                window.selectedItems = [];
-                                const itemsList = document.getElementById('selectedItemsList');
-                                const receiptTotal = document.getElementById('receiptTotal');
-
-                                if (itemsList) {
-                                    itemsList.innerHTML = '';
-                                    let total = 0;
-
-                                    // Load each item from the donation.items array
-                                    donation.items.forEach((item, index) => {
-                                        // Add to selectedItems array
-                                        window.selectedItems.push({
-                                            name: item.item_name,
-                                            category: item.category,
-                                            condition: item.condition,
-                                            quantity: item.quantity,
-                                            value: item.total_value,
-                                            unit_value: item.unit_value
-                                        });
-
-                                        // Create the display element
-                                        const itemDiv = document.createElement('div');
-                                        itemDiv.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:0.5rem;background:#f9fafb;margin-bottom:0.25rem;border-radius:4px;';
-                                        itemDiv.innerHTML = `
-                                            <div>
-                                                <strong>${item.quantity}x</strong> ${item.item_name}
-                                                <span style="color:#6b7280;font-size:0.75rem;margin-left:0.5rem;">(${item.condition})</span>
-                                            </div>
-                                            <div style="display:flex;align-items:center;gap:0.5rem;">
-                                                <span style="font-weight:600;">$${parseFloat(item.total_value).toFixed(2)}</span>
-                                                <button type="button" onclick="removeItemFromList(${index})" style="color:#dc2626;background:none;border:none;cursor:pointer;font-size:1rem;">×</button>
-                                            </div>
-                                        `;
-                                        itemsList.appendChild(itemDiv);
-                                        total += parseFloat(item.total_value);
-                                    });
-
-                                    // Update the total
-                                    if (receiptTotal) receiptTotal.textContent = total.toFixed(2);
-
-                                    // Show the save button
-                                    const saveBtn = document.getElementById('saveItemsDonationBtn');
-                                    if (saveBtn) saveBtn.style.display = 'block';
-                                }
-
-                                // Extract any user notes (after ITEMS data if present)
-                                if (donation.notes && donation.notes.startsWith('ITEMS:')) {
-                                    const lastBracketIndex = donation.notes.lastIndexOf(']');
-                                    if (lastBracketIndex !== -1) {
-                                        const userNotes = donation.notes.substring(lastBracketIndex + 1).replace(/^\|?\s*/, '').trim();
-                                        const notesField = document.getElementById('donationNotes');
-                                        if (notesField) notesField.value = userNotes;
-                                    }
-                                }
-                            }
                         }
 
                         // Update submit button text
@@ -5212,6 +5220,261 @@
                 m.style.display = 'none';
             });
         });
+
+        // Item Donation Edit Modal Functions
+        let editingItemsArray = [];
+
+        function openEditItemDonationModal(donation) {
+            const modal = document.getElementById('editItemDonationModal');
+            if (!modal) return;
+
+            // Store donation for saving
+            window.currentEditingDonation = donation;
+            editingItemsArray = [];
+
+            // Populate charity and date
+            document.getElementById('editItemCharity').value = donation.charity_name || '';
+            document.getElementById('editItemDate').value = donation.date || donation.donation_date || '';
+
+            // Extract user notes
+            let userNotes = '';
+            if (donation.notes) {
+                if (donation.notes.startsWith('ITEMS:')) {
+                    const lastBracketIndex = donation.notes.lastIndexOf(']');
+                    if (lastBracketIndex !== -1) {
+                        userNotes = donation.notes.substring(lastBracketIndex + 1).replace(/^\|?\s*/, '').trim();
+                    }
+                } else {
+                    userNotes = donation.notes;
+                }
+            }
+            document.getElementById('editItemNotes').value = userNotes;
+
+            // Load items
+            if (donation.items && donation.items.length > 0) {
+                donation.items.forEach(item => {
+                    editingItemsArray.push({
+                        item_name: item.item_name,
+                        category: item.category,
+                        condition: item.condition,
+                        quantity: item.quantity,
+                        unit_value: item.unit_value,
+                        total_value: item.total_value
+                    });
+                });
+            }
+
+            // Render items
+            renderEditItems();
+
+            // Show modal
+            modal.style.display = 'flex';
+        }
+
+        function closeEditItemModal() {
+            const modal = document.getElementById('editItemDonationModal');
+            if (modal) modal.style.display = 'none';
+            window.currentEditingDonation = null;
+            editingItemsArray = [];
+        }
+
+        function renderEditItems() {
+            const container = document.getElementById('editItemsList');
+            const totalElement = document.getElementById('editItemTotal');
+
+            if (!container) return;
+
+            if (editingItemsArray.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">No items added yet</p>';
+                if (totalElement) totalElement.textContent = '0.00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            editingItemsArray.forEach((item, index) => {
+                const itemTotal = parseFloat(item.total_value) || 0;
+                total += itemTotal;
+
+                html += `
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 0.8fr 0.8fr auto; gap: 0.75rem; align-items: center;">
+                            <!-- Item Name -->
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Item Name</label>
+                                <input type="text"
+                                       value="${item.item_name}"
+                                       onchange="updateEditItem(${index}, 'item_name', this.value)"
+                                       style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+
+                            <!-- Category -->
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Category</label>
+                                <input type="text"
+                                       value="${item.category}"
+                                       onchange="updateEditItem(${index}, 'category', this.value)"
+                                       style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+
+                            <!-- Condition -->
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Condition</label>
+                                <select onchange="updateEditItem(${index}, 'condition', this.value)"
+                                        style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                                    <option value="fair" ${item.condition === 'fair' ? 'selected' : ''}>Fair</option>
+                                    <option value="good" ${item.condition === 'good' ? 'selected' : ''}>Good</option>
+                                    <option value="very_good" ${item.condition === 'very_good' ? 'selected' : ''}>Very Good</option>
+                                    <option value="excellent" ${item.condition === 'excellent' ? 'selected' : ''}>Excellent</option>
+                                </select>
+                            </div>
+
+                            <!-- Quantity -->
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Qty</label>
+                                <input type="number"
+                                       value="${item.quantity}"
+                                       min="1"
+                                       onchange="updateEditItemQuantity(${index}, this.value)"
+                                       style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+
+                            <!-- Value -->
+                            <div>
+                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Value</label>
+                                <input type="number"
+                                       value="${itemTotal.toFixed(2)}"
+                                       step="0.01"
+                                       min="0"
+                                       onchange="updateEditItemValue(${index}, this.value)"
+                                       style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                            </div>
+
+                            <!-- Delete Button -->
+                            <div>
+                                <button type="button"
+                                        onclick="removeEditItem(${index})"
+                                        style="padding: 0.375rem 0.75rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                    ×
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            if (totalElement) totalElement.textContent = total.toFixed(2);
+        }
+
+        function updateEditItem(index, field, value) {
+            if (editingItemsArray[index]) {
+                editingItemsArray[index][field] = value;
+                if (field !== 'quantity' && field !== 'total_value') {
+                    renderEditItems(); // Only re-render for non-value changes
+                }
+            }
+        }
+
+        function updateEditItemQuantity(index, value) {
+            if (editingItemsArray[index]) {
+                const quantity = parseInt(value) || 1;
+                editingItemsArray[index].quantity = quantity;
+                // Recalculate unit value
+                const totalValue = parseFloat(editingItemsArray[index].total_value) || 0;
+                editingItemsArray[index].unit_value = totalValue / quantity;
+                renderEditItems();
+            }
+        }
+
+        function updateEditItemValue(index, value) {
+            if (editingItemsArray[index]) {
+                const totalValue = parseFloat(value) || 0;
+                const quantity = parseInt(editingItemsArray[index].quantity) || 1;
+                editingItemsArray[index].total_value = totalValue;
+                editingItemsArray[index].unit_value = totalValue / quantity;
+                renderEditItems();
+            }
+        }
+
+        function removeEditItem(index) {
+            editingItemsArray.splice(index, 1);
+            renderEditItems();
+        }
+
+        function addNewItemRow() {
+            editingItemsArray.push({
+                item_name: 'New Item',
+                category: 'Miscellaneous',
+                condition: 'good',
+                quantity: 1,
+                unit_value: 10,
+                total_value: 10
+            });
+            renderEditItems();
+        }
+
+        async function saveEditedItemDonation() {
+            if (!window.currentEditingDonation || !window.editingDonationId) {
+                alert('Error: No donation being edited');
+                return;
+            }
+
+            if (editingItemsArray.length === 0) {
+                alert('Please add at least one item to the donation');
+                return;
+            }
+
+            // Prepare the update data
+            const formData = {
+                charity_id: window.currentEditingDonation.charity_id || window.currentEditingDonation.user_charity_id,
+                donation_type: 'items',
+                donation_date: document.getElementById('editItemDate').value,
+                items: editingItemsArray,
+                amount: editingItemsArray.reduce((sum, item) => sum + (parseFloat(item.total_value) || 0), 0)
+            };
+
+            // Build the ITEMS format for notes (backwards compatibility)
+            let itemsNotesFormat = 'ITEMS:';
+            editingItemsArray.forEach(item => {
+                itemsNotesFormat += `[${item.item_name}|${item.category}|${item.condition}|${item.quantity}|${item.total_value}]`;
+            });
+
+            // Append user notes
+            const userNotes = document.getElementById('editItemNotes').value;
+            if (userNotes) {
+                itemsNotesFormat += ' | ' + userNotes;
+            }
+            formData.notes = itemsNotesFormat;
+
+            try {
+                const token = localStorage.getItem('token') || 'test-token';
+                const response = await fetch(`/api/donations/${window.editingDonationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success || response.ok) {
+                    showToast('Donation updated successfully!', 'success');
+                    closeEditItemModal();
+
+                    // Refresh donations list
+                    await loadDonations();
+                } else {
+                    showToast('Failed to update donation', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating donation:', error);
+                showToast('Error updating donation', 'error');
+            }
+        }
 
         // View donation details
         async function viewDonationDetails(donationId) {
