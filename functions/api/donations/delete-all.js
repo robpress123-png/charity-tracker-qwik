@@ -11,7 +11,7 @@ function getUserFromToken(token) {
 
     const tokenValue = token.replace('Bearer ', '');
 
-    // Admin tokens - accept various formats
+    // Admin tokens - ONLY accept specific admin tokens
     if (tokenValue === 'admin-token' ||
         tokenValue === 'admin' ||
         tokenValue === 'admin-dev' ||
@@ -20,12 +20,10 @@ function getUserFromToken(token) {
         return { id: 'admin', email: 'admin@example.com', isAdmin: true };
     }
 
-    // Also check for regular user tokens that might have admin privileges
-    // In dev mode, accept any token for admin operations
-    if (tokenValue.startsWith('token-') || tokenValue) {
-        // For development, treat any token as admin
-        // In production, you'd verify against a database
-        return { id: 'admin', email: 'admin@example.com', isAdmin: true };
+    // Regular user tokens should NOT have admin privileges
+    if (tokenValue.startsWith('token-') && !tokenValue.startsWith('token-admin')) {
+        // This is a regular user token, NOT admin
+        return null;
     }
 
     return null;
