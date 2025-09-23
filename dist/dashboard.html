@@ -4695,7 +4695,8 @@
             selectedDonationItems.push({
                 categoryName: category.name,
                 itemName: item.name,
-                quality: qualityLabel,
+                quality: quality,  // Use the actual value (very_good) not the label (Very Good)
+                qualityLabel: qualityLabel,  // Keep label for display purposes
                 quantity: quantity,
                 unitValue: unitValue,
                 totalValue: unitValue * quantity
