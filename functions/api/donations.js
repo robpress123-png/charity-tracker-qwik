@@ -180,8 +180,8 @@ export async function onRequestPost(context) {
       miles_driven || null,
       mileage_rate || null,
       mileage_purpose || null,
-      item_description || null,
-      estimated_value || null,
+      null, // item_description - deprecated, using donation_items table instead
+      null, // estimated_value - deprecated, calculated from items
       stock_symbol || null,
       stock_quantity || null,
       fair_market_value || null,
@@ -574,8 +574,8 @@ export async function onRequestPut(context) {
       miles_driven || null,
       mileage_rate || null,
       mileage_purpose || null,
-      item_description || null,
-      estimated_value || null,
+      null, // item_description - deprecated, using donation_items table instead
+      null, // estimated_value - deprecated, calculated from items
       stock_symbol || null,
       stock_quantity || null,
       fair_market_value || null,
