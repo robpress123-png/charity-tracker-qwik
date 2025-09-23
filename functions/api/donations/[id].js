@@ -79,6 +79,24 @@ export async function onRequestGet(context) {
             }, { status: 404 });
         }
 
+        // If this is an items donation, fetch the items from donation_items table
+        if (donation.donation_type === 'items') {
+            const items = await env.DB.prepare(`
+                SELECT
+                    item_name,
+                    category,
+                    condition,
+                    quantity,
+                    unit_value,
+                    total_value
+                FROM donation_items
+                WHERE donation_id = ?
+                ORDER BY item_name
+            `).bind(donationId).all();
+
+            donation.items = items.results || [];
+        }
+
         // Notes is now just user-entered text, no JSON parsing needed
 
         return Response.json({
