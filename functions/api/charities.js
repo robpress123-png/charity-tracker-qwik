@@ -132,31 +132,61 @@ export async function onRequestGet(context) {
       // Get both system charities AND user's personal charities
       if (searchTerm) {
         if (user) {
-          // If authenticated, include user's personal charities
+          // If authenticated, include user's personal charities with improved ranking
+          // Rank by: 1) exact match, 2) starts with, 3) contains
           query = `
-            SELECT id, name, ein, category, website, description, 'system' as source
-            FROM charities
-            WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
-            UNION ALL
-            SELECT id, name, ein, category, website, description, 'personal' as source
-            FROM user_charities
-            WHERE user_id = ? AND (name LIKE ? OR ein LIKE ? OR category LIKE ?)
-            ORDER BY name
-            LIMIT ? OFFSET ?
+            SELECT id, name, ein, category, website, description, source,
+                   CASE
+                     WHEN LOWER(name) = LOWER(?) THEN 1
+                     WHEN LOWER(name) LIKE LOWER(?) THEN 2
+                     WHEN LOWER(name) LIKE LOWER(?) THEN 3
+                     ELSE 4
+                   END as rank
+            FROM (
+              SELECT id, name, ein, category, website, description, 'system' as source
+              FROM charities
+              WHERE LOWER(name) LIKE LOWER(?) OR LOWER(ein) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
+              UNION ALL
+              SELECT id, name, ein, category, website, description, 'personal' as source
+              FROM user_charities
+              WHERE user_id = ? AND (LOWER(name) LIKE LOWER(?) OR LOWER(ein) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?))
+            )
+            ORDER BY rank, name
+            LIMIT 25
           `;
           const searchPattern = `%${searchTerm}%`;
-          queryParams = [searchPattern, searchPattern, searchPattern, user.id, searchPattern, searchPattern, searchPattern, limit, offset];
+          const startsWithPattern = `${searchTerm}%`;
+          // Parameters for ranking and filtering
+          queryParams = [
+            searchTerm, // exact match check
+            startsWithPattern, // starts with check
+            searchPattern, // contains check
+            searchPattern, searchPattern, searchPattern, // main charity filters
+            user.id, searchPattern, searchPattern, searchPattern // personal charity filters
+          ];
         } else {
-          // Not authenticated - only show system charities
+          // Not authenticated - only show system charities with improved ranking
           query = `
-            SELECT id, name, ein, category, website, description
+            SELECT id, name, ein, category, website, description,
+                   CASE
+                     WHEN LOWER(name) = LOWER(?) THEN 1
+                     WHEN LOWER(name) LIKE LOWER(?) THEN 2
+                     WHEN LOWER(name) LIKE LOWER(?) THEN 3
+                     ELSE 4
+                   END as rank
             FROM charities
-            WHERE name LIKE ? OR ein LIKE ? OR category LIKE ?
-            ORDER BY name
-            LIMIT ? OFFSET ?
+            WHERE LOWER(name) LIKE LOWER(?) OR LOWER(ein) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
+            ORDER BY rank, name
+            LIMIT 25
           `;
           const searchPattern = `%${searchTerm}%`;
-          queryParams = [searchPattern, searchPattern, searchPattern, limit, offset];
+          const startsWithPattern = `${searchTerm}%`;
+          queryParams = [
+            searchTerm, // exact match check
+            startsWithPattern, // starts with check
+            searchPattern, // contains check
+            searchPattern, searchPattern, searchPattern // filters
+          ];
         }
       } else {
         if (user) {

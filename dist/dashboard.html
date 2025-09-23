@@ -2411,6 +2411,15 @@
                     `;
                 });
 
+                // If we have 25 results, we likely hit the limit - show indicator
+                if (results.length >= 25) {
+                    html += `
+                        <div style="padding: 8px 12px; color: #6b7280; font-size: 0.875rem; text-align: center; border-top: 1px solid #e5e7eb;">
+                            Showing top 25 matches - type more to refine
+                        </div>
+                    `;
+                }
+
                 // Add "Add new charity" option at the end
                 html += `
                     <div class="autocomplete-add-new" onclick="showAddCharityFromSearch('${query}')">
