@@ -1,22 +1,20 @@
-# Charity Tracker Continuation Context - v2.1.60
+# Charity Tracker Continuation Context - v2.2.0
 
 ## Current Status
-- **Version:** 2.1.60
+- **Version:** 2.2.0
 - **Last Updated:** 2025-09-23
 - **Date/Time Context:** September 23, 2025
 
 ## 🚨 CURRENT ISSUES (CHANGE THIS SECTION):
 
-### 1. Pending Migration:
-- **Status**: Need to run `migration_add_value_source.sql` on production D1
-- **API Token**: Invalid - need valid CLOUDFLARE_API_TOKEN
-- **Next**: After migration, re-enable value_source in INSERT statements
+None - All systems operational!
 
 ## 📌 NEXT STEPS ON RESTART:
-1. Run migration `migration_add_value_source.sql` on production D1
-2. Re-enable value_source in INSERT statements after migration
+- Monitor for any issues with value_source feature
+- All features working as expected
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
+- Enabled value_source column for item donations (v2.2.0)
 - Fixed category-item misalignment by mapping category ID to name (v2.1.60)
 - Edit donation now fetches items from donation_items table (v2.1.54)
 - Edit modal fields read-only except Condition (v2.1.55)
@@ -45,8 +43,7 @@
 -- Core Tables:
 users (id TEXT PRIMARY KEY, email, name, password_hash)
 donations (id TEXT PRIMARY KEY, user_id, charity_id, amount, date, donation_type, ...)
-donation_items (id TEXT PRIMARY KEY, donation_id, item_name, category, condition, quantity, unit_value, total_value)
-  -- PENDING: value_source TEXT column (migration file exists)
+donation_items (id TEXT PRIMARY KEY, donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source TEXT)
 
 -- Reference Tables:
 items (id TEXT PRIMARY KEY, name, category TEXT, low_value, high_value) -- 497 test items
