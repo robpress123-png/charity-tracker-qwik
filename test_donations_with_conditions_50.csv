@@ -1,0 +1,51 @@
+date,charity_name,donation_type,amount,description,notes,stock_symbol,stock_quantity,fair_market_value,crypto_symbol,crypto_quantity,crypto_type,miles_driven,mileage_rate,mileage_purpose,items
+2025-01-15,"American Red Cross",cash,100,"Monthly donation","Regular monthly contribution",,,,,,,,,,,
+2025-01-15,"Habitat for Humanity",items,225,"Clothing donation","Winter closet cleanout",,,,,,,,,,,"Coat:good:30|Sweater:excellent:20|Jeans:good:15|Dress:good:15|Blouse:excellent:12|Shoes:good:12|Suit:fair:20|Handbag:good:20|Skirt:excellent:18|Shirt:good:12|Pants:good:15|Belt:excellent:15|Tie:good:4|Shoes:good:18"
+2025-01-14,"St. Jude Children's Research Hospital",stock,2500,"Stock donation","Tax-efficient giving",AAPL,15,166.67,,,,,,,,
+2025-01-14,"UNICEF",miles,140,"Volunteer driving","Event transportation",,,,,,,14,0.14,"Volunteer transport",
+2025-01-13,"Doctors Without Borders",crypto,3000,"Bitcoin donation","Year-end crypto gift",,,,,BTC,0.03,"Bitcoin",,,,
+2025-01-13,"World Wildlife Fund",items,460,"Electronics donation","Old tech upgrade",,,,,,,,,,,"Computer - Desktop:good:200|Television:fair:75|Tablet:good:100|Printer:fair:20|Monitor:good:60|DVD:excellent:5"
+2025-01-12,"United Way",cash,250,"Corporate matching","Employer matched donation",,,,,,,,,,,
+2025-01-12,"Make-A-Wish Foundation",items,385,"Furniture donation","Moving sale",,,,,,,,,,,"Sofa:fair:85|Chair:good:75|Coffee Table:good:50|Dresser:fair:50|Desk:good:75|Bookcase:good:50"
+2025-01-11,"Goodwill",items,165,"Household items","Spring cleaning",,,,,,,,,,,"Pots & Pans:good:15|Dishes (set):fair:15|Glassware (set):good:15|Bedding (set):excellent:35|Towels:good:4|Towels:good:4|Towels:good:4|Blanket:good:15|Curtains:good:10|Kitchen Utensils:excellent:20|Small Appliances:good:20|Small Appliances:fair:10"
+2025-01-11,"American Cancer Society",stock,5000,"MSFT shares","Long-term holding",MSFT,20,250,,,,,,,,
+2025-01-10,"American Heart Association",cash,500,"Memorial donation","In memory of loved one",,,,,,,,,,,
+2025-01-10,"Boys and Girls Clubs of America",items,130,"Kids clothing","Children outgrew clothes",,,,,,,,,,,"Shirt/Blouse:good:4|Pants/Jeans:excellent:12|Dress:good:8|Coat:fair:8|Shoes:good:8|Baby Clothes:excellent:5|Baby Clothes:good:3|Sweater:good:6|Shirt/Blouse:excellent:8|Pants/Jeans:good:7|Dress:excellent:15|Coat:good:15|Shoes:excellent:15|Baby Clothes:excellent:5|Sweater:excellent:10"
+2025-01-09,"YMCA",miles,210,"Program delivery","Youth program transport",,,,,,,21,0.14,"Youth program",
+2025-01-09,"Feed the Children",crypto,2000,"Ethereum donation","Crypto portfolio rebalancing",,,,,ETH,0.5,"Ethereum",,,,
+2025-01-08,"Nature Conservancy",cash,1000,"Annual pledge","Environmental protection",,,,,,,,,,,
+2025-01-08,"Sierra Club",items,215,"Sports equipment","Garage cleanout",,,,,,,,,,,"Bicycle:good:100|Golf Clubs:fair:60|Tennis Racket:good:25|Skateboard:fair:12|Sports Balls:good:10|Fishing Rod:excellent:8"
+2025-01-07,"PBS",stock,1500,"TSLA shares","Growth stock donation",TSLA,10,150,,,,,,,,
+2025-01-07,"NPR",items,93,"Books and media","Library refresh",,,,,,,,,,,"Hardback Book:excellent:5|Paperback Book:good:2|Textbook:fair:10|Children's Book:excellent:3|DVD:good:3|Blu-ray:excellent:8|CD:good:2|Video Game:good:10|Board Game:excellent:20|Hardback Book:good:3|Paperback Book:excellent:3|Textbook:good:20|DVD:excellent:5"
+2025-01-06,"Planned Parenthood",cash,300,"Health services support","Women's health",,,,,,,,,,,
+2025-01-06,"ASPCA",miles,105,"Animal rescue transport","Dog rescue mission",,,,,,,10.5,0.14,"Animal rescue",
+2025-01-05,"Humane Society",items,244,"Pet supplies and toys","Pet adoption drive",,,,,,,,,,,"Stuffed Animal:excellent:8|Doll:good:8|Building Blocks:fair:12|Puzzle:excellent:10|Toy Car/Truck:good:6|Educational Toy:excellent:25|Outdoor Toy:fair:20|Electronic Toy:good:20|Stuffed Animal:good:4|Doll:excellent:15|Building Blocks:good:25|Puzzle:good:5|Toy Car/Truck:excellent:12|Educational Toy:good:12|Outdoor Toy:good:40|Electronic Toy:excellent:40"
+2025-01-05,"World Vision",crypto,1500,"Litecoin donation","Alternative crypto gift",,,,,LTC,10,"Litecoin",,,,
+2025-01-04,"Feeding America",cash,750,"Food bank support","Holiday giving",,,,,,,,,,,
+2025-01-04,"Special Olympics",items,295,"Athletic wear","Team uniforms",,,,,,,,,,,"Shirt:excellent:20|Pants:good:15|Jeans:excellent:25|Coat:good:35|Shoes:fair:8|Sweater:good:15|Shirt:good:12|Pants:excellent:25|Jeans:good:15|Coat:excellent:75|Shoes:good:18|Sweater:excellent:25|Belt:good:8|Tie:excellent:4"
+2025-01-03,"Catholic Charities",stock,3500,"GOOGL shares","Tech stock donation",GOOGL,25,140,,,,,,,,
+2025-01-03,"Lutheran Services",miles,168,"Service delivery","Meal delivery program",,,,,,,12,0.14,"Meal delivery",
+2025-01-02,"Jewish Federation",cash,2000,"Community support","Local programs",,,,,,,,,,,
+2025-01-02,"Smithsonian",items,650,"Tech equipment","Museum support",,,,,,,,,,,"Computer - Laptop:good:300|Tablet:excellent:200|Smartphone:fair:50|Camera:good:100"
+2025-01-01,"Metropolitan Museum of Art",crypto,2500,"Bitcoin donation","Art preservation",,,,,BTC,0.025,"Bitcoin",,,,
+2025-01-01,"Museum of Modern Art",items,410,"Art books and furniture","Gallery donation",,,,,,,,,,,"Hardback Book:excellent:5|Hardback Book:excellent:5|Paperback Book:excellent:3|Textbook:excellent:40|Coffee Table:excellent:100|Chair:excellent:150|Desk:excellent:150|Bookcase:fair:25|Hardback Book:good:3|Paperback Book:good:2|Textbook:fair:10|Children's Book:good:2"
+2024-12-31,"Harvard University",cash,5000,"Education fund","Scholarship support",,,,,,,,,,,
+2024-12-31,"MIT",stock,7500,"NVDA shares","AI research support",NVDA,50,150,,,,,,,,
+2024-12-30,"Stanford University",items,890,"Lab equipment","Research donation",,,,,,,,,,,"Computer - Desktop:excellent:400|Monitor:excellent:120|Printer:excellent:80|Camera:excellent:250|Tablet:fair:40"
+2024-12-30,"Yale University",miles,245,"Alumni event transport","Reunion planning",,,,,,,17.5,0.14,"Alumni events",
+2024-12-29,"American Red Cross",crypto,1000,"Dogecoin donation","Meme coin contribution",,,,,DOGE,5000,"Dogecoin",,,,
+2024-12-29,"Habitat for Humanity",cash,1500,"Building fund","New home project",,,,,,,,,,,
+2024-12-28,"St. Jude Children's Research Hospital",items,525,"Children's items","Toy drive contribution",,,,,,,,,,,"Stuffed Animal:excellent:8|Doll:excellent:15|Building Blocks:excellent:50|Puzzle:excellent:10|Toy Car/Truck:excellent:12|Educational Toy:excellent:25|Outdoor Toy:excellent:80|Electronic Toy:excellent:40|Building Blocks:good:25|Puzzle:fair:3|Toy Car/Truck:good:6|Educational Toy:fair:6|Outdoor Toy:good:40|Electronic Toy:fair:10|Stuffed Animal:good:4|Doll:good:8|Building Blocks:excellent:50|Puzzle:good:5|Toy Car/Truck:fair:3|Educational Toy:good:12|Outdoor Toy:fair:20|Electronic Toy:good:20|Stuffed Animal:fair:2|Doll:fair:4"
+2024-12-28,"UNICEF",stock,4000,"AMZN shares","E-commerce leader",AMZN,40,100,,,,,,,,
+2024-12-27,"Doctors Without Borders",miles,126,"Medical supply delivery","Emergency response",,,,,,,9,0.14,"Medical supplies",
+2024-12-27,"World Wildlife Fund",cash,800,"Wildlife conservation","Endangered species",,,,,,,,,,,
+2024-12-26,"United Way",items,765,"Complete household","Estate donation",,,,,,,,,,,"Sofa:good:200|Chair:excellent:150|Dining Table:fair:60|Dining Chairs:good:25|Dining Chairs:good:25|Dining Chairs:good:25|Dining Chairs:good:25|Coffee Table:excellent:100|Dresser:good:100|Bed Frame:fair:50|Desk:excellent:50|Bookcase:excellent:100"
+2024-12-26,"Make-A-Wish Foundation",crypto,3500,"Ethereum donation","Smart contract support",,,,,ETH,0.875,"Ethereum",,,,
+2024-12-25,"Goodwill",cash,200,"Holiday donation","Christmas giving",,,,,,,,,,,
+2024-12-25,"American Cancer Society",items,380,"Medical equipment","Hospital donation",,,,,,,,,,,"Exercise Equipment:good:150|Exercise Equipment:excellent:300"
+2024-12-24,"American Heart Association",stock,6000,"META shares","Social media stock",META,30,200,,,,,,,,
+2024-12-24,"Boys and Girls Clubs of America",miles,196,"Youth sports transport","Tournament travel",,,,,,,14,0.14,"Youth sports",
+2024-12-23,"YMCA",items,295,"Gym equipment","Fitness center upgrade",,,,,,,,,,,"Exercise Equipment:fair:75|Bicycle:good:100|Tennis Racket:excellent:50|Sports Balls:excellent:20|Camping Gear:good:50"
+2024-12-23,"Feed the Children",cash,1200,"Emergency relief","Disaster response",,,,,,,,,,,
+2024-12-22,"Nature Conservancy",crypto,2200,"Bitcoin donation","Land preservation",,,,,BTC,0.022,"Bitcoin",,,,
+2024-12-22,"Sierra Club",items,680,"Outdoor gear","Trail maintenance",,,,,,,,,,,"Bicycle:excellent:200|Skis:good:80|Camping Gear:excellent:100|Fishing Rod:excellent:60|Golf Clubs:good:125|Tennis Racket:fair:12|Skateboard:good:25|Sports Balls:fair:5|Camping Gear:fair:25|Fishing Rod:good:30|Bicycle:fair:50"
