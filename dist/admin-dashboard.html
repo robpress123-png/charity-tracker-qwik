@@ -644,8 +644,8 @@
                 </div>
 
                 <!-- Delete Confirmation Modal -->
-                <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-                    <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px;">
+                <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
+                    <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px; margin: auto;">
                         <h3 style="color: #dc2626; margin-bottom: 1rem;">⚠️ Confirm Deletion</h3>
                         <p id="deleteConfirmMessage" style="color: #f3f4f6; margin-bottom: 1rem;">
                             Are you absolutely sure you want to delete ALL items from the database?
@@ -1304,13 +1304,23 @@
 
         // Charity Management Functions
         function confirmDeleteAllCharities() {
-            document.getElementById('deleteConfirmModal').style.display = 'flex';
+            console.log('confirmDeleteAllCharities called!');
+            const modal = document.getElementById('deleteConfirmModal');
+            if (!modal) {
+                console.error('deleteConfirmModal not found!');
+                alert('Error: Delete confirmation modal not found. Please refresh the page.');
+                return;
+            }
+
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
             document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL charities from the database?';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL CHARITIES';
             document.getElementById('deleteConfirmInput').value = '';
             document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL CHARITIES';
             document.getElementById('deleteStatus').textContent = '';
-            document.getElementById('deleteConfirmModal').dataset.deleteType = 'charities';
+            modal.dataset.deleteType = 'charities';
         }
 
         // Generic execute delete that routes to the right function
@@ -1329,13 +1339,26 @@
 
         // Delete All Donations Functions
         function confirmDeleteAllDonations() {
-            document.getElementById('deleteConfirmModal').style.display = 'flex';
+            console.log('confirmDeleteAllDonations called!');
+
+            const modal = document.getElementById('deleteConfirmModal');
+            if (!modal) {
+                console.error('deleteConfirmModal not found!');
+                alert('Error: Delete confirmation modal not found. Please refresh the page.');
+                return;
+            }
+
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
             document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records.';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL DONATIONS';
             document.getElementById('deleteConfirmInput').value = '';
             document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL DONATIONS';
             document.getElementById('deleteStatus').textContent = '';
-            document.getElementById('deleteConfirmModal').dataset.deleteType = 'donations';
+            modal.dataset.deleteType = 'donations';
+
+            console.log('Modal should be visible now');
         }
 
         async function executeDeleteAllDonations() {
