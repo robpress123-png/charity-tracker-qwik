@@ -110,14 +110,16 @@ export async function onRequestGet(context) {
         }
       });
     } else if (categoryId) {
+      // Query the donation_items table that has the 497 IRS-based valuations
+      // This is the original table with value columns
       const stmt = env.DB.prepare(`
         SELECT id, name, description,
-               value_poor,
-               value_fair,
-               value_good,
-               value_excellent
-        FROM items
-        WHERE category = ?
+               COALESCE(value_poor, 0) as value_poor,
+               COALESCE(value_fair, 0) as value_fair,
+               COALESCE(value_good, 0) as value_good,
+               COALESCE(value_excellent, 0) as value_excellent
+        FROM donation_items
+        WHERE category_id = ?
         ORDER BY name
       `);
       const result = await stmt.bind(categoryId).all();
@@ -135,7 +137,9 @@ export async function onRequestGet(context) {
 
     // Return all items if no specific request
     const stmt = env.DB.prepare(`
-      SELECT di.*, ic.name as category_name
+      SELECT di.id, di.name, di.description,
+             di.value_poor, di.value_fair, di.value_good, di.value_excellent,
+             ic.name as category_name
       FROM donation_items di
       JOIN item_categories ic ON di.category_id = ic.id
       ORDER BY ic.name, di.name
