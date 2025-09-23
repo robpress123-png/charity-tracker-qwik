@@ -102,11 +102,28 @@ export async function onRequestPost(context) {
         }
 
         // First, get all charities for name matching
-        const allCharities = await env.DB.prepare(`
-            SELECT id, name, ein, 'system' as type FROM charities
-            UNION ALL
-            SELECT id, name, ein, 'personal' as type FROM user_charities WHERE user_id = ?
-        `).bind(user.id).all();
+        let allCharities = { results: [] };
+        try {
+            // Try to get system charities
+            const systemCharities = await env.DB.prepare(`
+                SELECT id, name, ein, 'system' as type FROM charities LIMIT 1000
+            `).all();
+
+            // Try to get user charities
+            const userCharities = await env.DB.prepare(`
+                SELECT id, name, ein, 'personal' as type FROM user_charities WHERE user_id = ?
+            `).bind(user.id).all();
+
+            allCharities.results = [
+                ...(systemCharities.results || []),
+                ...(userCharities.results || [])
+            ];
+
+            console.log(`[DEBUG] Found ${systemCharities.results?.length || 0} system charities and ${userCharities.results?.length || 0} user charities`);
+        } catch (charityError) {
+            console.error('[ERROR] Failed to load charities:', charityError);
+            // Continue with empty charity list - all will need to be personal charities
+        }
 
         // Create a lookup map for charity names (case-insensitive)
         const charityMap = new Map();
@@ -132,7 +149,8 @@ export async function onRequestPost(context) {
             errors: [],
             charityMatches: {
                 found: 0,
-                notFound: []
+                notFound: [],
+                totalCharitiesInDB: allCharities.results.length
             }
         };
 
