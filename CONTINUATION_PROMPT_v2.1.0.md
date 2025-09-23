@@ -1,8 +1,14 @@
-# Charity Tracker Continuation Prompt - v2.1.0
+# Charity Tracker Continuation Prompt - v2.1.1
 ## Last Updated: 2025-01-23
 
+## CRITICAL VERSIONING POLICY
+**EVERY deployment must bump the patch version (e.g., 2.1.1 → 2.1.2)**
+- This ensures the user can verify they're on the latest code
+- Use `npm run bump` for every change deployment
+- Check version number on any page to confirm deployment
+
 ## Current System Status
-- **Version**: 2.1.0 (automated version management system in place)
+- **Version**: 2.1.1 (Delete modal fix deployed)
 - **Deployment**: Cloudflare Pages with D1 (SQLite) database
 - **Frontend**: Qwik framework with static HTML pages
 - **Backend**: Cloudflare Functions (Edge Workers)
