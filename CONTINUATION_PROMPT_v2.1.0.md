@@ -1,14 +1,14 @@
-# Charity Tracker Continuation Prompt - v2.1.1
+# Charity Tracker Continuation Prompt - v2.1.3
 ## Last Updated: 2025-01-23
 
 ## CRITICAL VERSIONING POLICY
-**EVERY deployment must bump the patch version (e.g., 2.1.1 → 2.1.2)**
+**EVERY deployment must bump the patch version (e.g., 2.1.3 → 2.1.4)**
 - This ensures the user can verify they're on the latest code
-- Use `npm run bump` for every change deployment
+- Use `npm run bump:patch` for every change deployment
 - Check version number on any page to confirm deployment
 
 ## Current System Status
-- **Version**: 2.1.1 (Delete modal fix deployed)
+- **Version**: 2.1.3 (Delete modal moved to body level - fully working)
 - **Deployment**: Cloudflare Pages with D1 (SQLite) database
 - **Frontend**: Qwik framework with static HTML pages
 - **Backend**: Cloudflare Functions (Edge Workers)
@@ -239,7 +239,8 @@ CREATE TABLE items_price_history (
 - Price history tracking (initialized)
 - Admin dashboard with proper sections
 - Automated version management
-- Delete all donations (with proper admin token)
+- Delete all donations (FULLY WORKING - modal fixed in v2.1.3)
+- Delete confirmation modal (moved to body level for visibility)
 
 ## File Locations
 - Admin Dashboard: `/dist/admin-dashboard.html`

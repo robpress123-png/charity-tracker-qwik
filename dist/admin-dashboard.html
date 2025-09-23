@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.1.3</title>
+    <title>Admin Dashboard - Charity Tracker v2.1.4</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.1.3</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.1.4</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -982,7 +982,15 @@
             <p style="color: #fca5a5; margin-bottom: 1.5rem;">
                 Type <strong id="deleteConfirmText">DELETE ALL</strong> to confirm:
             </p>
-            <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
+            <input type="text"
+                   id="deleteConfirmInput"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   data-form-type="other"
+                   data-lpignore="true"
+                   style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
             <div style="display: flex; gap: 1rem;">
                 <button class="tool-btn" onclick="executeDelete()" style="background: #dc2626;">
                     Delete All
@@ -1319,8 +1327,11 @@
             modal.style.justifyContent = 'center';
             document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL charities from the database?';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL CHARITIES';
-            document.getElementById('deleteConfirmInput').value = '';
-            document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL CHARITIES';
+            const confirmInput = document.getElementById('deleteConfirmInput');
+            confirmInput.value = '';
+            confirmInput.placeholder = 'Type: DELETE ALL CHARITIES';
+            // Add random name to prevent autofill
+            confirmInput.setAttribute('name', 'confirm-' + Date.now() + '-' + Math.random());
             document.getElementById('deleteStatus').textContent = '';
             modal.dataset.deleteType = 'charities';
         }
@@ -1356,8 +1367,11 @@
 
             document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records.';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL DONATIONS';
-            document.getElementById('deleteConfirmInput').value = '';
-            document.getElementById('deleteConfirmInput').placeholder = 'Type: DELETE ALL DONATIONS';
+            const confirmInput = document.getElementById('deleteConfirmInput');
+            confirmInput.value = '';
+            confirmInput.placeholder = 'Type: DELETE ALL DONATIONS';
+            // Add random name to prevent autofill
+            confirmInput.setAttribute('name', 'confirm-' + Date.now() + '-' + Math.random());
             document.getElementById('deleteStatus').textContent = '';
             modal.dataset.deleteType = 'donations';
 
