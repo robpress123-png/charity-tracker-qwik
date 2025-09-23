@@ -116,19 +116,20 @@ export async function onRequestGet(context) {
         // Log for debugging
         console.log('Fetching items for category_id:', categoryId);
 
-        // Query the items table (not donation_items which is for tracking)
-        // The 497 IRS items should be in a table with value columns
+        // Query the items table which contains our 497 test items with valuations
+        // The table uses category as TEXT, not category_id
+        // Values: fair=$0 (IRS requirement), good=low_value, very_good=midpoint, excellent=high_value
         const stmt = env.DB.prepare(`
           SELECT
             id,
             name,
-            COALESCE(description, '') as description,
-            COALESCE(low_value, 0) as value_poor,
-            COALESCE(low_value, 0) as value_fair,
-            COALESCE(high_value, low_value, 0) as value_good,
-            COALESCE(high_value * 1.5, high_value, 0) as value_excellent
+            0 as value_poor,
+            0 as value_fair,
+            COALESCE(low_value, 0) as value_good,
+            COALESCE((low_value + high_value) / 2, low_value, 0) as value_verygood,
+            COALESCE(high_value, low_value, 0) as value_excellent
           FROM items
-          WHERE category = ?
+          WHERE category = (SELECT name FROM item_categories WHERE id = ?)
           ORDER BY name
         `);
         // Don't parse if already a number
