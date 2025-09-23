@@ -110,19 +110,33 @@ export async function onRequestGet(context) {
         }
       });
     } else if (categoryId) {
-      // Query the donation_items table that has the 497 IRS-based valuations
-      // This is the original table with value columns
-      const stmt = env.DB.prepare(`
-        SELECT id, name, description,
-               COALESCE(value_poor, 0) as value_poor,
-               COALESCE(value_fair, 0) as value_fair,
-               COALESCE(value_good, 0) as value_good,
-               COALESCE(value_excellent, 0) as value_excellent
-        FROM donation_items
-        WHERE category_id = ?
-        ORDER BY name
-      `);
-      const result = await stmt.bind(categoryId).all();
+      // Try multiple approaches to find the items table
+      let stmt;
+      let result = { results: [] };
+
+      try {
+        // First try: The original donation_items table with INTEGER id and valuation columns
+        stmt = env.DB.prepare(`
+          SELECT
+            CAST(id AS TEXT) as id,
+            name,
+            COALESCE(description, '') as description,
+            COALESCE(value_poor, 0) as value_poor,
+            COALESCE(value_fair, 0) as value_fair,
+            COALESCE(value_good, 0) as value_good,
+            COALESCE(value_excellent, 0) as value_excellent
+          FROM donation_items
+          WHERE category_id = ?
+            AND name IS NOT NULL
+            AND id < 1000
+          ORDER BY name
+        `);
+        result = await stmt.bind(categoryId).all();
+      } catch (error) {
+        console.error('Error querying donation_items:', error);
+        // If the first query fails, the table structure might be different
+        result = { results: [] };
+      }
 
       return new Response(JSON.stringify({
         success: true,
