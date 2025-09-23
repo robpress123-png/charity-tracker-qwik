@@ -293,9 +293,9 @@ export function findCharityWithAliases(searchName, charityMap) {
   let match = charityMap.get(cleanSearchName);
   if (match) return match;
 
-  // Try alias matching
+  // Try alias matching - convert keys to lowercase for comparison
   for (const [commonName, aliases] of Object.entries(charityAliases)) {
-    if (cleanSearchName === commonName || cleanSearchName.includes(commonName)) {
+    if (cleanSearchName === commonName.toLowerCase() || cleanSearchName.includes(commonName.toLowerCase())) {
       // Try each alias
       for (const alias of aliases) {
         const aliasLower = alias.toLowerCase();
