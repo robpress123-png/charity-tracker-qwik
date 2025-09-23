@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.1.2</title>
+    <title>Admin Dashboard - Charity Tracker v2.1.3</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.1.2</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.1.3</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -643,28 +643,7 @@
                     </div>
                 </div>
 
-                <!-- Delete Confirmation Modal -->
-                <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
-                    <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px; margin: auto;">
-                        <h3 style="color: #dc2626; margin-bottom: 1rem;">⚠️ Confirm Deletion</h3>
-                        <p id="deleteConfirmMessage" style="color: #f3f4f6; margin-bottom: 1rem;">
-                            Are you absolutely sure you want to delete ALL items from the database?
-                        </p>
-                        <p style="color: #fca5a5; margin-bottom: 1.5rem;">
-                            Type <strong id="deleteConfirmText">DELETE ALL</strong> to confirm:
-                        </p>
-                        <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="tool-btn" onclick="executeDelete()" style="background: #dc2626;">
-                                Delete All
-                            </button>
-                            <button class="tool-btn secondary" onclick="cancelDelete()">
-                                Cancel
-                            </button>
-                        </div>
-                        <div id="deleteStatus" style="margin-top: 1rem; color: #f3f4f6;"></div>
-                    </div>
-                </div>
+                <!-- Modal moved to body level for proper visibility -->
             </div>
 
             <!-- Import Items Section -->
@@ -990,6 +969,29 @@
                     Settings panel coming soon.
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal (at body level for visibility) -->
+    <div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: #111827; border: 2px solid #dc2626; border-radius: 12px; padding: 2rem; max-width: 500px; margin: auto;">
+            <h3 style="color: #dc2626; margin-bottom: 1rem;">⚠️ Confirm Deletion</h3>
+            <p id="deleteConfirmMessage" style="color: #f3f4f6; margin-bottom: 1rem;">
+                Are you absolutely sure you want to delete ALL items from the database?
+            </p>
+            <p style="color: #fca5a5; margin-bottom: 1.5rem;">
+                Type <strong id="deleteConfirmText">DELETE ALL</strong> to confirm:
+            </p>
+            <input type="text" id="deleteConfirmInput" style="width: 100%; padding: 0.75rem; background: #1f2937; border: 1px solid #374151; color: #f3f4f6; border-radius: 6px; margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 1rem;">
+                <button class="tool-btn" onclick="executeDelete()" style="background: #dc2626;">
+                    Delete All
+                </button>
+                <button class="tool-btn secondary" onclick="cancelDelete()">
+                    Cancel
+                </button>
+            </div>
+            <div id="deleteStatus" style="margin-top: 1rem; color: #f3f4f6;"></div>
         </div>
     </div>
 
@@ -1350,7 +1352,7 @@
 
             // Clear all inline styles and set new ones with !important to override
             modal.removeAttribute('style');
-            modal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center;';
+            modal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; align-items: center; justify-content: center;';
 
             document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records.';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL DONATIONS';
@@ -1359,9 +1361,32 @@
             document.getElementById('deleteStatus').textContent = '';
             modal.dataset.deleteType = 'donations';
 
+            // More comprehensive debugging
             console.log('Modal should be visible now');
             console.log('Modal display style:', modal.style.display);
             console.log('Modal computed style:', window.getComputedStyle(modal).display);
+            console.log('Modal visibility:', window.getComputedStyle(modal).visibility);
+            console.log('Modal z-index:', window.getComputedStyle(modal).zIndex);
+            console.log('Modal position:', window.getComputedStyle(modal).position);
+            console.log('Modal bounding rect:', modal.getBoundingClientRect());
+            console.log('Modal parent element:', modal.parentElement);
+            console.log('Modal offset parent:', modal.offsetParent);
+
+            // Check if modal is within viewport
+            const rect = modal.getBoundingClientRect();
+            const isInViewport = rect.top >= 0 && rect.left >= 0 &&
+                                rect.bottom <= window.innerHeight &&
+                                rect.right <= window.innerWidth;
+            console.log('Is modal in viewport?', isInViewport);
+
+            // Force focus to input to make sure modal is interactive
+            setTimeout(() => {
+                const input = document.getElementById('deleteConfirmInput');
+                if (input) {
+                    input.focus();
+                    console.log('Focused on input field');
+                }
+            }, 100);
         }
 
         async function executeDeleteAllDonations() {
