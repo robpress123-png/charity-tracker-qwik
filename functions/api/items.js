@@ -112,12 +112,12 @@ export async function onRequestGet(context) {
     } else if (categoryId) {
       const stmt = env.DB.prepare(`
         SELECT id, name, description,
-               0 as value_poor,  -- Always $0 - not IRS deductible
-               0 as value_fair,  -- Always $0 - not IRS deductible
+               value_poor,
+               value_fair,
                value_good,
                value_excellent
-        FROM donation_items
-        WHERE category_id = ?
+        FROM items
+        WHERE category = ?
         ORDER BY name
       `);
       const result = await stmt.bind(categoryId).all();

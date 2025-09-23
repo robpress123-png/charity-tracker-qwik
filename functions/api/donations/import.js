@@ -335,12 +335,46 @@ export async function onRequestPost(context) {
                     item_description, estimated_value
                 ).run();
 
-                // For items donations, parse items from notes or create defaults
+                // For items donations, parse items from notes or items column
                 if (donationType === 'items') {
                     const itemsCreated = [];
 
-                    // Check if notes contains structured items data
-                    if (donation.notes && donation.notes.includes('ITEMS:')) {
+                    // Check if items column exists (from CSV)
+                    if (donation.items) {
+                        // Parse format: ItemName:condition or ItemName:condition:quantity
+                        // Multiple items separated by |
+                        const itemsList = donation.items.split('|');
+
+                        for (const itemStr of itemsList) {
+                            const parts = itemStr.trim().split(':');
+                            if (parts.length >= 2) {
+                                const itemName = parts[0];
+                                const condition = parts[1];
+                                const quantity = parts[2] ? parseInt(parts[2]) : 1;
+
+                                // For now, use estimated values - will be looked up from DB later
+                                const unitValue = 0; // Will be looked up based on item and condition
+
+                                await env.DB.prepare(`
+                                    INSERT INTO donation_items (
+                                        donation_id, item_name, category, condition, quantity, unit_value, total_value
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                                `).bind(
+                                    donationId,
+                                    itemName,
+                                    null, // Category will be determined later
+                                    condition,
+                                    quantity,
+                                    unitValue,
+                                    unitValue * quantity
+                                ).run();
+
+                                itemsCreated.push(itemName);
+                            }
+                        }
+                    }
+                    // Legacy format: Check if notes contains structured items data
+                    else if (donation.notes && donation.notes.includes('ITEMS:')) {
                         // Parse format: ITEMS:[name|category|condition|qty|value][name|category|condition|qty|value]
                         const itemsMatch = donation.notes.match(/ITEMS:\[(.+)\]/g);
                         if (itemsMatch) {
