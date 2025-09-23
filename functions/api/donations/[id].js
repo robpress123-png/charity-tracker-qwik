@@ -88,8 +88,8 @@ export async function onRequestGet(context) {
                     condition,
                     quantity,
                     unit_value,
-                    total_value,
-                    value_source
+                    total_value
+                    -- value_source  TODO: Add after migration
                 FROM donation_items
                 WHERE donation_id = ?
                 ORDER BY item_name
@@ -223,11 +223,11 @@ export async function onRequestPut(context) {
                 .bind(donationId)
                 .run();
 
-            // Then insert the new items
+            // TODO: Add value_source after migration is run on production
             const itemStmt = env.DB.prepare(`
                 INSERT INTO donation_items (
-                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `);
 
             for (const item of data.items) {
@@ -240,8 +240,8 @@ export async function onRequestPut(context) {
                     item.condition,
                     item.quantity || 1,
                     item.unit_value || item.value,
-                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0),
-                    item.value_source || null
+                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+                    // item.value_source || null  // TODO: Add after migration
                 ).run();
             }
         }

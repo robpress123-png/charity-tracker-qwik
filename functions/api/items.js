@@ -118,6 +118,28 @@ export async function onRequestGet(context) {
 
         // Query the items table which contains our 497 test items with valuations
         // The table uses category as TEXT, not category_id
+        // First, get the category name from the category ID
+        const catId = typeof categoryId === 'string' ? parseInt(categoryId) : categoryId;
+        const categoryResult = await env.DB.prepare(`
+          SELECT name FROM item_categories WHERE id = ?
+        `).bind(catId).first();
+
+        if (!categoryResult || !categoryResult.name) {
+          console.log('Category not found for ID:', catId);
+          return new Response(JSON.stringify({
+            success: true,
+            items: []
+          }), {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        }
+
+        const categoryName = categoryResult.name;
+        console.log(`Category ID ${catId} maps to name: "${categoryName}"`);
+
         // Values: fair=$0 (IRS requirement), good=low_value, very_good=midpoint, excellent=high_value
         const stmt = env.DB.prepare(`
           SELECT
@@ -129,12 +151,10 @@ export async function onRequestGet(context) {
             COALESCE((low_value + high_value) / 2, low_value, 0) as value_verygood,
             COALESCE(high_value, low_value, 0) as value_excellent
           FROM items
-          WHERE category = (SELECT name FROM item_categories WHERE id = ?)
+          WHERE category = ?
           ORDER BY name
         `);
-        // Don't parse if already a number
-        const catId = typeof categoryId === 'string' ? parseInt(categoryId) : categoryId;
-        const result = await stmt.bind(catId).all();
+        const result = await stmt.bind(categoryName).all();
 
         console.log('Items found:', result.results?.length || 0);
 

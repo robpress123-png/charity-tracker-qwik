@@ -233,11 +233,12 @@ export async function onRequestPost(context) {
 
     // If this is an items donation, insert the items
     if (donation_type === 'items' && items && Array.isArray(items)) {
+      // TODO: Add value_source to INSERT after migration_add_value_source.sql is run on production
       const itemStmt = env.DB.prepare(`
         INSERT INTO donation_items (
-          donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source
+          donation_id, item_name, category, condition, quantity, unit_value, total_value
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
 
       for (const item of items) {
@@ -248,8 +249,8 @@ export async function onRequestPost(context) {
           item.condition,
           item.quantity || 1,
           item.unit_value || item.value,
-          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0),
-          item.value_source || null
+          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+          // item.value_source || null  // TODO: Add after migration
         ).run();
       }
     }
