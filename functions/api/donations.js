@@ -183,11 +183,11 @@ export async function onRequestPost(context) {
       null, // item_description - deprecated, using donation_items table instead
       null, // estimated_value - deprecated, calculated from items
       stock_symbol || null,
-      stock_quantity || null,
+      shares_donated || null, // stock_quantity field
       fair_market_value || null,
       crypto_symbol || null,
       crypto_quantity || null,
-      crypto_type || null
+      null // crypto_type - not currently used
     ).run();
 
     // If this is an items donation, insert the items
@@ -577,11 +577,11 @@ export async function onRequestPut(context) {
       null, // item_description - deprecated, using donation_items table instead
       null, // estimated_value - deprecated, calculated from items
       stock_symbol || null,
-      stock_quantity || null,
+      shares_donated || null, // stock_quantity field
       fair_market_value || null,
       crypto_symbol || null,
       crypto_quantity || null,
-      crypto_type || null,
+      null // crypto_type - not currently used,
       donationId,
       userId
     ).run();
