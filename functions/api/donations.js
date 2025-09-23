@@ -345,7 +345,8 @@ export async function onRequestGet(context) {
 
     // Add optional filters
     if (year) {
-      query += ` AND strftime('%Y', d.date) = ?`;
+      // Make sure date is not null and handle year filtering safely
+      query += ` AND d.date IS NOT NULL AND strftime('%Y', d.date) = ?`;
       params.push(year);
     }
 
@@ -357,8 +358,26 @@ export async function onRequestGet(context) {
     query += ` ORDER BY d.date DESC, d.created_at DESC LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
-    const stmt = env.DB.prepare(query);
-    const result = await stmt.bind(...params).all();
+    let result;
+    try {
+      const stmt = env.DB.prepare(query);
+      result = await stmt.bind(...params).all();
+    } catch (queryError) {
+      console.error('Database query error:', queryError);
+      // Return empty result instead of throwing error
+      return new Response(JSON.stringify({
+        success: true,
+        donations: [],
+        total: 0,
+        message: 'No donations found',
+        debug: env.ENVIRONMENT === 'development' ? queryError.message : undefined
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
 
     // Handle empty results gracefully
     if (!result || !result.results || result.results.length === 0) {
