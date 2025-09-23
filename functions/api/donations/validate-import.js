@@ -33,7 +33,7 @@ function getUserFromToken(token) {
 /**
  * Find potential charity matches with confidence scores
  */
-function findPotentialMatches(searchName, charityMap, maxResults = 5) {
+function findPotentialMatches(searchName, charityMap, maxResults = 10) {
     const matches = [];
     const cleanSearchName = searchName.toLowerCase().trim();
 
@@ -132,10 +132,20 @@ function findPotentialMatches(searchName, charityMap, maxResults = 5) {
         }
     }
 
-    // Sort by confidence and return top matches
-    return matches
-        .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, maxResults);
+    // Sort by confidence
+    const sortedMatches = matches.sort((a, b) => b.confidence - a.confidence);
+
+    // Return ALL high-confidence matches (>= 70%) plus additional matches up to maxResults
+    const highConfidenceMatches = sortedMatches.filter(m => m.confidence >= 70);
+    const lowerConfidenceMatches = sortedMatches.filter(m => m.confidence < 70);
+
+    // If we have many high-confidence matches (like multiple Goodwills), show them all
+    if (highConfidenceMatches.length > maxResults) {
+        return highConfidenceMatches.slice(0, maxResults * 2); // Allow up to 2x for high confidence
+    }
+
+    // Otherwise, combine high confidence with some lower confidence
+    return [...highConfidenceMatches, ...lowerConfidenceMatches.slice(0, maxResults - highConfidenceMatches.length)];
 }
 
 export async function onRequestPost(context) {
