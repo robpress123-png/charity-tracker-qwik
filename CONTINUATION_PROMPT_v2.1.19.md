@@ -30,9 +30,22 @@
   - Calculating statistics
 - localStorage copies of donations are for offline fallback ONLY
 
-## CRITICAL VERSIONING POLICY
-**EVERY deployment must bump the patch version**
-- Use `npm run bump:patch` for every change deployment
+## 🔴 CRITICAL VERSIONING POLICY 🔴
+**EVERY deployment MUST use the automated version bump system**
+
+### Version Bump Commands:
+- `npm run bump:patch` - Bug fixes and small changes (most common)
+- `npm run bump:minor` - New features
+- `npm run bump:major` - Breaking changes
+
+### What the bump script does automatically:
+1. Updates package.json version
+2. Updates version in ALL HTML files
+3. Updates VERSION.json
+4. Commits the version change
+5. Pushes to GitHub for auto-deploy
+
+**NEVER manually edit version numbers - ALWAYS use npm run bump:patch/minor/major**
 
 ## Recent Fixes (v2.1.18-19)
 - Fixed API to use proper database columns instead of JSON in notes field
@@ -77,20 +90,42 @@ The donations table has these dedicated columns:
 6. Bump version on every deployment
 
 ## Deployment Instructions (AUTO-DEPLOY via GitHub)
-1. Update version in dashboard.html title and any VERSION constants
-2. Run `npm run bump:patch` to update package.json
-3. Commit and push to GitHub:
-   ```bash
-   git add .
-   git commit -m "v2.1.19: Fix database column usage and mileage editing"
-   git push origin main
-   ```
-4. **Cloudflare Pages will automatically deploy from GitHub**
-   - URL: https://charity-tracker-qwik.pages.dev
-   - GitHub repo: https://github.com/robpress123-png/charity-tracker-qwik
-5. Test all donation types after deployment
 
-**DO NOT use wrangler deploy directly - always go through GitHub for auto-deployment**
+### For Bug Fixes and Small Changes:
+```bash
+npm run bump:patch
+```
+This single command:
+- Bumps version (e.g., 2.1.19 → 2.1.20)
+- Updates all files automatically
+- Commits with message "Bump version to 2.1.20"
+- Pushes to GitHub
+- Triggers Cloudflare Pages auto-deployment
+
+### For New Features:
+```bash
+npm run bump:minor
+```
+
+### For Breaking Changes:
+```bash
+npm run bump:major
+```
+
+### Deployment URLs:
+- **Production**: https://charity-tracker-qwik.pages.dev
+- **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
+- **Cloudflare Dashboard**: Check deployment status
+
+**NEVER:**
+- Manually edit version numbers
+- Use `wrangler deploy` directly
+- Push without version bump
+
+**ALWAYS:**
+- Use npm run bump:patch/minor/major
+- Wait for Cloudflare auto-deployment
+- Test after deployment completes
 
 ## Files Structure
 - `/dist/dashboard.html` - Main application file
