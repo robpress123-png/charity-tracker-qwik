@@ -4560,8 +4560,10 @@
                 filteredItems.forEach(item => {
                     const veryGoodValue = ((item.value_good || 0) + (item.value_excellent || 0)) / 2;
                     const priceRange = `Fair: $0 | Good: $${item.value_good || 0} | Very Good: $${veryGoodValue.toFixed(0)} | Excellent: $${item.value_excellent || 0}`;
+                    // Use JSON.stringify to properly escape the item ID for safe onclick handling
+                    const safeItemId = JSON.stringify(item.id);
                     html += `
-                        <div onclick="selectItem(${item.id}, '${item.name.replace(/'/g, "\\'")}')"
+                        <div onclick="selectItem(${safeItemId}, this)"
                              style="padding:0.75rem;cursor:pointer;border-bottom:1px solid #e5e7eb;transition:background 0.2s;"
                              onmouseover="this.style.background='#f3f4f6'"
                              onmouseout="this.style.background='white'">
@@ -4585,12 +4587,12 @@
         }
 
         // Select an item
-        function selectItem(itemId, itemName) {
+        function selectItem(itemId, element) {
             const item = currentItems.find(i => i.id === itemId);
             if (!item) return;
 
             document.getElementById('itemSelect').value = itemId;
-            document.getElementById('itemSearch').value = itemName;
+            document.getElementById('itemSearch').value = item.name;
             document.getElementById('itemDropdown').style.display = 'none';
 
             // Enable quality, quantity, and add button
