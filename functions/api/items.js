@@ -66,12 +66,43 @@ export async function onRequestGet(context) {
 
     // Fetch from database
     if (type === 'categories') {
-      const stmt = env.DB.prepare('SELECT id, name, description, icon FROM item_categories ORDER BY name');
-      const result = await stmt.all();
+      try {
+        const stmt = env.DB.prepare('SELECT id, name, description, icon FROM item_categories ORDER BY name');
+        const result = await stmt.all();
 
+        // If we have results from DB, use them
+        if (result && result.results && result.results.length > 0) {
+          return new Response(JSON.stringify({
+            success: true,
+            categories: result.results
+          }), {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        }
+      } catch (dbError) {
+        console.log('item_categories table not found or empty, using defaults');
+      }
+
+      // Return default categories if DB is empty or table doesn't exist
       return new Response(JSON.stringify({
         success: true,
-        categories: result.results || []
+        categories: [
+          { id: 'clothing', name: 'Clothing', icon: '👔' },
+          { id: 'electronics', name: 'Electronics', icon: '💻' },
+          { id: 'furniture', name: 'Furniture', icon: '🪑' },
+          { id: 'books', name: 'Books & Media', icon: '📚' },
+          { id: 'toys', name: 'Toys & Games', icon: '🧸' },
+          { id: 'sports', name: 'Sports Equipment', icon: '⚽' },
+          { id: 'household', name: 'Household Items', icon: '🏠' },
+          { id: 'kitchenware', name: 'Kitchenware', icon: '🍳' },
+          { id: 'tools', name: 'Tools & Hardware', icon: '🔧' },
+          { id: 'art', name: 'Art & Crafts', icon: '🎨' },
+          { id: 'musical', name: 'Musical Instruments', icon: '🎵' },
+          { id: 'other', name: 'Other Items', icon: '📦' }
+        ]
       }), {
         headers: {
           'Content-Type': 'application/json',

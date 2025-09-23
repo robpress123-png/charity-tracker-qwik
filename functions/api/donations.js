@@ -360,6 +360,21 @@ export async function onRequestGet(context) {
     const stmt = env.DB.prepare(query);
     const result = await stmt.bind(...params).all();
 
+    // Handle empty results gracefully
+    if (!result || !result.results || result.results.length === 0) {
+      return new Response(JSON.stringify({
+        success: true,
+        donations: [],
+        total: 0,
+        message: year ? `No donations found for year ${year}` : 'No donations found'
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     // For items donations, fetch the items
     const donationsWithItems = await Promise.all(result.results.map(async (donation) => {
       if (donation.donation_type === 'items') {
