@@ -114,20 +114,20 @@ export async function onRequestPost(context) {
                     continue;
                 }
 
-                // Map category_id to category name
+                // Map category_id to category name (must match item_categories table exactly)
                 const categoryMap = {
                     1: "Clothing - Women",
                     2: "Clothing - Men",
                     3: "Clothing - Children",
-                    4: "Electronics",
-                    5: "Furniture",
-                    6: "Household Items",
-                    7: "Appliances",
-                    8: "Books & Media",
-                    9: "Sports & Recreation",
-                    10: "Toys & Games",
-                    11: "Tools & Equipment",
-                    12: "Jewelry & Accessories"
+                    4: "Household Items",
+                    5: "Electronics",
+                    6: "Furniture",
+                    7: "Books & Media",
+                    8: "Sports & Recreation",
+                    9: "Toys & Games",
+                    10: "Appliances",
+                    11: "Jewelry & Accessories",
+                    12: "Tools & Equipment"
                 };
 
                 const categoryName = categoryMap[item.category_id] || `Category ${item.category_id}`;
