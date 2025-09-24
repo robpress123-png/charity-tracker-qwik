@@ -1,28 +1,32 @@
-# Charity Tracker Continuation Context - v2.2.5
+# Charity Tracker Continuation Context - v2.2.7
 
 ## Current Status
-- **Version:** 2.2.5
+- **Version:** 2.2.7
 - **Last Updated:** 2025-09-24
 - **Date/Time Context:** September 24, 2025
 
 ## 🚨 CURRENT ISSUES (CHANGE THIS SECTION):
 
-- Fixed but NOT DEPLOYED: Dashboard year selector and import authentication
-- Waiting for user testing before version bump
+None - All systems operational!
 
 ## 📌 NEXT STEPS ON RESTART:
-- User testing dashboard with 10 imported donations
-- When confirmed working: run `npm run bump:patch` to deploy v2.2.6
-- Then import larger 175-donation CSV file
+- **TODO**: Implement auto-logout feature with admin-configurable timeout setting
+- **TODO**: Implement freemium model demo - see `/FREEMIUM_STRATEGY.md` for detailed plan:
+  - Free tier: 3 donations max, no exports
+  - Premium tier: $29/year unlimited
+  - Demo payment flow (no real Stripe yet)
+- Test with new 60-donation CSV files for users 2-5 (created in project root)
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
-- PENDING v2.2.6: Fixed dashboard year selector (was hardcoded to 2025, now defaults to 2024)
-- PENDING v2.2.6: Fixed import API authentication bug
-- PENDING v2.2.6: Added "All Years" option to year selector
-- PENDING v2.2.6: Added debug logging to import process
-- Admin delete now clears donation_items and user_charities for complete reset (v2.2.5)
-- Import auto-creates personal charities for unmatched names (v2.2.4)
-- Fixed category mapping in items import tool (v2.2.3)
+- Created larger test data files (60 donations each for users 2-5) (v2.2.7)
+- Fixed year selector to default to current year (2025) (v2.2.7)
+- Improved progress bar timing for accurate import feedback (v2.2.7)
+- Tax savings now updates when adding/removing items (v2.2.7)
+- Removed old ITEMS format from notes field (v2.2.7)
+- Fixed item donation import to parse CSV columns correctly (v2.2.7)
+- Restored fuzzy charity matching with auto-create for no matches (v2.2.7)
+- Added progress bar to import process (v2.2.7)
+- Fixed import authentication bug (v2.2.7)
 
 ---
 
