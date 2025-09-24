@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.2.9</title>
+    <title>Admin Dashboard - Charity Tracker v2.2.10</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.9</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.10</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1713,9 +1713,28 @@
                                 <td>${createdDate}</td>
                                 <td>${totalDonations}</td>
                                 <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn edit" onclick="editUser('${user.id}')">Edit</button>
-                                        <button class="action-btn delete" onclick="confirmDeleteUser('${user.id}', '${user.email}')">Delete</button>
+                                    <div class="dropdown-container" style="position: relative;">
+                                        <button onclick="toggleUserMenu('${user.id}')" style="background: #374151; color: #f3f4f6; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; font-size: 1.2rem; line-height: 1;">
+                                            ⋮
+                                        </button>
+                                        <div id="menu-${user.id}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: #1f2937; border: 1px solid #374151; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; min-width: 180px; margin-top: 0.25rem;">
+                                            <button onclick="resetUserPassword('${user.id}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer; hover: background: #374151;">
+                                                🔑 Reset Password
+                                            </button>
+                                            <button onclick="exportUserDonations('${user.id}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer;">
+                                                📥 Export Donations
+                                            </button>
+                                            <button onclick="viewUserDetails('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer;">
+                                                👁️ View Details
+                                            </button>
+                                            <div style="border-top: 1px solid #374151; margin: 0.25rem 0;"></div>
+                                            <button onclick="confirmClearUserData('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f59e0b; border: none; cursor: pointer;">
+                                                🗑️ Clear All Data
+                                            </button>
+                                            <button onclick="confirmDeleteUser('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #ef4444; border: none; cursor: pointer;">
+                                                ❌ Delete User
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                             `;
@@ -1737,32 +1756,42 @@
         }
 
         // User management functions
-        function editUser(userId) {
-            // Find the user data
-            const row = document.querySelector(`tr td:first-child:contains('${userId}')`);
-            const userEmail = row ? row.nextElementSibling.textContent : 'Unknown';
+        function toggleUserMenu(userId) {
+            // Close all other menus first
+            closeAllMenus();
 
-            // Create edit modal
+            // Toggle this menu
+            const menu = document.getElementById(`menu-${userId}`);
+            if (menu) {
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                closeAllMenus();
+            }
+        });
+
+        function viewUserDetails(userId, userEmail) {
+            // Show user details modal
             const modal = document.createElement('div');
             modal.className = 'modal active';
             modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
             modal.innerHTML = `
                 <div style="background: #1f2937; padding: 2rem; border-radius: 8px; min-width: 400px;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1.5rem;">Edit User: ${userEmail}</h3>
-
-                    <div style="margin-bottom: 1rem;">
-                        <button onclick="resetUserPassword('${userId}')" style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
-                            Reset Password
-                        </button>
-                        <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">
-                            This will set a temporary password and require the user to change it on next login.
-                        </p>
-                    </div>
-
-                    <div id="resetPasswordResult" style="margin: 1rem 0; color: #10b981; display: none;"></div>
-
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button onclick="this.closest('.modal').remove()" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; flex: 1;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1.5rem;">User Details: ${userEmail}</h3>
+                    <p style="color: #9ca3af;">User ID: ${userId}</p>
+                    <p style="color: #9ca3af;">More details coming soon...</p>
+                    <div style="margin-top: 1.5rem;">
+                        <button onclick="this.closest('.modal').remove()" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
                             Close
                         </button>
                     </div>
@@ -1771,12 +1800,68 @@
             document.body.appendChild(modal);
         }
 
+        function confirmClearUserData(userId, userEmail) {
+            if (confirm(`Are you sure you want to clear all donation data for ${userEmail}? This cannot be undone.`)) {
+                clearUserDonations(userId);
+            }
+        }
+
+        async function clearUserDonations(userId) {
+            try {
+                // Show loading notification
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #f59e0b; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10001;';
+                notification.innerHTML = `
+                    <strong>⏳ Clearing User Data...</strong><br>
+                    <small>Removing all donations, items, tax settings, and personal charities</small>
+                `;
+                document.body.appendChild(notification);
+
+                // Call the API to clear user data
+                const response = await fetch(`/api/users/${userId}/clear-all-data`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Success notification
+                    notification.style.background = '#10b981';
+                    notification.innerHTML = `
+                        <strong>✓ User Data Cleared!</strong><br>
+                        <small>Removed: ${data.results.donations} donations, ${data.results.donation_items} items, ${data.results.user_charities} personal charities</small><br>
+                        <small>Ready to import fresh test data</small>
+                    `;
+
+                    setTimeout(() => {
+                        notification.remove();
+                        loadUsers(); // Reload the user list
+                        // Also reload stats if visible
+                        if (document.getElementById('overview').style.display !== 'none') {
+                            loadAdminStats();
+                        }
+                    }, 4000);
+                } else {
+                    throw new Error(data.error || 'Failed to clear user data');
+                }
+
+            } catch (error) {
+                alert('Error clearing user data: ' + error.message);
+            }
+        }
+
         async function resetUserPassword(userId) {
-            const resultDiv = document.getElementById('resetPasswordResult');
+            // Show confirmation first
+            if (!confirm('Reset this user\'s password to "password123"?')) {
+                return;
+            }
 
             try {
-                // Generate a temporary password
-                const tempPassword = 'TempPass' + Math.random().toString(36).substr(2, 8);
+                // Use standard temporary password
+                const tempPassword = 'password123';
 
                 const response = await fetch(`/api/users/${userId}/reset-password`, {
                     method: 'POST',
@@ -1787,30 +1872,47 @@
                     body: JSON.stringify({ temporaryPassword: tempPassword })
                 });
 
+                // Show notification
+                const notification = document.createElement('div');
+                notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10001;';
+                notification.innerHTML = `
+                    <strong>✓ Password Reset</strong><br>
+                    New password: <strong>${tempPassword}</strong><br>
+                    <small>Note: Backend API pending. Update manually in DB.</small>
+                `;
+                document.body.appendChild(notification);
+
+                // Remove notification after 5 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+
+            } catch (error) {
+                alert('Error resetting password: ' + error.message);
+            }
+        }
+
+        async function exportUserDonations(userId) {
+            try {
+                const response = await fetch(`/api/donations/export-user/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
                 if (response.ok) {
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div style="background: #10b981; color: white; padding: 1rem; border-radius: 4px;">
-                            ✓ Password reset successful!<br>
-                            Temporary password: <strong>${tempPassword}</strong><br>
-                            <small>Please share this with the user securely.</small>
-                        </div>
-                    `;
+                    const data = await response.json();
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `user_${userId}_donations_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
                 } else {
-                    // For now, just show success since API doesn't exist yet
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div style="background: #10b981; color: white; padding: 1rem; border-radius: 4px;">
-                            ✓ Password reset successful!<br>
-                            Temporary password: <strong>${tempPassword}</strong><br>
-                            <small>Note: Backend API pending. Please manually update the user's password.</small>
-                        </div>
-                    `;
+                    alert('Export feature coming soon');
                 }
             } catch (error) {
-                resultDiv.style.display = 'block';
-                resultDiv.style.color = '#ef4444';
-                resultDiv.textContent = 'Error resetting password: ' + error.message;
+                alert('Export feature coming soon');
             }
         }
 

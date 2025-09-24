@@ -1,7 +1,7 @@
-# Charity Tracker Continuation Context - v2.2.8
+# Charity Tracker Continuation Context - v2.2.9
 
 ## Current Status
-- **Version:** 2.2.8 (pending deployment)
+- **Version:** 2.2.9 (deployed)
 - **Last Updated:** 2025-09-24
 - **Date/Time Context:** September 24, 2025
 
@@ -10,18 +10,49 @@
 None - All systems operational!
 
 ## 📌 NEXT STEPS ON RESTART:
-- **TODO**: Implement auto-logout feature with admin-configurable timeout setting
-- **TODO**: Implement freemium model demo - see `/FREEMIUM_STRATEGY.md` for detailed plan:
-  - Free tier: 3 donations max, no exports
-  - Premium tier: $49/year unlimited (price updated)
+
+### Immediate Tasks:
+- **TODO**: Test with new diverse 60-donation CSV files (test_user*_diverse_60.csv)
+  - User 2: Medical/Health focus
+  - User 3: Arts/Culture focus
+  - User 4: Youth/Food Security focus
+  - User 5: Animals/Environment focus
+- **TODO**: Run comprehensive test plan - see `/TEST_PLAN_v2.2.9.md`
+
+### Freemium Implementation:
+- **TODO**: Implement freemium model demo - see `/FREEMIUM_STRATEGY.md`:
+  - Make existing users premium (grandfathered)
+  - New users: Free tier with 3 donation limit
+  - Premium tier: $49/year unlimited
   - Demo payment flow (no real Stripe yet)
-- **TODO**: Add proper lost password/email recovery system
-- Test with new 60-donation CSV files for users 2-5 (created in project root)
+
+### Price Lookup Features:
+- **PLANNED**: Stock price lookup integration - see `/PRICE_LOOKUP_INTEGRATION_PLAN.md`:
+  - Alpha Vantage API for closing prices
+  - Automatic FMV calculation
+  - Premium feature only
+- **PLANNED**: Crypto price lookup:
+  - CoinGecko API for FMV
+  - IRS-compliant noon EST pricing
+  - Support BTC, ETH, major coins
+- **PLANNED**: Charity Navigator integration:
+  - Start with external links
+  - Show ratings inline (future)
+  - Help users evaluate charities
+
+### Monetization Strategy:
+- **DECISION**: No ads, no affiliates, no enterprise - see `/MONETIZATION_ALTERNATIVES.md`
+- **ONLY REVENUE**: Freemium subscriptions ($49/year) - Need 5,000 subscribers = $245k
+- **KEY PARTNERSHIP**: Tax software APIs (not for revenue, but essential for value)
+- **FOCUS**: Make the $49 worth it with premium features (price lookups, unlimited, exports)
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
-- PENDING v2.2.8: Import validation auto-confirms personal charity when no matches found
-- PENDING v2.2.8: Admin can reset user passwords via Manage Users (temporary password)
-- Updated freemium pricing to $49/year (v2.2.8)
+- v2.2.9: Auto-logout feature with admin-configurable timeout (default 30 min)
+- v2.2.9: Lost password link shows "coming soon" modal with admin contact info
+- v2.2.9: Admin can reset user passwords via Edit button in User Management
+- v2.2.9: Settings table added to database for system configuration
+- v2.2.8: Import validation auto-confirms personal charity when no matches found
+- v2.2.8: Admin can reset user passwords via Manage Users (temporary password)
 - Created larger test data files (60 donations each for users 2-5) (v2.2.7)
 - Fixed year selector to default to current year (2025) (v2.2.7)
 - Improved progress bar timing for accurate import feedback (v2.2.7)

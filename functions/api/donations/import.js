@@ -245,29 +245,57 @@ export async function onRequestPost(context) {
                             }
 
                             if (!foundPartialMatch) {
-                                // No matches at all - auto-create a personal charity
-                                console.log(`[IMPORT DEBUG] No match for "${donation.charity_name}" - auto-creating personal charity`);
+                                // No matches at all - check if personal charity already exists or create new one
+                                console.log(`[IMPORT DEBUG] No match for "${donation.charity_name}" - checking for existing personal charity`);
                                 try {
-                                    const newCharityId = crypto.randomUUID();
-                                    await env.DB.prepare(`
-                                        INSERT INTO user_charities (id, user_id, name, ein, created_at)
-                                        VALUES (?, ?, ?, ?, datetime('now'))
-                                    `).bind(newCharityId, user.id, donation.charity_name, null).run();
+                                    // First check if this personal charity already exists for this user
+                                    const existingPersonalCharity = await env.DB.prepare(`
+                                        SELECT id FROM user_charities
+                                        WHERE user_id = ? AND LOWER(name) = LOWER(?)
+                                    `).bind(user.id, donation.charity_name).first();
 
-                                    userCharityId = newCharityId;
-                                    charityType = 'personal';
-                                    results.charityMatches.notFound.push(donation.charity_name);
+                                    if (existingPersonalCharity) {
+                                        // Reuse existing personal charity
+                                        userCharityId = existingPersonalCharity.id;
+                                        charityType = 'personal';
+                                        console.log(`[IMPORT DEBUG] Found existing personal charity with ID: ${userCharityId}`);
 
-                                    // Track personal charity creation
-                                    if (!results.personalCharitiesCreated) {
-                                        results.personalCharitiesCreated = 0;
+                                        // Update charity map to include this for future donations in same import
+                                        charityMap.set(donation.charity_name.toLowerCase(), {
+                                            id: userCharityId,
+                                            name: donation.charity_name,
+                                            type: 'personal'
+                                        });
+                                    } else {
+                                        // Create new personal charity
+                                        const newCharityId = crypto.randomUUID();
+                                        await env.DB.prepare(`
+                                            INSERT INTO user_charities (id, user_id, name, ein, created_at)
+                                            VALUES (?, ?, ?, ?, datetime('now'))
+                                        `).bind(newCharityId, user.id, donation.charity_name, null).run();
+
+                                        userCharityId = newCharityId;
+                                        charityType = 'personal';
+                                        results.charityMatches.notFound.push(donation.charity_name);
+
+                                        // Track personal charity creation
+                                        if (!results.personalCharitiesCreated) {
+                                            results.personalCharitiesCreated = 0;
+                                        }
+                                        results.personalCharitiesCreated++;
+                                        console.log(`[IMPORT DEBUG] Created new personal charity with ID: ${newCharityId}`);
+
+                                        // Add to charity map for future donations in same import
+                                        charityMap.set(donation.charity_name.toLowerCase(), {
+                                            id: newCharityId,
+                                            name: donation.charity_name,
+                                            type: 'personal'
+                                        });
                                     }
-                                    results.personalCharitiesCreated++;
-                                    console.log(`[IMPORT DEBUG] Created personal charity with ID: ${newCharityId}`);
                                 } catch (createError) {
-                                    console.error(`[IMPORT DEBUG] Failed to create personal charity: ${createError.message}`);
+                                    console.error(`[IMPORT DEBUG] Failed to handle personal charity: ${createError.message}`);
                                     results.failed++;
-                                    results.errors.push(`Row ${results.processed}: Failed to create personal charity: ${donation.charity_name}`);
+                                    results.errors.push(`Row ${results.processed}: Failed to handle personal charity: ${donation.charity_name}`);
                                     continue;
                                 }
                             }

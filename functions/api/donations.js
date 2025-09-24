@@ -255,7 +255,23 @@ export async function onRequestPost(context) {
     }
 
     // Fetch the complete donation with items
-    let donation = await getDonationWithItems(env, donationId);
+    let donation;
+    try {
+      donation = await getDonationWithItems(env, donationId);
+    } catch (fetchError) {
+      console.error('Error fetching created donation:', fetchError);
+      // Return success with just the ID since the donation was created
+      return new Response(JSON.stringify({
+        success: true,
+        donation: { id: donationId },
+        message: 'Donation created successfully'
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
 
     return new Response(JSON.stringify({
       success: true,
@@ -700,7 +716,23 @@ export async function onRequestPut(context) {
     }
 
     // Fetch updated donation with items
-    const donation = await getDonationWithItems(env, donationId);
+    let donation;
+    try {
+      donation = await getDonationWithItems(env, donationId);
+    } catch (fetchError) {
+      console.error('Error fetching updated donation:', fetchError);
+      // Return success with just the ID since the donation was updated
+      return new Response(JSON.stringify({
+        success: true,
+        donation: { id: donationId },
+        message: 'Donation updated successfully'
+      }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
 
     return new Response(JSON.stringify({
       success: true,
