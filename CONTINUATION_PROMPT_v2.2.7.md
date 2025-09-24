@@ -1,7 +1,7 @@
-# Charity Tracker Continuation Context - v2.2.7
+# Charity Tracker Continuation Context - v2.2.8
 
 ## Current Status
-- **Version:** 2.2.7
+- **Version:** 2.2.8 (pending deployment)
 - **Last Updated:** 2025-09-24
 - **Date/Time Context:** September 24, 2025
 
@@ -13,20 +13,19 @@ None - All systems operational!
 - **TODO**: Implement auto-logout feature with admin-configurable timeout setting
 - **TODO**: Implement freemium model demo - see `/FREEMIUM_STRATEGY.md` for detailed plan:
   - Free tier: 3 donations max, no exports
-  - Premium tier: $29/year unlimited
+  - Premium tier: $49/year unlimited (price updated)
   - Demo payment flow (no real Stripe yet)
+- **TODO**: Add proper lost password/email recovery system
 - Test with new 60-donation CSV files for users 2-5 (created in project root)
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
+- PENDING v2.2.8: Import validation auto-confirms personal charity when no matches found
+- PENDING v2.2.8: Admin can reset user passwords via Manage Users (temporary password)
+- Updated freemium pricing to $49/year (v2.2.8)
 - Created larger test data files (60 donations each for users 2-5) (v2.2.7)
 - Fixed year selector to default to current year (2025) (v2.2.7)
 - Improved progress bar timing for accurate import feedback (v2.2.7)
 - Tax savings now updates when adding/removing items (v2.2.7)
-- Removed old ITEMS format from notes field (v2.2.7)
-- Fixed item donation import to parse CSV columns correctly (v2.2.7)
-- Restored fuzzy charity matching with auto-create for no matches (v2.2.7)
-- Added progress bar to import process (v2.2.7)
-- Fixed import authentication bug (v2.2.7)
 
 ---
 

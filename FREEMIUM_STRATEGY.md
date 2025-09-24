@@ -9,7 +9,7 @@ Demonstrate a freemium model without requiring actual payment processing (no Str
 - **Basic features only** (no advanced analytics)
 - **Watermark on any reports**
 
-## Premium Tier ($29/year)
+## Premium Tier ($49/year)
 - **Unlimited donations**
 - **Full export capabilities** (CSV, PDF)
 - **Advanced analytics dashboard**
@@ -43,7 +43,7 @@ function upgradeAccount() {
   // Show payment modal
   showModal({
     title: "Upgrade to Premium",
-    price: "$29/year",
+    price: "$49/year",
     features: [...],
     buttons: [
       { text: "Demo: Instant Upgrade", action: mockUpgrade },
@@ -116,13 +116,13 @@ function exportDonations(req, res) {
   <div class="lock-icon">🔒</div>
   <h3>Premium Feature</h3>
   <p>Export functionality requires a premium account</p>
-  <button>Upgrade for $29/year</button>
+  <button>Upgrade for $49/year</button>
 </div>
 
 <!-- Upgrade Modal -->
 <div class="upgrade-modal">
   <h2>Unlock Full Access</h2>
-  <div class="price">$29/year</div>
+  <div class="price">$49/year</div>
   <ul>
     <li>✓ Unlimited donations</li>
     <li>✓ Export to CSV & PDF</li>
@@ -151,7 +151,7 @@ When ready for production:
 ## Revenue Projections
 - **Target**: 1000 users in Year 1
 - **Conversion Rate**: 10% (100 premium users)
-- **Annual Revenue**: $2,900
+- **Annual Revenue**: $4,900
 - **Growth**: 50% YoY
 
 ## Marketing Strategy
