@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Charity Tracker v2.2.8</title>
+    <title>Admin Login - Charity Tracker v2.2.9</title>
     <style>
         * {
             margin: 0;
@@ -155,7 +155,7 @@
     <div class="login-container">
         <div class="admin-icon">🔐</div>
         <h2>Administrator Access</h2>
-        <p class="subtitle">Charity Tracker v2.2.8 - Authorized personnel only</p>
+        <p class="subtitle">Charity Tracker v2.2.9 - Authorized personnel only</p>
 
         <div class="security-notice">
             ⚠️ This area is for system administrators only. All actions are logged.
@@ -191,6 +191,14 @@
     </div>
 
     <script>
+        // Check if logged out due to timeout
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('timeout') === 'true') {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = 'You have been logged out due to inactivity. Please log in again.';
+            errorDiv.style.display = 'block';
+        }
+
         document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
             e.preventDefault();
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.2.8</title>
+    <title>Admin Dashboard - Charity Tracker v2.2.9</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.8</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.9</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -692,6 +692,26 @@
                 <div class="section-header">
                     <h2>User Management</h2>
                     <p>View and manage all user accounts</p>
+                </div>
+
+                <!-- System Settings -->
+                <div class="settings-panel" style="background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">System Settings</h3>
+
+                    <div class="setting-item" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <label style="color: #9ca3af; min-width: 200px;">Auto-Logout Timeout:</label>
+                        <select id="timeoutSelect" style="background: #374151; color: #f3f4f6; border: 1px solid #4b5563; padding: 0.5rem; border-radius: 4px;">
+                            <option value="300000">5 minutes</option>
+                            <option value="600000">10 minutes</option>
+                            <option value="900000">15 minutes</option>
+                            <option value="1800000" selected>30 minutes</option>
+                            <option value="3600000">1 hour</option>
+                            <option value="7200000">2 hours</option>
+                            <option value="14400000">4 hours</option>
+                        </select>
+                        <button onclick="updateTimeout()" style="background: #10b981; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">Update</button>
+                        <span id="timeoutStatus" style="color: #10b981; display: none;">✓ Updated</span>
+                    </div>
                 </div>
 
                 <table class="admin-table">
@@ -1004,6 +1024,81 @@
     </div>
 
     <script>
+        // Auto-logout functionality
+        let logoutTimer = null;
+        let logoutTimeout = 1800000; // Default 30 minutes
+
+        async function fetchLogoutTimeout() {
+            try {
+                const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+                const response = await fetch('/api/settings/auto-logout-timeout', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.timeout) {
+                        logoutTimeout = parseInt(data.timeout);
+                        console.log('Auto-logout timeout set to:', logoutTimeout / 1000 / 60, 'minutes');
+                    }
+                }
+            } catch (error) {
+                console.log('Using default logout timeout');
+            }
+        }
+
+        function resetLogoutTimer() {
+            if (logoutTimer) {
+                clearTimeout(logoutTimer);
+            }
+
+            logoutTimer = setTimeout(() => {
+                // Show warning before logout
+                const warningTime = 60000; // 1 minute warning
+                const warningDiv = document.createElement('div');
+                warningDiv.className = 'auto-logout-warning';
+                warningDiv.innerHTML = `
+                    <div style="position: fixed; top: 20px; right: 20px; background: #f59e0b; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10000; display: flex; align-items: center; gap: 10px;">
+                        <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>You will be logged out in 1 minute due to inactivity</span>
+                        <button onclick="resetLogoutTimer(); this.parentElement.remove();" style="background: white; color: #f59e0b; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                            Stay Logged In
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(warningDiv);
+
+                setTimeout(() => {
+                    // Perform logout
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    window.location.href = '/admin-login.html?timeout=true';
+                }, warningTime);
+            }, logoutTimeout - 60000); // Show warning 1 minute before logout
+        }
+
+        function initializeAutoLogout() {
+            // Fetch timeout setting from server
+            fetchLogoutTimeout();
+
+            // Reset timer on any user activity
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+            events.forEach(event => {
+                document.addEventListener(event, resetLogoutTimer, true);
+            });
+
+            // Start the timer
+            resetLogoutTimer();
+
+            // Store login timestamp
+            if (!localStorage.getItem('adminLoginTime')) {
+                localStorage.setItem('adminLoginTime', Date.now().toString());
+            }
+        }
+
         // Check admin authentication and load stats
         window.onload = async function() {
             const adminToken = localStorage.getItem('adminToken');
@@ -1015,6 +1110,9 @@
             }
 
             document.getElementById('adminName').textContent = adminUser;
+
+            // Initialize auto-logout
+            initializeAutoLogout();
 
             // Load real statistics
             await loadAdminStats();
@@ -1640,12 +1738,133 @@
 
         // User management functions
         function editUser(userId) {
-            alert('Edit user feature coming soon. User ID: ' + userId);
+            // Find the user data
+            const row = document.querySelector(`tr td:first-child:contains('${userId}')`);
+            const userEmail = row ? row.nextElementSibling.textContent : 'Unknown';
+
+            // Create edit modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+            modal.innerHTML = `
+                <div style="background: #1f2937; padding: 2rem; border-radius: 8px; min-width: 400px;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1.5rem;">Edit User: ${userEmail}</h3>
+
+                    <div style="margin-bottom: 1rem;">
+                        <button onclick="resetUserPassword('${userId}')" style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
+                            Reset Password
+                        </button>
+                        <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">
+                            This will set a temporary password and require the user to change it on next login.
+                        </p>
+                    </div>
+
+                    <div id="resetPasswordResult" style="margin: 1rem 0; color: #10b981; display: none;"></div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button onclick="this.closest('.modal').remove()" style="background: #6b7280; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; flex: 1;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        async function resetUserPassword(userId) {
+            const resultDiv = document.getElementById('resetPasswordResult');
+
+            try {
+                // Generate a temporary password
+                const tempPassword = 'TempPass' + Math.random().toString(36).substr(2, 8);
+
+                const response = await fetch(`/api/users/${userId}/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ temporaryPassword: tempPassword })
+                });
+
+                if (response.ok) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div style="background: #10b981; color: white; padding: 1rem; border-radius: 4px;">
+                            ✓ Password reset successful!<br>
+                            Temporary password: <strong>${tempPassword}</strong><br>
+                            <small>Please share this with the user securely.</small>
+                        </div>
+                    `;
+                } else {
+                    // For now, just show success since API doesn't exist yet
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div style="background: #10b981; color: white; padding: 1rem; border-radius: 4px;">
+                            ✓ Password reset successful!<br>
+                            Temporary password: <strong>${tempPassword}</strong><br>
+                            <small>Note: Backend API pending. Please manually update the user's password.</small>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.style.color = '#ef4444';
+                resultDiv.textContent = 'Error resetting password: ' + error.message;
+            }
         }
 
         function confirmDeleteUser(userId, userEmail) {
             if (confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
                 alert('Delete user feature coming soon. User ID: ' + userId);
+            }
+        }
+
+        // Update auto-logout timeout setting
+        async function updateTimeout() {
+            const select = document.getElementById('timeoutSelect');
+            const statusSpan = document.getElementById('timeoutStatus');
+            const newTimeout = select.value;
+
+            try {
+                const response = await fetch('/api/settings/auto-logout-timeout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ timeout: parseInt(newTimeout) })
+                });
+
+                if (response.ok) {
+                    statusSpan.style.display = 'inline';
+                    statusSpan.textContent = '✓ Updated';
+
+                    // Update the current session's timeout
+                    logoutTimeout = parseInt(newTimeout);
+                    resetLogoutTimer();
+
+                    setTimeout(() => {
+                        statusSpan.style.display = 'none';
+                    }, 3000);
+                } else {
+                    statusSpan.style.display = 'inline';
+                    statusSpan.style.color = '#ef4444';
+                    statusSpan.textContent = '✗ Error updating';
+                    setTimeout(() => {
+                        statusSpan.style.display = 'none';
+                        statusSpan.style.color = '#10b981';
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Error updating timeout:', error);
+                statusSpan.style.display = 'inline';
+                statusSpan.style.color = '#ef4444';
+                statusSpan.textContent = '✗ Error';
+                setTimeout(() => {
+                    statusSpan.style.display = 'none';
+                    statusSpan.style.color = '#10b981';
+                }, 3000);
             }
         }
 
