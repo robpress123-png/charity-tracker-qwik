@@ -71,17 +71,24 @@ export async function onRequestDelete(context) {
         const itemsCountResult = await env.DB.prepare('SELECT COUNT(*) as count FROM donation_items').first();
         const beforeItemsCount = itemsCountResult?.count || 0;
 
+        const charitiesCountResult = await env.DB.prepare('SELECT COUNT(*) as count FROM user_charities').first();
+        const beforeCharitiesCount = charitiesCountResult?.count || 0;
+
         // Delete all donation_items first (in case CASCADE doesn't work)
         await env.DB.prepare('DELETE FROM donation_items').run();
 
         // Delete all donations
         await env.DB.prepare('DELETE FROM donations').run();
 
+        // Delete all user_charities for a complete fresh start
+        await env.DB.prepare('DELETE FROM user_charities').run();
+
         return new Response(JSON.stringify({
             success: true,
-            message: `Successfully deleted all donations and items`,
+            message: `Successfully deleted all donations, items, and personal charities`,
             deletedCount: beforeCount,
-            deletedItemsCount: beforeItemsCount
+            deletedItemsCount: beforeItemsCount,
+            deletedCharitiesCount: beforeCharitiesCount
         }), {
             headers: {
                 'Content-Type': 'application/json',
