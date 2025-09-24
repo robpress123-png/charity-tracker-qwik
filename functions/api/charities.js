@@ -152,7 +152,7 @@ export async function onRequestGet(context) {
               WHERE user_id = ? AND (LOWER(name) LIKE LOWER(?) OR LOWER(ein) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?))
             )
             ORDER BY rank, name
-            LIMIT 25
+            LIMIT 100
           `;
           const searchPattern = `%${searchTerm}%`;
           const startsWithPattern = `${searchTerm}%`;
@@ -177,7 +177,7 @@ export async function onRequestGet(context) {
             FROM charities
             WHERE LOWER(name) LIKE LOWER(?) OR LOWER(ein) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
             ORDER BY rank, name
-            LIMIT 25
+            LIMIT 100
           `;
           const searchPattern = `%${searchTerm}%`;
           const startsWithPattern = `${searchTerm}%`;
