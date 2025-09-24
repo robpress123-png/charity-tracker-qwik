@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.2.11</title>
+    <title>Admin Dashboard - Charity Tracker v2.2.12</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.11</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.12</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -628,6 +628,16 @@
                             🔍 Search Charities
                         </button>
                     </div>
+
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+                        <h4 style="color: #9ca3af; margin-bottom: 1rem;">Clean Duplicate Personal Charities</h4>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Find and merge duplicate personal charities across all users. This will consolidate duplicate entries and update all associated donations.
+                        </p>
+                        <button class="tool-btn" onclick="cleanAllDuplicateCharities()" style="background: #10b981;">
+                            🔧 Clean All Duplicates
+                        </button>
+                    </div>
                 </div>
 
                 <div style="margin-top: 2rem;">
@@ -692,6 +702,34 @@
                 <div class="section-header">
                     <h2>User Management</h2>
                     <p>View and manage all user accounts</p>
+                </div>
+
+                <!-- User Search and Filters -->
+                <div class="search-panel" style="background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <input type="text"
+                                   id="userSearchInput"
+                                   placeholder="🔍 Search users by name or email..."
+                                   style="width: 100%; padding: 0.75rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px;"
+                                   oninput="filterUsers()">
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="filter-btn" data-filter="premium" onclick="toggleUserFilter(this, 'premium')"
+                                    style="padding: 0.5rem 1rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer;">
+                                💎 Premium
+                            </button>
+                            <button class="filter-btn" data-filter="free" onclick="toggleUserFilter(this, 'free')"
+                                    style="padding: 0.5rem 1rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer;">
+                                🆓 Free
+                            </button>
+                            <button class="filter-btn" data-filter="duplicates" onclick="toggleUserFilter(this, 'duplicates')"
+                                    style="padding: 0.5rem 1rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer;">
+                                ⚠️ Has Duplicates
+                            </button>
+                        </div>
+                    </div>
+                    <div id="searchResultsCount" style="margin-top: 0.75rem; color: #9ca3af; font-size: 0.875rem; display: none;"></div>
                 </div>
 
                 <!-- System Settings -->
@@ -1706,6 +1744,11 @@
                             const createdDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
                             const totalDonations = user.total_donations ? `$${parseFloat(user.total_donations).toLocaleString()}` : '$0';
 
+                            // Add data attributes for filtering
+                            row.setAttribute('data-email', user.email);
+                            row.setAttribute('data-name', user.name || '');
+                            row.setAttribute('data-plan', user.plan || 'free');
+
                             row.innerHTML = `
                                 <td>${user.id}</td>
                                 <td>${user.email}</td>
@@ -1726,6 +1769,9 @@
                                             </button>
                                             <button onclick="viewUserDetails('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer;">
                                                 👁️ View Details
+                                            </button>
+                                            <button onclick="fixUserDuplicates('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer;">
+                                                🔧 Fix Duplicate Charities
                                             </button>
                                             <div style="border-top: 1px solid #374151; margin: 0.25rem 0;"></div>
                                             <button onclick="confirmClearUserData('${user.id}', '${user.email}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f59e0b; border: none; cursor: pointer;">
@@ -1920,6 +1966,201 @@
             if (confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
                 alert('Delete user feature coming soon. User ID: ' + userId);
             }
+        }
+
+        // Fix duplicate personal charities for a user
+        async function fixUserDuplicates(userId, userEmail) {
+            try {
+                // First check if user has duplicates (dry run)
+                const checkResponse = await fetch('/api/admin/merge-duplicate-charities', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': 'admin-secret-2024'
+                    },
+                    body: JSON.stringify({ userId: userId, dryRun: true })
+                });
+
+                const checkData = await checkResponse.json();
+
+                if (!checkData.success) {
+                    alert('Error checking for duplicates: ' + checkData.error);
+                    return;
+                }
+
+                if (!checkData.results.duplicatesFound || checkData.results.duplicatesFound.length === 0) {
+                    alert(`No duplicate personal charities found for ${userEmail}`);
+                    return;
+                }
+
+                // Show what will be fixed
+                let message = `Found duplicate personal charities for ${userEmail}:\n\n`;
+                checkData.results.duplicatesFound.forEach(dup => {
+                    const names = dup.original_names.split(',');
+                    message += `• "${names[0]}" (${dup.duplicate_count} copies)\n`;
+                });
+                message += `\nDo you want to merge these duplicates?`;
+
+                if (confirm(message)) {
+                    // Perform the actual merge
+                    const mergeResponse = await fetch('/api/admin/merge-duplicate-charities', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Admin-Token': 'admin-secret-2024'
+                        },
+                        body: JSON.stringify({ userId: userId, dryRun: false })
+                    });
+
+                    const mergeData = await mergeResponse.json();
+
+                    if (mergeData.success) {
+                        alert(`✅ Successfully merged duplicates for ${userEmail}\n\n${mergeData.message}`);
+                        loadUsers(); // Reload the user list
+                    } else {
+                        alert('Error merging duplicates: ' + mergeData.error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fixing duplicates:', error);
+                alert('Failed to fix duplicate charities: ' + error.message);
+            }
+        }
+
+        // Clean all duplicate personal charities across all users
+        async function cleanAllDuplicateCharities() {
+            try {
+                // First do a dry run to see what will be cleaned
+                const checkResponse = await fetch('/api/admin/merge-duplicate-charities', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': 'admin-secret-2024'
+                    },
+                    body: JSON.stringify({ dryRun: true })
+                });
+
+                const checkData = await checkResponse.json();
+
+                if (!checkData.success) {
+                    alert('Error checking for duplicates: ' + checkData.error);
+                    return;
+                }
+
+                if (!checkData.results.duplicatesFound || checkData.results.duplicatesFound.length === 0) {
+                    alert('No duplicate personal charities found across any users.');
+                    return;
+                }
+
+                // Show summary of what will be cleaned
+                let message = `Found duplicate personal charities:\n\n`;
+                let totalDuplicates = 0;
+                checkData.results.duplicatesFound.forEach(dup => {
+                    const names = dup.original_names.split(',');
+                    totalDuplicates += dup.duplicate_count - 1; // Subtract 1 because we keep one
+                    message += `• User ${dup.user_id}: "${names[0]}" (${dup.duplicate_count} copies)\n`;
+                });
+                message += `\nTotal duplicates to remove: ${totalDuplicates}\n`;
+                message += `\nDo you want to merge all these duplicates? This cannot be undone.`;
+
+                if (confirm(message)) {
+                    // Show loading indicator
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.disabled = true;
+                    button.textContent = '⏳ Cleaning duplicates...';
+
+                    // Perform the actual merge
+                    const mergeResponse = await fetch('/api/admin/merge-duplicate-charities', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Admin-Token': 'admin-secret-2024'
+                        },
+                        body: JSON.stringify({ dryRun: false })
+                    });
+
+                    const mergeData = await mergeResponse.json();
+
+                    // Restore button
+                    button.disabled = false;
+                    button.textContent = originalText;
+
+                    if (mergeData.success) {
+                        alert(`✅ Successfully cleaned all duplicates!\n\n${mergeData.message}`);
+                        loadUsers(); // Reload the user list
+                        loadDatabaseStats(); // Update database stats
+                    } else {
+                        alert('Error merging duplicates: ' + mergeData.error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error cleaning duplicates:', error);
+                alert('Failed to clean duplicate charities: ' + error.message);
+            }
+        }
+
+        // Filter users based on search and filters
+        let activeFilters = new Set();
+        let allUsersData = []; // Store all users for filtering
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+            const tbody = document.getElementById('userTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+
+            let visibleCount = 0;
+            let totalCount = rows.length;
+
+            for (let row of rows) {
+                const email = row.getAttribute('data-email') || '';
+                const name = row.getAttribute('data-name') || '';
+                const plan = row.getAttribute('data-plan') || '';
+
+                let showRow = true;
+
+                // Search filter
+                if (searchTerm && !email.toLowerCase().includes(searchTerm) && !name.toLowerCase().includes(searchTerm)) {
+                    showRow = false;
+                }
+
+                // Plan filters
+                if (activeFilters.has('premium') && plan !== 'premium') {
+                    showRow = false;
+                }
+                if (activeFilters.has('free') && plan !== 'free') {
+                    showRow = false;
+                }
+
+                // TODO: Add duplicate check when we have that data
+                if (activeFilters.has('duplicates')) {
+                    // This would require checking if user has duplicate charities
+                    // For now, we'll skip this filter
+                }
+
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) visibleCount++;
+            }
+
+            // Update results count
+            const countDiv = document.getElementById('searchResultsCount');
+            if (searchTerm || activeFilters.size > 0) {
+                countDiv.style.display = 'block';
+                countDiv.textContent = `Showing ${visibleCount} of ${totalCount} users`;
+            } else {
+                countDiv.style.display = 'none';
+            }
+        }
+
+        function toggleUserFilter(button, filterType) {
+            if (activeFilters.has(filterType)) {
+                activeFilters.delete(filterType);
+                button.style.background = '#374151';
+            } else {
+                activeFilters.add(filterType);
+                button.style.background = '#10b981';
+            }
+            filterUsers();
         }
 
         // Update auto-logout timeout setting
