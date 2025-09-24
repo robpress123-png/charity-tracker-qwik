@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.2.10</title>
+    <title>Dashboard - Charity Tracker v2.2.11</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -722,13 +722,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.2.10</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.2.11</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.2.10</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.2.11</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1345,6 +1345,7 @@
                                        required
                                        autocomplete="off">
                                 <input type="hidden" id="selectedCharityId">
+                                <input type="hidden" id="selectedCharitySource">
                                 <div id="charityDropdown" class="autocomplete-dropdown"></div>
                             </div>
                         </div>
@@ -2080,7 +2081,7 @@
                             <div style="padding: 0.75rem; background: #f9fafb; border-radius: 6px; cursor: pointer; transition: background 0.2s;"
                                  onmouseover="this.style.background='#f3f4f6'"
                                  onmouseout="this.style.background='#f9fafb'"
-                                 onclick="${onClickFunc}('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">
+                                 onclick="${onClickFunc}('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">
                                 <div style="font-weight: 500; color: #111827;">${charity.name}${personalBadge}</div>
                                 <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
                                     ${charity.count} donation${charity.count !== 1 ? 's' : ''} · $${formatCurrency(charity.total, true)}
@@ -2430,12 +2431,16 @@
             } else {
                 let html = '';
                 results.forEach((charity, index) => {
+                    const personalBadge = charity.source === 'personal'
+                        ? '<span style="background: #fbbf24; color: #92400e; font-size: 0.7rem; padding: 0.125rem 0.375rem; border-radius: 4px; margin-left: 0.5rem; font-weight: 500;">Personal</span>'
+                        : '';
                     html += `
                         <div class="autocomplete-item ${index === selectedCharityIndex ? 'selected' : ''}"
                              data-id="${charity.id}"
                              data-index="${index}"
-                             onclick="selectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">
-                            <div class="autocomplete-item-name">${charity.name}</div>
+                             data-source="${charity.source || 'system'}"
+                             onclick="selectCharity('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">
+                            <div class="autocomplete-item-name">${charity.name}${personalBadge}</div>
                             ${charity.ein ? `<span class="autocomplete-item-ein">EIN: ${charity.ein}</span>` : ''}
                             ${charity.category ? `<span class="autocomplete-item-category">${charity.category}</span>` : ''}
                         </div>
@@ -2505,8 +2510,9 @@
             });
         }
 
-        function selectCharity(id, name) {
+        function selectCharity(id, name, source) {
             document.getElementById('selectedCharityId').value = id;
+            document.getElementById('selectedCharitySource').value = source || 'system';
             document.getElementById('donationCharity').value = name;
             // Track the selected charity name to prevent clearing on input events
             window.lastSelectedCharityName = name;
@@ -2514,13 +2520,14 @@
             dropdown.classList.remove('show');
             dropdown.style.display = 'none';
             selectedCharityIndex = -1;
-            console.log('Selected charity:', name, 'ID:', id);
+            console.log('Selected charity:', name, 'ID:', id, 'Source:', source);
         }
 
         // Quick add donation from My Charities
-        function quickAddDonation(charityId, charityName) {
+        function quickAddDonation(charityId, charityName, charitySource) {
             // Store the selected charity
             document.getElementById('selectedCharityId').value = charityId;
+            document.getElementById('selectedCharitySource').value = charitySource || 'personal';
             document.getElementById('donationCharity').value = charityName;
             // Track the selected charity name to prevent clearing on input events
             window.lastSelectedCharityName = charityName;
@@ -2605,7 +2612,8 @@
             const isEditing = window.editingDonationId !== null && window.editingDonationId !== undefined;
 
             // Determine if this is a user charity or system charity
-            const isUserCharity = charityId.startsWith('user_charity_');
+            const charitySource = document.getElementById('selectedCharitySource').value || 'system';
+            const isUserCharity = charitySource === 'personal';
 
             const formData = {
                 donation_type: donationType,
@@ -3223,7 +3231,7 @@
 
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.75rem 0;">
                                     ${charity.ein ? `<p class="charity-ein" style="margin: 0; font-size: 0.875rem;"><strong>EIN:</strong> ${charity.ein}</p>` : '<span></span>'}
-                                    <button class="btn-primary" style="padding: 0.375rem 0.75rem; font-size: 0.8rem;" onclick="quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}')">+ Quick Donation</button>
+                                    <button class="btn-primary" style="padding: 0.375rem 0.75rem; font-size: 0.8rem;" onclick="quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">+ Quick Donation</button>
                                 </div>
 
                                 <div class="charity-stats">
@@ -3432,7 +3440,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.2.10</p>
+                            <p>Generated by Charity Tracker v2.2.11</p>
                         </div>
                     </body>
                     </html>
@@ -6444,7 +6452,16 @@
             }
 
             // Determine if this is a user charity or system charity
-            const isUserCharity = charityId.startsWith('user_charity_');
+            // Check if the charity ID exists in the donations data to get source
+            let charitySource = 'system';
+            const storedDonations = JSON.parse(localStorage.getItem('recentDonations') || '[]');
+            const donation = storedDonations.find(d => d.id === window.editingDonationId);
+            if (donation) {
+                if (donation.user_charity_id) {
+                    charitySource = 'personal';
+                }
+            }
+            const isUserCharity = charitySource === 'personal';
 
             // Prepare the update data
             const formData = {
