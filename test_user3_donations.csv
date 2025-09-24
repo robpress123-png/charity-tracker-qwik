@@ -1,0 +1,21 @@
+date,charity_name,donation_type,amount,description,notes,stock_symbol,stock_quantity,fair_market_value,crypto_symbol,crypto_quantity,crypto_type,miles_driven,mileage_rate,mileage_purpose,items
+2024-01-20,"American Red Cross",cash,300,"Emergency relief","Disaster support",,,,,,,,,,,
+2024-02-15,"Habitat for Humanity",items,280,"Home goods donation","Moving sale",,,,,,,,,,,"Microwave:good:30|Coffee Maker:fair:15|Toaster:excellent:20|Blender:good:25|Sofa:fair:125|Coffee Table:good:50|Encyclopedia Set:good:25|Dictionary:fair:10"
+2024-03-10,"St. Jude Children's Research Hospital",crypto,2000,"Bitcoin donation","Crypto gift",,,,"BTC",0.04,"bitcoin",,,,,
+2024-04-22,"Doctors Without Borders",miles,140,"Medical volunteer","Hospital transport",,,,,,,10,0.14,"Medical volunteer driving",
+2024-05-18,"Make-A-Wish Foundation",cash,400,"Wish granting","Children's dreams",,,,,,,,,,,
+2024-06-12,"American Cancer Society",items,320,"Electronics donation","Tech upgrade",,,,,,,,,,,"Laptop - Business:good:200|Monitor - 24 inch:fair:50|Keyboard - Wireless:excellent:25|Mouse - Wireless:good:15|Printer - Inkjet:fair:30"
+2024-07-25,"Salvation Army",stock,3500,"Apple stock","Social services",AAPL,21,166.67,,,,,,,,
+2024-08-20,"World Wildlife Fund",cash,250,"Wildlife protection","Conservation",,,,,,,,,,,
+2024-09-15,"United Way",items,255,"Children's items","Kids outgrew",,,,,,,,,,,"Shirt - School:good:10|Pants - School:fair:8|Backpack - School:excellent:20|Board Game:good:15|Puzzle - 500pc:excellent:8|Basketball:good:15|Lego Set:excellent:35|Action Figures:fair:5"
+2024-10-30,"UNICEF",crypto,1500,"Ethereum donation","Children worldwide",,,,"ETH",0.5,"ethereum",,,,,
+2024-11-22,"Feeding America",miles,126,"Food delivery","Food bank support",,,,,,,9,0.14,"Food bank delivery",
+2024-12-20,"Boys and Girls Clubs",cash,350,"Youth programs","After school activities",,,,,,,,,,,
+2025-01-15,"Goodwill",items,385,"Clothing donation","Closet cleanout",,,,,,,,,,,"Dress - Formal:excellent:65|Suit - Business:good:40|Coat - Winter:excellent:85|Sweater - Pullover:good:30|Jeans - Designer:fair:25|Handbag - Casual:good:15|Shoes - Heels:excellent:25|Belt:good:10"
+2025-02-28,"Nature Conservancy",stock,4000,"Microsoft stock","Land conservation",MSFT,16,250,,,,,,,,
+2025-03-20,"American Heart Association",cash,275,"Heart research","Medical advances",,,,,,,,,,,
+2025-04-15,"Humane Society",items,290,"Pet supplies value","Animal shelter",,,,,,,,,,,"Dishes - Set:good:25|Towels - Bath:fair:8|Blanket:good:15|Tennis Racquet:excellent:35|Golf Clubs - Set:good:150|Bicycle - Mountain:fair:75"
+2025-05-30,"Special Olympics",crypto,1800,"Litecoin donation","Athletic programs",,,,"LTC",18,"litecoin",,,,,
+2025-06-25,"Alzheimer's Association",miles,168,"Patient transport","Memory care support",,,,,,,12,0.14,"Patient transportation",
+2025-07-20,"Meals on Wheels",cash,225,"Senior meals","Elderly nutrition",,,,,,,,,,,
+2025-08-15,"Planned Parenthood",items,315,"Medical equipment value","Healthcare support",,,,,,,,,,,"Desktop - Office:good:150|Monitor - 27 inch:excellent:125|Diamond Ring:excellent:500|Pearl Necklace:good:40"

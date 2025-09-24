@@ -1,0 +1,21 @@
+date,charity_name,donation_type,amount,description,notes,stock_symbol,stock_quantity,fair_market_value,crypto_symbol,crypto_quantity,crypto_type,miles_driven,mileage_rate,mileage_purpose,items
+2024-01-10,"Sierra Club Foundation",cash,200,"Environmental protection","Climate action",,,,,,,,,,,
+2024-02-25,"Disabled American Veterans",miles,182,"Veteran transport","VA hospital trips",,,,,,,13,0.14,"Veteran medical transport",
+2024-03-15,"Kiva Microfunds",stock,2500,"Tesla stock","Microfinance",TSLA,12,208.33,,,,,,,,
+2024-04-20,"Heifer International",items,345,"Farm equipment value","Livestock programs",,,,,,,,,,,"Hammer:excellent:8|Saw - Circular:good:45|Drill - Cordless:excellent:55|Ladder - Step:good:35|Tool Box:excellent:25|Wrench Set:fair:20|Screwdriver Set:good:15"
+2024-05-15,"ACLU Foundation",cash,300,"Civil liberties","Rights protection",,,,,,,,,,,
+2024-06-30,"Wikimedia Foundation",crypto,1200,"Bitcoin donation","Knowledge sharing",,,,"BTC",0.02,"bitcoin",,,,,
+2024-07-22,"Charity: Water",items,270,"Household items","Clean water support",,,,,,,,,,,"Blender:good:25|Toaster:excellent:20|Coffee Table:fair:50|Bookshelf:good:75|Lamp - Table:excellent:15|Dishes - Set:good:25|Cookware Set:fair:35|Towels - Bath:good:25"
+2024-08-18,"Room to Read",miles,154,"School visits","Education support",,,,,,,11,0.14,"School volunteer visits",
+2024-09-25,"Wounded Warrior Project",stock,5000,"Amazon stock","Veteran support",AMZN,31,161.29,,,,,,,,
+2024-10-15,"Environmental Defense Fund",cash,400,"Climate change","Environmental research",,,,,,,,,,,
+2024-11-20,"Oxfam America",items,410,"Tools and equipment","Global poverty",,,,,,,,,,,"Saw - Circular:good:45|Hammer:excellent:8|Screwdriver Set:good:15|Wrench Set:fair:20|Ladder - Step:good:35|Tool Box:excellent:25|Drill Bits:good:10|Power Drill:good:35"
+2024-12-28,"Smithsonian Institution",crypto,2200,"Ethereum donation","Museum support",,,,"ETH",0.7,"ethereum",,,,,
+2025-01-25,"American Library Association",cash,175,"Literacy programs","Reading support",,,,,,,,,,,
+2025-02-20,"Big Brothers Big Sisters",items,365,"Toys and games","Youth mentoring",,,,,,,,,,,"Video Game Console:good:150|Board Game:excellent:15|Action Figures:fair:5|Doll:good:12|Lego Set:excellent:35|Bicycle - Kids:good:45|Puzzle - 1000pc:excellent:10|Building Blocks:good:20"
+2025-03-15,"National Multiple Sclerosis Society",stock,3800,"Apple stock","MS research",AAPL,23,165.22,,,,,,,,
+2025-04-30,"Teach for America",miles,168,"School volunteering","Education equity",,,,,,,12,0.14,"School volunteer support",
+2025-05-25,"ASPCA",cash,250,"Animal rescue","Pet welfare",,,,,,,,,,,
+2025-06-20,"National Park Foundation",items,380,"Camping equipment","Park support",,,,,,,,,,,"Tent - 4 Person:good:75|Sleeping Bag:excellent:35|Camping Stove:fair:25|Backpack - Hiking:good:45|Cooler:excellent:30|Binoculars:good:25|Kayak:excellent:200"
+2025-07-15,"American Diabetes Association",crypto,1600,"Litecoin donation","Diabetes research",,,,"LTC",16,"litecoin",,,,,
+2025-08-30,"Ronald McDonald House",cash,325,"Family housing","Healthcare support",,,,,,,,,,,

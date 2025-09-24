@@ -1,0 +1,22 @@
+date,charity_name,donation_type,amount,description,notes,stock_symbol,stock_quantity,fair_market_value,crypto_symbol,crypto_quantity,crypto_type,miles_driven,mileage_rate,mileage_purpose,items
+2024-01-05,"Greenpeace USA",cash,350,"Ocean protection","Marine conservation",,,,,,,,,,,
+2024-02-18,"Susan G. Komen",items,425,"Jewelry donation","Fundraising auction",,,,,,,,,,,"Diamond Necklace:excellent:250|Gold Bracelet:good:75|Watch - Men's:fair:50|Earrings - Gold:excellent:20|Sunglasses - Designer:good:25|Pearl Earrings:good:45"
+2024-03-22,"Veterans of Foreign Wars",stock,3200,"Microsoft stock","VFW support",MSFT,13,246.15,,,,,,,,
+2024-04-15,"World Vision",miles,196,"International aid","Global missions",,,,,,,14,0.14,"International aid driving",
+2024-05-10,"Rotary Foundation",cash,450,"Service projects","Community improvement",,,,,,,,,,,
+2024-06-25,"UNICEF",crypto,2500,"Bitcoin donation","Children's fund",,,,"BTC",0.045,"bitcoin",,,,,
+2024-07-20,"League of Women Voters",items,360,"Office furniture","Democracy support",,,,,,,,,,,"Desk - Executive:excellent:175|Office Chair:good:75|Filing Cabinet:fair:40|Conference Table:good:110|Printer - Laser:good:50"
+2024-08-15,"Operation Smile",cash,300,"Cleft surgery","Medical missions",,,,,,,,,,,
+2024-09-30,"Trust for Public Land",stock,4200,"Tesla stock","Land preservation",TSLA,21,200,,,,,,,,
+2024-10-25,"Food for the Poor",miles,140,"Food distribution","Poverty relief",,,,,,,10,0.14,"Food delivery volunteer",
+2024-11-15,"Toys for Tots",items,395,"Holiday toys","Christmas giving",,,,,,,,,,,"Video Game - Console:good:40|Board Game:excellent:15|Puzzle - 1000pc:fair:10|Doll:excellent:12|Action Figures:good:5|Lego Set:excellent:35|Building Blocks:good:20|Bicycle - Kids:excellent:45"
+2024-12-20,"National Urban League",crypto,1900,"Ethereum donation","Urban programs",,,,"ETH",0.6,"ethereum",,,,,
+2025-01-30,"March of Dimes",cash,375,"Birth defects research","Infant health",,,,,,,,,,,
+2025-02-25,"Public Broadcasting Service",items,440,"Media equipment","Educational TV",,,,,,,,,,,"Television - 32 inch:good:100|DVD - Movies:fair:3|CD - Music:good:2|Monitor - 32 inch:excellent:150|Router - Wireless:good:35|Webcam - HD:excellent:15"
+2025-03-20,"Direct Relief",stock,5500,"Amazon stock","Medical supplies",AMZN,34,161.76,,,,,,,,
+2025-04-15,"Charity Navigator",miles,182,"Research support","Charity evaluation",,,,,,,13,0.14,"Research volunteer driving",
+2025-05-30,"Disabled American Veterans",cash,425,"Veteran programs","DAV support",,,,,,,,,,,
+2025-06-25,"Big Brothers Big Sisters",items,485,"Sports equipment","Youth sports",,,,,,,,,,,"Basketball Hoop:good:75|Soccer Goal:excellent:50|Baseball Glove:fair:15|Football:good:20|Hockey Stick:excellent:25|Volleyball Net:good:40|Tennis Racquet:excellent:35|Golf Clubs - Set:good:150"
+2025-07-20,"National MS Society",crypto,2100,"Litecoin donation","MS research",,,,"LTC",21,"litecoin",,,,,
+2025-08-15,"Smithsonian",cash,500,"Museum preservation","Cultural heritage",,,,,,,,,,,
+2025-09-30,"American Library Association",items,345,"Book donation","Literacy support",,,,,,,,,,,"Encyclopedia Set:excellent:50|Dictionary:good:10|Atlas:fair:8|Cookbook - Hardcover:excellent:12|Textbook - College:good:20|DVD - Movies:fair:3|Magazine Collection:good:5"

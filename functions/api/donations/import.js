@@ -229,10 +229,28 @@ export async function onRequestPost(context) {
                             }
 
                             if (!charityId && !userCharityId) {
-                                results.charityMatches.notFound.push(donation.charity_name);
-                                results.failed++;
-                                results.errors.push(`Row ${results.processed}: Charity not found: ${donation.charity_name}`);
-                                continue;
+                                // Create a personal charity for this user
+                                try {
+                                    const newCharityId = crypto.randomUUID();
+                                    await env.DB.prepare(`
+                                        INSERT INTO user_charities (id, user_id, name, ein, created_at)
+                                        VALUES (?, ?, ?, ?, datetime('now'))
+                                    `).bind(newCharityId, user.id, donation.charity_name, null).run();
+
+                                    userCharityId = newCharityId;
+                                    charityType = 'personal';
+                                    results.charityMatches.notFound.push(donation.charity_name);
+
+                                    // Track personal charity creation
+                                    if (!results.personalCharitiesCreated) {
+                                        results.personalCharitiesCreated = 0;
+                                    }
+                                    results.personalCharitiesCreated++;
+                                } catch (createError) {
+                                    results.failed++;
+                                    results.errors.push(`Row ${results.processed}: Failed to create personal charity: ${donation.charity_name}`);
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -451,9 +469,11 @@ export async function onRequestPost(context) {
         return new Response(JSON.stringify({
             success: true,
             results,
-            message: `Import completed: ${results.added} donations added`,
+            message: results.personalCharitiesCreated > 0
+                ? `Import completed: ${results.added} donations added (${results.charityMatches.found} matched existing charities, ${results.personalCharitiesCreated} personal charities created)`
+                : `Import completed: ${results.added} donations added (all matched existing charities)`,
             unmatchedCharities: results.charityMatches.notFound.length > 0
-                ? `Could not match ${results.charityMatches.notFound.length} charity names`
+                ? `Created ${results.personalCharitiesCreated || 0} personal charities for: ${results.charityMatches.notFound.join(', ')}`
                 : null
         }), {
             headers: {

@@ -1,0 +1,21 @@
+date,charity_name,donation_type,amount,description,notes,stock_symbol,stock_quantity,fair_market_value,crypto_symbol,crypto_quantity,crypto_type,miles_driven,mileage_rate,mileage_purpose,items
+2024-01-15,"American Red Cross",cash,200,"Disaster relief","Emergency fund",,,,,,,,,,,
+2024-02-20,"Habitat for Humanity",items,315,"Furniture donation","House building",,,,,,,,,,,"Sofa:good:125|Coffee Table:fair:50|Bookshelf:excellent:75|Dresser - 6 Drawer:good:85|Nightstand:fair:35|End Table:excellent:30"
+2024-03-10,"St. Jude Children's Research Hospital",stock,2500,"Microsoft stock","Medical research",MSFT,10,250,,,,,,,,
+2024-04-25,"Doctors Without Borders",crypto,1500,"Bitcoin donation","Global health",,,,"BTC",0.03,"bitcoin",,,,,
+2024-05-15,"World Wildlife Fund",miles,112,"Conservation events","Wildlife protection",,,,,,,8,0.14,"Conservation event support",
+2024-06-20,"American Cancer Society",cash,250,"Cancer research","Finding cures",,,,,,,,,,,
+2024-07-10,"Salvation Army",items,280,"Appliance donation","Community support",,,,,,,,,,,"Microwave:good:30|Coffee Maker:fair:15|Toaster:excellent:20|Blender:good:25|Vacuum Cleaner:fair:35|Iron:excellent:10|Slow Cooker:good:25"
+2024-08-25,"UNICEF",stock,4000,"Amazon stock","Children's fund",AMZN,25,160,,,,,,,,
+2024-09-15,"Feeding America",cash,300,"Food banks","Hunger relief",,,,,,,,,,,
+2024-10-20,"Make-A-Wish Foundation",crypto,1800,"Ethereum donation","Children's wishes",,,,"ETH",0.6,"ethereum",,,,,
+2024-11-10,"United Way",miles,154,"Community service","Local support",,,,,,,11,0.14,"Community volunteer driving",
+2024-12-25,"Boys and Girls Clubs",items,325,"Youth items","After school programs",,,,,,,,,,,"T-Shirt Pack:excellent:12|Shorts:good:6|Board Game:fair:15|Lego Set:excellent:35|Basketball:good:15|Video Game Console:good:150|Action Figures:fair:5"
+2025-01-20,"Goodwill",cash,175,"Job training","Employment services",,,,,,,,,,,
+2025-02-15,"Nature Conservancy",stock,3500,"Google stock","Land conservation",GOOGL,35,100,,,,,,,,
+2025-03-10,"American Heart Association",items,290,"Electronics donation","Heart research",,,,,,,,,,,"Desktop - Office:good:150|Monitor - 24 inch:fair:50|Keyboard - Wireless:excellent:25|Mouse - Wireless:good:15|Printer - Inkjet:fair:30|Router - Wireless:excellent:35"
+2025-04-25,"Humane Society",crypto,1400,"Litecoin donation","Animal welfare",,,,"LTC",14,"litecoin",,,,,
+2025-05-20,"Special Olympics",miles,168,"Athletic events","Sports programs",,,,,,,12,0.14,"Athletic event support",
+2025-06-15,"Alzheimer's Association",cash,350,"Memory research","Medical advances",,,,,,,,,,,
+2025-07-30,"Meals on Wheels",stock,2800,"Tesla stock","Senior meals",TSLA,14,200,,,,,,,,
+2025-08-25,"Planned Parenthood",items,265,"Medical equipment value","Healthcare",,,,,,,,,,,"Laptop - Business:good:200|Tablet - iPad:fair:75|Phone - Smartphone:excellent:50|External Hard Drive:good:40"
