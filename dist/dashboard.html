@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.2.17</title>
+    <title>Dashboard - Charity Tracker v2.2.18</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -722,13 +722,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.2.17</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.2.18</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.2.17</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.2.18</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1612,6 +1612,73 @@
                             <button type="submit" class="btn-primary" id="donationSubmitBtn">Add Donation</button>
                         </div>
                     </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Cash Donation Modal -->
+    <div id="editCashDonationModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>✏️ Edit Cash Donation</h2>
+                <button class="close-btn" onclick="closeEditCashModal()">&times;</button>
+            </div>
+            <div style="padding: 1.5rem;">
+                <form id="editCashDonationForm">
+                    <input type="hidden" id="editCashDonationId">
+                    <input type="hidden" id="editCashCharityId">
+                    <input type="hidden" id="editCashCharitySource">
+
+                    <!-- Charity Section -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Charity</label>
+                        <div style="padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;">
+                            <div id="editCashCharityName" style="font-weight: 500; color: #111827;"></div>
+                            <div id="editCashCharityEIN" style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Date Section -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="editCashDate" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Donation Date</label>
+                        <input type="date" id="editCashDate" required style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                    </div>
+
+                    <!-- Amount Section -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="editCashAmount" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Amount ($)</label>
+                        <input type="number" id="editCashAmount" step="0.01" min="0" required
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;"
+                               oninput="updateEditCashTaxSavings()">
+                    </div>
+
+                    <!-- Tax Savings Display -->
+                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.875rem; color: #0369a1;">Estimated Tax Savings:</span>
+                            <span style="font-size: 1.25rem; font-weight: bold; color: #0284c7;">$<span id="editCashTaxSavings">0</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label for="editCashNotes" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
+                        <textarea id="editCashNotes" rows="3"
+                                  style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" onclick="closeEditCashModal()"
+                                style="padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                            💾 Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -3500,7 +3567,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.2.17</p>
+                            <p>Generated by Charity Tracker v2.2.18</p>
                         </div>
                     </body>
                     </html>
@@ -5165,12 +5232,27 @@
                         return;
                     }
 
-                    // For other types, use the regular modal
+                    // Use specific edit modal for cash donations
+                    if (donationType === 'cash') {
+                        openEditCashDonationModal(donation);
+                        return;
+                    }
+
+                    // For other types, use the regular modal (for now)
                     const charityId = donation.charity_id || donation.user_charity_id || '';
                     const charityName = donation.charity_name || '';
+                    const charitySource = donation.charity_source || (donation.user_charity_id ? 'personal' : 'system');
+
+                    console.log('[EDIT] Opening modal for donation:', {
+                        charityId,
+                        charityName,
+                        charitySource,
+                        hasUserCharityId: !!donation.user_charity_id,
+                        hasCharityId: !!donation.charity_id
+                    });
 
                     // Open modal with pre-filled data
-                    openDonationModal(donationType, charityId, charityName);
+                    openDonationModal(donationType, charityId, charityName, charitySource);
 
                     // Wait for the modal to be ready
                     setTimeout(() => {
@@ -5312,39 +5394,41 @@
 
         // Helper function to open donation modal with specific type
         function openDonationModal(type, preselectedCharityId = null, preselectedCharityName = null, preselectedCharitySource = null) {
-            // Clear any editing state when opening from quick donation
-            if (preselectedCharityId && preselectedCharityName) {
-                window.editingDonationId = null;
-                window.isEditing = false;
-            }
+            // Don't clear editing state if we're already editing
+            // This preserves the edit mode when called from editDonation
+            const preserveEditState = window.isEditing === true;
+
+            // Check if we're in edit mode
+            const isEditMode = preserveEditState || (window.editingDonationId !== null && window.editingDonationId !== undefined);
+            const titlePrefix = isEditMode ? 'Edit' : 'Add';
 
             const typeInfo = {
                 cash: {
-                    title: 'Add Cash Donation',
+                    title: `${titlePrefix} Cash Donation`,
                     icon: '💵',
                     label: 'Cash/Check Donation',
                     desc: 'Record a monetary donation'
                 },
                 items: {
-                    title: 'Add Item Donation',
+                    title: `${titlePrefix} Item Donation`,
                     icon: '📦',
                     label: 'Item/Goods Donation',
                     desc: 'Record donated items with values'
                 },
                 miles: {
-                    title: 'Add Mileage Donation',
+                    title: `${titlePrefix} Mileage Donation`,
                     icon: '🚗',
                     label: 'Mileage Donation',
                     desc: 'Record miles driven for charity'
                 },
                 stock: {
-                    title: 'Add Stock Donation',
+                    title: `${titlePrefix} Stock Donation`,
                     icon: '📈',
                     label: 'Stock/Securities Donation',
                     desc: 'Record donated stocks or securities'
                 },
                 crypto: {
-                    title: 'Add Crypto Donation',
+                    title: `${titlePrefix} Crypto Donation`,
                     icon: '₿',
                     label: 'Cryptocurrency Donation',
                     desc: 'Record cryptocurrency donations'
@@ -5353,8 +5437,10 @@
 
             const info = typeInfo[type] || typeInfo.cash;
 
-            // Clear the form including charity fields
-            document.getElementById('donationForm').reset();
+            // Only reset form if not preserving edit state
+            if (!preserveEditState) {
+                document.getElementById('donationForm').reset();
+            }
 
             // Explicitly clear all amount fields to ensure they're reset (check if they exist first)
             const fieldsToClean = [
@@ -5376,14 +5462,28 @@
                 taxDisplay.textContent = '$0';
             }
 
-            // If charity was preselected, set it, otherwise clear
+            // UUID detection helper
+            const isUUID = (str) => {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return uuidRegex.test(str);
+            };
+
+            // Set charity if provided (for both edit and quick add)
             if (preselectedCharityId && preselectedCharityName) {
+                // Auto-detect source if not provided or incorrect
+                if (isUUID(preselectedCharityId)) {
+                    preselectedCharitySource = 'personal';
+                } else if (!isNaN(preselectedCharityId)) {
+                    preselectedCharitySource = 'system';
+                }
+
                 document.getElementById('selectedCharityId').value = preselectedCharityId;
                 document.getElementById('selectedCharitySource').value = preselectedCharitySource || 'system';
                 document.getElementById('donationCharity').value = preselectedCharityName;
                 // Track the selected charity name to prevent clearing on input events
                 window.lastSelectedCharityName = preselectedCharityName;
-            } else {
+            } else if (!preserveEditState) {
+                // Only clear if not preserving edit state
                 document.getElementById('selectedCharityId').value = '';
                 document.getElementById('selectedCharitySource').value = '';
                 document.getElementById('donationCharity').value = '';
@@ -6180,6 +6280,115 @@
             document.querySelectorAll('.dropdown-menu').forEach(m => {
                 m.style.display = 'none';
             });
+        });
+
+        // Cash Donation Edit Modal Functions
+        function openEditCashDonationModal(donation) {
+            const modal = document.getElementById('editCashDonationModal');
+            if (!modal) return;
+
+            // Store donation ID for saving
+            document.getElementById('editCashDonationId').value = donation.id;
+
+            // Store charity info
+            const charityId = donation.charity_id || donation.user_charity_id || '';
+            const charitySource = donation.charity_source || (donation.user_charity_id ? 'personal' : 'system');
+            document.getElementById('editCashCharityId').value = charityId;
+            document.getElementById('editCashCharitySource').value = charitySource;
+
+            // Display charity name and EIN
+            document.getElementById('editCashCharityName').textContent = donation.charity_name || 'Unknown Charity';
+            const einDisplay = document.getElementById('editCashCharityEIN');
+            if (donation.charity_ein) {
+                einDisplay.textContent = `EIN: ${donation.charity_ein}`;
+                einDisplay.style.display = 'block';
+            } else {
+                einDisplay.style.display = 'none';
+            }
+
+            // Populate form fields
+            document.getElementById('editCashDate').value = donation.date || donation.donation_date || '';
+            document.getElementById('editCashAmount').value = donation.amount || '';
+
+            // Parse notes if needed
+            let notes = donation.notes || '';
+            if (typeof notes === 'string' && notes.startsWith('{')) {
+                try {
+                    const notesObj = JSON.parse(notes);
+                    notes = notesObj.notes || notesObj.userNotes || '';
+                } catch (e) {
+                    // Use as-is if not valid JSON
+                }
+            }
+            document.getElementById('editCashNotes').value = notes;
+
+            // Calculate tax savings
+            updateEditCashTaxSavings();
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function closeEditCashModal() {
+            document.getElementById('editCashDonationModal').classList.remove('active');
+            document.getElementById('editCashDonationForm').reset();
+        }
+
+        function updateEditCashTaxSavings() {
+            const amount = parseFloat(document.getElementById('editCashAmount').value) || 0;
+            const taxRate = currentTaxRate || 0.22;
+            const savings = (amount * taxRate).toFixed(2);
+            document.getElementById('editCashTaxSavings').textContent = formatCurrency(savings, true);
+        }
+
+        // Handle Edit Cash Donation Form Submit
+        document.getElementById('editCashDonationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const donationId = document.getElementById('editCashDonationId').value;
+            const charityId = document.getElementById('editCashCharityId').value;
+            const charitySource = document.getElementById('editCashCharitySource').value;
+
+            const formData = {
+                donation_type: 'cash',
+                donation_date: document.getElementById('editCashDate').value,
+                amount: parseFloat(document.getElementById('editCashAmount').value),
+                notes: document.getElementById('editCashNotes').value
+            };
+
+            // Set the appropriate charity ID field based on source
+            if (charitySource === 'personal') {
+                formData.user_charity_id = charityId;
+            } else {
+                formData.charity_id = charityId;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/donations/${donationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('✅ Cash donation updated successfully!', 'success');
+                    closeEditCashModal();
+                    await loadDonationHistory();
+                    await loadStats();
+                    await loadCharities();
+                } else {
+                    showToast(`❌ Failed to update donation: ${data.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating donation:', error);
+                showToast('❌ Failed to update donation', 'error');
+            }
         });
 
         // Item Donation Edit Modal Functions
