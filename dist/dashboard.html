@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.2.16</title>
+    <title>Dashboard - Charity Tracker v2.2.17</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -722,13 +722,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.2.16</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.2.17</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.2.16</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.2.17</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -2529,6 +2529,22 @@
             console.log('[QUICK ADD] Charity Name:', charityName);
             console.log('[QUICK ADD] Charity Source:', charitySource);
 
+            // UUID detection helper
+            const isUUID = (str) => {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return uuidRegex.test(str);
+            };
+
+            // Auto-detect charity type if source is missing or incorrect
+            if (isUUID(charityId)) {
+                console.log('[QUICK ADD] Detected UUID format - forcing source to personal');
+                charitySource = 'personal';
+            } else if (!isNaN(charityId)) {
+                console.log('[QUICK ADD] Detected numeric format - forcing source to system');
+                charitySource = 'system';
+            }
+            console.log('[QUICK ADD] Final charity source:', charitySource);
+
             // Store the selected charity
             document.getElementById('selectedCharityId').value = charityId;
             document.getElementById('selectedCharitySource').value = charitySource || 'personal';
@@ -2586,7 +2602,22 @@
             if (selector) selector.remove();
 
             // Get the charity source from the stored value
-            const charitySource = document.getElementById('selectedCharitySource').value || 'personal';
+            let charitySource = document.getElementById('selectedCharitySource').value || 'personal';
+
+            // UUID detection helper
+            const isUUID = (str) => {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return uuidRegex.test(str);
+            };
+
+            // Double-check with UUID detection
+            if (isUUID(charityId)) {
+                console.log('[QUICK SELECT] Detected UUID - forcing source to personal');
+                charitySource = 'personal';
+            } else if (!isNaN(charityId)) {
+                console.log('[QUICK SELECT] Detected numeric - forcing source to system');
+                charitySource = 'system';
+            }
 
             // Open the donation modal with the selected type and pre-filled charity
             openDonationModal(type, charityId, charityName, charitySource);
@@ -2618,8 +2649,24 @@
             const donationType = document.getElementById('donationType').value;
             const isEditing = window.editingDonationId !== null && window.editingDonationId !== undefined;
 
+            // UUID detection helper
+            const isUUID = (str) => {
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return uuidRegex.test(str);
+            };
+
             // Determine if this is a user charity or system charity
-            const charitySource = document.getElementById('selectedCharitySource').value || 'system';
+            let charitySource = document.getElementById('selectedCharitySource').value || 'system';
+
+            // Override with UUID detection for safety
+            if (isUUID(charityId)) {
+                console.log('[FORM SUBMIT] Detected UUID format - overriding to personal charity');
+                charitySource = 'personal';
+            } else if (!isNaN(charityId)) {
+                console.log('[FORM SUBMIT] Detected numeric format - overriding to system charity');
+                charitySource = 'system';
+            }
+
             const isUserCharity = charitySource === 'personal';
 
             console.log('[DEBUG] Charity Source:', charitySource);
@@ -3453,7 +3500,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.2.16</p>
+                            <p>Generated by Charity Tracker v2.2.17</p>
                         </div>
                     </body>
                     </html>
@@ -7065,6 +7112,38 @@
                 localStorage.setItem('loginTime', Date.now().toString());
             }
         }
+
+        // Diagnostic function for debugging charity issues
+        window.diagnoseCharityIssue = function() {
+            console.log('=== CHARITY DIAGNOSTIC REPORT ===');
+
+            // Check form fields
+            console.log('\nForm Fields:');
+            console.log('- selectedCharityId:', document.getElementById('selectedCharityId').value);
+            console.log('- selectedCharitySource:', document.getElementById('selectedCharitySource').value);
+            console.log('- donationCharity:', document.getElementById('donationCharity').value);
+
+            // Check all charity buttons
+            console.log('\nPersonal Charities in DOM:');
+            document.querySelectorAll('[onclick*="quickAddDonation"]').forEach(el => {
+                const onclick = el.getAttribute('onclick');
+                const match = onclick.match(/quickAddDonation\('([^']+)',\s*'([^']+)',\s*'([^']*)'\)/);
+                if (match) {
+                    const [_, id, name, source] = match;
+                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+                    console.log(`- ${name}: ID=${id}, Source=${source || 'not set'}, Is UUID=${isUUID}`);
+                }
+            });
+
+            // Check local storage
+            console.log('\nLocal Storage:');
+            console.log('- Token:', localStorage.getItem('token') ? 'Set' : 'Not set');
+            console.log('- User:', JSON.parse(localStorage.getItem('user') || '{}'));
+
+            console.log('\n=== END DIAGNOSTIC REPORT ===');
+            console.log('\nTo test a quick donation, run:');
+            console.log("quickAddDonation('375d4c33-c60f-4f73-8aca-567fabc9c84b', 'ACLU Foundation', 'personal')");
+        };
 
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
