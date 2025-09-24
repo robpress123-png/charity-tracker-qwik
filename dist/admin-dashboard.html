@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.2.5</title>
+    <title>Admin Dashboard - Charity Tracker v2.2.6</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.5</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.6</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1365,7 +1365,7 @@
             modal.removeAttribute('style');
             modal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 99999; align-items: center; justify-content: center;';
 
-            document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records.';
+            document.getElementById('deleteConfirmMessage').textContent = 'Are you absolutely sure you want to delete ALL donations from the database? This will also delete all donation_items records and all personal charities.';
             document.getElementById('deleteConfirmText').textContent = 'DELETE ALL DONATIONS';
             const confirmInput = document.getElementById('deleteConfirmInput');
             confirmInput.value = '';
@@ -1450,14 +1450,15 @@
 
                 if (data.success) {
                     statusDiv.style.color = '#10b981';
-                    statusDiv.textContent = `✅ Successfully deleted ${data.deletedCount || 'all'} donations and ${data.deletedItemsCount || 'all'} donation items`;
+                    statusDiv.textContent = `✅ Successfully deleted ${data.deletedCount || 'all'} donations, ${data.deletedItemsCount || 'all'} donation items, and ${data.deletedCharitiesCount || 'all'} personal charities`;
 
                     console.log('✅ Delete successful!');
                     console.log('Deleted donations:', data.deletedCount);
                     console.log('Deleted items:', data.deletedItemsCount);
+                    console.log('Deleted personal charities:', data.deletedCharitiesCount);
 
                     // Show success alert
-                    alert(`✅ Success!\n\nDeleted ${data.deletedCount || 'all'} donations\nDeleted ${data.deletedItemsCount || 'all'} donation items\n\nThe database has been cleared.`);
+                    alert(`✅ Success!\n\nDeleted ${data.deletedCount || 'all'} donations\nDeleted ${data.deletedItemsCount || 'all'} donation items\nDeleted ${data.deletedCharitiesCount || 'all'} personal charities\n\nThe database has been cleared.`);
 
                     // Reload ALL stats to show updated counts
                     await loadAdminStats();

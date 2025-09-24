@@ -1,26 +1,28 @@
-# Charity Tracker Continuation Context - v2.2.4
+# Charity Tracker Continuation Context - v2.2.5
 
 ## Current Status
-- **Version:** 2.2.4
+- **Version:** 2.2.5
 - **Last Updated:** 2025-09-24
-- **Date/Time Context:** September 23, 2025
+- **Date/Time Context:** September 24, 2025
 
 ## 🚨 CURRENT ISSUES (CHANGE THIS SECTION):
 
-None - All systems operational!
+- Fixed but NOT DEPLOYED: Dashboard year selector and import authentication
+- Waiting for user testing before version bump
 
 ## 📌 NEXT STEPS ON RESTART:
-- Monitor for any issues with value_source feature
-- All features working as expected
+- User testing dashboard with 10 imported donations
+- When confirmed working: run `npm run bump:patch` to deploy v2.2.6
+- Then import larger 175-donation CSV file
 
 ## ✅ RECENT FIXES (CHANGE THIS SECTION):
-- Enabled value_source column for item donations (v2.2.0)
-- Fixed category-item misalignment by mapping category ID to name (v2.1.60)
-- Edit donation now fetches items from donation_items table (v2.1.54)
-- Edit modal fields read-only except Condition (v2.1.55)
-- Added "Other item in [category]" option with value_source (v2.1.55)
-- Fixed crypto display to show "crypto" not symbol (v2.1.52)
-- Year selector fixed to 2024, 2025, 2026 (v2.1.59)
+- PENDING v2.2.6: Fixed dashboard year selector (was hardcoded to 2025, now defaults to 2024)
+- PENDING v2.2.6: Fixed import API authentication bug
+- PENDING v2.2.6: Added "All Years" option to year selector
+- PENDING v2.2.6: Added debug logging to import process
+- Admin delete now clears donation_items and user_charities for complete reset (v2.2.5)
+- Import auto-creates personal charities for unmatched names (v2.2.4)
+- Fixed category mapping in items import tool (v2.2.3)
 
 ---
 

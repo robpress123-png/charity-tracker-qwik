@@ -34,17 +34,23 @@ export async function onRequestPost(context) {
     try {
         // Check authentication
         const token = request.headers.get('Authorization');
-        const user = getUserFromToken(token);
+        console.log('[IMPORT DEBUG] Token received:', token ? token.substring(0, 20) + '...' : 'None');
+        let user = getUserFromToken(token);
+        console.log('[IMPORT DEBUG] Initial user from token:', user);
 
         if (!user) {
             // Try to get real user ID from database
             if (token && token.startsWith('Bearer token-')) {
                 const parts = token.replace('Bearer token-', '').split('-');
-                if (parts.length >= 1) {
+                if (parts.length >= 1 && env.DB) {
                     const userId = parts[0];
                     const userCheck = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(userId).first();
                     if (userCheck) {
-                        user.id = userId;
+                        // Create a user object since it was null
+                        user = { id: userId, email: 'user@example.com' };
+                        console.log('[IMPORT DEBUG] Created user object from token:', user);
+                    } else {
+                        console.log('[IMPORT DEBUG] User ID not found in database:', userId);
                     }
                 }
             }
@@ -154,6 +160,10 @@ export async function onRequestPost(context) {
             }
         };
 
+        console.log('[IMPORT DEBUG] Starting import for user:', user.id);
+        console.log('[IMPORT DEBUG] Total donations to process:', donations.length);
+        console.log('[IMPORT DEBUG] Total charities in DB:', allCharities.results.length);
+
         // Process donations
         for (const donation of donations) {
             results.processed++;
@@ -187,6 +197,7 @@ export async function onRequestPost(context) {
                     const match = charityMap.get(searchName);
 
                     if (match) {
+                        // Exact match found
                         if (match.type === 'personal') {
                             userCharityId = match.id;
                             charityType = 'personal';
@@ -195,8 +206,9 @@ export async function onRequestPost(context) {
                             charityType = 'system';
                         }
                         results.charityMatches.found++;
+                        console.log(`[IMPORT DEBUG] Found exact match for "${donation.charity_name}"`);
                     } else {
-                        // Try cleaned name
+                        // Try cleaned name for fuzzy matching
                         const cleanName = searchName
                             .replace(/\b(inc|incorporated|llc|ltd|foundation|fund|charity|organization|org)\b/gi, '')
                             .replace(/[^\w\s]/g, '')
@@ -212,8 +224,10 @@ export async function onRequestPost(context) {
                                 charityType = 'system';
                             }
                             results.charityMatches.found++;
+                            console.log(`[IMPORT DEBUG] Found fuzzy match for "${donation.charity_name}" -> "${cleanMatch.name}"`);
                         } else {
                             // Try partial match
+                            let foundPartialMatch = false;
                             for (const [key, charity] of charityMap) {
                                 if (key.includes(searchName) || searchName.includes(key)) {
                                     if (charity.type === 'personal') {
@@ -224,12 +238,15 @@ export async function onRequestPost(context) {
                                         charityType = 'system';
                                     }
                                     results.charityMatches.found++;
+                                    foundPartialMatch = true;
+                                    console.log(`[IMPORT DEBUG] Found partial match for "${donation.charity_name}" -> "${charity.name}"`);
                                     break;
                                 }
                             }
 
-                            if (!charityId && !userCharityId) {
-                                // Create a personal charity for this user
+                            if (!foundPartialMatch) {
+                                // No matches at all - auto-create a personal charity
+                                console.log(`[IMPORT DEBUG] No match for "${donation.charity_name}" - auto-creating personal charity`);
                                 try {
                                     const newCharityId = crypto.randomUUID();
                                     await env.DB.prepare(`
@@ -246,7 +263,9 @@ export async function onRequestPost(context) {
                                         results.personalCharitiesCreated = 0;
                                     }
                                     results.personalCharitiesCreated++;
+                                    console.log(`[IMPORT DEBUG] Created personal charity with ID: ${newCharityId}`);
                                 } catch (createError) {
+                                    console.error(`[IMPORT DEBUG] Failed to create personal charity: ${createError.message}`);
                                     results.failed++;
                                     results.errors.push(`Row ${results.processed}: Failed to create personal charity: ${donation.charity_name}`);
                                     continue;
@@ -322,6 +341,16 @@ export async function onRequestPost(context) {
                 }
 
                 // Insert donation with ALL proper columns
+                console.log(`[IMPORT DEBUG] Inserting donation ${results.processed}:`, {
+                    donationId,
+                    userId: user.id,
+                    charityId,
+                    userCharityId,
+                    donationType,
+                    amount,
+                    donationDate
+                });
+
                 await env.DB.prepare(`
                     INSERT INTO donations (
                         id, user_id, charity_id, user_charity_id, donation_type, amount, date, notes,
@@ -353,12 +382,46 @@ export async function onRequestPost(context) {
                     item_description, estimated_value
                 ).run();
 
+                console.log(`[IMPORT DEBUG] Successfully inserted donation ${donationId}`);
+
                 // For items donations, parse items from notes or items column
                 if (donationType === 'items') {
                     const itemsCreated = [];
 
-                    // Check if items column exists (from CSV)
-                    if (donation.items) {
+                    // First check for individual item columns (item_1_name, item_2_name, etc.)
+                    let hasIndividualItems = false;
+                    for (let i = 1; i <= 10; i++) {
+                        const itemName = donation[`item_${i}_name`];
+                        if (itemName && itemName.trim()) {
+                            hasIndividualItems = true;
+                            const category = donation[`item_${i}_category`] || 'General';
+                            const condition = donation[`item_${i}_condition`] || 'good';
+                            const quantity = parseInt(donation[`item_${i}_quantity`]) || 1;
+                            const value = parseFloat(donation[`item_${i}_value`]) || 0;
+                            const unitValue = value / quantity;
+
+                            console.log(`[IMPORT DEBUG] Adding item ${i}: ${itemName}, ${category}, ${condition}, qty=${quantity}, value=${value}`);
+
+                            await env.DB.prepare(`
+                                INSERT INTO donation_items (
+                                    donation_id, item_name, category, condition, quantity, unit_value, total_value
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                            `).bind(
+                                donationId,
+                                itemName,
+                                category,
+                                condition,
+                                quantity,
+                                unitValue,
+                                value
+                            ).run();
+
+                            itemsCreated.push(itemName);
+                        }
+                    }
+
+                    // If no individual items found, check if items column exists (from CSV)
+                    if (!hasIndividualItems && donation.items) {
                         // Parse format: ItemName:condition or ItemName:condition:quantity
                         // Multiple items separated by |
                         const itemsList = donation.items.split('|');
@@ -428,8 +491,9 @@ export async function onRequestPost(context) {
                         }
                     }
 
-                    // If no structured items found, create generic items
+                    // Only create generic items if no real items were found AND this is an items donation
                     if (itemsCreated.length === 0) {
+                        console.log('[IMPORT DEBUG] No items found in CSV, creating generic items');
                         // Parse item count from notes if available
                         const itemCountMatch = donation.notes ? donation.notes.match(/(\d+)\s*items/i) : null;
                         const itemCount = itemCountMatch ? parseInt(itemCountMatch[1]) : 3;
@@ -452,18 +516,30 @@ export async function onRequestPost(context) {
                                 avgValue
                             ).run();
                         }
+                    } else {
+                        console.log(`[IMPORT DEBUG] Created ${itemsCreated.length} items for donation ${donationId}`);
                     }
                 }
 
                 results.added++;
 
             } catch (error) {
+                console.error(`[IMPORT DEBUG] Error processing donation ${results.processed}:`, error);
                 results.failed++;
                 if (results.errors.length < 20) {
                     results.errors.push(`Row ${results.processed}: ${error.message}`);
                 }
             }
         }
+
+        console.log('[IMPORT DEBUG] Final Results:', {
+            processed: results.processed,
+            added: results.added,
+            failed: results.failed,
+            skipped: results.skipped,
+            personalCharitiesCreated: results.personalCharitiesCreated || 0,
+            errors: results.errors.length
+        });
 
         // Return detailed results
         return new Response(JSON.stringify({

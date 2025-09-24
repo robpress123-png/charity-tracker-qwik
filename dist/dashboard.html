@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.2.5</title>
+    <title>Dashboard - Charity Tracker v2.2.6</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -332,6 +332,33 @@
         /* Date input specific styling */
         input[type="date"] {
             max-width: 200px;
+        }
+
+        /* Year selector dropdown styling */
+        #globalYearFilter {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        #globalYearFilter option {
+            background: #374151; /* Dark gray background */
+            color: white; /* White text */
+            padding: 0.5rem;
+        }
+
+        #globalYearFilter option:hover {
+            background: #4b5563; /* Lighter gray on hover */
+        }
+
+        /* Fix for report year dropdown too */
+        #reportYear option {
+            background: #374151;
+            color: white;
         }
 
         /* Autocomplete styles */
@@ -695,13 +722,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.2.5</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.2.6</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.2.5</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.2.6</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -728,7 +755,7 @@
                 </button>
                 <div style="margin-left: auto; display: flex; align-items: center; gap: 0.5rem; padding-right: 1rem;">
                     <label style="color: white; font-size: 0.9rem; font-weight: 500;">Tax Year:</label>
-                    <select id="globalYearFilter" onchange="updateYearFilter()" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; cursor: pointer;">
+                    <select id="globalYearFilter" onchange="updateYearFilter()">
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
@@ -2631,23 +2658,8 @@
 
                     formData.amount = totalAmount;
 
-                    // Build the ITEMS format for the notes field (for backwards compatibility)
-                    let itemsNotesFormat = 'ITEMS:';
-                    itemsArray.forEach(item => {
-                        const name = item.name || item.itemName;
-                        const category = item.category || item.categoryName;
-                        const condition = item.condition || item.quality;
-                        const quantity = item.quantity || 1;
-                        const value = item.value || item.totalValue || 0;
-                        itemsNotesFormat += `[${name}|${category}|${condition}|${quantity}|${value}]`;
-                    });
-
-                    // Append user notes if any
-                    const userNotes = document.getElementById('donationNotes').value;
-                    if (userNotes) {
-                        itemsNotesFormat += ' | ' + userNotes;
-                    }
-                    formData.notes = itemsNotesFormat;
+                    // Just use the user's notes directly - items are now stored in donation_items table
+                    formData.notes = document.getElementById('donationNotes').value || '';
                     break;
                 case 'miles':
                     const miles = parseFloat(document.getElementById('milesDriven').value);
@@ -2935,12 +2947,16 @@
         // Update year filter
         function updateYearFilter() {
             const year = document.getElementById('globalYearFilter').value;
+            console.log('[YEAR FILTER] Changed to:', year);
+
             // Sync with report year dropdown
             const reportYear = document.getElementById('reportYear');
             if (reportYear) {
                 reportYear.value = year;
             }
+
             // Reload data with new filter
+            console.log('[YEAR FILTER] Reloading data for year:', year);
             loadDonations();
             loadStats();
             loadCharities();
@@ -2949,7 +2965,10 @@
         // Load and display donations
         async function loadDonations() {
             const container = document.getElementById('donationsContent');
-            const year = document.getElementById('globalYearFilter')?.value || '2025';
+            // Default to 2024 if no year selected (since that's where the data is)
+            const year = document.getElementById('globalYearFilter')?.value || '2024';
+
+            console.log('[LOAD DONATIONS] Loading donations for year:', year);
 
             // Update the title to show the year
             const titleElement = document.getElementById('donationHistoryTitle');
@@ -2963,6 +2982,7 @@
                 if (year && year !== 'all') {
                     url += `&year=${year}`;
                 }
+                console.log('[LOAD DONATIONS] API URL:', url);
 
                 // Get auth token
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -3056,7 +3076,8 @@
 
         // Load statistics
         async function loadStats() {
-            const year = document.getElementById('globalYearFilter')?.value || '2025';
+            // Default to 2024 if no year selected (since that's where the data is)
+            const year = document.getElementById('globalYearFilter')?.value || '2024';
 
             // Update labels with selected year
             if (year === 'all') {
@@ -3253,7 +3274,7 @@
         async function exportCSV() {
             try {
                 // Fetch all donations for the selected year
-                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2025';
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
                 let url = '/api/donations?limit=10000';
                 if (selectedYear && selectedYear !== 'all') {
                     url = `/api/donations?year=${selectedYear}&limit=10000`;
@@ -3331,7 +3352,7 @@
         async function exportPDF() {
             try {
                 // Fetch all donations for the selected year
-                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2025';
+                const selectedYear = document.getElementById('reportYear')?.value || document.getElementById('globalYearFilter')?.value || '2024';
                 let url = '/api/donations?limit=10000';
                 if (selectedYear && selectedYear !== 'all') {
                     url = `/api/donations?year=${selectedYear}&limit=10000`;
@@ -3411,7 +3432,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.2.5</p>
+                            <p>Generated by Charity Tracker v2.2.6</p>
                         </div>
                     </body>
                     </html>
@@ -4097,6 +4118,38 @@
 
             const resultsDiv = document.getElementById('importResultsDetails');
 
+            // Add progress bar
+            resultsDiv.innerHTML = `
+                <div style="padding: 2rem; background: #e0f2fe; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <h3 style="color: #0369a1; margin-bottom: 1rem;">📤 Importing Donations...</h3>
+                    <div style="background: #cbd5e1; border-radius: 8px; overflow: hidden; height: 30px; margin-bottom: 1rem;">
+                        <div id="importProgressBar" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); height: 100%; width: 0%; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center;">
+                            <span id="importProgressText" style="color: white; font-weight: 500; font-size: 0.875rem;"></span>
+                        </div>
+                    </div>
+                    <p id="importProgressStatus" style="color: #0369a1; margin: 0;">Preparing import...</p>
+                </div>
+            `;
+
+            // Simulate progress stages
+            const updateProgress = (percent, status) => {
+                const bar = document.getElementById('importProgressBar');
+                const text = document.getElementById('importProgressText');
+                const statusText = document.getElementById('importProgressStatus');
+                if (bar) {
+                    bar.style.width = percent + '%';
+                    text.textContent = percent + '%';
+                }
+                if (statusText) {
+                    statusText.textContent = status;
+                }
+            };
+
+            // Start progress
+            updateProgress(10, 'Validating data...');
+            await new Promise(resolve => setTimeout(resolve, 200));
+            updateProgress(30, 'Creating charity mappings...');
+
             try {
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 const token = user.token || localStorage.getItem('token') || 'test-token';
@@ -4119,6 +4172,8 @@
                     return donation;
                 });
 
+                updateProgress(50, `Sending ${mappedData.length} donations to server...`);
+
                 // Use the smart import API
                 const response = await fetch('/api/donations/import', {
                     method: 'POST',
@@ -4131,9 +4186,11 @@
                     })
                 });
 
+                updateProgress(80, 'Processing server response...');
                 const data = await response.json();
 
                 if (data.success) {
+                    updateProgress(100, 'Import complete!');
                     // Update status
                     document.getElementById('importStatusIcon').textContent = '✅';
                     document.getElementById('importStatusText').textContent = `Import complete! ${data.results.added} donations added.`;
@@ -4174,17 +4231,17 @@
                         `;
                     }
 
-                    if (data.results.charityMatches?.notFound?.length > 0) {
+                    if (data.results.personalCharitiesCreated > 0) {
                         resultHtml += `
-                            <details style="background: #fef3c7; padding: 1rem; border-radius: 8px;">
-                                <summary style="color: #d97706; cursor: pointer; font-weight: 500;">
-                                    ⚠️ Unmatched Charities (${data.results.charityMatches.notFound.length})
+                            <details open style="background: #e0f2fe; padding: 1rem; border-radius: 8px;">
+                                <summary style="color: #0369a1; cursor: pointer; font-weight: 500;">
+                                    ✨ Personal Charities Created (${data.results.personalCharitiesCreated})
                                 </summary>
-                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #92400e;">
-                                    ${data.results.charityMatches.notFound.map(name => `<li>${name}</li>`).join('')}
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #075985;">
+                                    ${data.results.charityMatches?.notFound?.map(name => `<li>${name}</li>`).join('') || ''}
                                 </ul>
-                                <p style="font-size: 0.875rem; color: #92400e; margin-top: 0.5rem;">
-                                    Tip: Add these as personal charities first, then retry the import.
+                                <p style="font-size: 0.875rem; color: #0369a1; margin-top: 0.5rem;">
+                                    These charities were automatically added to your personal charities list.
                                 </p>
                             </details>
                         `;
@@ -4929,6 +4986,9 @@
             document.getElementById('estimatedValue').value = totalValue.toFixed(2);
             if (receiptTotal) receiptTotal.textContent = totalValue.toFixed(2);  // No $ needed, already in HTML
 
+            // Update tax savings when items change
+            updateTaxSavings();
+
             // Show save button when there are items
             if (saveBtn) saveBtn.style.display = 'block';
 
@@ -5584,20 +5644,21 @@
         // Function to populate year dropdowns dynamically
         function populateYearSelectors() {
             // Simple fixed range of tax years
-            const currentYear = 2025; // Current tax year (Sept 2025)
+            const currentYear = new Date().getFullYear(); // Get actual current year
 
-            // Show just previous year, current year, and next year (3 years total)
+            // Show previous year, current year, next year, and "All Years" option
             const years = [
-                { value: 2024, label: '2024' },
-                { value: 2025, label: '2025' },
-                { value: 2026, label: '2026' }
+                { value: 'all', label: 'All Years' },
+                { value: currentYear - 1, label: (currentYear - 1).toString() },
+                { value: currentYear, label: currentYear.toString() },
+                { value: currentYear + 1, label: (currentYear + 1).toString() }
             ];
 
             // Populate global year filter
             const globalFilter = document.getElementById('globalYearFilter');
             if (globalFilter) {
                 globalFilter.innerHTML = years.map(year =>
-                    `<option value="${year.value}" ${year.value === currentYear ? 'selected' : ''}>${year.label}</option>`
+                    `<option value="${year.value}" ${year.value === 2024 ? 'selected' : ''}>${year.label}</option>`
                 ).join('');
             }
 
@@ -5605,7 +5666,7 @@
             const reportFilter = document.getElementById('reportYear');
             if (reportFilter) {
                 reportFilter.innerHTML = years.map(year =>
-                    `<option value="${year.value}" ${year.value === currentYear ? 'selected' : ''}>${year.label}</option>`
+                    `<option value="${year.value}" ${year.value === 2024 ? 'selected' : ''}>${year.label}</option>`
                 ).join('');
             }
         }
@@ -6360,18 +6421,8 @@
                 formData.charity_id = charityId;
             }
 
-            // Build the ITEMS format for notes (backwards compatibility)
-            let itemsNotesFormat = 'ITEMS:';
-            editingItemsArray.forEach(item => {
-                itemsNotesFormat += `[${item.item_name}|${item.category}|${item.condition}|${item.quantity}|${item.total_value}]`;
-            });
-
-            // Append user notes
-            const userNotes = document.getElementById('editItemNotes').value;
-            if (userNotes) {
-                itemsNotesFormat += ' | ' + userNotes;
-            }
-            formData.notes = itemsNotesFormat;
+            // Just use the user's notes directly - items are now stored in donation_items table
+            formData.notes = document.getElementById('editItemNotes').value || '';
 
             try {
                 const token = localStorage.getItem('token') || 'test-token';
