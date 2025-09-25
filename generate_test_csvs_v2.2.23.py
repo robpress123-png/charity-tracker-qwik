@@ -160,16 +160,30 @@ def generate_donations_for_user(user_id, profile, charities, items_by_category, 
     if len(focused_charities) < 50:
         focused_charities = charities.copy()
 
-    # Generate donations over the past 2 years
-    end_date = datetime(2025, 9, 24)
-    start_date = end_date - timedelta(days=730)
-
+    # Generate donations across 2024, 2025, 2026
+    # 10% in 2024, 80% in 2025, 10% in 2026
     conditions = ['good', 'very_good', 'excellent']  # No 'fair' - not deductible
 
     for i in range(num_donations):
-        # Random date in the range
-        days_ago = random.randint(0, 730)
-        donation_date = end_date - timedelta(days=days_ago)
+        # Determine year based on distribution
+        rand = random.random()
+        if rand < 0.1:  # 10% in 2024
+            year = 2024
+            month = random.randint(1, 12)
+            day = random.randint(1, 28)  # Use 28 to avoid month-end issues
+        elif rand < 0.9:  # 80% in 2025
+            year = 2025
+            month = random.randint(1, 9)  # Up to September 2025
+            if month == 9:
+                day = random.randint(1, 24)  # Up to Sep 24, 2025
+            else:
+                day = random.randint(1, 28)
+        else:  # 10% in 2026 (future/planned)
+            year = 2026
+            month = random.randint(1, 12)
+            day = random.randint(1, 28)
+
+        donation_date = datetime(year, month, day)
 
         # Determine donation type based on profile rates
         rand = random.random()
