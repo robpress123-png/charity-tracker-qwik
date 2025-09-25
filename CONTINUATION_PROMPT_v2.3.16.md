@@ -1,19 +1,37 @@
-# Charity Tracker Continuation Context - v2.3.12
+# Charity Tracker Continuation Context - v2.3.16
 **Generated:** 2025-01-25
-**Current Version:** 2.3.12
-**Status:** Working - Test data fixed, item edit values fixed, UI improvements
+**Current Version:** 2.3.16
+**Status:** Mostly working - Personal charities show "Unknown Charity" in edit forms
 
 ## ✅ RECENT FIXES (Session 2025-01-25):
-1. **Created real data test generator** (`generate_test_csvs_real_data.py`)
+
+### Test Data Generator Fixed:
+1. **Created `generate_test_csvs_real_data.py`**
    - Loads 10,000 real charities from export
    - Loads 496 real items from database
-   - Generates proper CSV structure for all donation types
-2. **Fixed item edit values showing 0**
+   - Generates files: `user1_test_real_data.csv` through `user5_test_real_data.csv`
+   - **IMPORTANT:** Use these files, NOT the old `user*_test_v2.3.11.csv` files!
+
+### UI/UX Improvements:
+2. **Fixed item edit values**
    - Corrected API field mapping (value_good, value_verygood, value_excellent)
-3. **UI Improvements**
+   - Values now update when changing condition
+3. **Visual improvements**
    - Changed "Unit $" to "Unit FMV" in edit form
    - Updated icons: Items 🎁, Crypto 🪙
-   - Made Actions button more prominent (purple with shadow)
+   - Actions button: purple with horizontal dots (⋯)
+   - Added "P" badge for personal charities in lists
+4. **Tax savings fixes**
+   - Now recalculates when changing stock/crypto quantities
+   - Stock details show price per share at donation time
+
+## 🔴 CURRENT ISSUES:
+
+### Personal Charities in Edit Forms:
+**Problem:** Personal charities show "Unknown Charity" when editing donations
+**Example:** "Town Library Fund" shows correctly in list but as "Unknown Charity" in edit form
+**Root Cause:** The edit modal isn't properly retrieving charity names for personal charities (user_charity_id)
+**Impact:** Users can't see which charity they're editing for personal charities
 
 ### CSV Structure Requirements:
 #### Item Donations MUST have (per item):
@@ -64,10 +82,13 @@
 - ✅ Type filter now reapplies when year changes
 - ✅ Fixed donation filtering persistence
 
-### v2.3.12: Test Data & UI Fixes
+### v2.3.12-2.3.16: Test Data & UI Fixes
 - ✅ Real data test CSV generator created
 - ✅ Fixed item edit value calculations
 - ✅ UI improvements (Unit FMV, icons, button styling)
+- ✅ Tax savings recalculation for stock/crypto
+- ✅ Personal charity "P" badge indicator
+- ⚠️ Personal charities show "Unknown Charity" in edit forms (needs fix)
 
 ## ✅ PREVIOUSLY RESOLVED ISSUES:
 
@@ -227,9 +248,10 @@ npm run bump:patch  # 2.3.11 → 2.3.12
 - ✅ Item edit form shows correct FMV based on condition
 
 ## 🐛 KNOWN ISSUES:
-1. **Tax tables not deployed** - Schema ready but not in D1
-2. **Capital gains calculations** - Not implemented
-3. **Mileage rates hardcoded** - Should be year-specific from database
+1. **Personal charities show "Unknown Charity" in edit forms** - Critical UX issue
+2. **Tax tables not deployed** - Schema ready but not in D1
+3. **Capital gains calculations** - Not implemented
+4. **Mileage rates hardcoded** - Should be year-specific from database
 
 ## ⚠️ DON'T BREAK:
 - Chunked import system (working well)
@@ -247,7 +269,7 @@ The generator MUST:
 6. For items: use EXACT item names and EXACT category names from the export
 
 ## 🎯 NEXT STEPS:
-1. **Fix test data generator** - Use real exported data ✅ COMPLETED
+1. **Fix personal charity edit issue** - Personal charities show "Unknown Charity" in edit forms
 2. **Deploy tax tables** - Run migration in D1
 3. **Create tax API endpoints**
 4. **Implement capital gains calculations**
@@ -275,8 +297,14 @@ The generator MUST:
 - **Production:** https://charity-tracker-qwik.pages.dev
 - **Status:** Fully functional with real test data
 
+## 💡 KEY INSIGHTS FROM SESSION:
+1. **Test data files matter!** Always use `user*_test_real_data.csv`, NOT the old v2.3.11 files
+2. **Personal charities** use `user_charity_id` field, while system charities use `charity_id`
+3. **Item names must match exactly** - "Toaster" in "Appliances" not "Household"
+4. **Browser extension errors** (`web-client-content-script.js`) can be ignored
+
 ## 💭 CURRENT THINKING:
-All major functionality is working. Test data now uses real charity and item names. Next priorities are deploying tax tables for proper tax calculations and implementing year-specific mileage rates. The three-tier valuation enhancement would improve accuracy but the current calculated average for "very good" items works adequately.
+Most functionality is working well. The critical issue is personal charities showing "Unknown Charity" in edit forms - this breaks the UX for users with custom charities. Once fixed, the main remaining work is deploying tax tables for accurate calculations.
 
 ---
-**END OF CONTINUATION PROMPT v2.3.12**
+**END OF CONTINUATION PROMPT v2.3.16**

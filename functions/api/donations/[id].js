@@ -43,11 +43,13 @@ export async function onRequestGet(context) {
         }
 
         // Query the database for the specific donation
+        // IMPORTANT: Join both system charities and user charities to get the name
         const donation = await env.DB.prepare(`
             SELECT
                 d.id,
                 d.user_id,
                 d.charity_id,
+                d.user_charity_id,
                 d.amount,
                 d.date,
                 d.donation_type,
@@ -65,10 +67,16 @@ export async function onRequestGet(context) {
                 d.crypto_symbol,
                 d.crypto_quantity,
                 d.crypto_type,
-                c.name as charity_name,
-                c.ein as charity_ein
+                d.cost_basis,
+                COALESCE(c.name, uc.name) as charity_name,
+                COALESCE(c.ein, uc.ein) as charity_ein,
+                CASE
+                    WHEN d.user_charity_id IS NOT NULL THEN 'personal'
+                    ELSE 'system'
+                END as charity_source
             FROM donations d
             LEFT JOIN charities c ON d.charity_id = c.id
+            LEFT JOIN user_charities uc ON d.user_charity_id = uc.id
             WHERE d.id = ? AND d.user_id = ?
         `).bind(donationId, user.id).first();
 
