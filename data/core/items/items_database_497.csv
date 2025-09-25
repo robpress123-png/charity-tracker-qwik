@@ -1,0 +1,498 @@
+category_id,name,description,unit,value_good,value_very_good,value_excellent,source_reference
+1,Blouse,Women's blouse or shirt,each,7,10,15,Test Data 2024
+1,Dress - Casual,Women's casual dress,each,12,18,28,Test Data 2024
+1,Dress - Formal,Women's formal/evening dress,each,25,40,65,Test Data 2024
+1,Dress - Summer,Women's summer dress,each,10,15,22,Test Data 2024
+1,Suit - Business,Women's business suit,each,40,60,100,Test Data 2024
+1,Suit - Pantsuit,Women's pantsuit,each,35,55,90,Test Data 2024
+1,Blazer,Women's blazer,each,20,30,50,Test Data 2024
+1,Coat - Winter,Women's winter coat,each,35,55,85,Test Data 2024
+1,Coat - Rain,Women's raincoat,each,20,30,45,Test Data 2024
+1,Jacket - Denim,Women's denim jacket,each,15,22,35,Test Data 2024
+1,Jacket - Leather,Women's leather jacket,each,40,65,110,Test Data 2024
+1,Jacket - Light,Women's light jacket,each,18,28,42,Test Data 2024
+1,Shoes - Heels,Women's high heels,pair,15,25,45,Test Data 2024
+1,Shoes - Flats,Women's flats,pair,10,18,30,Test Data 2024
+1,Shoes - Sneakers,Women's sneakers,pair,20,35,55,Test Data 2024
+1,Shoes - Boots,Women's boots,pair,25,40,70,Test Data 2024
+1,Shoes - Sandals,Women's sandals,pair,8,15,25,Test Data 2024
+1,Handbag - Designer,Designer handbag,each,50,85,150,Test Data 2024
+1,Handbag - Casual,Casual handbag,each,15,25,40,Test Data 2024
+1,Clutch,Evening clutch,each,12,20,35,Test Data 2024
+1,Wallet,Women's wallet,each,10,18,30,Test Data 2024
+1,Sweater - Cardigan,Women's cardigan,each,12,18,28,Test Data 2024
+1,Sweater - Pullover,Women's pullover,each,10,16,25,Test Data 2024
+1,Sweater - Cashmere,Women's cashmere sweater,each,30,50,85,Test Data 2024
+1,Jeans - Designer,Designer jeans,each,25,40,65,Test Data 2024
+1,Jeans - Regular,Regular jeans,each,12,18,30,Test Data 2024
+1,Pants - Dress,Women's dress pants,each,15,22,35,Test Data 2024
+1,Pants - Casual,Women's casual pants,each,10,15,25,Test Data 2024
+1,Leggings,Women's leggings,each,6,10,16,Test Data 2024
+1,Shorts,Women's shorts,each,8,12,20,Test Data 2024
+1,Skirt - Pencil,Pencil skirt,each,10,15,25,Test Data 2024
+1,Skirt - A-Line,A-line skirt,each,12,18,28,Test Data 2024
+1,Skirt - Maxi,Maxi skirt,each,14,20,32,Test Data 2024
+1,Scarf - Silk,Silk scarf,each,15,25,40,Test Data 2024
+1,Scarf - Winter,Winter scarf,each,8,12,20,Test Data 2024
+1,Belt,Women's belt,each,8,14,22,Test Data 2024
+1,Gloves,Women's gloves,pair,6,10,18,Test Data 2024
+1,Hat,Women's hat,each,8,15,25,Test Data 2024
+1,Pajamas,Women's pajama set,set,10,16,26,Test Data 2024
+1,Robe,Women's robe,each,12,20,32,Test Data 2024
+2,Shirt - Dress,Men's dress shirt,each,12,18,28,Test Data 2024
+2,Shirt - Casual,Men's casual shirt,each,10,15,24,Test Data 2024
+2,Shirt - Polo,Men's polo shirt,each,12,20,32,Test Data 2024
+2,Shirt - T-Shirt,Men's t-shirt,each,6,10,16,Test Data 2024
+2,Shirt - Designer,Designer dress shirt,each,25,40,65,Test Data 2024
+2,Suit - Business,Men's business suit,each,60,90,150,Test Data 2024
+2,Suit - Tuxedo,Men's tuxedo,each,80,130,220,Test Data 2024
+2,Suit - Three Piece,Three piece suit,each,70,110,180,Test Data 2024
+2,Blazer,Men's blazer,each,30,45,75,Test Data 2024
+2,Sport Coat,Men's sport coat,each,25,40,65,Test Data 2024
+2,Pants - Dress,Men's dress pants,each,15,22,35,Test Data 2024
+2,Pants - Khakis,Men's khakis,each,12,18,30,Test Data 2024
+2,Pants - Casual,Men's casual pants,each,10,15,25,Test Data 2024
+2,Jeans - Designer,Designer jeans,each,25,40,65,Test Data 2024
+2,Jeans - Regular,Regular jeans,each,12,18,30,Test Data 2024
+2,Shorts - Cargo,Cargo shorts,each,10,15,25,Test Data 2024
+2,Shorts - Athletic,Athletic shorts,each,8,12,20,Test Data 2024
+2,Coat - Winter,Men's winter coat,each,40,65,110,Test Data 2024
+2,Coat - Overcoat,Men's overcoat,each,50,80,135,Test Data 2024
+2,Jacket - Leather,Men's leather jacket,each,45,75,125,Test Data 2024
+2,Jacket - Denim,Men's denim jacket,each,18,28,45,Test Data 2024
+2,Jacket - Windbreaker,Men's windbreaker,each,15,25,40,Test Data 2024
+2,Shoes - Dress,Men's dress shoes,pair,25,40,70,Test Data 2024
+2,Shoes - Casual,Men's casual shoes,pair,18,30,50,Test Data 2024
+2,Shoes - Athletic,Men's athletic shoes,pair,25,45,75,Test Data 2024
+2,Shoes - Boots,Men's boots,pair,30,50,85,Test Data 2024
+2,Tie - Silk,Silk tie,each,8,15,25,Test Data 2024
+2,Tie - Regular,Regular tie,each,4,7,12,Test Data 2024
+2,Bow Tie,Bow tie,each,5,10,18,Test Data 2024
+2,Sweater - V-Neck,Men's V-neck sweater,each,15,22,35,Test Data 2024
+2,Sweater - Crew,Men's crew neck sweater,each,12,20,32,Test Data 2024
+2,Sweater - Cardigan,Men's cardigan,each,18,28,45,Test Data 2024
+2,Belt - Leather,Leather belt,each,12,20,32,Test Data 2024
+2,Belt - Casual,Casual belt,each,6,10,18,Test Data 2024
+2,Wallet,Men's wallet,each,12,22,38,Test Data 2024
+2,Watch - Dress,Men's dress watch,each,35,60,110,Test Data 2024
+2,Watch - Casual,Men's casual watch,each,20,35,60,Test Data 2024
+2,Cufflinks,Cufflinks set,set,15,25,45,Test Data 2024
+2,Suspenders,Men's suspenders,each,8,14,24,Test Data 2024
+2,Underwear Pack,Men's underwear pack,pack,8,12,20,Test Data 2024
+2,Socks Pack,Men's dress socks pack,pack,6,10,16,Test Data 2024
+2,Pajamas,Men's pajama set,set,12,20,32,Test Data 2024
+2,Robe,Men's robe,each,15,25,40,Test Data 2024
+3,Shirt - School,School uniform shirt,each,5,8,14,Test Data 2024
+3,Pants - School,School uniform pants,each,8,12,20,Test Data 2024
+3,Dress - School,School uniform dress,each,10,15,25,Test Data 2024
+3,Sweater - School,School sweater,each,8,12,20,Test Data 2024
+3,T-Shirt Pack,Kids t-shirt pack,pack,10,15,25,Test Data 2024
+3,Shorts,Children's shorts,each,5,8,14,Test Data 2024
+3,Jeans - Toddler,Toddler jeans,each,6,10,16,Test Data 2024
+3,Jeans - Kids,Kids jeans,each,8,14,22,Test Data 2024
+3,Jeans - Teen,Teen jeans,each,12,20,32,Test Data 2024
+3,Dress - Party,Party dress,each,12,20,32,Test Data 2024
+3,Dress - Casual,Casual dress,each,8,12,20,Test Data 2024
+3,Jacket - Spring,Spring jacket,each,12,18,30,Test Data 2024
+3,Jacket - Winter,Winter jacket,each,18,28,45,Test Data 2024
+3,Raincoat,Kids raincoat,each,10,16,26,Test Data 2024
+3,Snowsuit,Children's snowsuit,each,25,40,65,Test Data 2024
+3,Shoes - School,School shoes,pair,10,18,30,Test Data 2024
+3,Shoes - Sneakers,Kids sneakers,pair,12,20,35,Test Data 2024
+3,Shoes - Dress,Dress shoes,pair,12,20,32,Test Data 2024
+3,Boots - Rain,Rain boots,pair,8,14,22,Test Data 2024
+3,Boots - Winter,Winter boots,pair,15,25,40,Test Data 2024
+3,Onesies Pack,Baby onesies pack,pack,8,12,20,Test Data 2024
+3,Sleepers Pack,Baby sleepers pack,pack,10,15,25,Test Data 2024
+3,Baby Hat,Baby hat,each,3,5,8,Test Data 2024
+3,Baby Mittens,Baby mittens,pair,3,5,8,Test Data 2024
+3,Bib Set,Baby bib set,set,5,8,14,Test Data 2024
+3,Pajamas - Toddler,Toddler pajamas,set,8,12,20,Test Data 2024
+3,Pajamas - Kids,Kids pajamas,set,10,16,26,Test Data 2024
+3,Underwear Pack,Kids underwear pack,pack,6,10,16,Test Data 2024
+3,Socks Pack,Kids socks pack,pack,5,8,14,Test Data 2024
+3,Swimsuit,Kids swimsuit,each,8,14,22,Test Data 2024
+4,Cookware Set,Complete cookware set,set,25,45,75,Test Data 2024
+4,Frying Pan,Non-stick frying pan,each,8,15,25,Test Data 2024
+4,Sauce Pan,Sauce pan with lid,each,10,18,30,Test Data 2024
+4,Stock Pot,Large stock pot,each,15,25,42,Test Data 2024
+4,Baking Set,Baking pans set,set,12,20,35,Test Data 2024
+4,Mixing Bowls,Mixing bowl set,set,8,14,24,Test Data 2024
+4,Dinnerware - China,China dinnerware set,set,40,70,120,Test Data 2024
+4,Dinnerware - Casual,Casual dinnerware set,set,20,35,60,Test Data 2024
+4,Flatware - Silver,Silverware set,set,25,45,75,Test Data 2024
+4,Flatware - Steel,Stainless steel set,set,12,20,35,Test Data 2024
+4,Glassware - Crystal,Crystal glasses,set,30,50,85,Test Data 2024
+4,Glassware - Regular,Regular glasses,set,10,18,30,Test Data 2024
+4,Coffee Mugs,Coffee mug set,set,8,14,24,Test Data 2024
+4,Tea Set,Complete tea set,set,20,35,60,Test Data 2024
+4,Serving Dishes,Serving dish set,set,15,25,45,Test Data 2024
+4,Cutting Board,Wooden cutting board,each,8,14,24,Test Data 2024
+4,Knife Set,Kitchen knife set,set,20,35,60,Test Data 2024
+4,Utensil Set,Cooking utensil set,set,10,18,30,Test Data 2024
+4,Storage Containers,Food storage set,set,8,15,25,Test Data 2024
+4,Sheets - King,King size sheet set,set,20,35,60,Test Data 2024
+4,Sheets - Queen,Queen size sheet set,set,18,30,50,Test Data 2024
+4,Sheets - Twin,Twin size sheet set,set,12,20,35,Test Data 2024
+4,Comforter - King,King size comforter,each,30,50,85,Test Data 2024
+4,Comforter - Queen,Queen size comforter,each,25,45,75,Test Data 2024
+4,Blanket - Throw,Throw blanket,each,8,14,24,Test Data 2024
+4,Blanket - Electric,Electric blanket,each,20,35,60,Test Data 2024
+4,Pillows,Pillow set,set,10,18,30,Test Data 2024
+4,Towels - Bath,Bath towel set,set,12,20,35,Test Data 2024
+4,Towels - Beach,Beach towel,each,6,10,18,Test Data 2024
+4,Bath Mat,Bath mat set,set,8,14,24,Test Data 2024
+4,Shower Curtain,Shower curtain,each,8,14,24,Test Data 2024
+4,Curtains - Living,Living room curtains,set,20,35,60,Test Data 2024
+4,Curtains - Bedroom,Bedroom curtains,set,15,25,45,Test Data 2024
+4,Rug - Area,Area rug,each,30,55,95,Test Data 2024
+4,Rug - Runner,Hallway runner,each,15,25,45,Test Data 2024
+4,Tablecloth,Tablecloth set,set,10,18,30,Test Data 2024
+4,Placemats,Placemat set,set,8,14,24,Test Data 2024
+4,Napkins,Cloth napkin set,set,6,10,18,Test Data 2024
+4,Candles,Decorative candles,set,8,14,24,Test Data 2024
+4,Vase,Decorative vase,each,10,18,30,Test Data 2024
+4,Picture Frames,Frame set,set,12,20,35,Test Data 2024
+4,Wall Art,Wall art piece,each,15,28,48,Test Data 2024
+4,Mirror,Decorative mirror,each,20,35,60,Test Data 2024
+4,Clock,Wall clock,each,12,22,38,Test Data 2024
+4,Lamp - Table,Table lamp,each,15,25,45,Test Data 2024
+4,Lamp - Floor,Floor lamp,each,20,35,60,Test Data 2024
+5,Desktop - Gaming,Gaming desktop,each,300,500,850,Test Data 2024
+5,Desktop - Office,Office desktop,each,150,250,425,Test Data 2024
+5,All-in-One PC,All-in-one computer,each,200,350,600,Test Data 2024
+5,Laptop - Gaming,Gaming laptop,each,400,700,1200,Test Data 2024
+5,Laptop - Business,Business laptop,each,250,450,750,Test Data 2024
+5,Laptop - Chromebook,Chromebook,each,75,125,225,Test Data 2024
+5,Tablet - iPad Pro,iPad Pro,each,200,350,600,Test Data 2024
+5,Tablet - iPad,Regular iPad,each,100,175,300,Test Data 2024
+5,Tablet - Android,Android tablet,each,75,125,225,Test Data 2024
+5,E-Reader,Kindle/e-reader,each,40,70,120,Test Data 2024
+5,Smartphone - iPhone Pro,iPhone Pro,each,200,400,700,Test Data 2024
+5,Smartphone - iPhone,Regular iPhone,each,150,275,475,Test Data 2024
+5,Smartphone - Android High,High-end Android,each,125,225,400,Test Data 2024
+5,Smartphone - Android Mid,Mid-range Android,each,60,110,200,Test Data 2024
+5,Smartwatch,Smart watch,each,50,100,175,Test Data 2024
+5,Fitness Tracker,Fitness band,each,25,45,80,Test Data 2024
+5,TV - 65 inch,65 inch TV,each,200,350,600,Test Data 2024
+5,TV - 55 inch,55 inch TV,each,150,275,475,Test Data 2024
+5,TV - 43 inch,43 inch TV,each,100,175,300,Test Data 2024
+5,TV - 32 inch,32 inch TV,each,60,100,175,Test Data 2024
+5,Soundbar,TV soundbar,each,40,75,130,Test Data 2024
+5,Home Theater System,5.1 system,set,100,200,350,Test Data 2024
+5,Streaming Device,Roku/Fire TV,each,20,35,60,Test Data 2024
+5,Printer - Laser,Laser printer,each,50,90,160,Test Data 2024
+5,Printer - Inkjet,Inkjet printer,each,30,55,95,Test Data 2024
+5,Printer - All-in-One,Multifunction printer,each,60,110,190,Test Data 2024
+5,Scanner,Document scanner,each,35,60,110,Test Data 2024
+5,Router,WiFi router,each,30,55,95,Test Data 2024
+5,Modem,Cable modem,each,25,45,80,Test Data 2024
+5,External Hard Drive,Portable HDD,each,30,55,95,Test Data 2024
+5,SSD Drive,External SSD,each,40,70,120,Test Data 2024
+5,Flash Drive Set,USB flash drives,set,10,18,32,Test Data 2024
+5,Webcam,HD webcam,each,20,35,65,Test Data 2024
+5,Microphone,USB microphone,each,25,45,80,Test Data 2024
+5,Headphones - Noise Cancel,Noise canceling,each,60,110,200,Test Data 2024
+5,Headphones - Regular,Regular headphones,each,20,35,65,Test Data 2024
+5,Earbuds - Wireless,Wireless earbuds,each,30,55,100,Test Data 2024
+5,Earbuds - Wired,Wired earbuds,each,10,18,32,Test Data 2024
+5,Speakers - Bluetooth,Bluetooth speaker,each,25,45,80,Test Data 2024
+5,Speakers - Computer,Computer speakers,set,20,35,65,Test Data 2024
+5,Keyboard - Mechanical,Mechanical keyboard,each,35,60,110,Test Data 2024
+5,Keyboard - Regular,Regular keyboard,each,12,22,40,Test Data 2024
+5,Mouse - Gaming,Gaming mouse,each,20,35,65,Test Data 2024
+5,Mouse - Regular,Regular mouse,each,8,15,28,Test Data 2024
+5,Monitor - 4K,4K monitor,each,100,200,350,Test Data 2024
+5,Monitor - 1080p,HD monitor,each,50,90,160,Test Data 2024
+5,Camera - DSLR,DSLR camera,each,200,400,700,Test Data 2024
+5,Camera - Mirrorless,Mirrorless camera,each,175,350,600,Test Data 2024
+5,Camera - Point Shoot,Point and shoot,each,50,90,160,Test Data 2024
+5,Camera Lens,Camera lens,each,75,150,275,Test Data 2024
+5,Drone,Camera drone,each,100,200,375,Test Data 2024
+5,PlayStation 5,PS5 console,each,200,350,550,Test Data 2024
+5,Xbox Series X,Xbox console,each,175,325,525,Test Data 2024
+5,Nintendo Switch,Switch console,each,100,175,300,Test Data 2024
+5,VR Headset,Virtual reality set,each,100,200,350,Test Data 2024
+6,Sofa - Sectional,Sectional sofa,each,300,550,950,Test Data 2024
+6,Sofa - Loveseat,Loveseat sofa,each,150,275,475,Test Data 2024
+6,Sofa - Sleeper,Sleeper sofa,each,200,375,650,Test Data 2024
+6,Sofa - Reclining,Reclining sofa,each,250,450,775,Test Data 2024
+6,Chair - Recliner,Recliner chair,each,100,200,350,Test Data 2024
+6,Chair - Accent,Accent chair,each,75,140,250,Test Data 2024
+6,Chair - Office,Office chair,each,50,100,175,Test Data 2024
+6,Chair - Gaming,Gaming chair,each,75,150,275,Test Data 2024
+6,Ottoman,Ottoman,each,35,65,115,Test Data 2024
+6,Table - Dining 8,8-person dining table,each,200,400,700,Test Data 2024
+6,Table - Dining 6,6-person dining table,each,150,300,525,Test Data 2024
+6,Table - Dining 4,4-person dining table,each,100,200,350,Test Data 2024
+6,Chairs - Dining Set,Set of 6 dining chairs,set,150,300,525,Test Data 2024
+6,China Cabinet,China cabinet,each,175,350,600,Test Data 2024
+6,Buffet,Dining buffet,each,125,250,425,Test Data 2024
+6,Bar Stools,Bar stool set,set,75,150,275,Test Data 2024
+6,Coffee Table - Glass,Glass coffee table,each,75,140,250,Test Data 2024
+6,Coffee Table - Wood,Wooden coffee table,each,60,115,200,Test Data 2024
+6,End Table,End table set,set,50,90,160,Test Data 2024
+6,Console Table,Console table,each,75,140,250,Test Data 2024
+6,TV Stand,TV stand/console,each,75,150,275,Test Data 2024
+6,Entertainment Center,Entertainment center,each,150,300,525,Test Data 2024
+6,Bookshelf - Large,Large bookcase,each,75,150,275,Test Data 2024
+6,Bookshelf - Small,Small bookcase,each,35,70,125,Test Data 2024
+6,Filing Cabinet,Filing cabinet,each,40,75,135,Test Data 2024
+6,Desk - Executive,Executive desk,each,175,350,600,Test Data 2024
+6,Desk - Computer,Computer desk,each,75,150,275,Test Data 2024
+6,Desk - Writing,Writing desk,each,60,115,200,Test Data 2024
+6,Desk Chair,Desk chair,each,50,100,175,Test Data 2024
+6,Bed - King,King bed frame,each,150,300,525,Test Data 2024
+6,Bed - Queen,Queen bed frame,each,125,250,425,Test Data 2024
+6,Bed - Full,Full bed frame,each,100,200,350,Test Data 2024
+6,Bed - Twin,Twin bed frame,each,75,150,275,Test Data 2024
+6,Bunk Bed,Bunk bed set,each,150,300,525,Test Data 2024
+6,Headboard - King,King headboard,each,75,150,275,Test Data 2024
+6,Headboard - Queen,Queen headboard,each,60,120,220,Test Data 2024
+6,Mattress - King,King mattress,each,200,400,700,Test Data 2024
+6,Mattress - Queen,Queen mattress,each,150,300,525,Test Data 2024
+6,Mattress - Full,Full mattress,each,100,200,350,Test Data 2024
+6,Mattress - Twin,Twin mattress,each,75,150,275,Test Data 2024
+6,Dresser - Large,Large dresser,each,125,250,425,Test Data 2024
+6,Dresser - Small,Small dresser,each,75,150,275,Test Data 2024
+6,Nightstand,Nightstand set,set,50,100,175,Test Data 2024
+6,Armoire,Bedroom armoire,each,175,350,600,Test Data 2024
+6,Vanity,Vanity with mirror,each,100,200,350,Test Data 2024
+6,Chest,Blanket chest,each,60,120,210,Test Data 2024
+6,Mirror - Full Length,Full length mirror,each,35,70,125,Test Data 2024
+6,Bench,Bedroom bench,each,40,80,140,Test Data 2024
+7,Encyclopedia Set,Complete encyclopedia,set,25,50,90,Test Data 2024
+7,Dictionary,Hardcover dictionary,each,5,10,18,Test Data 2024
+7,Atlas,World atlas,each,8,15,28,Test Data 2024
+7,Cookbook - Hardcover,Hardcover cookbook,each,6,12,22,Test Data 2024
+7,Cookbook - Paperback,Paperback cookbook,each,3,6,11,Test Data 2024
+7,Novel - Hardcover,Hardcover novel,each,3,5,9,Test Data 2024
+7,Novel - Paperback,Paperback novel,each,2,3,5,Test Data 2024
+7,Textbook - Medical,Medical textbook,each,20,40,75,Test Data 2024
+7,Textbook - Law,Law textbook,each,15,30,55,Test Data 2024
+7,Textbook - Engineering,Engineering textbook,each,15,30,55,Test Data 2024
+7,Textbook - Business,Business textbook,each,12,25,45,Test Data 2024
+7,Textbook - General,General textbook,each,10,20,35,Test Data 2024
+7,Children's Books Set,Set of 10 kids books,set,10,20,35,Test Data 2024
+7,Picture Book,Children's picture book,each,2,4,7,Test Data 2024
+7,Young Adult Novel,YA novel,each,3,5,9,Test Data 2024
+7,Comic Book,Single comic book,each,2,4,8,Test Data 2024
+7,Graphic Novel,Graphic novel,each,5,10,18,Test Data 2024
+7,Magazine Collection,Year of magazines,set,5,10,18,Test Data 2024
+7,DVD Box Set,TV series box set,set,15,30,55,Test Data 2024
+7,DVD - Movie,Single movie DVD,each,2,4,7,Test Data 2024
+7,Blu-ray Box Set,HD series box set,set,20,40,75,Test Data 2024
+7,Blu-ray - Movie,Single Blu-ray movie,each,4,7,12,Test Data 2024
+7,4K Movie,4K UHD movie,each,6,12,22,Test Data 2024
+7,CD Album,Music CD album,each,2,3,5,Test Data 2024
+7,CD Box Set,Music collection,set,10,20,35,Test Data 2024
+7,Vinyl Record - New,New vinyl LP,each,8,15,28,Test Data 2024
+7,Vinyl Record - Classic,Classic vinyl LP,each,5,10,18,Test Data 2024
+7,Vinyl Collection,Set of 10 records,set,30,60,110,Test Data 2024
+7,Cassette Tape,Audio cassette,each,1,2,4,Test Data 2024
+7,VHS Movie,VHS tape,each,1,2,3,Test Data 2024
+7,Video Game - New,Current gen game,each,15,30,55,Test Data 2024
+7,Video Game - Recent,Last gen game,each,8,15,28,Test Data 2024
+7,Video Game - Retro,Retro game,each,5,10,20,Test Data 2024
+7,Board Game - Strategy,Strategy board game,each,15,30,55,Test Data 2024
+7,Board Game - Family,Family board game,each,8,15,28,Test Data 2024
+7,Board Game - Classic,Classic board game,each,5,10,18,Test Data 2024
+7,Puzzle - 1000pc,1000 piece puzzle,each,5,10,18,Test Data 2024
+7,Puzzle - 500pc,500 piece puzzle,each,3,6,11,Test Data 2024
+7,Card Game,Trading card game,each,5,10,20,Test Data 2024
+8,Bicycle - Road,Road bike,each,125,250,450,Test Data 2024
+8,Bicycle - Mountain,Mountain bike,each,100,200,375,Test Data 2024
+8,Bicycle - Hybrid,Hybrid bike,each,75,150,275,Test Data 2024
+8,Bicycle - Kids,Children's bike,each,30,60,110,Test Data 2024
+8,Bicycle - Electric,E-bike,each,200,400,750,Test Data 2024
+8,Scooter - Electric,Electric scooter,each,75,150,275,Test Data 2024
+8,Scooter - Kids,Kids scooter,each,15,30,55,Test Data 2024
+8,Skateboard - Pro,Professional skateboard,each,30,60,110,Test Data 2024
+8,Skateboard - Regular,Regular skateboard,each,15,30,55,Test Data 2024
+8,Roller Blades,Inline skates,pair,20,40,75,Test Data 2024
+8,Golf Clubs - Full Set,Complete golf set,set,150,300,550,Test Data 2024
+8,Golf Clubs - Iron Set,Iron set only,set,75,150,275,Test Data 2024
+8,Golf Bag,Golf bag,each,30,60,110,Test Data 2024
+8,Golf Cart,Push/pull cart,each,40,80,150,Test Data 2024
+8,Tennis Racket - Pro,Professional racket,each,30,60,110,Test Data 2024
+8,Tennis Racket - Regular,Regular racket,each,15,30,55,Test Data 2024
+8,Tennis Bag,Tennis equipment bag,each,15,30,55,Test Data 2024
+8,Baseball Glove,Baseball/softball glove,each,15,30,55,Test Data 2024
+8,Baseball Bat,Baseball/softball bat,each,20,40,75,Test Data 2024
+8,Basketball,Basketball,each,10,20,35,Test Data 2024
+8,Football,Football,each,10,20,35,Test Data 2024
+8,Soccer Ball,Soccer ball,each,10,20,35,Test Data 2024
+8,Volleyball,Volleyball,each,8,15,28,Test Data 2024
+8,Hockey Stick,Ice/street hockey stick,each,20,40,75,Test Data 2024
+8,Hockey Skates,Ice hockey skates,pair,30,60,110,Test Data 2024
+8,Lacrosse Stick,Lacrosse stick,each,25,50,95,Test Data 2024
+8,Treadmill,Home treadmill,each,200,400,750,Test Data 2024
+8,Elliptical,Elliptical machine,each,150,300,550,Test Data 2024
+8,Exercise Bike,Stationary bike,each,100,200,375,Test Data 2024
+8,Rowing Machine,Rowing machine,each,125,250,475,Test Data 2024
+8,Weight Set,Dumbbell set,set,50,100,185,Test Data 2024
+8,Weight Bench,Weight bench,each,50,100,185,Test Data 2024
+8,Yoga Mat,Yoga/exercise mat,each,10,20,35,Test Data 2024
+8,Yoga Block Set,Yoga blocks and straps,set,15,30,55,Test Data 2024
+8,Resistance Bands,Resistance band set,set,10,20,35,Test Data 2024
+8,Kettlebell Set,Kettlebell set,set,30,60,110,Test Data 2024
+8,Punching Bag,Heavy bag,each,40,80,150,Test Data 2024
+8,Skis - Downhill,Downhill skis,pair,75,150,275,Test Data 2024
+8,Skis - Cross Country,Cross country skis,pair,50,100,185,Test Data 2024
+8,Ski Boots,Ski boots,pair,40,80,150,Test Data 2024
+8,Ski Poles,Ski poles,pair,15,30,55,Test Data 2024
+8,Snowboard,Snowboard,each,60,120,225,Test Data 2024
+8,Snowboard Boots,Snowboard boots,pair,30,60,110,Test Data 2024
+8,Tent - 4 Person,4-person tent,each,40,80,150,Test Data 2024
+8,Tent - 2 Person,2-person tent,each,25,50,95,Test Data 2024
+8,Sleeping Bag,Sleeping bag,each,20,40,75,Test Data 2024
+8,Camping Stove,Portable stove,each,15,30,55,Test Data 2024
+8,Cooler,Large cooler,each,20,40,75,Test Data 2024
+8,Backpack - Hiking,Hiking backpack,each,30,60,110,Test Data 2024
+8,Fishing Rod - Fly,Fly fishing rod,each,40,80,150,Test Data 2024
+8,Fishing Rod - Regular,Regular fishing rod,each,20,40,75,Test Data 2024
+8,Tackle Box,Fishing tackle box,each,15,30,55,Test Data 2024
+8,Kayak,Single kayak,each,150,300,550,Test Data 2024
+8,Canoe,Canoe,each,175,350,650,Test Data 2024
+8,Life Jacket,Life vest,each,15,30,55,Test Data 2024
+9,Action Figures Set,Set of action figures,set,10,20,35,Test Data 2024
+9,Doll - Baby,Baby doll,each,8,15,28,Test Data 2024
+9,Doll - Fashion,Fashion doll,each,5,10,18,Test Data 2024
+9,Doll House,Doll house,each,30,60,110,Test Data 2024
+9,Stuffed Animal - Large,Large plush toy,each,8,15,28,Test Data 2024
+9,Stuffed Animal - Small,Small plush toy,each,3,6,11,Test Data 2024
+9,LEGO Set - Large,Large building set,each,40,80,150,Test Data 2024
+9,LEGO Set - Medium,Medium building set,each,20,40,75,Test Data 2024
+9,LEGO Set - Small,Small building set,each,10,20,35,Test Data 2024
+9,Building Blocks,Generic blocks set,set,15,30,55,Test Data 2024
+9,Train Set - Electric,Electric train set,set,50,100,185,Test Data 2024
+9,Train Set - Wooden,Wooden train set,set,25,50,95,Test Data 2024
+9,Race Track,Toy car race track,each,20,40,75,Test Data 2024
+9,RC Car,Remote control car,each,20,40,75,Test Data 2024
+9,RC Helicopter,Remote control helicopter,each,25,50,95,Test Data 2024
+9,RC Drone,Toy drone,each,30,60,110,Test Data 2024
+9,Play Kitchen,Toy kitchen set,each,40,80,150,Test Data 2024
+9,Tool Set,Toy tool set,set,15,30,55,Test Data 2024
+9,Doctor Kit,Play doctor kit,set,10,20,35,Test Data 2024
+9,Art Set,Art supplies kit,set,15,30,55,Test Data 2024
+9,Musical Toy,Electronic music toy,each,15,30,55,Test Data 2024
+9,Puzzle - Kids,Children's puzzle,each,5,10,18,Test Data 2024
+9,Board Game - Kids,Kids board game,each,8,15,28,Test Data 2024
+9,Card Game - Kids,Kids card game,each,3,6,11,Test Data 2024
+9,Sandbox Toys,Sand toys set,set,10,20,35,Test Data 2024
+9,Pool Toys,Pool toys set,set,15,30,55,Test Data 2024
+9,Swing Set,Portable swing,each,30,60,110,Test Data 2024
+9,Trampoline - Small,Small trampoline,each,40,80,150,Test Data 2024
+9,Playhouse,Kids playhouse,each,75,150,275,Test Data 2024
+9,Ride-On Toy,Ride-on vehicle,each,25,50,95,Test Data 2024
+9,Wagon,Kids wagon,each,20,40,75,Test Data 2024
+9,Tricycle,Children's tricycle,each,20,40,75,Test Data 2024
+9,Balance Bike,Balance bike,each,25,50,95,Test Data 2024
+10,Refrigerator - Full,Full size fridge,each,200,400,750,Test Data 2024
+10,Refrigerator - Compact,Compact fridge,each,75,150,275,Test Data 2024
+10,Freezer - Chest,Chest freezer,each,125,250,475,Test Data 2024
+10,Freezer - Upright,Upright freezer,each,150,300,550,Test Data 2024
+10,Range - Gas,Gas stove/oven,each,175,350,650,Test Data 2024
+10,Range - Electric,Electric stove/oven,each,150,300,550,Test Data 2024
+10,Microwave - Over Range,Over-range microwave,each,75,150,275,Test Data 2024
+10,Microwave - Countertop,Countertop microwave,each,30,60,110,Test Data 2024
+10,Dishwasher,Dishwasher,each,150,300,550,Test Data 2024
+10,Washer,Washing machine,each,175,350,650,Test Data 2024
+10,Dryer,Clothes dryer,each,150,300,550,Test Data 2024
+10,Washer/Dryer Combo,Combo unit,each,250,500,925,Test Data 2024
+10,Coffee Maker - Espresso,Espresso machine,each,50,100,185,Test Data 2024
+10,Coffee Maker - Drip,Drip coffee maker,each,15,30,55,Test Data 2024
+10,Coffee Grinder,Coffee grinder,each,10,20,35,Test Data 2024
+10,Blender - High End,High-end blender,each,40,80,150,Test Data 2024
+10,Blender - Regular,Regular blender,each,15,30,55,Test Data 2024
+10,Food Processor,Food processor,each,30,60,110,Test Data 2024
+10,Mixer - Stand,Stand mixer,each,50,100,185,Test Data 2024
+10,Mixer - Hand,Hand mixer,each,10,20,35,Test Data 2024
+10,Toaster Oven,Toaster oven,each,20,40,75,Test Data 2024
+10,Toaster,Pop-up toaster,each,10,20,35,Test Data 2024
+10,Air Fryer,Air fryer,each,30,60,110,Test Data 2024
+10,Instant Pot,Pressure cooker,each,35,70,130,Test Data 2024
+10,Slow Cooker,Crock pot,each,15,30,55,Test Data 2024
+10,Rice Cooker,Rice cooker,each,15,30,55,Test Data 2024
+10,Bread Maker,Bread machine,each,30,60,110,Test Data 2024
+10,Juicer,Juice extractor,each,25,50,95,Test Data 2024
+10,Electric Kettle,Electric kettle,each,12,25,45,Test Data 2024
+10,Vacuum - Dyson,Dyson vacuum,each,75,150,275,Test Data 2024
+10,Vacuum - Upright,Upright vacuum,each,40,80,150,Test Data 2024
+10,Vacuum - Canister,Canister vacuum,each,35,70,130,Test Data 2024
+10,Vacuum - Robot,Robot vacuum,each,60,120,225,Test Data 2024
+10,Vacuum - Handheld,Handheld vacuum,each,15,30,55,Test Data 2024
+10,Steam Cleaner,Steam cleaner,each,30,60,110,Test Data 2024
+10,Iron,Clothes iron,each,10,20,35,Test Data 2024
+10,Ironing Board,Ironing board,each,10,20,35,Test Data 2024
+10,Steamer,Garment steamer,each,15,30,55,Test Data 2024
+10,Sewing Machine,Sewing machine,each,40,80,150,Test Data 2024
+10,Fan - Ceiling,Ceiling fan,each,40,80,150,Test Data 2024
+10,Fan - Tower,Tower fan,each,25,50,95,Test Data 2024
+10,Fan - Box,Box fan,each,15,30,55,Test Data 2024
+10,Heater - Space,Space heater,each,20,40,75,Test Data 2024
+10,Humidifier,Humidifier,each,20,40,75,Test Data 2024
+10,Dehumidifier,Dehumidifier,each,50,100,185,Test Data 2024
+10,Air Conditioner - Window,Window AC unit,each,75,150,275,Test Data 2024
+10,Air Conditioner - Portable,Portable AC,each,100,200,375,Test Data 2024
+10,Air Purifier,Air purifier,each,30,60,110,Test Data 2024
+11,Ring - Fashion,Fashion ring,each,10,20,35,Test Data 2024
+11,Necklace - Gold Plated,Gold plated necklace,each,15,30,55,Test Data 2024
+11,Necklace - Silver,Silver necklace,each,20,40,75,Test Data 2024
+11,Necklace - Costume,Costume necklace,each,8,15,28,Test Data 2024
+11,Bracelet - Tennis,Tennis bracelet,each,25,50,95,Test Data 2024
+11,Bracelet - Charm,Charm bracelet,each,15,30,55,Test Data 2024
+11,Bracelet - Bangle,Bangle set,set,10,20,35,Test Data 2024
+11,Earrings - Diamond Style,Diamond-style earrings,pair,20,40,75,Test Data 2024
+11,Earrings - Gold Plated,Gold plated earrings,pair,10,20,35,Test Data 2024
+11,Earrings - Fashion,Fashion earrings,pair,5,10,18,Test Data 2024
+11,Watch - Luxury Style,Luxury style watch,each,50,100,185,Test Data 2024
+11,Watch - Smart,Smart watch,each,40,80,150,Test Data 2024
+11,Watch - Fashion,Fashion watch,each,20,40,75,Test Data 2024
+11,Watch - Vintage,Vintage watch,each,30,60,110,Test Data 2024
+11,Brooch,Decorative brooch,each,8,15,28,Test Data 2024
+11,Pendant,Pendant with chain,each,15,30,55,Test Data 2024
+11,Anklet,Ankle bracelet,each,8,15,28,Test Data 2024
+11,Jewelry Box,Jewelry organizer,each,15,30,55,Test Data 2024
+11,Sunglasses - Designer Style,Designer style sunglasses,each,20,40,75,Test Data 2024
+11,Sunglasses - Regular,Regular sunglasses,each,8,15,28,Test Data 2024
+11,Scarf - Designer Style,Designer style scarf,each,25,50,95,Test Data 2024
+11,Hair Accessories,Hair accessories set,set,10,20,35,Test Data 2024
+12,Drill - Cordless,Cordless drill,each,30,60,110,Test Data 2024
+12,Drill - Corded,Corded drill,each,20,40,75,Test Data 2024
+12,Saw - Circular,Circular saw,each,35,70,130,Test Data 2024
+12,Saw - Miter,Miter saw,each,75,150,275,Test Data 2024
+12,Saw - Jigsaw,Jigsaw,each,25,50,95,Test Data 2024
+12,Saw - Hand,Hand saw,each,10,20,35,Test Data 2024
+12,Sander,Electric sander,each,25,50,95,Test Data 2024
+12,Router,Wood router,each,40,80,150,Test Data 2024
+12,Nail Gun,Nail gun,each,40,80,150,Test Data 2024
+12,Tool Set - Mechanics,Mechanics tool set,set,75,150,275,Test Data 2024
+12,Tool Set - Basic,Basic tool set,set,30,60,110,Test Data 2024
+12,Socket Set,Socket wrench set,set,25,50,95,Test Data 2024
+12,Wrench Set,Wrench set,set,20,40,75,Test Data 2024
+12,Screwdriver Set,Screwdriver set,set,15,30,55,Test Data 2024
+12,Pliers Set,Pliers set,set,15,30,55,Test Data 2024
+12,Hammer,Hammer,each,8,15,28,Test Data 2024
+12,Level,Level,each,10,20,35,Test Data 2024
+12,Tape Measure,Tape measure,each,5,10,18,Test Data 2024
+12,Tool Box,Tool box,each,20,40,75,Test Data 2024
+12,Tool Chest,Tool chest,each,75,150,275,Test Data 2024
+12,Workbench,Workbench,each,75,150,275,Test Data 2024
+12,Ladder - Extension,Extension ladder,each,75,150,275,Test Data 2024
+12,Ladder - Step,Step ladder,each,30,60,110,Test Data 2024
+12,Pressure Washer,Pressure washer,each,75,150,275,Test Data 2024
+12,Generator,Portable generator,each,150,300,550,Test Data 2024
+12,Air Compressor,Air compressor,each,75,150,275,Test Data 2024
+12,Shop Vac,Wet/dry vacuum,each,30,60,110,Test Data 2024
+12,Lawn Mower - Riding,Riding mower,each,400,800,1500,Test Data 2024
+12,Lawn Mower - Push,Push mower,each,75,150,275,Test Data 2024
+12,Lawn Mower - Electric,Electric mower,each,50,100,185,Test Data 2024
+12,Trimmer - Gas,Gas trimmer,each,30,60,110,Test Data 2024
+12,Trimmer - Electric,Electric trimmer,each,20,40,75,Test Data 2024
+12,Leaf Blower,Leaf blower,each,25,50,95,Test Data 2024
+12,Chainsaw,Chainsaw,each,50,100,185,Test Data 2024
+12,Hedge Trimmer,Hedge trimmer,each,25,50,95,Test Data 2024
+12,Garden Tools Set,Garden tools set,set,30,60,110,Test Data 2024
+12,Wheelbarrow,Wheelbarrow,each,30,60,110,Test Data 2024
+12,Hose Reel,Garden hose with reel,each,20,40,75,Test Data 2024

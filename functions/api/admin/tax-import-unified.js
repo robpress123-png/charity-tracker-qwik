@@ -119,11 +119,11 @@ export async function onRequestPost(context) {
                             (tax_year, purpose, rate, effective_date)
                             VALUES (?, ?, ?, ?)
                         `;
-                        // For mileage_rates, purpose is in the gain_type column position
+                        // For mileage_rates: purpose is in gain_type column, rate is in min_income column
                         bindValues = [
                             parseInt(row.tax_year),
                             row.gain_type || row.purpose,  // purpose is in gain_type column
-                            parseFloat(row.rate),
+                            parseFloat(row.min_income || row.rate),  // rate is in min_income column
                             row.effective_date
                         ];
                         break;
@@ -134,12 +134,12 @@ export async function onRequestPost(context) {
                             (tax_year, rule_type, filing_status, value, description)
                             VALUES (?, ?, ?, ?, ?)
                         `;
-                        // For contribution_limits, rule_type is in the purpose column position
+                        // For contribution_limits: rule_type is in purpose column, value is in amount column
                         bindValues = [
                             parseInt(row.tax_year),
                             row.purpose || row.rule_type,  // rule_type is in purpose column
                             row.filing_status || null,
-                            parseFloat(row.value),
+                            parseFloat(row.amount || row.value),  // value is in amount column
                             row.description
                         ];
                         break;
