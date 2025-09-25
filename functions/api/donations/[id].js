@@ -195,24 +195,54 @@ export async function onRequestPut(context) {
         // Convert notes to JSON string
         const notesJson = Object.keys(notes).length > 0 ? JSON.stringify(notes) : data.notes || '';
 
-        // Update the donation
+        // Determine if this is a personal or system charity
+        const isPersonalCharity = data.charity_source === 'personal' ||
+                                 (data.user_charity_id && !data.charity_id);
+
+        // Update the donation with proper charity field handling
         const result = await env.DB.prepare(`
             UPDATE donations
             SET
                 charity_id = ?,
+                user_charity_id = ?,
                 amount = ?,
                 date = ?,
                 donation_type = ?,
                 notes = ?,
-                receipt_url = COALESCE(?, receipt_url)
+                receipt_url = COALESCE(?, receipt_url),
+                miles_driven = ?,
+                mileage_rate = ?,
+                mileage_purpose = ?,
+                stock_symbol = ?,
+                stock_quantity = ?,
+                fair_market_value = ?,
+                cost_basis = ?,
+                crypto_symbol = ?,
+                crypto_quantity = ?,
+                crypto_type = ?,
+                item_description = ?,
+                estimated_value = ?
             WHERE id = ? AND user_id = ?
         `).bind(
-            data.charity_id,
+            isPersonalCharity ? null : data.charity_id,
+            isPersonalCharity ? (data.user_charity_id || data.charity_id) : null,
             amount,
             date,
             donationType,
             notesJson,
             data.receipt_url || null,
+            donationType === 'miles' ? data.miles_driven : null,
+            donationType === 'miles' ? data.mileage_rate : null,
+            donationType === 'miles' ? data.mileage_purpose : null,
+            donationType === 'stock' ? data.stock_symbol : null,
+            donationType === 'stock' ? data.stock_quantity : null,
+            donationType === 'stock' || donationType === 'crypto' ? data.fair_market_value : null,
+            donationType === 'stock' || donationType === 'crypto' ? data.cost_basis : null,
+            donationType === 'crypto' ? data.crypto_symbol : null,
+            donationType === 'crypto' ? data.crypto_quantity : null,
+            donationType === 'crypto' ? data.crypto_type : null,
+            donationType === 'items' ? data.item_description : null,
+            donationType === 'items' ? data.estimated_value : null,
             donationId,
             user.id
         ).run();

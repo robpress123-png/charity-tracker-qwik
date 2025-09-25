@@ -1,7 +1,7 @@
-# Charity Tracker Continuation Context - v2.3.16
+# Charity Tracker Continuation Context - v2.3.18
 **Generated:** 2025-01-25
-**Current Version:** 2.3.16
-**Status:** Mostly working - Personal charities show "Unknown Charity" in edit forms
+**Current Version:** 2.3.18
+**Status:** ✅ FULLY FUNCTIONAL - All major features working!
 
 ## ✅ RECENT FIXES (Session 2025-01-25):
 
@@ -25,13 +25,28 @@
    - Now recalculates when changing stock/crypto quantities
    - Stock details show price per share at donation time
 
-## 🔴 CURRENT ISSUES:
+## ✅ ALL MAJOR ISSUES RESOLVED!
 
-### Personal Charities in Edit Forms:
-**Problem:** Personal charities show "Unknown Charity" when editing donations
-**Example:** "Town Library Fund" shows correctly in list but as "Unknown Charity" in edit form
-**Root Cause:** The edit modal isn't properly retrieving charity names for personal charities (user_charity_id)
-**Impact:** Users can't see which charity they're editing for personal charities
+### v2.3.17-2.3.18 Fixed Personal Charities:
+**GET Fix:** Updated API endpoint `/api/donations/[id].js` to JOIN both tables:
+```sql
+LEFT JOIN charities c ON d.charity_id = c.id
+LEFT JOIN user_charities uc ON d.user_charity_id = uc.id
+COALESCE(c.name, uc.name) as charity_name
+```
+
+**PUT Fix:** Updated PUT endpoint to properly handle dual charity fields:
+```javascript
+// Determine charity type from data
+const isPersonalCharity = data.charity_source === 'personal' ||
+                         (data.user_charity_id && !data.charity_id);
+// Set appropriate field
+SET
+    charity_id = ?, // NULL for personal charities
+    user_charity_id = ?, // NULL for system charities
+```
+
+**Result:** Personal charities now work in all edit forms and save correctly
 
 ### CSV Structure Requirements:
 #### Item Donations MUST have (per item):
@@ -82,13 +97,16 @@
 - ✅ Type filter now reapplies when year changes
 - ✅ Fixed donation filtering persistence
 
-### v2.3.12-2.3.16: Test Data & UI Fixes
+### v2.3.12-2.3.18: Complete Feature Set
 - ✅ Real data test CSV generator created
 - ✅ Fixed item edit value calculations
 - ✅ UI improvements (Unit FMV, icons, button styling)
-- ✅ Tax savings recalculation for stock/crypto
+- ✅ Tax savings recalculation for all donation types
 - ✅ Personal charity "P" badge indicator
-- ⚠️ Personal charities show "Unknown Charity" in edit forms (needs fix)
+- ✅ Personal charities display in ALL edit forms (GET fix)
+- ✅ Personal charities save correctly (PUT fix)
+- ✅ Mileage tax savings calculation fixed
+- ✅ All type-specific fields properly saved (stock, crypto, miles, items)
 
 ## ✅ PREVIOUSLY RESOLVED ISSUES:
 
@@ -237,21 +255,22 @@ npm run bump:patch  # 2.3.11 → 2.3.12
 - Token-based auth (localStorage)
 - Test user: test@example.com / test123
 
-## ✅ WORKING FEATURES (v2.3.12):
+## ✅ WORKING FEATURES (v2.3.18):
 - ✅ Chunked CSV import (no timeout on 175+ donations)
-- ✅ Proper display of all donation types
-- ✅ Edit works for all donation types with value updates
-- ✅ Value calculations from database
-- ✅ Tax settings in database
+- ✅ All donation types display and edit correctly
+- ✅ Personal AND system charities work in all forms
+- ✅ Item values calculate from database
+- ✅ Tax savings calculate for all types
 - ✅ Filter persistence across year changes
 - ✅ Real data test CSV generator
-- ✅ Item edit form shows correct FMV based on condition
+- ✅ Personal charity "P" badge indicator
+- ✅ Stock shows price per share at donation
 
-## 🐛 KNOWN ISSUES:
-1. **Personal charities show "Unknown Charity" in edit forms** - Critical UX issue
-2. **Tax tables not deployed** - Schema ready but not in D1
-3. **Capital gains calculations** - Not implemented
-4. **Mileage rates hardcoded** - Should be year-specific from database
+## 🎯 REMAINING ENHANCEMENTS (Nice-to-Have):
+1. **Deploy tax tables to D1** - Schema ready, needs migration
+2. **Year-specific mileage rates** - Currently hardcoded at $0.14
+3. **Capital gains calculations** - For stock/crypto optimization
+4. **Three-tier item valuations** - Currently calculates mid as average
 
 ## ⚠️ DON'T BREAK:
 - Chunked import system (working well)
@@ -268,12 +287,12 @@ The generator MUST:
 5. Include ALL proper type-specific columns
 6. For items: use EXACT item names and EXACT category names from the export
 
-## 🎯 NEXT STEPS:
-1. **Fix personal charity edit issue** - Personal charities show "Unknown Charity" in edit forms
-2. **Deploy tax tables** - Run migration in D1
-3. **Create tax API endpoints**
-4. **Implement capital gains calculations**
-5. **Add year-specific mileage rates** - Store in tax tables (2024: $0.14, 2025: $0.14)
+## 🎯 NEXT STEPS (All Optional Enhancements):
+1. **Deploy tax tables** - Run `db_migration_tax_tables.sql` in D1
+2. **Create tax API endpoints** - `/api/tax/brackets`, `/api/tax/mileage`
+3. **Implement capital gains calculations** - Optimize stock/crypto deductions
+4. **Add year-specific mileage rates** - Store in database (2024: $0.14, 2025: $0.14)
+5. **Enhance item valuations** - Add mid_value column for three-tier system
 
 ## 🔮 FUTURE ENHANCEMENTS:
 1. **Three-tier item valuations** - Add `mid_value` column to items table
@@ -292,7 +311,7 @@ The generator MUST:
 - Edit views need proper column data, not notes
 
 ## 🚀 DEPLOYMENT STATUS:
-- **Version:** 2.3.12
+- **Version:** 2.3.18
 - **GitHub:** https://github.com/robpress123-png/charity-tracker-qwik
 - **Production:** https://charity-tracker-qwik.pages.dev
 - **Status:** Fully functional with real test data
@@ -303,8 +322,8 @@ The generator MUST:
 3. **Item names must match exactly** - "Toaster" in "Appliances" not "Household"
 4. **Browser extension errors** (`web-client-content-script.js`) can be ignored
 
-## 💭 CURRENT THINKING:
-Most functionality is working well. The critical issue is personal charities showing "Unknown Charity" in edit forms - this breaks the UX for users with custom charities. Once fixed, the main remaining work is deploying tax tables for accurate calculations.
+## 💭 CURRENT STATUS:
+All major functionality is now working! Personal charities display and save correctly in all donation types. The test data generator uses real charity/item data from exports. Tax savings calculate properly. The only remaining work is optional enhancements like deploying tax tables for more accurate calculations and adding year-specific mileage rates.
 
 ---
-**END OF CONTINUATION PROMPT v2.3.16**
+**END OF CONTINUATION PROMPT v2.3.18**
