@@ -188,23 +188,39 @@ npx wrangler pages dev --local --port 8788
 ```
 charity-tracker-qwik/
 ├── dist/
-│   ├── dashboard.html          # v2.6.0 - Main user dashboard
-│   ├── admin-dashboard.html    # v2.6.0 - Fixed drag-drop, reorganized menu
-│   └── admin.html             # v2.6.0 - Legacy admin page
+│   ├── dashboard.html          # v2.6.1 - Main user dashboard
+│   ├── admin-dashboard.html    # v2.6.1 - Fixed drag-drop, reorganized menu
+│   └── admin.html             # v2.6.1 - Legacy admin page
 ├── functions/api/             # Cloudflare Pages Functions
 │   ├── donations/
 │   │   └── import.js         # CSV import with value calculation
 │   ├── admin/
-│   │   └── tax-import-unified.js  # Tax data import endpoint
+│   │   └── tax-import-unified.js  # Tax data import endpoint (v2.6.1 fixed)
 │   └── [other endpoints]
-├── tax_data/
-│   └── all_tax_data_2024_2026.csv  # Complete tax data
-├── data/
-│   └── items_database_497.csv      # 496 valid items source
+├── data/                      # ORGANIZED DATA STRUCTURE (v2.6.1)
+│   ├── core/                 # Core reference data
+│   │   ├── charities/
+│   │   │   └── charities_10k_full.csv    # 10,000 IRS charities
+│   │   ├── items/
+│   │   │   └── items_database_497.csv    # 496 items with valuations
+│   │   └── tax/
+│   │       └── all_tax_data_2024_2026.csv # Tax tables 2024-2026
+│   ├── exports/              # User-generated exports
+│   ├── imports/              # Import-ready files
+│   │   └── test_data/        # Test CSV files
+│   ├── archive/              # Old/unused files (55+ test CSVs)
+│   └── README.md             # Data structure documentation
 ├── scripts/
-│   └── auto-version-bump.js        # Deployment automation
+│   └── auto-version-bump.js  # Deployment automation
 └── [documentation files]
 ```
+
+### Critical File Locations (v2.6.1)
+- **Charity Database**: `data/core/charities/charities_10k_full.csv`
+- **Items Database**: `data/core/items/items_database_497.csv`
+- **Tax Tables**: `data/core/tax/all_tax_data_2024_2026.csv`
+- **Test CSVs**: `data/imports/test_data/user*.csv`
+- **Archived Files**: `data/archive/` (can be cleaned periodically)
 
 ## Important Notes & Gotchas
 1. **Dashboard uses vanilla JavaScript**, NOT Qwik framework
