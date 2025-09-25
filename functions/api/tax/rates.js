@@ -29,25 +29,33 @@ export async function onRequestGet(context) {
         // If user_id provided, check for saved settings
         if (userId) {
             const userSettings = await env.DB.prepare(`
-                SELECT tax_bracket, agi_range
+                SELECT filing_status, tax_bracket, agi_range
                 FROM user_tax_settings
                 WHERE user_id = ? AND tax_year = ?
             `).bind(userId, year).first();
 
-            if (userSettings && userSettings.tax_bracket) {
-                response.tax_bracket = userSettings.tax_bracket;
+            if (userSettings) {
+                // Override filing status with user's saved setting
+                if (userSettings.filing_status) {
+                    response.filing_status = userSettings.filing_status;
+                }
+                if (userSettings.tax_bracket) {
+                    response.tax_bracket = userSettings.tax_bracket;
+                }
                 response.agi_range = userSettings.agi_range;
                 response.source = 'user_settings';
             }
         }
 
         // Get tax brackets for this year and filing status
+        // Use the user's saved filing status if available, otherwise use the query parameter
+        const effectiveFilingStatus = response.filing_status;
         const brackets = await env.DB.prepare(`
             SELECT min_income, max_income, rate
             FROM tax_brackets
             WHERE tax_year = ? AND filing_status = ?
             ORDER BY min_income ASC
-        `).bind(year, filingStatus).all();
+        `).bind(year, effectiveFilingStatus).all();
 
         response.brackets = brackets.results || [];
 
@@ -71,7 +79,7 @@ export async function onRequestGet(context) {
             SELECT amount
             FROM standard_deductions
             WHERE tax_year = ? AND filing_status = ?
-        `).bind(year, filingStatus).first();
+        `).bind(year, effectiveFilingStatus).first();
 
         if (deduction) {
             response.standard_deduction = deduction.amount;
@@ -83,7 +91,7 @@ export async function onRequestGet(context) {
             FROM contribution_limits
             WHERE tax_year = ?
             AND (filing_status = ? OR filing_status IS NULL)
-        `).bind(year, filingStatus).all();
+        `).bind(year, effectiveFilingStatus).all();
 
         if (limits.results && limits.results.length > 0) {
             response.contribution_rules = {};
@@ -101,7 +109,7 @@ export async function onRequestGet(context) {
             FROM capital_gains_rates
             WHERE tax_year = ? AND filing_status = ? AND gain_type = 'long_term'
             ORDER BY min_income ASC
-        `).bind(year, filingStatus).all();
+        `).bind(year, effectiveFilingStatus).all();
 
         response.capital_gains_rates = capitalGains.results || [];
 
