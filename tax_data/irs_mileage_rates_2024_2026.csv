@@ -1,0 +1,10 @@
+tax_year,purpose,rate,effective_date
+2024,charitable,0.14,2024-01-01
+2024,medical,0.21,2024-01-01
+2024,business,0.67,2024-01-01
+2025,charitable,0.14,2025-01-01
+2025,medical,0.21,2025-01-01
+2025,business,0.70,2025-01-01
+2026,charitable,0.14,2026-01-01
+2026,medical,0.22,2026-01-01
+2026,business,0.72,2026-01-01

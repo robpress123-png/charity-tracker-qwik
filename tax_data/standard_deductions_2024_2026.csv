@@ -1,0 +1,13 @@
+tax_year,filing_status,amount
+2024,single,14600
+2024,married_jointly,29200
+2024,married_separately,14600
+2024,head_of_household,21900
+2025,single,15000
+2025,married_jointly,30000
+2025,married_separately,15000
+2025,head_of_household,22500
+2026,single,15375
+2026,married_jointly,30750
+2026,married_separately,15375
+2026,head_of_household,23050

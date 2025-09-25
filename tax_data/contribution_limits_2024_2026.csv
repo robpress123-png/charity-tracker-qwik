@@ -1,0 +1,11 @@
+tax_year,rule_type,filing_status,value,description
+2024,agi_floor,,0.0,No AGI floor for charitable deductions
+2024,rate_cap,,0.37,Maximum tax benefit at highest marginal rate
+2025,agi_floor,,0.0,No AGI floor for charitable deductions
+2025,rate_cap,,0.37,Maximum tax benefit at highest marginal rate
+2026,agi_floor,,0.005,0.5% of AGI floor for itemized charitable deductions (OBBBA)
+2026,rate_cap,,0.35,Maximum 35% tax benefit even if in 37% bracket (OBBBA)
+2026,standard_deduction_addon,single,1000,Non-itemizers can deduct up to $1000 in cash donations
+2026,standard_deduction_addon,married_jointly,2000,Non-itemizers can deduct up to $2000 in cash donations
+2026,standard_deduction_addon,married_separately,1000,Non-itemizers can deduct up to $1000 in cash donations
+2026,standard_deduction_addon,head_of_household,1000,Non-itemizers can deduct up to $1000 in cash donations

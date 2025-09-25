@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Charity Tracker v2.3.37</title>
+    <title>Admin - Charity Tracker v2.3.38</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -255,7 +255,7 @@
 <body>
     <div class="container">
         <h1>🛠️ Admin Panel</h1>
-        <div class="version">Charity Tracker v2.3.37</div>
+        <div class="version">Charity Tracker v2.3.38</div>
 
         <div class="warning">
             <p>⚠️ Admin Access Only</p>
@@ -300,6 +300,52 @@
             </details>
 
             <button class="btn-primary" id="importBtn" disabled>Import Charities</button>
+        </div>
+
+        <!-- Tax Tables Import Section -->
+        <div class="section" style="margin-top: 3rem; border-top: 2px solid #e5e7eb; padding-top: 2rem;">
+            <h2>🗂️ Tax Tables Management</h2>
+            <p style="color: #6b7280; margin-bottom: 1rem;">
+                Import tax brackets, capital gains rates, and deduction data for 2024-2026.
+            </p>
+
+            <div class="form-group">
+                <label>Tax Data Status</label>
+                <div id="taxTableStatus" style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p style="color: #6b7280;">Checking tax tables...</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Import All Tax Data (2024-2026)</label>
+                <div class="file-input-wrapper" id="taxDropZone">
+                    <input type="file" id="taxCsvFile" accept=".csv">
+                    <p style="font-size: 1.25rem; margin-bottom: 0.5rem;">📊</p>
+                    <p style="color: #333; font-weight: 500;">Drop all_tax_data_2024_2026.csv here</p>
+                    <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Single file contains all tax data</p>
+                </div>
+                <div class="file-info" id="taxFileInfo"></div>
+            </div>
+
+            <details style="margin-bottom: 1.5rem;">
+                <summary style="cursor: pointer; color: #667eea; font-weight: 500;">Tax CSV Format</summary>
+                <div class="sample-format">
+                    <strong>File: all_tax_data_2024_2026.csv</strong><br><br>
+                    <strong>Includes:</strong><br>
+                    • Tax brackets for all filing statuses<br>
+                    • Capital gains rates (0%, 15%, 20%)<br>
+                    • Standard deductions by year<br>
+                    • IRS mileage rates<br>
+                    • 2026 OBBBA rules (0.5% AGI floor, 35% cap)<br><br>
+                    <strong>First column identifies table type:</strong><br>
+                    tax_brackets, capital_gains, standard_deductions, mileage_rates, contribution_limits
+                </div>
+            </details>
+
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-primary" id="importTaxBtn" disabled>Import Tax Data</button>
+                <button class="btn-danger" id="clearTaxBtn" style="background: #ef4444;" onclick="clearTaxTables()">Clear All Tax Tables</button>
+            </div>
         </div>
 
         <div class="progress" id="progress">
@@ -588,6 +634,194 @@
                 importBtn.disabled = false;
             }
         });
+
+        // ============================================
+        // TAX TABLES IMPORT FUNCTIONALITY
+        // ============================================
+
+        const taxDropZone = document.getElementById('taxDropZone');
+        const taxFileInput = document.getElementById('taxCsvFile');
+        const taxFileInfo = document.getElementById('taxFileInfo');
+        const importTaxBtn = document.getElementById('importTaxBtn');
+        const taxTableStatus = document.getElementById('taxTableStatus');
+
+        let taxCsvData = null;
+
+        // Check tax table status on load
+        checkTaxTableStatus();
+
+        async function checkTaxTableStatus() {
+            try {
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:5173/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken.value}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let statusHtml = '<div style="font-family: monospace; font-size: 0.9rem;">';
+                    for (const [table, count] of Object.entries(data.tables)) {
+                        const status = count === 'Not created' ? '❌ Not created' :
+                                     count === 0 ? '⚠️ Empty' :
+                                     `✅ ${count} rows`;
+                        statusHtml += `<div style="margin: 0.25rem 0;">
+                            <strong>${table}:</strong> ${status}
+                        </div>`;
+                    }
+                    statusHtml += '</div>';
+                    if (data.message) {
+                        statusHtml += `<p style="color: #667eea; margin-top: 1rem; font-size: 0.875rem;">${data.message}</p>`;
+                    }
+                    taxTableStatus.innerHTML = statusHtml;
+                } else {
+                    taxTableStatus.innerHTML = `<p style="color: #ef4444;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                taxTableStatus.innerHTML = `<p style="color: #ef4444;">Failed to check tax tables: ${error.message}</p>`;
+            }
+        }
+
+        // Tax file handling
+        taxDropZone.addEventListener('click', () => taxFileInput.click());
+
+        taxDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            taxDropZone.classList.add('dragover');
+        });
+
+        taxDropZone.addEventListener('dragleave', () => {
+            taxDropZone.classList.remove('dragover');
+        });
+
+        taxDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            taxDropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleTaxFile(files[0]);
+            }
+        });
+
+        taxFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleTaxFile(e.target.files[0]);
+            }
+        });
+
+        function handleTaxFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Please select a CSV file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                taxCsvData = e.target.result;
+                taxFileInfo.innerHTML = `
+                    <p style="color: #10b981; font-weight: 500;">✓ ${file.name}</p>
+                    <p style="color: #6b7280; font-size: 0.875rem;">Size: ${(file.size / 1024).toFixed(2)} KB</p>
+                `;
+                importTaxBtn.disabled = false;
+            };
+            reader.readAsText(file);
+        }
+
+        importTaxBtn.addEventListener('click', importTaxData);
+
+        async function importTaxData() {
+            if (!taxCsvData) {
+                alert('Please select a tax data CSV file');
+                return;
+            }
+
+            importTaxBtn.disabled = true;
+            importTaxBtn.textContent = 'Importing...';
+
+            try {
+                const formData = new FormData();
+                const blob = new Blob([taxCsvData], { type: 'text/csv' });
+                formData.append('file', blob, 'tax_data.csv');
+
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:5173/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken.value}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+
+                    // Show detailed stats
+                    if (data.stats) {
+                        let statsMsg = '\nDetails:\n';
+                        for (const [table, info] of Object.entries(data.stats)) {
+                            statsMsg += `${table}: ${info.success} success, ${info.errors} errors\n`;
+                        }
+                        console.log(statsMsg);
+                    }
+
+                    // Refresh status display
+                    await checkTaxTableStatus();
+
+                    // Reset form
+                    taxFileInput.value = '';
+                    taxFileInfo.innerHTML = '';
+                    importTaxBtn.disabled = true;
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Import failed: ${error.message}`);
+            } finally {
+                importTaxBtn.textContent = 'Import Tax Data';
+                importTaxBtn.disabled = !taxCsvData;
+            }
+        }
+
+        async function clearTaxTables() {
+            if (!confirm('⚠️ This will DELETE all tax data from the database. Are you sure?')) {
+                return;
+            }
+
+            try {
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:5173/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken.value}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    await checkTaxTableStatus();
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Failed to clear tables: ${error.message}`);
+            }
+        }
     </script>
 </body>
 </html>
