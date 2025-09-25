@@ -1,6 +1,6 @@
-# Charity Tracker Continuation Context - v2.3.19
+# Charity Tracker Continuation Context - v2.3.23
 **Generated:** 2025-09-25
-**Current Version:** 2.3.19
+**Current Version:** 2.3.23
 **Status:** ✅ FULLY FUNCTIONAL - All major features working!
 
 ## ✅ RECENT FIXES (Session 2025-09-25):
@@ -27,7 +27,7 @@
 
 ## ✅ ALL MAJOR ISSUES RESOLVED!
 
-### v2.3.17-2.3.19 Fixed Personal Charities:
+### v2.3.17-2.3.23 Personal Charities Saga (LOTS OF CIRCLES!):
 **GET Fix:** Updated API endpoint `/api/donations/[id].js` to JOIN both tables:
 ```sql
 LEFT JOIN charities c ON d.charity_id = c.id
@@ -49,7 +49,24 @@ if (charitySource === 'personal') {
 }
 ```
 
-**Result:** Personal charities now work in all edit forms and save correctly
+**v2.3.19 Result:** Cash form worked, but crypto/stock/miles still had 500 errors
+
+**v2.3.20-22 Going in Circles:**
+- Confused `fairMarketValue` (form field for price/share) with `fair_market_value` (DB column for total)
+- Tried to add `stock_price_per_share` columns that don't exist
+- Put structured data in notes field (BIG NO-NO!)
+- Fixed field names that weren't broken
+- **KEY INSIGHT:** System charity edits ALWAYS WORKED - only personal charities were broken!
+
+**v2.3.23 Actual Fix:**
+```javascript
+// WRONG (API was doing this):
+isPersonalCharity ? (data.user_charity_id || data.charity_id) : null
+// Problem: Form only sends user_charity_id for personal, not charity_id!
+
+// RIGHT:
+isPersonalCharity ? data.user_charity_id : null
+```
 
 ### CSV Structure Requirements:
 #### Item Donations MUST have (per item):
@@ -100,7 +117,7 @@ if (charitySource === 'personal') {
 - ✅ Type filter now reapplies when year changes
 - ✅ Fixed donation filtering persistence
 
-### v2.3.12-2.3.19: Complete Feature Set
+### v2.3.12-2.3.23: Complete Feature Set
 - ✅ Real data test CSV generator created
 - ✅ Fixed item edit value calculations
 - ✅ UI improvements (Unit FMV, icons, button styling)
@@ -258,7 +275,7 @@ npm run bump:patch  # 2.3.11 → 2.3.12
 - Token-based auth (localStorage)
 - Test user: test@example.com / test123
 
-## ✅ WORKING FEATURES (v2.3.19):
+## ✅ WORKING FEATURES (v2.3.23):
 - ✅ Chunked CSV import (no timeout on 175+ donations)
 - ✅ All donation types display and edit correctly
 - ✅ Personal AND system charities work in all forms
@@ -314,19 +331,46 @@ The generator MUST:
 - Edit views need proper column data, not notes
 
 ## 🚀 DEPLOYMENT STATUS:
-- **Version:** 2.3.19
+- **Version:** 2.3.23
 - **GitHub:** https://github.com/robpress123-png/charity-tracker-qwik
 - **Production:** https://charity-tracker-qwik.pages.dev
 - **Status:** Fully functional with real test data
 
-## 💡 KEY INSIGHTS FROM SESSION:
+## 💡 LESSONS LEARNED (THE HARD WAY!):
 1. **Test data files matter!** Always use `user*_test_real_data.csv`, NOT the old v2.3.11 files
 2. **Personal charities** use `user_charity_id` field, while system charities use `charity_id`
 3. **Item names must match exactly** - "Toaster" in "Appliances" not "Household"
 4. **Browser extension errors** (`web-client-content-script.js`) can be ignored
+5. **NEVER store structured data in notes field** - it's for user text only!
+6. **When debugging, check what WORKS first** - if system charities work, the issue is with personal charity logic, not the database schema
+7. **Don't confuse form field IDs with database columns** - `fairMarketValue` (camelCase) vs `fair_market_value` (snake_case)
+8. **The form sends EITHER `user_charity_id` OR `charity_id`**, never both - don't use fallbacks!
 
 ## 💭 CURRENT STATUS:
-All major functionality is now working! Personal charities display and save correctly in all donation types. The test data generator uses real charity/item data from exports. Tax savings calculate properly. The only remaining work is optional enhancements like deploying tax tables for more accurate calculations and adding year-specific mileage rates.
+After going in circles with unnecessary "fixes", the actual problem was simple: the API was trying to use `data.charity_id` as a fallback for personal charities, but that field doesn't exist when submitting personal charity donations. All donation types now work with both system and personal charities.
 
 ---
-**END OF CONTINUATION PROMPT v2.3.19**
+## ⚠️ CRITICAL REMINDERS:
+
+### Database Schema (ACTUAL COLUMNS THAT EXIST):
+```sql
+-- Stock columns
+stock_symbol, stock_quantity, fair_market_value, cost_basis
+-- NO stock_price_per_share column!
+
+-- Crypto columns
+crypto_symbol, crypto_quantity, crypto_type, fair_market_value, cost_basis
+-- NO crypto_price_per_unit column!
+```
+
+### Form vs Database Field Names:
+- **Form field:** `fairMarketValue` = price per share/unit entered by user
+- **DB column:** `fair_market_value` = total value (quantity × price)
+- **Dashboard calculates:** total = quantity × price before sending
+
+### Personal vs System Charities:
+- **System:** sends `charity_id` only
+- **Personal:** sends `user_charity_id` only (NOT both!)
+- **API must check:** `data.charity_source` or detect UUID format
+
+**END OF CONTINUATION PROMPT v2.3.23**
