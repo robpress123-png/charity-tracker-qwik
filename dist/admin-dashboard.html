@@ -275,6 +275,56 @@
             background: #4b5563;
         }
 
+        /* Collapsible Sidebar Styles */
+        .sidebar-section.collapsible .sidebar-title {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-section.collapsible .sidebar-title:hover {
+            background: rgba(220, 38, 38, 0.2);
+        }
+
+        .sidebar-section .toggle-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-section.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            max-height: 500px;
+        }
+
+        .sidebar-content.collapsed {
+            max-height: 0;
+        }
+
+        .sidebar-subsection {
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        .sidebar-subtitle {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin: 0.5rem 0;
+            padding-left: 0.5rem;
+        }
+
         /* Import Panel */
         .import-panel {
             background: #111827;
@@ -406,8 +456,8 @@
     <div class="admin-container">
         <!-- Sidebar -->
         <div class="admin-sidebar">
+            <!-- Dashboard (Always Visible) -->
             <div class="sidebar-section">
-                <div class="sidebar-title">Overview</div>
                 <button class="sidebar-item active" onclick="showSection('overview')">
                     📊 Dashboard
                 </button>
@@ -416,69 +466,88 @@
                 </button>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Charity Management</div>
-                <button class="sidebar-item" onclick="showSection('import-charities')">
-                    📥 Import/Export Charities
-                </button>
-                <button class="sidebar-item" onclick="exportCharitiesDatabase()">
-                    📤 Export Charities Database
-                </button>
-                <button class="sidebar-item" onclick="showSection('charity-management')">
-                    🏢 Manage Charities
-                </button>
-                <button class="sidebar-item" onclick="showSection('charities')">
-                    ✅ Charity Verification
-                </button>
+            <!-- Content Management (Collapsible) -->
+            <div class="sidebar-section collapsible">
+                <div class="sidebar-title" onclick="toggleSection(this)">
+                    <span class="toggle-icon">▼</span> Content Management
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-subsection">
+                        <div class="sidebar-subtitle">Charities</div>
+                        <button class="sidebar-item" onclick="showSection('charity-management')">
+                            🏢 Manage Charities
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('import-charities')">
+                            📥 Import/Export
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('charities')">
+                            ✅ Verification
+                        </button>
+                    </div>
+                    <div class="sidebar-subsection">
+                        <div class="sidebar-subtitle">Donations</div>
+                        <button class="sidebar-item" onclick="showSection('donations-management')">
+                            💰 View All
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('donations-backup')">
+                            💾 Backup/Restore
+                        </button>
+                    </div>
+                    <div class="sidebar-subsection">
+                        <div class="sidebar-subtitle">Items Database</div>
+                        <button class="sidebar-item" onclick="showSection('items')">
+                            📝 Manage Items
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('import')">
+                            📦 Import Items
+                        </button>
+                        <button class="sidebar-item" onclick="exportItemsDatabase()">
+                            📤 Export Items
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('items-history')">
+                            📊 Price History
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Donations Management</div>
-                <button class="sidebar-item" onclick="showSection('donations-management')">
-                    💰 Manage All Donations
-                </button>
-                <button class="sidebar-item" onclick="showSection('donations-backup')">
-                    💾 Backup/Restore Donations
-                </button>
+            <!-- Users & Tax Management (Collapsible) -->
+            <div class="sidebar-section collapsible">
+                <div class="sidebar-title" onclick="toggleSection(this)">
+                    <span class="toggle-icon">▼</span> Users & Tax
+                </div>
+                <div class="sidebar-content">
+                    <button class="sidebar-item" onclick="showSection('users')">
+                        👥 Manage Users
+                    </button>
+                    <button class="sidebar-item" onclick="showSection('tax-tables')">
+                        📊 Tax Tables Import
+                    </button>
+                    <button class="sidebar-item" onclick="showSection('tax-rates')">
+                        💰 Tax Rate Overview
+                    </button>
+                </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Donated Items Management</div>
-                <button class="sidebar-item" onclick="showSection('import')">
-                    📦 Import Items Database
-                </button>
-                <button class="sidebar-item" onclick="exportItemsDatabase()">
-                    📤 Export Items Database
-                </button>
-                <button class="sidebar-item" onclick="showSection('items')">
-                    📝 Manage Items
-                </button>
-                <button class="sidebar-item" onclick="showSection('items-history')">
-                    📊 Price History
-                </button>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-title">User Management</div>
-                <button class="sidebar-item" onclick="showSection('users')">
-                    👥 Manage Users
-                </button>
-            </div>
-
-            <div class="sidebar-section">
-                <div class="sidebar-title">System</div>
-                <button class="sidebar-item" onclick="showSection('database')">
-                    🗄️ Database Management
-                </button>
-                <button class="sidebar-item" onclick="showSection('backup')">
-                    💾 Backup & Restore
-                </button>
-                <button class="sidebar-item" onclick="showSection('logs')">
-                    📋 System Logs
-                </button>
-                <button class="sidebar-item" onclick="showSection('settings')">
-                    ⚙️ Settings
-                </button>
+            <!-- System (Collapsible) -->
+            <div class="sidebar-section collapsible">
+                <div class="sidebar-title" onclick="toggleSection(this)">
+                    <span class="toggle-icon">▼</span> System
+                </div>
+                <div class="sidebar-content">
+                    <button class="sidebar-item" onclick="showSection('database')">
+                        🗄️ Database
+                    </button>
+                    <button class="sidebar-item" onclick="showSection('backup')">
+                        💾 Backup & Restore
+                    </button>
+                    <button class="sidebar-item" onclick="showSection('logs')">
+                        📋 System Logs
+                    </button>
+                    <button class="sidebar-item" onclick="showSection('settings')">
+                        ⚙️ Settings
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1033,6 +1102,105 @@
                     Settings panel coming soon.
                 </div>
             </div>
+
+            <!-- Tax Tables Import Section -->
+            <div id="tax-tables" class="content-section">
+                <div class="section-header">
+                    <h2>📊 Tax Tables Import</h2>
+                    <p>Import and manage tax brackets, capital gains rates, and deduction data for 2024-2026</p>
+                </div>
+
+                <!-- Tax Table Status -->
+                <div class="stat-card" style="margin-bottom: 2rem;">
+                    <h3>Tax Table Status</h3>
+                    <div id="taxTableStatus" style="margin-top: 1rem; font-family: monospace; font-size: 0.9rem;">
+                        <p style="color: #6b7280;">Checking tax tables...</p>
+                    </div>
+                    <button onclick="checkTaxTableStatus()" class="tool-btn" style="margin-top: 1rem;">
+                        🔄 Refresh Status
+                    </button>
+                </div>
+
+                <!-- Import Section -->
+                <div class="stat-card">
+                    <h3>Import Tax Data (2024-2026)</h3>
+                    <div class="alert alert-info" style="margin: 1rem 0;">
+                        📝 <strong>Required File:</strong> all_tax_data_2024_2026.csv<br>
+                        This single file contains all tax brackets, capital gains rates, standard deductions, mileage rates, and 2026 OBBBA rules.
+                    </div>
+
+                    <div id="taxDropZone" class="drop-zone">
+                        <input type="file" id="taxCsvFile" accept=".csv" style="display: none;">
+                        <p style="font-size: 1.25rem; margin-bottom: 0.5rem;">📊</p>
+                        <p style="font-weight: 500;">Drop all_tax_data_2024_2026.csv here or click to browse</p>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">Single file contains all tax data</p>
+                    </div>
+                    <div id="taxFileInfo" style="margin-top: 1rem;"></div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button id="importTaxBtn" class="tool-btn" disabled onclick="importTaxData()">
+                            📥 Import Tax Data
+                        </button>
+                        <button class="tool-btn" style="background: #ef4444;" onclick="clearTaxTables()">
+                            🗑️ Clear All Tax Tables
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="stat-card" style="margin-top: 2rem;">
+                    <h3>What's Included</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✅ Tax brackets for all filing statuses (2024-2026)</li>
+                        <li>✅ Capital gains rates (0%, 15%, 20%)</li>
+                        <li>✅ Standard deductions by year</li>
+                        <li>✅ IRS mileage rates ($0.14/mile charitable)</li>
+                        <li>✅ 2026 OBBBA rules (0.5% AGI floor, 35% cap)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tax Rates Overview Section -->
+            <div id="tax-rates" class="content-section">
+                <div class="section-header">
+                    <h2>💰 Tax Rate Overview</h2>
+                    <p>View current tax brackets and rates by year</p>
+                </div>
+
+                <!-- Year Selector -->
+                <div style="margin-bottom: 2rem;">
+                    <label for="taxYearSelect" style="font-weight: 600; color: #e5e7eb;">Select Year:</label>
+                    <select id="taxYearSelect" onchange="loadTaxRatesForYear()" style="margin-left: 1rem; padding: 0.5rem; background: #1f2937; color: white; border: 1px solid #374151; border-radius: 4px;">
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+
+                    <label for="filingStatusSelect" style="margin-left: 2rem; font-weight: 600; color: #e5e7eb;">Filing Status:</label>
+                    <select id="filingStatusSelect" onchange="loadTaxRatesForYear()" style="margin-left: 1rem; padding: 0.5rem; background: #1f2937; color: white; border: 1px solid #374151; border-radius: 4px;">
+                        <option value="single">Single</option>
+                        <option value="married_jointly">Married Filing Jointly</option>
+                        <option value="married_separately">Married Filing Separately</option>
+                        <option value="head_of_household">Head of Household</option>
+                    </select>
+                </div>
+
+                <!-- Tax Brackets Display -->
+                <div class="stat-card">
+                    <h3>Tax Brackets</h3>
+                    <div id="taxBracketsDisplay" style="margin-top: 1rem;">
+                        <p style="color: #6b7280;">Select year and filing status to view tax brackets</p>
+                    </div>
+                </div>
+
+                <!-- Special Rules Display -->
+                <div class="stat-card" style="margin-top: 2rem;">
+                    <h3>Special Rules & Deductions</h3>
+                    <div id="specialRulesDisplay" style="margin-top: 1rem;">
+                        <p style="color: #6b7280;">Loading special rules...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1312,6 +1480,23 @@
             } catch (error) {
                 console.error('Export error:', error);
                 alert('❌ Failed to export charities database: ' + error.message);
+            }
+        }
+
+        // Toggle collapsible sections
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const content = section.querySelector('.sidebar-content');
+            const icon = element.querySelector('.toggle-icon');
+
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                section.classList.remove('collapsed');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('collapsed');
+                section.classList.add('collapsed');
+                icon.style.transform = 'rotate(-90deg)';
             }
         }
 
