@@ -242,19 +242,12 @@ export async function onRequestPut(context) {
 
             const itemStmt = env.DB.prepare(`
                 INSERT INTO donation_items (
-                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    donation_id, item_name, category, condition, quantity, unit_value, total_value
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
             `);
 
             for (const item of data.items) {
-                // Generate UUID using Web Crypto API available in Workers
-                const itemId = crypto.randomUUID ? crypto.randomUUID() :
-                    ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                    );
-
                 await itemStmt.bind(
-                    itemId,
                     donationId,
                     item.item_name || item.name,
                     item.category,
