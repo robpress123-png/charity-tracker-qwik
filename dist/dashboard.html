@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.8.1</title>
+    <title>Dashboard - Charity Tracker v2.8.2</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -735,13 +735,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.8.1</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.8.2</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.8.1</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.8.2</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1090,9 +1090,12 @@
                             Currently editing: <strong id="currentEditYear">2024</strong> tax settings
                         </div>
                     </div>
-                    <button class="btn-primary" onclick="saveProfile()">
-                        Save Profile
-                    </button>
+                    <!-- Update Profile Button - moved up and centered -->
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <button class="btn-primary" onclick="saveProfile()" style="padding: 0.75rem 2rem;">
+                            💾 Update Profile
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3275,12 +3278,16 @@
             const year = document.getElementById('globalYearFilter')?.value || new Date().getFullYear().toString();
 
             // Update labels with selected year
+            // Update labels with tax bracket percentage
+            const percentage = Math.round((currentTaxRate || 0) * 100);
             if (year === 'all') {
                 document.getElementById('totalDonationsLabel').textContent = 'Total Donations (All Years)';
-                document.getElementById('taxSavingsLabel').textContent = 'Est. Tax Savings (All Years)';
+                document.getElementById('taxSavingsLabel').textContent =
+                    percentage > 0 ? `Est. Tax Savings (${percentage}%)` : 'Est. Tax Savings (Not Set)';
             } else {
                 document.getElementById('totalDonationsLabel').textContent = `Total Donations (${year})`;
-                document.getElementById('taxSavingsLabel').textContent = `Est. Tax Savings (${year})`;
+                document.getElementById('taxSavingsLabel').textContent =
+                    percentage > 0 ? `Est. Tax Savings (${percentage}%)` : 'Est. Tax Savings (Not Set)';
             }
 
             try {
@@ -3308,17 +3315,18 @@
                     // Count unique charities
                     const uniqueCharities = new Set(data.donations.map(d => d.charity_id)).size;
 
-                    // Calculate tax savings based on current tax rate
-                    // Check if user has set tax information
-                    const taxBracketSelect = document.getElementById('taxBracket');
-                    const hasValidTaxSettings = taxBracketSelect && taxBracketSelect.value && parseFloat(taxBracketSelect.value) > 0;
+                    // Calculate tax savings based on year-specific tax rate
+                    let taxRate = 0;
+                    let hasValidTaxSettings = false;
 
-                    if (!hasValidTaxSettings) {
-                        // No tax settings - use 0% and show prompt
-                        currentTaxRate = 0;
-                    }
+                    // Get tax rate for the selected year (or current year if "all")
+                    const taxYear = year === 'all' ? new Date().getFullYear().toString() : year;
+                    taxRate = await getTaxRateForYear(taxYear);
+                    hasValidTaxSettings = taxRate > 0;
 
-                    const taxRate = currentTaxRate || 0;
+                    // Update currentTaxRate for display purposes
+                    currentTaxRate = taxRate;
+
                     const estimatedSavings = totalAmount * taxRate;
 
                     // Update display with proper formatting
@@ -3644,7 +3652,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.8.1</p>
+                            <p>Generated by Charity Tracker v2.8.2</p>
                         </div>
                     </body>
                     </html>
@@ -3730,6 +3738,7 @@
         let currentTaxRate = 0.22; // Default 22%
         let currentTaxBrackets = [];
         let currentStandardDeduction = 14600;
+        let taxRatesByYear = {}; // Store tax rates for each year
 
         // Load tax brackets from database
         async function loadTaxBrackets() {
@@ -3863,7 +3872,8 @@
                 const years = ['2024', '2025', '2026'];
 
                 for (const year of years) {
-                    const response = await fetch(`/api/tax/rates?year=${year}&filing_status=single&user_id=${userId}`, {
+                    // Don't hardcode filing status - let API return user's saved settings
+                    const response = await fetch(`/api/tax/rates?year=${year}&user_id=${userId}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
 
@@ -3956,6 +3966,44 @@
         // Legacy function for compatibility
         function updateTaxRate() {
             loadTaxBrackets();
+        }
+
+        // Get tax rate for a specific year
+        async function getTaxRateForYear(year) {
+            // Check if we have it cached
+            if (taxRatesByYear[year] !== undefined) {
+                return taxRatesByYear[year];
+            }
+
+            // Load it from database
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || localStorage.getItem('token') || 'test-token';
+            const userId = user.id || user.userId;
+
+            if (!userId) {
+                taxRatesByYear[year] = 0;
+                return 0;
+            }
+
+            try {
+                const response = await fetch(`/api/tax/rates?year=${year}&user_id=${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.tax_bracket) {
+                        taxRatesByYear[year] = data.tax_bracket;
+                        return data.tax_bracket;
+                    }
+                }
+            } catch (error) {
+                console.error(`Error loading tax rate for year ${year}:`, error);
+            }
+
+            // Default to 0 if not found
+            taxRatesByYear[year] = 0;
+            return 0;
         }
 
         // Save profile information
@@ -7163,6 +7211,16 @@
 
             container.innerHTML = html;
             if (totalElement) totalElement.textContent = total.toFixed(2);
+
+            // Update tax savings display
+            const taxRateElem = document.getElementById('editItemTaxRate');
+            const taxSavingsElem = document.getElementById('editItemTaxSavings');
+            if (taxRateElem && taxSavingsElem) {
+                const percentage = Math.round((currentTaxRate || 0) * 100);
+                taxRateElem.textContent = percentage;
+                const savings = total * (currentTaxRate || 0);
+                taxSavingsElem.textContent = savings.toFixed(2);
+            }
         }
 
         async function updateEditItem(index, field, value) {
