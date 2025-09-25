@@ -127,6 +127,11 @@ export async function onRequestPut(context) {
     const { params, env, request } = context;
     const donationId = params.id;
 
+    // Define these outside try block for error handler
+    let donationType = null;
+    let isPersonalCharity = false;
+    let data = {};
+
     try {
         // Verify authentication
         const token = request.headers.get('Authorization');
@@ -140,7 +145,7 @@ export async function onRequestPut(context) {
         }
 
         // Parse request body
-        const data = await request.json();
+        data = await request.json();
 
         // First, verify the donation exists and belongs to the user
         const existing = await env.DB.prepare(
@@ -157,13 +162,13 @@ export async function onRequestPut(context) {
         // Prepare the update data
         const amount = data.amount || 0;
         const date = data.donation_date || data.date || new Date().toISOString().split('T')[0];
-        const donationType = data.donation_type || 'cash';
+        donationType = data.donation_type || 'cash';
 
         // Notes field should ONLY contain user-entered text, never structured data
         const notesText = data.notes || '';
 
         // Determine if this is a personal or system charity
-        const isPersonalCharity = data.charity_source === 'personal' ||
+        isPersonalCharity = data.charity_source === 'personal' ||
                                  (data.user_charity_id && !data.charity_id);
 
         // Debug logging
