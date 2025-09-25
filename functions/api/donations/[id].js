@@ -237,39 +237,51 @@ export async function onRequestPut(context) {
             try {
                 // First, delete existing items for this donation
                 console.log('Deleting existing items for donation:', donationId);
-                await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
+                const deleteResult = await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
                     .bind(donationId)
                     .run();
+                console.log('Delete result:', deleteResult);
 
                 console.log('Inserting new items:', data.items.length);
 
                 // Insert new items one by one for better error tracking
                 for (let i = 0; i < data.items.length; i++) {
                     const item = data.items[i];
-                    console.log(`Inserting item ${i + 1}:`, item);
+                    console.log(`Inserting item ${i + 1}:`, JSON.stringify(item));
 
                     try {
-                        await env.DB.prepare(`
-                            INSERT INTO donation_items (
-                                donation_id, item_name, category, condition, quantity, unit_value, total_value
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        // Simplify to bare minimum INSERT
+                        const insertResult = await env.DB.prepare(`
+                            INSERT INTO donation_items (donation_id, item_name, category, condition, quantity, unit_value, total_value)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
                         `).bind(
                             donationId,
-                            item.item_name || item.name,
-                            item.category,
-                            item.condition,
-                            item.quantity || 1,
-                            item.unit_value || item.value || 0,
-                            item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+                            item.item_name || item.name || 'Unknown Item',
+                            item.category || 'General',
+                            item.condition || 'good',
+                            parseInt(item.quantity) || 1,
+                            parseFloat(item.unit_value) || parseFloat(item.value) || 0,
+                            parseFloat(item.total_value) || 0
                         ).run();
+                        console.log(`Item ${i + 1} insert result:`, insertResult);
                     } catch (itemError) {
                         console.error(`Failed to insert item ${i + 1}:`, itemError);
-                        throw itemError;
+                        console.error('Item data was:', JSON.stringify(item));
+                        // Return error response instead of throwing
+                        return Response.json({
+                            success: false,
+                            error: `Failed to insert item: ${itemError.message}`,
+                            item: item
+                        }, { status: 500 });
                     }
                 }
             } catch (itemsError) {
                 console.error('Error updating donation items:', itemsError);
-                throw itemsError;
+                // Return error response instead of throwing
+                return Response.json({
+                    success: false,
+                    error: `Failed to update items: ${itemsError.message}`
+                }, { status: 500 });
             }
         }
 
