@@ -159,41 +159,8 @@ export async function onRequestPut(context) {
         const date = data.donation_date || data.date || new Date().toISOString().split('T')[0];
         const donationType = data.donation_type || 'cash';
 
-        // Build notes field with type-specific data
-        let notes = {};
-        if (data.notes) {
-            notes.userNotes = data.notes;
-        }
-
-        // Add type-specific fields to notes
-        switch(donationType) {
-            case 'miles':
-                notes.miles_driven = data.miles_driven;
-                notes.mileage_rate = data.mileage_rate;
-                notes.mileage_purpose = data.mileage_purpose;
-                break;
-            case 'stock':
-                notes.stock_name = data.stock_name;
-                notes.stock_symbol = data.stock_symbol;
-                notes.shares_donated = data.shares_donated;
-                notes.price_per_share = data.fair_market_value;
-                notes.cost_basis = data.cost_basis;
-                break;
-            case 'crypto':
-                notes.crypto_name = data.crypto_name;
-                notes.crypto_symbol = data.crypto_symbol;
-                notes.crypto_quantity = data.crypto_quantity;
-                notes.crypto_price_per_unit = data.crypto_price_per_unit;
-                notes.crypto_datetime = data.crypto_datetime;
-                break;
-            case 'items':
-                // For items, we'll handle the items array separately
-                // Just store the plain text notes
-                break;
-        }
-
-        // Convert notes to JSON string
-        const notesJson = Object.keys(notes).length > 0 ? JSON.stringify(notes) : data.notes || '';
+        // Notes field should ONLY contain user-entered text, never structured data
+        const notesText = data.notes || '';
 
         // Determine if this is a personal or system charity
         const isPersonalCharity = data.charity_source === 'personal' ||
@@ -241,7 +208,7 @@ export async function onRequestPut(context) {
             amount,
             date,
             donationType,
-            notesJson,
+            notesText,
             data.receipt_url || null,
             donationType === 'miles' ? data.miles_driven : null,
             donationType === 'miles' ? data.mileage_rate : null,
