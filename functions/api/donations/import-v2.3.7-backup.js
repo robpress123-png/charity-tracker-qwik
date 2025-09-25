@@ -67,7 +67,7 @@ export async function onRequestPost(context) {
         }
 
         const body = await request.json();
-        const { donations, charityMappings, skipValues } = body;
+        const { donations, charityMappings } = body;
 
         if (!donations || !Array.isArray(donations)) {
             return new Response(JSON.stringify({
@@ -121,22 +121,19 @@ export async function onRequestPost(context) {
 
             allCharities = charityQuery;
 
-            // Only load items if we're not skipping value calculations
-            if (!skipValues) {
-                // Load ALL items at once for value lookups
-                const itemsQuery = await env.DB.prepare(`
-                    SELECT name, category, low_value, high_value FROM items
-                `).all();
+            // Load ALL items at once for value lookups
+            const itemsQuery = await env.DB.prepare(`
+                SELECT name, category, low_value, high_value FROM items
+            `).all();
 
-                // Create fast lookup map: "name|category" -> values
-                itemsQuery.results.forEach(item => {
-                    const key = `${item.name}|${item.category}`;
-                    itemsLookup.set(key, {
-                        low: parseFloat(item.low_value) || 0,
-                        high: parseFloat(item.high_value) || 0
-                    });
+            // Create fast lookup map: "name|category" -> values
+            itemsQuery.results.forEach(item => {
+                const key = `${item.name}|${item.category}`;
+                itemsLookup.set(key, {
+                    low: parseFloat(item.low_value) || 0,
+                    high: parseFloat(item.high_value) || 0
                 });
-            }
+            });
 
         } catch (loadError) {
             console.error('[ERROR] Failed to load data:', loadError);
@@ -425,8 +422,8 @@ export async function onRequestPost(context) {
                             let value = parseFloat(donation[`item_${i}_value`]) || 0;
                             let unitValue = value / quantity;
 
-                            // If not skipping values and no value provided, look it up from the items map
-                            if (!skipValues && (!value || value === 0)) {
+                            // If no value provided, look it up from the items map
+                            if (!value || value === 0) {
                                 const lookupKey = `${itemName}|${category}`;
                                 const itemValues = itemsLookup.get(lookupKey);
 
@@ -444,10 +441,6 @@ export async function onRequestPost(context) {
 
                                     value = unitValue * quantity;
                                 }
-                            } else if (skipValues) {
-                                // When skipping values, set to 0 (will be calculated later)
-                                unitValue = 0;
-                                value = 0;
                             }
 
                             // Removed debug logging to speed up import
