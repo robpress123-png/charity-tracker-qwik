@@ -1,23 +1,25 @@
-# Charity Tracker Qwik - Continuation Prompt v2.9.0
+# Charity Tracker Qwik - Continuation Prompt v2.9.1
 
-## 🎉 Version 2.9.0 - Complete Edit Item Form & Tax System Fixes
+## 🎉 Version 2.9.1 - Simplified Edit Item Form with Inline Dropdowns
 
-### Latest Updates (v2.9.0)
-- ✅ **Edit Item Form Complete Overhaul**:
-  - Added full category and item selection modal (like main form)
-  - No more default "Miscellaneous" items
-  - Users can search and select from database items
-  - Proper value calculation based on condition
-  - Tax savings uses correct year's rate
-  - Scrolling container fixed (300px height)
-  - Delete button inline with total value field
+### Latest Updates (v2.9.1)
+- ✅ **Edit Item Form Simplified** (Reverted v2.9.0 approach):
+  - Replaced modal popups with inline dropdowns (matches Add form)
+  - Category dropdown in each new item row
+  - Item search/dropdown appears after category selection
+  - All selection happens inline - no modals
+  - Added live receipt preview on right side
+  - Receipt updates automatically as items change
+  - Uses actual database categories and items via API
+  - Highlighted new item rows in blue until completed
+
+### Previous Updates (v2.9.0)
 - ✅ **Tax System Fully Year-Aware**:
   - Fixed viewSummary() to use year-specific rates
   - All tax calculations now properly use donation year's rate
   - Comprehensive audit completed - no remaining issues found
 - ✅ **UI Improvements**:
   - Changed all "Std. Deduction" to "Standard Deduction"
-  - Added proper modals for item selection in edit form
 
 ### Previous Updates (v2.8.7)
 - ✅ **Tax System Completely Fixed**:
@@ -201,6 +203,12 @@ npm run bump:major  # 2.6.0 → 3.0.0
 
 ### Known Issues
 
+#### Item Donations - "Other" Category Missing:
+- **Problem**: "Other" category not appearing in dropdown for custom items
+- **Impact**: Users cannot add custom items not in the database
+- **Note**: Logic exists for handling "Other" items, just missing from dropdown
+- **Priority**: Medium - workaround exists but limits functionality
+
 #### Edit Item Donation Form:
 1. ✅ ~~**Missing tax savings display**~~ - Fixed, now year-aware (v2.8.8)
 2. ✅ ~~**Scrolling problem**~~ - Fixed with 300px height (v2.8.8)
@@ -224,36 +232,43 @@ npm run bump:major  # 2.6.0 → 3.0.0
 
 ## Next Priority Tasks
 
-### 1. Simplify Edit Item Form to Match Add Form (HIGH PRIORITY - UX CONSISTENCY)
-- **Problem**: Current implementation (v2.9.0) is too fancy with modal popups
-- **Solution**: Match the simpler inline approach from add item donation form:
-  - Category dropdown in each item row (not modal)
-  - Selecting category populates item dropdown in same row
-  - Select item, then condition - all inline
-  - No modal popups needed
-- **Enhancement**: Add receipt preview on right side that updates with changes
-- **Benefits**:
-  - Consistent UX between add and edit forms
-  - Simpler, more intuitive workflow
-  - Live receipt preview during editing
-- **Note**: Revert the v2.9.0 modal approach, use inline dropdowns instead
+### ✅ ~~1. Simplify Edit Item Form~~ (COMPLETED v2.9.1)
+- Successfully replaced modal approach with inline dropdowns
+- Matches Add form UX for consistency
+- Added live receipt preview on right side
+- All database-driven (categories and items from API)
 
-### 2. Secure Admin Access (SECURITY PRIORITY)
+### 1. Fix Edit Item Form Issues (IMMEDIATE)
+- **Unit FMV label** - Change to just "FMV" to fix alignment
+- **Dropdown positioning** - Item dropdown needs proper positioning like My Donations action menu
+- **Form width** - Increase to give more room for item dropdown
+- **JavaScript error** - Fix syntax error when selecting items (quote escaping issue)
+- **Personal charities** - Ensure proper handling like in Add form
+
+### 2. Add "Other" Category for Item Donations (MEDIUM PRIORITY)
+- **Problem**: "Other" category missing from dropdown
+- **Solution**: Add "Other" option to category dropdown
+- **Note**: Backend logic already exists, just needs UI addition
+
+### 3. Secure Admin Access (SECURITY PRIORITY)
 - ⏳ Add 'role' field to users table (admin/user)
 - ⏳ Replace hardcoded admin credentials with database authentication
 - ⏳ Verify admin endpoints check role properly
 - ⏳ Remove hardcoded admin/admin123 from admin-login.html
 - **CRITICAL**: Currently using hardcoded credentials - security risk!
 
-### 2. Edit Item Form Status (NEEDS REVISION)
+### 2. Edit Item Form Status (COMPLETED v2.9.1)
 - ✅ Tax savings calculation display (v2.8.8)
 - ✅ Scrolling with fixed height container (v2.8.8)
 - ✅ Improved layout with inline delete button (v2.8.8)
-- ⚠️ Category/item selection system (v2.9.0) - **Too complex, needs simplification**
-  - Current: Modal-based selection (too fancy)
-  - Needed: Inline dropdowns like add form
-  - Should match the simpler UX of add item donation
-- ⏳ **Still needed**: Receipt preview on right side
+- ✅ Category/item selection system simplified (v2.9.1)
+  - Inline dropdowns matching Add form UX
+  - No more modal popups
+  - Database-driven categories and items
+- ✅ Receipt preview on right side (v2.9.1)
+  - Live updates as items change
+  - Shows item details and totals
+  - Includes tax savings calculation
 
 ### 3. Complete Tax Integration (MOSTLY DONE)
 - ✅ API endpoints created (/api/tax/rates GET and POST)
@@ -361,15 +376,16 @@ npx wrangler pages dev --local --port 8788
 - v2.8.6: Fixed filing status display from database
 - v2.8.7: Complete tax system fixes and year-awareness
 - v2.8.8: Edit item form improvements (scrolling, layout, tax calculations)
-- v2.9.0: Full category/item selection for edit form, complete tax audit
+- v2.9.0: Full category/item selection for edit form (modal approach), complete tax audit
+- v2.9.1: Simplified edit form with inline dropdowns, added receipt preview
 
 ## File Structure
 ```
 charity-tracker-qwik/
 ├── dist/
-│   ├── dashboard.html          # v2.9.0 - Main user dashboard with complete edit forms
-│   ├── admin-dashboard.html    # v2.9.0 - Admin console with all features
-│   └── admin.html             # v2.9.0 - Legacy admin page
+│   ├── dashboard.html          # v2.9.1 - Main dashboard with simplified edit forms
+│   ├── admin-dashboard.html    # v2.9.1 - Admin console with all features
+│   └── admin.html             # v2.9.1 - Legacy admin page
 ├── functions/api/             # Cloudflare Pages Functions
 │   ├── donations/
 │   │   └── import.js         # CSV import with value calculation
