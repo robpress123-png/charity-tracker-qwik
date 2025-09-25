@@ -63,13 +63,25 @@ export async function onRequestGet(context) {
         }
 
         // Get user data including tax settings
-        const userData = await env.DB.prepare(`
-            SELECT id, email, name, plan, created_at, updated_at,
-                   address, city, state, zip_code,
-                   tax_bracket, filing_status, income_range
-            FROM users
-            WHERE id = ?
-        `).bind(user.id).first();
+        // Use safe column selection to handle missing columns
+        let userData;
+        try {
+            userData = await env.DB.prepare(`
+                SELECT id, email, name, plan, created_at, updated_at,
+                       address, city, state, zip_code,
+                       tax_bracket, filing_status, income_range
+                FROM users
+                WHERE id = ?
+            `).bind(user.id).first();
+        } catch (error) {
+            // If columns don't exist, try basic query
+            console.log('Tax columns may not exist, falling back to basic query');
+            userData = await env.DB.prepare(`
+                SELECT id, email, name, plan, created_at, updated_at
+                FROM users
+                WHERE id = ?
+            `).bind(user.id).first();
+        }
 
         if (!userData) {
             return new Response(JSON.stringify({
