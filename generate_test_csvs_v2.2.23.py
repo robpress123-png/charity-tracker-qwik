@@ -87,6 +87,15 @@ USER_PROFILES = {
         'miles_rate': 0.12,
         'stock_rate': 0.06,
         'crypto_rate': 0.02
+    },
+    'user5': {
+        'name': 'International Aid & Disaster Relief Donor',
+        'focus_categories': ['International', 'Human Services', 'Public Benefit'],
+        'avg_donation': 400,
+        'item_donation_rate': 0.10,
+        'miles_rate': 0.08,
+        'stock_rate': 0.15,
+        'crypto_rate': 0.05
     }
 }
 
