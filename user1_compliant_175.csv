@@ -1,0 +1,150 @@
+charity_name,donation_date,donation_type,amount,notes
+AMERICAN NATIONAL RED CROSS,2024-01-15,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2024-01-20,items,180.00,"ITEMS:[Coat - Winter|Clothing|excellent|2|120.00][Jeans|Clothing|good|3|60.00]"
+GOODWILL INDUSTRIES INTERNATIONAL,2024-01-28,items,95.00,"ITEMS:[Dress Shirt|Clothing|very_good|4|80.00][Belt - Leather|Clothing|good|1|15.00]"
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-02-01,cash,500.00,Annual donation
+Local Food Bank,2024-02-05,miles,28.50,"50 miles at $0.57/mile - Food bank delivery"
+DOCTORS WITHOUT BORDERS USA,2024-02-12,cash,150.00,Emergency response donation
+HABITAT FOR HUMANITY INTERNATIONAL,2024-02-18,items,340.00,"ITEMS:[Television - 32 inch|Electronics|excellent|1|200.00][Laptop|Electronics|good|1|140.00]"
+AMERICAN NATIONAL RED CROSS,2024-02-25,cash,250.00,Monthly recurring donation
+GOODWILL INDUSTRIES INTERNATIONAL,2024-03-03,items,125.00,"ITEMS:[Handbag|Clothing|excellent|2|80.00][Boots|Clothing|very_good|1|45.00]"
+SALVATION ARMY,2024-03-10,cash,100.00,Spring donation drive
+Community Church,2024-03-15,items,220.00,"ITEMS:[Microwave|Household Items|excellent|1|120.00][Coffee Maker|Household Items|very_good|1|75.00][Vacuum Cleaner|Household Items|good|1|25.00]"
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-03-20,stock,1250.00,Apple Inc. - 15 shares at $83.33/share
+AMERICAN NATIONAL RED CROSS,2024-03-25,cash,250.00,Monthly recurring donation
+Local Animal Shelter,2024-04-02,miles,34.20,"60 miles at $0.57/mile - Medical appointment transport"
+DOCTORS WITHOUT BORDERS USA,2024-04-08,items,185.00,"ITEMS:[Textbook - Science|Books & Media|excellent|3|120.00][Novel - Fiction|Books & Media|good|5|40.00][Cookbook|Books & Media|very_good|1|25.00]"
+HABITAT FOR HUMANITY INTERNATIONAL,2024-04-15,cash,300.00,Home building fund
+GOODWILL INDUSTRIES INTERNATIONAL,2024-04-22,items,160.00,"ITEMS:[Desk|Furniture|excellent|1|120.00][Office Chair|Furniture|good|1|40.00]"
+AMERICAN NATIONAL RED CROSS,2024-04-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2024-05-05,items,95.00,"ITEMS:[Jacket - Kids|Clothing|very_good|2|60.00][T-Shirt - Kids|Clothing|good|3|21.00][Shoes - Kids|Clothing|good|2|14.00]"
+Local Youth Center,2024-05-12,crypto,850.00,Bitcoin - 0.0125 BTC at $68000/BTC
+DOCTORS WITHOUT BORDERS USA,2024-05-18,cash,200.00,Monthly pledge
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-05-22,items,275.00,"ITEMS:[Bicycle|Sports Equipment|excellent|1|200.00][Basketball|Sports Equipment|very_good|2|50.00][Tennis Racket|Sports Equipment|good|1|25.00]"
+AMERICAN NATIONAL RED CROSS,2024-05-25,cash,250.00,Monthly recurring donation
+GOODWILL INDUSTRIES INTERNATIONAL,2024-06-01,items,140.00,"ITEMS:[Game Console|Electronics|good|1|140.00]"
+Community Food Pantry,2024-06-08,miles,22.80,"40 miles at $0.57/mile - Food delivery"
+HABITAT FOR HUMANITY INTERNATIONAL,2024-06-15,cash,400.00,Build-A-Thon contribution
+SALVATION ARMY,2024-06-20,items,110.00,"ITEMS:[Dresser|Furniture|very_good|1|75.00][Lamp - Table|Household Items|good|2|35.00]"
+AMERICAN NATIONAL RED CROSS,2024-06-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-07-03,stock,980.00,Microsoft Corp - 12 shares at $81.67/share
+DOCTORS WITHOUT BORDERS USA,2024-07-10,cash,175.00,Emergency relief fund
+Local Library Foundation,2024-07-15,items,85.00,"ITEMS:[Bookshelf|Furniture|good|1|60.00][Coffee Table|Furniture|fair|1|0.00][Toys - Building Blocks|Toys & Games|very_good|1|25.00]"
+GOODWILL INDUSTRIES INTERNATIONAL,2024-07-22,items,195.00,"ITEMS:[Smartphone|Electronics|excellent|1|150.00][Tablet|Electronics|very_good|1|45.00]"
+AMERICAN NATIONAL RED CROSS,2024-07-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2024-08-05,miles,45.60,"80 miles at $0.57/mile - Medical appointment transport"
+HABITAT FOR HUMANITY INTERNATIONAL,2024-08-12,items,225.00,"ITEMS:[Golf Clubs|Sports Equipment|excellent|1|180.00][Sport Coat|Clothing|very_good|1|45.00]"
+Community Senior Center,2024-08-18,cash,150.00,Senior services support
+DOCTORS WITHOUT BORDERS USA,2024-08-22,crypto,1200.00,Ethereum - 0.75 ETH at $1600/ETH
+AMERICAN NATIONAL RED CROSS,2024-08-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-09-02,cash,750.00,Childhood Cancer Awareness Month
+GOODWILL INDUSTRIES INTERNATIONAL,2024-09-08,items,165.00,"ITEMS:[Dress - Formal|Clothing|excellent|2|120.00][Blouse|Clothing|good|3|45.00]"
+Local Homeless Shelter,2024-09-15,items,90.00,"ITEMS:[Sneakers|Clothing|very_good|3|75.00][Coat - Winter|Clothing|fair|1|0.00][Coat - Winter|Clothing|good|1|15.00]"
+SALVATION ARMY,2024-09-22,cash,125.00,Back-to-school drive
+AMERICAN NATIONAL RED CROSS,2024-09-25,cash,250.00,Monthly recurring donation
+HABITAT FOR HUMANITY INTERNATIONAL,2024-10-05,stock,1575.00,Google Inc. - 18 shares at $87.50/share
+DOCTORS WITHOUT BORDERS USA,2024-10-12,miles,31.35,"55 miles at $0.57/mile - Food bank delivery"
+Community Arts Center,2024-10-18,cash,200.00,Fall fundraising gala
+GOODWILL INDUSTRIES INTERNATIONAL,2024-10-22,items,145.00,"ITEMS:[Musical Instruments|Musical Instruments|good|1|120.00][Other|Other|very_good|1|25.00]"
+AMERICAN NATIONAL RED CROSS,2024-10-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-11-03,cash,300.00,Thanksgiving gratitude donation
+SALVATION ARMY,2024-11-10,items,210.00,"ITEMS:[Tools & Equipment|Tools & Equipment|excellent|1|150.00][Kitchen Items|Kitchen Items|very_good|2|60.00]"
+Local Veterans Association,2024-11-15,cash,175.00,Veterans Day tribute
+DOCTORS WITHOUT BORDERS USA,2024-11-20,crypto,750.00,Cardano - 1500 ADA at $0.50/ADA
+AMERICAN NATIONAL RED CROSS,2024-11-25,cash,250.00,Monthly recurring donation
+HABITAT FOR HUMANITY INTERNATIONAL,2024-12-08,items,280.00,"ITEMS:[Jewelry|Jewelry|excellent|2|200.00][Handbag|Clothing|good|2|80.00]"
+GOODWILL INDUSTRIES INTERNATIONAL,2024-12-15,cash,500.00,Year-end tax donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2024-12-20,miles,39.90,"70 miles at $0.57/mile - Medical appointment transport"
+AMERICAN NATIONAL RED CROSS,2024-12-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2025-01-05,cash,300.00,New Year donation
+DOCTORS WITHOUT BORDERS USA,2025-01-12,items,195.00,"ITEMS:[Coat - Winter|Clothing|excellent|2|140.00][Dress Shirt|Clothing|very_good|3|55.00]"
+GOODWILL INDUSTRIES INTERNATIONAL,2025-01-18,stock,1320.00,Tesla Inc. - 16 shares at $82.50/share
+Community Health Clinic,2025-01-22,cash,150.00,Healthcare access fund
+AMERICAN NATIONAL RED CROSS,2025-01-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-01-30,items,235.00,"ITEMS:[Television - 32 inch|Electronics|excellent|1|200.00][Game Console|Electronics|fair|1|0.00][Smartphone|Electronics|very_good|1|35.00]"
+HABITAT FOR HUMANITY INTERNATIONAL,2025-02-08,cash,400.00,Winter building fund
+SALVATION ARMY,2025-02-14,items,120.00,"ITEMS:[Jeans|Clothing|excellent|4|80.00][Belt - Leather|Clothing|good|2|40.00]"
+Local Animal Rescue,2025-02-20,miles,28.50,"50 miles at $0.57/mile - Food delivery"
+DOCTORS WITHOUT BORDERS USA,2025-02-25,cash,200.00,Monthly pledge
+AMERICAN NATIONAL RED CROSS,2025-02-25,cash,250.00,Monthly recurring donation
+GOODWILL INDUSTRIES INTERNATIONAL,2025-03-05,crypto,1080.00,Bitcoin - 0.015 BTC at $72000/BTC
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-03-12,items,175.00,"ITEMS:[Boots|Clothing|excellent|2|120.00][Sneakers|Clothing|very_good|2|55.00]"
+Community Library,2025-03-18,cash,100.00,Reading program support
+HABITAT FOR HUMANITY INTERNATIONAL,2025-03-22,items,290.00,"ITEMS:[Desk|Furniture|excellent|1|150.00][Office Chair|Furniture|excellent|1|100.00][Bookshelf|Furniture|good|1|40.00]"
+AMERICAN NATIONAL RED CROSS,2025-03-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2025-04-02,items,185.00,"ITEMS:[Microwave|Household Items|excellent|1|130.00][Coffee Maker|Household Items|very_good|1|55.00]"
+DOCTORS WITHOUT BORDERS USA,2025-04-10,miles,34.20,"60 miles at $0.57/mile - Medical appointment transport"
+Local Food Bank,2025-04-15,cash,180.00,Spring food drive
+GOODWILL INDUSTRIES INTERNATIONAL,2025-04-20,stock,1125.00,Amazon Inc. - 15 shares at $75.00/share
+AMERICAN NATIONAL RED CROSS,2025-04-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-05-05,items,245.00,"ITEMS:[Laptop|Electronics|excellent|1|180.00][Tablet|Electronics|very_good|1|65.00]"
+HABITAT FOR HUMANITY INTERNATIONAL,2025-05-12,cash,350.00,Spring building season
+Community Youth Center,2025-05-18,items,110.00,"ITEMS:[Jacket - Kids|Clothing|excellent|2|80.00][T-Shirt - Kids|Clothing|good|4|24.00][Shoes - Kids|Clothing|fair|2|0.00][Toys - Building Blocks|Toys & Games|good|1|6.00]"
+SALVATION ARMY,2025-05-22,crypto,900.00,Ethereum - 0.5 ETH at $1800/ETH
+AMERICAN NATIONAL RED CROSS,2025-05-25,cash,250.00,Monthly recurring donation
+DOCTORS WITHOUT BORDERS USA,2025-06-02,cash,225.00,Emergency response fund
+GOODWILL INDUSTRIES INTERNATIONAL,2025-06-08,items,205.00,"ITEMS:[Bicycle|Sports Equipment|excellent|1|180.00][Basketball|Sports Equipment|good|1|25.00]"
+Local Senior Center,2025-06-15,miles,39.90,"70 miles at $0.57/mile - Food delivery"
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-06-20,cash,400.00,Summer camp fund
+AMERICAN NATIONAL RED CROSS,2025-06-25,cash,250.00,Monthly recurring donation
+HABITAT FOR HUMANITY INTERNATIONAL,2025-07-05,items,320.00,"ITEMS:[Dresser|Furniture|excellent|1|180.00][Coffee Table|Furniture|excellent|1|140.00]"
+SALVATION ARMY,2025-07-12,stock,1470.00,Facebook Inc. - 21 shares at $70.00/share
+Community Arts Program,2025-07-18,cash,125.00,Summer arts support
+DOCTORS WITHOUT BORDERS USA,2025-07-22,items,155.00,"ITEMS:[Textbook - Science|Books & Media|excellent|2|100.00][Novel - Fiction|Books & Media|very_good|4|40.00][Cookbook|Books & Media|good|1|15.00]"
+AMERICAN NATIONAL RED CROSS,2025-07-25,cash,250.00,Monthly recurring donation
+GOODWILL INDUSTRIES INTERNATIONAL,2025-08-02,cash,300.00,Summer donation drive
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-08-10,miles,45.60,"80 miles at $0.57/mile - Medical appointment transport"
+Local Homeless Shelter,2025-08-15,items,135.00,"ITEMS:[Coat - Winter|Clothing|excellent|1|60.00][Sport Coat|Clothing|very_good|1|45.00][Dress - Formal|Clothing|good|1|30.00]"
+HABITAT FOR HUMANITY INTERNATIONAL,2025-08-20,crypto,1125.00,Cardano - 1875 ADA at $0.60/ADA
+AMERICAN NATIONAL RED CROSS,2025-08-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2025-09-05,items,275.00,"ITEMS:[Tennis Racket|Sports Equipment|excellent|2|150.00][Golf Clubs|Sports Equipment|excellent|1|125.00]"
+DOCTORS WITHOUT BORDERS USA,2025-09-12,cash,175.00,Back-to-school health initiative
+Community Food Pantry,2025-09-18,stock,1200.00,Netflix Inc. - 20 shares at $60.00/share
+GOODWILL INDUSTRIES INTERNATIONAL,2025-09-22,items,190.00,"ITEMS:[Game Console|Electronics|excellent|1|160.00][Smartphone|Electronics|good|1|30.00]"
+AMERICAN NATIONAL RED CROSS,2025-09-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-10-02,cash,500.00,Childhood Cancer Awareness
+HABITAT FOR HUMANITY INTERNATIONAL,2025-10-08,items,225.00,"ITEMS:[Vacuum Cleaner|Household Items|excellent|1|120.00][Lamp - Table|Household Items|excellent|3|105.00]"
+Local Veterans Group,2025-10-15,miles,31.35,"55 miles at $0.57/mile - Food bank delivery"
+SALVATION ARMY,2025-10-20,cash,200.00,Fall fundraiser
+AMERICAN NATIONAL RED CROSS,2025-10-25,cash,250.00,Monthly recurring donation
+DOCTORS WITHOUT BORDERS USA,2025-11-05,crypto,1400.00,Bitcoin - 0.018 BTC at $77777/BTC
+GOODWILL INDUSTRIES INTERNATIONAL,2025-11-12,items,165.00,"ITEMS:[Handbag|Clothing|excellent|3|135.00][Blouse|Clothing|good|2|30.00]"
+Community Church,2025-11-18,cash,300.00,Thanksgiving outreach
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-11-22,stock,1050.00,Disney Inc. - 15 shares at $70.00/share
+AMERICAN NATIONAL RED CROSS,2025-11-25,cash,250.00,Monthly recurring donation
+HABITAT FOR HUMANITY INTERNATIONAL,2025-12-02,items,340.00,"ITEMS:[Television - 32 inch|Electronics|excellent|1|220.00][Laptop|Electronics|excellent|1|120.00]"
+SALVATION ARMY,2025-12-10,cash,400.00,Holiday giving campaign
+Local Animal Shelter,2025-12-15,miles,42.75,"75 miles at $0.57/mile - Medical appointment transport"
+DOCTORS WITHOUT BORDERS USA,2025-12-20,items,210.00,"ITEMS:[Tools & Equipment|Tools & Equipment|excellent|1|160.00][Kitchen Items|Kitchen Items|very_good|2|50.00]"
+AMERICAN NATIONAL RED CROSS,2025-12-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2025-12-30,cash,750.00,Year-end donation
+GOODWILL INDUSTRIES INTERNATIONAL,2026-01-05,items,295.00,"ITEMS:[Desk|Furniture|excellent|1|180.00][Office Chair|Furniture|excellent|1|115.00]"
+SALVATION ARMY,2026-01-12,crypto,1050.00,Ethereum - 0.6 ETH at $1750/ETH
+HABITAT FOR HUMANITY INTERNATIONAL,2026-01-18,cash,350.00,New year building fund
+DOCTORS WITHOUT BORDERS USA,2026-01-22,stock,1440.00,Apple Inc. - 16 shares at $90.00/share
+AMERICAN NATIONAL RED CROSS,2026-01-25,cash,250.00,Monthly recurring donation
+Community Health Clinic,2026-02-02,items,185.00,"ITEMS:[Coat - Winter|Clothing|excellent|2|140.00][Jeans|Clothing|very_good|3|45.00]"
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2026-02-10,cash,300.00,Research funding donation
+GOODWILL INDUSTRIES INTERNATIONAL,2026-02-15,miles,36.48,"64 miles at $0.57/mile - Food delivery"
+Local Food Bank,2026-02-20,items,155.00,"ITEMS:[Microwave|Household Items|excellent|1|110.00][Coffee Maker|Household Items|good|1|45.00]"
+AMERICAN NATIONAL RED CROSS,2026-02-25,cash,250.00,Monthly recurring donation
+SALVATION ARMY,2026-03-05,items,225.00,"ITEMS:[Bicycle|Sports Equipment|excellent|1|200.00][Tennis Racket|Sports Equipment|good|1|25.00]"
+HABITAT FOR HUMANITY INTERNATIONAL,2026-03-12,cash,400.00,Spring building projects
+DOCTORS WITHOUT BORDERS USA,2026-03-18,crypto,840.00,Cardano - 1200 ADA at $0.70/ADA
+Community Arts Center,2026-03-22,items,170.00,"ITEMS:[Musical Instruments|Musical Instruments|excellent|1|150.00][Jewelry|Jewelry|good|1|20.00]"
+AMERICAN NATIONAL RED CROSS,2026-03-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2026-04-02,stock,1350.00,Microsoft Corp - 15 shares at $90.00/share
+GOODWILL INDUSTRIES INTERNATIONAL,2026-04-08,items,240.00,"ITEMS:[Television - 32 inch|Electronics|excellent|1|240.00]"
+Local Youth Program,2026-04-15,cash,175.00,Spring activities fund
+SALVATION ARMY,2026-04-20,miles,28.50,"50 miles at $0.57/mile - Medical appointment transport"
+AMERICAN NATIONAL RED CROSS,2026-04-25,cash,250.00,Monthly recurring donation
+HABITAT FOR HUMANITY INTERNATIONAL,2026-05-05,items,285.00,"ITEMS:[Dresser|Furniture|excellent|1|200.00][Bookshelf|Furniture|very_good|1|85.00]"
+DOCTORS WITHOUT BORDERS USA,2026-05-12,cash,225.00,Emergency medical aid
+Community Library,2026-05-18,items,125.00,"ITEMS:[Textbook - Science|Books & Media|excellent|2|80.00][Novel - Fiction|Books & Media|excellent|3|45.00]"
+GOODWILL INDUSTRIES INTERNATIONAL,2026-05-22,crypto,1600.00,Bitcoin - 0.02 BTC at $80000/BTC
+AMERICAN NATIONAL RED CROSS,2026-05-25,cash,250.00,Monthly recurring donation
+ST JUDE CHILDRENS RESEARCH HOSPITAL,2026-06-02,cash,400.00,Summer research support
+SALVATION ARMY,2026-06-08,items,195.00,"ITEMS:[Jacket - Kids|Clothing|excellent|3|120.00][Shoes - Kids|Clothing|excellent|3|75.00]"
+Local Senior Center,2026-06-15,stock,1200.00,Google Inc. - 12 shares at $100.00/share
+HABITAT FOR HUMANITY INTERNATIONAL,2026-06-20,miles,41.04,"72 miles at $0.57/mile - Food bank delivery"
+AMERICAN NATIONAL RED CROSS,2026-06-25,cash,250.00,Monthly recurring donation

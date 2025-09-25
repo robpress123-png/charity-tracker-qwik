@@ -1,0 +1,114 @@
+charity_name,donation_date,donation_type,amount,notes
+FEEDING AMERICA,2024-01-03,cash,250.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2024-01-10,items,320.00,"ITEMS:[Microwave|Kitchen Items|excellent|2|180.00][Coffee Maker|Kitchen Items|very_good|1|75.00][Toaster|Kitchen Items|good|2|65.00]"
+FOOD FOR THE POOR,2024-01-17,cash,200.00,International hunger relief
+LOCAL FOOD BANK,2024-01-24,miles,39.90,"70 miles at $0.57/mile - Food delivery and sorting"
+FEEDING AMERICA,2024-02-03,cash,250.00,Monthly food security support
+Youth Emergency Shelter,2024-02-08,items,275.00,"ITEMS:[Blender|Kitchen Items|excellent|1|120.00][Cookware Set|Kitchen Items|very_good|1|95.00][Kitchen Utensils|Kitchen Items|good|2|60.00]"
+MEALS ON WHEELS AMERICA,2024-02-15,cash,175.00,Senior meal program
+FOOD FOR THE POOR,2024-02-22,stock,800.00,General Mills - 16 shares at $50.00/share
+FEEDING AMERICA,2024-03-03,cash,250.00,Monthly food security support
+LOCAL FOOD BANK,2024-03-10,items,295.00,"ITEMS:[Refrigerator - Mini|Electronics|excellent|1|200.00][Food Storage Containers|Kitchen Items|very_good|10|60.00][Can Opener|Kitchen Items|good|3|35.00]"
+Community Soup Kitchen,2024-03-17,miles,42.75,"75 miles at $0.57/mile - Meal service volunteer"
+MEALS ON WHEELS AMERICA,2024-03-24,cash,150.00,Emergency meal fund
+FEEDING AMERICA,2024-04-03,cash,250.00,Monthly food security support
+FOOD FOR THE POOR,2024-04-10,items,340.00,"ITEMS:[Food Processor|Kitchen Items|excellent|1|180.00][Electric Griddle|Kitchen Items|very_good|1|90.00][Slow Cooker|Kitchen Items|good|1|70.00]"
+Local Youth Center,2024-04-17,cash,225.00,After school meal program
+LOCAL FOOD BANK,2024-04-24,crypto,300.00,Bitcoin donation for warehouse improvements
+FEEDING AMERICA,2024-05-03,cash,250.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2024-05-10,stock,900.00,Campbell Soup Company - 18 shares at $50.00/share
+Community Garden Project,2024-05-17,items,185.00,"ITEMS:[Garden Tools|Tools & Equipment|excellent|1|100.00][Seeds - Vegetable|Other|very_good|20|60.00][Watering Can|Tools & Equipment|good|2|25.00]"
+FOOD FOR THE POOR,2024-05-24,miles,56.05,"98.5 miles at $0.57/mile - Rural food distribution"
+FEEDING AMERICA,2024-06-03,cash,250.00,Monthly food security support
+Homeless Youth Alliance,2024-06-10,items,265.00,"ITEMS:[Pressure Cooker|Kitchen Items|excellent|1|140.00][Rice Cooker|Kitchen Items|very_good|1|80.00][Food Scale|Kitchen Items|good|1|45.00]"
+LOCAL FOOD BANK,2024-06-17,cash,200.00,Summer youth meal program
+MEALS ON WHEELS AMERICA,2024-06-24,cash,180.00,Senior nutrition support
+FEEDING AMERICA,2024-07-03,cash,250.00,Monthly food security support
+FOOD FOR THE POOR,2024-07-10,items,315.00,"ITEMS:[Commercial Blender|Kitchen Items|excellent|1|220.00][Food Mixer|Kitchen Items|very_good|1|70.00][Measuring Cups|Kitchen Items|good|5|25.00]"
+Community Food Pantry,2024-07-17,miles,48.45,"85 miles at $0.57/mile - Mobile pantry coordination"
+LOCAL FOOD BANK,2024-07-24,stock,750.00,Kroger Company - 15 shares at $50.00/share
+FEEDING AMERICA,2024-08-03,cash,250.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2024-08-10,items,285.00,"ITEMS:[Insulated Bags|Other|excellent|8|160.00][Thermal Containers|Kitchen Items|very_good|6|90.00][Ice Packs|Other|good|10|35.00]"
+Youth Summer Program,2024-08-17,cash,190.00,Nutrition education
+FOOD FOR THE POOR,2024-08-24,crypto,250.00,Ethereum for emergency relief
+FEEDING AMERICA,2024-09-03,cash,250.00,Monthly food security support
+LOCAL FOOD BANK,2024-09-10,items,325.00,"ITEMS:[Freezer - Chest|Electronics|excellent|1|250.00][Food Thermometer|Kitchen Items|very_good|3|45.00][Freezer Bags|Other|good|20|30.00]"
+Community Kitchen,2024-09-17,miles,62.70,"110 miles at $0.57/mile - Volunteer chef program"
+MEALS ON WHEELS AMERICA,2024-09-24,cash,165.00,Back to school meal support
+FEEDING AMERICA,2024-10-03,cash,250.00,Monthly food security support
+FOOD FOR THE POOR,2024-10-10,stock,850.00,Sysco Corporation - 17 shares at $50.00/share
+Local Homeless Shelter,2024-10-17,items,295.00,"ITEMS:[Industrial Coffee Maker|Kitchen Items|excellent|1|200.00][Large Pots|Kitchen Items|very_good|2|70.00][Serving Spoons|Kitchen Items|good|10|25.00]"
+Youth Nutrition Program,2024-10-24,cash,220.00,Halloween healthy treats
+FEEDING AMERICA,2024-11-03,cash,250.00,Monthly food security support
+LOCAL FOOD BANK,2024-11-10,items,275.00,"ITEMS:[Food Dehydrator|Kitchen Items|excellent|1|150.00][Vacuum Sealer|Kitchen Items|very_good|1|85.00][Storage Bags|Other|good|20|40.00]"
+MEALS ON WHEELS AMERICA,2024-11-17,miles,71.25,"125 miles at $0.57/mile - Thanksgiving meal delivery"
+Community Thanksgiving Drive,2024-11-24,cash,400.00,Holiday meal boxes
+FEEDING AMERICA,2024-12-03,cash,250.00,Monthly food security support
+FOOD FOR THE POOR,2024-12-10,crypto,350.00,Bitcoin for year-end campaign
+LOCAL FOOD BANK,2024-12-17,items,315.00,"ITEMS:[Hot Plate - Portable|Kitchen Items|excellent|3|180.00][Electric Kettle|Kitchen Items|very_good|2|70.00][Food Warmer|Kitchen Items|good|2|65.00]"
+Holiday Meal Program,2024-12-24,cash,500.00,Christmas food distribution
+FEEDING AMERICA,2025-01-03,cash,275.00,Monthly food security support - New Year increase
+MEALS ON WHEELS AMERICA,2025-01-10,stock,1000.00,Walmart Inc. - 20 shares at $50.00/share
+FOOD FOR THE POOR,2025-01-17,items,355.00,"ITEMS:[Commercial Microwave|Kitchen Items|excellent|1|280.00][Food Processor - Large|Kitchen Items|very_good|1|75.00]"
+LOCAL FOOD BANK,2025-01-24,miles,45.60,"80 miles at $0.57/mile - New volunteer orientation"
+FEEDING AMERICA,2025-02-03,cash,275.00,Monthly food security support
+Youth Emergency Services,2025-02-08,items,245.00,"ITEMS:[Soup Warmer|Kitchen Items|excellent|1|140.00][Bread Maker|Kitchen Items|very_good|1|80.00][Food Mills|Kitchen Items|good|2|25.00]"
+MEALS ON WHEELS AMERICA,2025-02-15,cash,195.00,Heart health meal initiative
+Community Food Recovery,2025-02-22,cash,180.00,Food waste reduction program
+FEEDING AMERICA,2025-03-03,cash,275.00,Monthly food security support
+FOOD FOR THE POOR,2025-03-10,items,285.00,"ITEMS:[Pizza Oven - Portable|Kitchen Items|excellent|1|200.00][Baking Sheets|Kitchen Items|very_good|6|60.00][Mixing Bowls|Kitchen Items|good|5|25.00]"
+LOCAL FOOD BANK,2025-03-17,miles,59.85,"105 miles at $0.57/mile - Spring food drive coordination"
+Mobile Food Pantry,2025-03-24,cash,210.00,Rural outreach expansion
+FEEDING AMERICA,2025-04-03,cash,275.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2025-04-10,crypto,400.00,Ethereum for delivery vehicle
+Youth Culinary Program,2025-04-17,items,325.00,"ITEMS:[Chef Knives|Tools & Equipment|excellent|6|180.00][Cutting Boards|Kitchen Items|very_good|8|80.00][Aprons|Clothing|good|10|65.00]"
+FOOD FOR THE POOR,2025-04-24,stock,950.00,ConAgra Foods - 19 shares at $50.00/share
+FEEDING AMERICA,2025-05-03,cash,275.00,Monthly food security support
+LOCAL FOOD BANK,2025-05-10,items,275.00,"ITEMS:[Grill - Portable|Kitchen Items|excellent|1|180.00][BBQ Tools|Tools & Equipment|very_good|1|55.00][Cooler - Large|Other|good|1|40.00]"
+Community Nutrition Center,2025-05-17,miles,52.25,"91.67 miles at $0.57/mile - Nutrition education outreach"
+MEALS ON WHEELS AMERICA,2025-05-24,cash,185.00,Memorial Day senior support
+FEEDING AMERICA,2025-06-03,cash,275.00,Monthly food security support
+FOOD FOR THE POOR,2025-06-10,items,295.00,"ITEMS:[Juicer - Commercial|Kitchen Items|excellent|1|220.00][Citrus Press|Kitchen Items|very_good|1|45.00][Juice Containers|Kitchen Items|good|6|30.00]"
+Summer Youth Nutrition,2025-06-17,cash,240.00,Healthy summer meals
+LOCAL FOOD BANK,2025-06-24,stock,800.00,Tyson Foods - 16 shares at $50.00/share
+FEEDING AMERICA,2025-07-03,cash,275.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2025-07-10,items,315.00,"ITEMS:[Ice Cream Maker|Kitchen Items|excellent|1|180.00][Smoothie Maker|Kitchen Items|very_good|2|90.00][Ice Crusher|Kitchen Items|good|1|45.00]"
+Community BBQ Program,2025-07-17,miles,68.40,"120 miles at $0.57/mile - Summer cookout coordination"
+Youth Cooking Classes,2025-07-24,cash,200.00,Culinary skills development
+FEEDING AMERICA,2025-08-03,cash,275.00,Monthly food security support
+FOOD FOR THE POOR,2025-08-10,crypto,300.00,Bitcoin for school lunch program
+LOCAL FOOD BANK,2025-08-17,items,285.00,"ITEMS:[Food Slicer|Kitchen Items|excellent|1|200.00][Mandoline Slicer|Kitchen Items|very_good|1|55.00][Cutting Gloves|Other|good|3|30.00]"
+Back to School Nutrition,2025-08-24,cash,225.00,Healthy lunch initiative
+FEEDING AMERICA,2025-09-03,cash,275.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2025-09-10,stock,900.00,Unilever - 18 shares at $50.00/share
+Community Harvest Festival,2025-09-17,items,265.00,"ITEMS:[Canning Equipment|Kitchen Items|excellent|1|150.00][Pressure Canner|Kitchen Items|very_good|1|85.00][Canning Jars|Kitchen Items|good|24|30.00]"
+FOOD FOR THE POOR,2025-09-24,miles,56.05,"98.5 miles at $0.57/mile - Harvest donation coordination"
+FEEDING AMERICA,2025-10-03,cash,275.00,Monthly food security support
+LOCAL FOOD BANK,2025-10-10,items,295.00,"ITEMS:[Candy Thermometer|Kitchen Items|excellent|2|60.00][Deep Fryer|Kitchen Items|very_good|1|120.00][Strainer Set|Kitchen Items|good|6|45.00][Oil Dispenser|Kitchen Items|excellent|2|70.00]"
+Halloween Healthy Treats,2025-10-17,cash,160.00,Alternative candy program
+MEALS ON WHEELS AMERICA,2025-10-24,cash,190.00,Halloween senior meals
+FEEDING AMERICA,2025-11-03,cash,275.00,Monthly food security support
+FOOD FOR THE POOR,2025-11-10,items,345.00,"ITEMS:[Turkey Fryer|Kitchen Items|excellent|1|250.00][Meat Thermometer|Kitchen Items|very_good|3|60.00][Roasting Pan|Kitchen Items|good|2|35.00]"
+Thanksgiving Food Drive,2025-11-17,miles,73.53,"129 miles at $0.57/mile - Multi-site coordination"
+LOCAL FOOD BANK,2025-11-24,cash,450.00,Thanksgiving meal boxes
+FEEDING AMERICA,2025-12-03,cash,275.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2025-12-10,crypto,400.00,Ethereum for holiday meal expansion
+Community Winter Shelter,2025-12-17,items,315.00,"ITEMS:[Hot Chocolate Maker|Kitchen Items|excellent|1|180.00][Soup Kettles|Kitchen Items|very_good|2|100.00][Ladles|Kitchen Items|good|6|35.00]"
+Holiday Meal Distribution,2025-12-24,stock,1100.00,Hormel Foods - 22 shares at $50.00/share
+FEEDING AMERICA,2026-01-03,cash,300.00,Monthly food security support - Major donor commitment
+MEALS ON WHEELS AMERICA,2026-01-10,cash,400.00,New Year nutrition expansion
+FOOD FOR THE POOR,2026-01-17,items,375.00,"ITEMS:[Walk-in Freezer Unit|Electronics|excellent|1|300.00][Temperature Monitor|Electronics|very_good|1|75.00]"
+LOCAL FOOD BANK,2026-01-24,miles,62.70,"110 miles at $0.57/mile - Winter outreach program"
+FEEDING AMERICA,2026-02-03,cash,300.00,Monthly food security support
+Youth Nutrition Alliance,2026-02-08,stock,1000.00,Kellogg Company - 20 shares at $50.00/share
+MEALS ON WHEELS AMERICA,2026-02-15,items,295.00,"ITEMS:[Commercial Steamer|Kitchen Items|excellent|1|220.00][Steam Baskets|Kitchen Items|very_good|6|75.00]"
+Community Food Security,2026-02-22,cash,275.00,Emergency food fund
+FEEDING AMERICA,2026-03-03,cash,300.00,Monthly food security support
+FOOD FOR THE POOR,2026-03-10,crypto,500.00,Bitcoin for global hunger relief
+LOCAL FOOD BANK,2026-03-17,items,335.00,"ITEMS:[Mobile Kitchen Unit|Kitchen Items|excellent|1|280.00][Portable Sinks|Kitchen Items|very_good|1|55.00]"
+Spring Food Festival,2026-03-24,miles,48.45,"85 miles at $0.57/mile - Community celebration"
+FEEDING AMERICA,2026-04-03,cash,300.00,Monthly food security support
+MEALS ON WHEELS AMERICA,2026-04-10,stock,950.00,Nestlé - 19 shares at $50.00/share
+Youth Garden Program,2026-04-17,items,265.00,"ITEMS:[Greenhouse Kit|Other|excellent|1|200.00][Gardening Tools - Youth|Tools & Equipment|very_good|10|65.00]"
+FOOD FOR THE POOR,2026-04-24,cash,325.00,Spring planting initiative
+FEEDING AMERICA,2026-05-01,cash,300.00,Monthly food security support - Final major commitment
