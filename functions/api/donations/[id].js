@@ -179,6 +179,7 @@ export async function onRequestPut(context) {
         });
 
         // Update the donation with proper charity field handling
+        // NOTE: cost_basis column removed - not in production DB
         const result = await env.DB.prepare(`
             UPDATE donations
             SET
@@ -195,7 +196,6 @@ export async function onRequestPut(context) {
                 stock_symbol = ?,
                 stock_quantity = ?,
                 fair_market_value = ?,
-                cost_basis = ?,
                 crypto_symbol = ?,
                 crypto_quantity = ?,
                 crypto_type = ?,
@@ -216,7 +216,6 @@ export async function onRequestPut(context) {
             donationType === 'stock' ? data.stock_symbol : null,
             donationType === 'stock' ? data.stock_quantity : null,
             donationType === 'stock' || donationType === 'crypto' ? data.fair_market_value : null,
-            donationType === 'stock' || donationType === 'crypto' ? data.cost_basis : null,
             donationType === 'crypto' ? data.crypto_symbol : null,
             donationType === 'crypto' ? data.crypto_quantity : null,
             donationType === 'crypto' ? data.crypto_type : null,
@@ -235,27 +234,42 @@ export async function onRequestPut(context) {
 
         // If this is an items donation, update the items in donation_items table
         if (donationType === 'items' && data.items && Array.isArray(data.items)) {
-            // First, delete existing items for this donation
-            await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
-                .bind(donationId)
-                .run();
+            try {
+                // First, delete existing items for this donation
+                console.log('Deleting existing items for donation:', donationId);
+                await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
+                    .bind(donationId)
+                    .run();
 
-            const itemStmt = env.DB.prepare(`
-                INSERT INTO donation_items (
-                    donation_id, item_name, category, condition, quantity, unit_value, total_value
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            `);
+                console.log('Inserting new items:', data.items.length);
 
-            for (const item of data.items) {
-                await itemStmt.bind(
-                    donationId,
-                    item.item_name || item.name,
-                    item.category,
-                    item.condition,
-                    item.quantity || 1,
-                    item.unit_value || item.value,
-                    item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
-                ).run();
+                // Insert new items one by one for better error tracking
+                for (let i = 0; i < data.items.length; i++) {
+                    const item = data.items[i];
+                    console.log(`Inserting item ${i + 1}:`, item);
+
+                    try {
+                        await env.DB.prepare(`
+                            INSERT INTO donation_items (
+                                donation_id, item_name, category, condition, quantity, unit_value, total_value
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        `).bind(
+                            donationId,
+                            item.item_name || item.name,
+                            item.category,
+                            item.condition,
+                            item.quantity || 1,
+                            item.unit_value || item.value || 0,
+                            item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
+                        ).run();
+                    } catch (itemError) {
+                        console.error(`Failed to insert item ${i + 1}:`, itemError);
+                        throw itemError;
+                    }
+                }
+            } catch (itemsError) {
+                console.error('Error updating donation items:', itemsError);
+                throw itemsError;
             }
         }
 
