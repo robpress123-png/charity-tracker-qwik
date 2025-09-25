@@ -247,14 +247,8 @@ export async function onRequestPut(context) {
             `);
 
             for (const item of data.items) {
-                // Generate UUID - use crypto.randomUUID if available, otherwise fallback
-                let itemId;
-                try {
-                    itemId = crypto.randomUUID();
-                } catch (e) {
-                    // Fallback: generate a simple unique ID
-                    itemId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-                }
+                // Generate a simple unique ID that works in Cloudflare Workers
+                const itemId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}`;
 
                 await itemStmt.bind(
                     itemId,
