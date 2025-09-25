@@ -1,8 +1,14 @@
-# Charity Tracker Qwik - Continuation Prompt v2.8.1
+# Charity Tracker Qwik - Continuation Prompt v2.8.3
 
-## 🎉 Version 2.8.1 - Tax System Fully Integrated
+## 🎉 Version 2.8.3 - Authentication Documentation Update
 
-### Latest Updates (v2.8.0-2.8.1)
+### Latest Updates (v2.8.3)
+- ✅ **Documentation Update**: Corrected authentication section
+  - Clarified test@example.com is primary test account with live data
+  - Documented separate admin authentication system
+  - Noted 'test-token' fallbacks need removal
+
+### Previous Updates (v2.8.2)
 - ✅ **3-Column Tax Display**: Shows all years (2024-2026) side-by-side
   - Each year shows: Filing Status, Tax Bracket, Standard Deduction
   - 2026 includes AGI Estimate and OBBBA Threshold (0.5% of AGI)
@@ -78,11 +84,16 @@
 - **Deployment**: GitHub webhook triggers auto-deployment
 
 ### Authentication
-- Token-based auth (localStorage)
-- Passwords are SHA-256 hashed
-- Test account: test@example.com / password123
-- Token format: `token-{userId}-{timestamp}`
-- Admin access through admin-dashboard.html
+- **Multi-user system**: Full user registration and login
+- **Password security**: SHA-256 hashed before storage
+- **Token format**: `token-{userId}-{timestamp}`
+- **Session storage**: Token stored in localStorage
+- **Primary test account**: test@example.com / password123 (live account with test data)
+- **Admin access**: Separate login at /admin-login.html
+  - Hardcoded credentials: admin/admin123 (development only)
+  - Admin dashboard requires adminToken in localStorage
+  - No database role field - admin handled separately
+- **Known issue**: Dashboard has 'test-token' fallbacks that should be removed
 
 ## Complete Database Schema
 
@@ -168,7 +179,14 @@ npm run bump:major  # 2.6.0 → 3.0.0
 
 ## Next Priority Tasks
 
-### 1. Fix Edit Item Form (HIGH PRIORITY - BE CAREFUL!)
+### 1. Secure Admin Access (SECURITY PRIORITY)
+- ⏳ Add 'role' field to users table (admin/user)
+- ⏳ Replace hardcoded admin credentials with database authentication
+- ⏳ Verify admin endpoints check role properly
+- ⏳ Remove hardcoded admin/admin123 from admin-login.html
+- **CRITICAL**: Currently using hardcoded credentials - security risk!
+
+### 2. Fix Edit Item Form (HIGH PRIORITY - BE CAREFUL!)
 - ⏳ Add tax savings calculation display
 - ⏳ Fix scrolling with fixed height container
 - ⏳ Improve layout (delete button on same row)
@@ -176,14 +194,14 @@ npm run bump:major  # 2.6.0 → 3.0.0
 - **CRITICAL**: This form was difficult to get working with both system and personal charities
 - **APPROACH**: Make incremental changes, test thoroughly, have backup ready
 
-### 2. Complete Tax Integration
+### 3. Complete Tax Integration
 - ✅ API endpoints created (/api/tax/rates GET and POST)
 - ✅ User tax settings UI in profile (bracket selection)
 - ✅ Tax calculations use database rates
 - ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor calculation)
 - ⏳ Show tax bracket on dashboard with savings
 
-### 3. Monetization Implementation
+### 4. Monetization Implementation
 - **Model**: Freemium
 - **Free**: 3 donation limit for new users
 - **Premium**: $49/year unlimited
