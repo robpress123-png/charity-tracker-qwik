@@ -119,9 +119,10 @@ export async function onRequestPost(context) {
                             (tax_year, purpose, rate, effective_date)
                             VALUES (?, ?, ?, ?)
                         `;
+                        // For mileage_rates, purpose is in the gain_type column position
                         bindValues = [
                             parseInt(row.tax_year),
-                            row.purpose,
+                            row.gain_type || row.purpose,  // purpose is in gain_type column
                             parseFloat(row.rate),
                             row.effective_date
                         ];
@@ -133,9 +134,10 @@ export async function onRequestPost(context) {
                             (tax_year, rule_type, filing_status, value, description)
                             VALUES (?, ?, ?, ?, ?)
                         `;
+                        // For contribution_limits, rule_type is in the purpose column position
                         bindValues = [
                             parseInt(row.tax_year),
-                            row.rule_type,
+                            row.purpose || row.rule_type,  // rule_type is in purpose column
                             row.filing_status || null,
                             parseFloat(row.value),
                             row.description

@@ -1137,6 +1137,19 @@
                     </div>
                     <div id="taxFileInfo" style="margin-top: 1rem;"></div>
 
+                    <!-- Tax Import Preview -->
+                    <div id="taxPreview" style="display: none; margin-top: 1.5rem; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 1.5rem;">
+                        <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview Tax Data</h3>
+                        <div id="taxPreviewContent" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- Import Results -->
+                    <div id="taxImportResults" style="display: none; margin-top: 1.5rem; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 1.5rem;">
+                        <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Results</h3>
+                        <div id="taxImportSummary"></div>
+                        <div id="taxImportErrors" style="margin-top: 1rem; color: #ef4444;"></div>
+                    </div>
+
                     <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                         <button id="importTaxBtn" class="tool-btn" disabled onclick="importTaxData()">
                             📥 Import Tax Data
@@ -3484,12 +3497,62 @@
                         <p style="color: #6b7280; font-size: 0.875rem;">Size: ${(file.size / 1024).toFixed(2)} KB</p>
                     `;
                 }
+
+                // Parse and show preview
+                showTaxPreview(taxCsvData);
+
                 const importTaxBtn = document.getElementById('importTaxBtn');
                 if (importTaxBtn) {
                     importTaxBtn.disabled = false;
                 }
             };
             reader.readAsText(file);
+        }
+
+        function showTaxPreview(csvData) {
+            const lines = csvData.split('\n').filter(l => l.trim());
+            const preview = document.getElementById('taxPreview');
+            const previewContent = document.getElementById('taxPreviewContent');
+
+            if (!preview || !previewContent) return;
+
+            // Count rows by table type
+            const counts = {};
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                const tableType = cols[0];
+                if (tableType) {
+                    counts[tableType] = (counts[tableType] || 0) + 1;
+                }
+            }
+
+            let previewHtml = `
+                <div style="color: #e5e7eb;">
+                    <p style="margin-bottom: 1rem;"><strong>Total rows:</strong> ${lines.length - 1}</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #374151;">
+                                <th style="text-align: left; padding: 0.5rem;">Table</th>
+                                <th style="text-align: right; padding: 0.5rem;">Rows</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            for (const [table, count] of Object.entries(counts)) {
+                previewHtml += `
+                    <tr style="border-bottom: 1px solid #1f2937;">
+                        <td style="padding: 0.5rem;">${table}</td>
+                        <td style="text-align: right; padding: 0.5rem;">${count}</td>
+                    </tr>`;
+            }
+
+            previewHtml += `
+                        </tbody>
+                    </table>
+                </div>`;
+
+            previewContent.innerHTML = previewHtml;
+            preview.style.display = 'block';
         }
 
         async function importTaxData() {
@@ -3523,25 +3586,73 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert(data.message);
+                    // Show detailed import results
+                    const resultsDiv = document.getElementById('taxImportResults');
+                    const summaryDiv = document.getElementById('taxImportSummary');
+                    const errorsDiv = document.getElementById('taxImportErrors');
 
-                    // Show detailed stats
-                    if (data.stats) {
-                        let statsMsg = '\nDetails:\n';
-                        for (const [table, info] of Object.entries(data.stats)) {
-                            statsMsg += `${table}: ${info.success} success, ${info.errors} errors\n`;
+                    if (resultsDiv && summaryDiv) {
+                        let summaryHtml = '<div style="color: #10b981;">';
+                        summaryHtml += `<p style="font-weight: 600; margin-bottom: 1rem;">✅ ${data.message}</p>`;
+
+                        if (data.stats) {
+                            summaryHtml += '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">';
+                            summaryHtml += '<thead><tr style="border-bottom: 1px solid #374151;">';
+                            summaryHtml += '<th style="text-align: left; padding: 0.5rem;">Table</th>';
+                            summaryHtml += '<th style="text-align: right; padding: 0.5rem; color: #10b981;">Success</th>';
+                            summaryHtml += '<th style="text-align: right; padding: 0.5rem; color: #ef4444;">Errors</th>';
+                            summaryHtml += '</tr></thead><tbody>';
+
+                            let totalSuccess = 0;
+                            let totalErrors = 0;
+                            for (const [table, info] of Object.entries(data.stats)) {
+                                summaryHtml += `<tr style="border-bottom: 1px solid #1f2937;">`;
+                                summaryHtml += `<td style="padding: 0.5rem;">${table}</td>`;
+                                summaryHtml += `<td style="text-align: right; padding: 0.5rem; color: #10b981;">${info.success}</td>`;
+                                summaryHtml += `<td style="text-align: right; padding: 0.5rem; color: ${info.errors > 0 ? '#ef4444' : '#6b7280'};">${info.errors}</td>`;
+                                summaryHtml += '</tr>';
+                                totalSuccess += info.success;
+                                totalErrors += info.errors;
+                            }
+
+                            summaryHtml += `<tr style="font-weight: 600;">`;
+                            summaryHtml += `<td style="padding: 0.5rem;">Total</td>`;
+                            summaryHtml += `<td style="text-align: right; padding: 0.5rem; color: #10b981;">${totalSuccess}</td>`;
+                            summaryHtml += `<td style="text-align: right; padding: 0.5rem; color: ${totalErrors > 0 ? '#ef4444' : '#6b7280'};">${totalErrors}</td>`;
+                            summaryHtml += '</tr>';
+                            summaryHtml += '</tbody></table>';
                         }
-                        console.log(statsMsg);
+                        summaryHtml += '</div>';
+
+                        summaryDiv.innerHTML = summaryHtml;
+
+                        // Show errors if any
+                        if (data.errors && data.errors.length > 0) {
+                            let errorHtml = '<p style="font-weight: 600; margin-bottom: 0.5rem;">⚠️ Import Errors:</p>';
+                            errorHtml += '<ul style="list-style: none; padding: 0;">';
+                            data.errors.forEach(err => {
+                                errorHtml += `<li style="margin: 0.25rem 0;">• Row ${err.row}: ${err.error}</li>`;
+                            });
+                            errorHtml += '</ul>';
+                            errorsDiv.innerHTML = errorHtml;
+                        } else {
+                            errorsDiv.innerHTML = '';
+                        }
+
+                        resultsDiv.style.display = 'block';
                     }
 
                     // Refresh status display
                     await checkTaxTableStatus();
 
-                    // Reset form
-                    document.getElementById('taxCsvFile').value = '';
-                    document.getElementById('taxFileInfo').innerHTML = '';
-                    importTaxBtn.disabled = true;
-                    taxCsvData = null;
+                    // Reset form after delay
+                    setTimeout(() => {
+                        document.getElementById('taxCsvFile').value = '';
+                        document.getElementById('taxFileInfo').innerHTML = '';
+                        document.getElementById('taxPreview').style.display = 'none';
+                        importTaxBtn.disabled = true;
+                        taxCsvData = null;
+                    }, 3000);
                 } else {
                     alert(`Error: ${data.error}`);
                 }
