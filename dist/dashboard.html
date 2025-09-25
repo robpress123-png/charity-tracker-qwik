@@ -3274,14 +3274,30 @@
                     const uniqueCharities = new Set(data.donations.map(d => d.charity_id)).size;
 
                     // Calculate tax savings based on current tax rate
-                    const taxRate = currentTaxRate || 0.22;
+                    // Check if user has set tax information
+                    const taxBracketSelect = document.getElementById('taxBracket');
+                    const hasValidTaxSettings = taxBracketSelect && taxBracketSelect.value && parseFloat(taxBracketSelect.value) > 0;
+
+                    if (!hasValidTaxSettings) {
+                        // No tax settings - use 0% and show prompt
+                        currentTaxRate = 0;
+                    }
+
+                    const taxRate = currentTaxRate || 0;
                     const estimatedSavings = totalAmount * taxRate;
 
                     // Update display with proper formatting
                     document.getElementById('totalDonations').textContent = `$${formatCurrency(totalAmount)}`;
                     document.getElementById('donationCount').textContent = (data.total || data.donations.length).toString();
                     document.getElementById('charityCount').textContent = uniqueCharities.toString();
-                    document.getElementById('taxSavings').textContent = `$${formatCurrency(estimatedSavings)}`;
+
+                    // Update tax savings display
+                    if (!hasValidTaxSettings && totalAmount > 0) {
+                        document.getElementById('taxSavings').innerHTML =
+                            '<a href="#" onclick="showSection(\'profile\'); return false;" style="color: #667eea; text-decoration: underline; font-size: 0.9rem;">Set tax info</a>';
+                    } else {
+                        document.getElementById('taxSavings').textContent = `$${formatCurrency(estimatedSavings)}`;
+                    }
                 } else {
                     // No donations, show zeros
                     document.getElementById('totalDonations').textContent = '$0';
@@ -3959,6 +3975,20 @@
                     const cryptoPrice = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
                     amount = cryptoQty * cryptoPrice;
                     break;
+            }
+
+            // Check if user has set tax information
+            const taxBracketSelect = document.getElementById('taxBracket');
+            const hasValidTaxSettings = taxBracketSelect && taxBracketSelect.value && parseFloat(taxBracketSelect.value) > 0;
+
+            if (!hasValidTaxSettings) {
+                // User hasn't set tax information - default to 0% and show prompt
+                currentTaxRate = 0;
+                document.getElementById('taxRateDisplay').textContent = '0';
+                document.getElementById('donationAmountDisplay').textContent = '$' + amount.toFixed(2);
+                document.getElementById('taxSavingsDisplay').innerHTML =
+                    '<a href="#" onclick="showSection(\'profile\'); return false;" style="color: #667eea; text-decoration: underline;">Update profile for tax estimate</a>';
+                return;
             }
 
             const savings = amount * currentTaxRate;

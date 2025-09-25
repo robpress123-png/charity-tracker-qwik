@@ -1,8 +1,17 @@
-# Charity Tracker Qwik - Continuation Prompt v2.6.0
+# Charity Tracker Qwik - Continuation Prompt v2.7.0
 
-## 🎉 Version 2.6.0 - Admin Console Improvements
+## 🎉 Version 2.7.0 - Tax Settings in User Profile
 
-### Latest Updates (v2.6.0)
+### Latest Updates (v2.7.0)
+- ✅ Removed user_tax_settings from tax import validation (it's user data, not reference data)
+- ✅ Added tax settings UI to user profile section
+- ✅ Users can now select tax year (2024-2026), filing status, and tax bracket
+- ✅ Tax settings saved to database via user_tax_settings table
+- ✅ Added AGI estimate field for 2026 OBBBA calculations
+- ✅ Tax brackets loaded dynamically from database
+- ✅ Privacy-focused: Users select bracket range, not exact income
+
+### Previous Updates (v2.6.0)
 - ✅ Fixed tax import drag-and-drop functionality
 - ✅ Reorganized admin console menu with collapsible sections
 - ✅ Moved Tax Configuration to Content Management section
@@ -138,17 +147,18 @@ npm run bump:major  # 2.6.0 → 3.0.0
 
 ## Next Priority Tasks
 
-### 1. Implement Tax Calculations
-- Create API endpoints for tax calculations
-- Add user tax settings UI (bracket selection)
-- Update donation calculations to use real rates
-- Apply 2026 special rules when applicable
+### 1. Complete Tax Integration
+- ✅ API endpoints created (/api/tax/rates GET and POST)
+- ✅ User tax settings UI in profile (bracket selection)
+- ⏳ Update donation calculations to use real rates from database
+- ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor)
+- ⏳ Test complete tax calculation flow with real data
 
-### 2. Fix Tax Settings Storage
-- Currently in localStorage (HIGH PRIORITY)
-- Add columns to users table: tax_bracket, filing_status
-- Migrate localStorage values on next login
-- Update API endpoints to save/load from database
+### 2. Tax Settings Storage (COMPLETED)
+- ✅ Migrated from localStorage to database
+- ✅ Using user_tax_settings table for persistence
+- ✅ Tax brackets loaded dynamically from database
+- ✅ Users select bracket range for privacy (not exact income)
 
 ### 3. Monetization Implementation
 - **Model**: Freemium
