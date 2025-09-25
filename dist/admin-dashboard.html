@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.2.21</title>
+    <title>Admin Dashboard - Charity Tracker v2.2.22</title>
     <style>
         * {
             margin: 0;
@@ -394,7 +394,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.21</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.2.22</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -420,6 +420,9 @@
                 <div class="sidebar-title">Charity Management</div>
                 <button class="sidebar-item" onclick="showSection('import-charities')">
                     📥 Import/Export Charities
+                </button>
+                <button class="sidebar-item" onclick="exportCharitiesDatabase()">
+                    📤 Export Charities Database
                 </button>
                 <button class="sidebar-item" onclick="showSection('charity-management')">
                     🏢 Manage Charities
@@ -1275,6 +1278,40 @@
             } catch (error) {
                 console.error('Export error:', error);
                 alert('❌ Failed to export items database: ' + error.message);
+            }
+        }
+
+        // Export charities database
+        async function exportCharitiesDatabase() {
+            try {
+                const response = await fetch('/api/charities/export', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/csv'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Export failed');
+                }
+
+                // Get the CSV content
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                // Create download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `charities_database_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                alert('✅ Charities database exported successfully!');
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('❌ Failed to export charities database: ' + error.message);
             }
         }
 
