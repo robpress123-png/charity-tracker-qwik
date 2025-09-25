@@ -1,15 +1,24 @@
-# Charity Tracker Qwik - Continuation Prompt v2.7.0
+# Charity Tracker Qwik - Continuation Prompt v2.8.1
 
-## 🎉 Version 2.7.0 - Tax Settings in User Profile
+## 🎉 Version 2.8.1 - Tax System Fully Integrated
 
-### Latest Updates (v2.7.0)
-- ✅ Removed user_tax_settings from tax import validation (it's user data, not reference data)
-- ✅ Added tax settings UI to user profile section
-- ✅ Users can now select tax year (2024-2026), filing status, and tax bracket
-- ✅ Tax settings saved to database via user_tax_settings table
-- ✅ Added AGI estimate field for 2026 OBBBA calculations
-- ✅ Tax brackets loaded dynamically from database
+### Latest Updates (v2.8.0-2.8.1)
+- ✅ **3-Column Tax Display**: Shows all years (2024-2026) side-by-side
+  - Each year shows: Filing Status, Tax Bracket, Standard Deduction
+  - 2026 includes AGI Estimate and OBBBA Threshold (0.5% of AGI)
+- ✅ **Year Switching**: Changing tax year loads saved settings for that year
+- ✅ **Tax Settings Persistence**: All settings saved to user_tax_settings table
+- ✅ **Missing Tax Settings Handling**:
+  - Defaults to 0% tax rate when not set
+  - Shows "Update profile for tax estimate" prompt
+- ✅ **Bug Fixes (v2.8.1)**:
+  - Fixed null reference errors when loading tax brackets
+  - Added safety checks for missing DOM elements
+
+### Previous Updates (v2.7.0)
+- ✅ Tax settings UI in profile with year/filing status/bracket selection
 - ✅ Privacy-focused: Users select bracket range, not exact income
+- ✅ AGI estimate field for 2026 OBBBA calculations
 
 ### Previous Updates (v2.6.0)
 - ✅ Fixed tax import drag-and-drop functionality
@@ -145,20 +154,34 @@ npm run bump:major  # 2.6.0 → 3.0.0
 - **35% Rate Cap**: Max benefit capped at 35% even for 37% bracket
 - **Non-itemizer Addon**: $1,000/$2,000 cash donation deduction
 
+## Current Known Issues & In Progress
+
+### Edit Item Donation Form Issues:
+1. **Missing tax savings display** - Other forms show it, edit items doesn't
+2. **Scrolling problem** - Items list grows without limit (needs fixed height)
+3. **Layout issues** - Delete button on own row wastes space
+4. **Category selection** - New items default to "Miscellaneous" without dropdown
+5. **No receipt preview** - Add form has nice receipt, edit doesn't
+
+### Dashboard Display:
+- Need to show tax bracket (e.g., "22%") with tax savings amount
+
 ## Next Priority Tasks
 
-### 1. Complete Tax Integration
+### 1. Fix Edit Item Form (HIGH PRIORITY - BE CAREFUL!)
+- ⏳ Add tax savings calculation display
+- ⏳ Fix scrolling with fixed height container
+- ⏳ Improve layout (delete button on same row)
+- ⏳ Add category dropdown for new items
+- **CRITICAL**: This form was difficult to get working with both system and personal charities
+- **APPROACH**: Make incremental changes, test thoroughly, have backup ready
+
+### 2. Complete Tax Integration
 - ✅ API endpoints created (/api/tax/rates GET and POST)
 - ✅ User tax settings UI in profile (bracket selection)
-- ⏳ Update donation calculations to use real rates from database
-- ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor)
-- ⏳ Test complete tax calculation flow with real data
-
-### 2. Tax Settings Storage (COMPLETED)
-- ✅ Migrated from localStorage to database
-- ✅ Using user_tax_settings table for persistence
-- ✅ Tax brackets loaded dynamically from database
-- ✅ Users select bracket range for privacy (not exact income)
+- ✅ Tax calculations use database rates
+- ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor calculation)
+- ⏳ Show tax bracket on dashboard with savings
 
 ### 3. Monetization Implementation
 - **Model**: Freemium
@@ -240,5 +263,29 @@ charity-tracker-qwik/
 5. **Charity matching**: Uses fuzzy matching, creates user_charities for misses
 6. **Items must match** database exactly (496 predefined items)
 7. **Tax settings** currently in localStorage (needs migration)
+
+## About This Continuation Prompt
+
+### What is this document?
+This is a comprehensive state snapshot of the Charity Tracker project that allows AI assistants (like Claude) to quickly understand:
+- Current version and recent changes
+- System architecture and tech stack
+- Database schema and structure
+- Known issues and work in progress
+- Development guidelines and best practices
+
+### When to update:
+- After significant feature additions or changes
+- When version bumps occur (especially minor/major)
+- When critical bugs are fixed
+- When architecture changes
+- **Auto-update trigger**: When context usage approaches 90% in a conversation
+
+### Why it matters:
+- Enables seamless continuation across sessions
+- Preserves critical project knowledge
+- Prevents regression of fixed issues
+- Maintains development momentum
+- Documents decisions and rationale
 
 Ready for continued development!
