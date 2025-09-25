@@ -199,6 +199,18 @@ export async function onRequestPut(context) {
         const isPersonalCharity = data.charity_source === 'personal' ||
                                  (data.user_charity_id && !data.charity_id);
 
+        // Debug logging
+        console.log('Update donation debug:', {
+            donationId,
+            donationType,
+            isPersonalCharity,
+            charity_id: data.charity_id,
+            user_charity_id: data.user_charity_id,
+            charity_source: data.charity_source,
+            amount,
+            date
+        });
+
         // Update the donation with proper charity field handling
         const result = await env.DB.prepare(`
             UPDATE donations
@@ -291,9 +303,19 @@ export async function onRequestPut(context) {
 
     } catch (error) {
         console.error('Error updating donation:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            donationId: donationId,
+            donationType: donationType,
+            isPersonalCharity: isPersonalCharity,
+            charity_id: data.charity_id,
+            user_charity_id: data.user_charity_id,
+            charity_source: data.charity_source
+        });
         return Response.json({
             success: false,
-            error: 'Failed to update donation'
+            error: `Failed to update donation: ${error.message}`
         }, { status: 500 });
     }
 }
