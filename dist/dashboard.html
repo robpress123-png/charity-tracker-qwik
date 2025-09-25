@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.7.1</title>
+    <title>Dashboard - Charity Tracker v2.8.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -735,13 +735,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.7.1</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.8.0</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.7.1</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.8.0</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1043,24 +1043,51 @@
                     </div>
 
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
-                        <h3 style="margin-bottom: 0.5rem;">Your Tax Information - <span id="taxInfoYear">2024</span></h3>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                            <div>
-                                <div style="font-size: 0.875rem; opacity: 0.9;">Federal Marginal Tax Rate</div>
-                                <div style="font-size: 2rem; font-weight: bold;" id="marginalTaxRate">Not Set</div>
+                        <h3 style="margin-bottom: 1rem;">Your Tax Information</h3>
+
+                        <!-- All Years Grid Display -->
+                        <div id="allYearsTaxInfo" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                            <!-- 2024 Column -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2024</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
+                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2024">Not Set</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
+                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2024">-</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.875rem;" id="deduction2024">-</div>
                             </div>
-                            <div>
-                                <div style="font-size: 0.875rem; opacity: 0.9;">Est. Tax Savings per $100</div>
-                                <div style="font-size: 2rem; font-weight: bold;" id="savingsPerHundred">$0</div>
+
+                            <!-- 2025 Column -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2025</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
+                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2025">Not Set</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
+                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2025">-</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.875rem;" id="deduction2025">-</div>
+                            </div>
+
+                            <!-- 2026 Column -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2026 (OBBBA)</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
+                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2026">Not Set</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
+                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2026">-</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">AGI Estimate</div>
+                                <div style="font-size: 0.875rem; margin-bottom: 0.5rem;" id="agi2026">-</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">OBBBA Threshold (0.5%)</div>
+                                <div style="font-size: 0.875rem; font-weight: 500; color: #fbbf24; margin-bottom: 0.5rem;" id="threshold2026" title="First 0.5% of AGI must be donated before tax benefits apply">-</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.875rem;" id="deduction2026">-</div>
                             </div>
                         </div>
-                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
-                            <div style="font-size: 0.875rem; opacity: 0.9;">Standard Deduction (<span id="deductionYear">2024</span>)</div>
-                            <div style="font-size: 1.25rem; font-weight: 600;" id="standardDeduction">$14,600</div>
-                        </div>
-                        <div id="allYearsSummary" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3); display: none;">
-                            <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Settings for Other Years:</div>
-                            <div id="otherYearsContent" style="font-size: 0.875rem;"></div>
+
+                        <!-- Current Selection Helper Text -->
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3); text-align: center; font-size: 0.875rem; opacity: 0.9;">
+                            Currently editing: <strong id="currentEditYear">2024</strong> tax settings
                         </div>
                     </div>
                     <button class="btn-primary" onclick="saveProfile()">
@@ -3613,7 +3640,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.7.1</p>
+                            <p>Generated by Charity Tracker v2.8.0</p>
                         </div>
                     </body>
                     </html>
@@ -3784,35 +3811,21 @@
             const taxYear = taxYearElem.value;
             const bracketRate = parseFloat(taxBracketElem.value);
 
-            // Update year displays
-            const taxInfoYear = document.getElementById('taxInfoYear');
-            const deductionYear = document.getElementById('deductionYear');
-            if (taxInfoYear) taxInfoYear.textContent = taxYear;
-            if (deductionYear) deductionYear.textContent = taxYear;
+            // Update current editing year
+            const currentEditYear = document.getElementById('currentEditYear');
+            if (currentEditYear) currentEditYear.textContent = taxYear;
 
+            // Update donation form display
             if (bracketRate) {
                 currentTaxRate = bracketRate;
                 const percentage = Math.round(bracketRate * 100);
-
-                // Update profile display
-                const marginalRate = document.getElementById('marginalTaxRate');
-                const savingsDisplay = document.getElementById('savingsPerHundred');
-                if (marginalRate) marginalRate.textContent = percentage + '%';
-                if (savingsDisplay) savingsDisplay.textContent = '$' + percentage;
-
-                // Update donation form display
                 const rateDisplay = document.getElementById('taxRateDisplay');
                 if (rateDisplay) rateDisplay.textContent = percentage;
                 updateTaxSavings();
             } else {
                 // No bracket selected
                 currentTaxRate = 0;
-                const marginalRate = document.getElementById('marginalTaxRate');
-                const savingsDisplay = document.getElementById('savingsPerHundred');
                 const rateDisplay = document.getElementById('taxRateDisplay');
-
-                if (marginalRate) marginalRate.textContent = 'Not Set';
-                if (savingsDisplay) savingsDisplay.textContent = '$0';
                 if (rateDisplay) rateDisplay.textContent = '0';
                 updateTaxSavings();
             }
@@ -3831,37 +3844,92 @@
 
             try {
                 const years = ['2024', '2025', '2026'];
-                const currentYear = document.getElementById('taxYear')?.value;
-                const summaryContainer = document.getElementById('allYearsSummary');
-                const contentDiv = document.getElementById('otherYearsContent');
-
-                if (!summaryContainer || !contentDiv) return;
-
-                let hasOtherYears = false;
-                let summaryHTML = '';
 
                 for (const year of years) {
-                    if (year === currentYear) continue; // Skip current year
-
-                    const response = await fetch(`/api/tax/rates?year=${year}&user_id=${userId}`, {
+                    const response = await fetch(`/api/tax/rates?year=${year}&filing_status=single&user_id=${userId}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
 
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.tax_bracket) {
-                            hasOtherYears = true;
-                            const rate = Math.round(data.tax_bracket * 100);
-                            summaryHTML += `<div style="margin-bottom: 0.25rem;">• ${year}: ${rate}% (${data.filing_status || 'single'})</div>`;
+
+                        // Format filing status display
+                        const formatFilingStatus = (status) => {
+                            if (!status) return 'Not Set';
+                            const labels = {
+                                'single': 'Single',
+                                'married_jointly': 'Married Joint',
+                                'married_separately': 'Married Sep.',
+                                'head_of_household': 'Head of House'
+                            };
+                            return labels[status] || status;
+                        };
+
+                        // Update filing status
+                        const statusElem = document.getElementById(`status${year}`);
+                        if (statusElem) {
+                            statusElem.textContent = data.filing_status ?
+                                formatFilingStatus(data.filing_status) : 'Not Set';
+                        }
+
+                        // Update tax bracket
+                        const rateElem = document.getElementById(`rate${year}`);
+                        if (rateElem) {
+                            if (data.tax_bracket) {
+                                const rate = Math.round(data.tax_bracket * 100);
+                                rateElem.textContent = `${rate}%`;
+                            } else {
+                                rateElem.textContent = '-';
+                            }
+                        }
+
+                        // Update standard deduction
+                        const deductionElem = document.getElementById(`deduction${year}`);
+                        if (deductionElem) {
+                            if (data.standard_deduction) {
+                                deductionElem.textContent = `$${data.standard_deduction.toLocaleString()}`;
+                            } else {
+                                deductionElem.textContent = '-';
+                            }
+                        }
+
+                        // For 2026, update AGI and threshold
+                        if (year === '2026') {
+                            const agiElem = document.getElementById('agi2026');
+                            const thresholdElem = document.getElementById('threshold2026');
+
+                            if (agiElem) {
+                                if (data.agi_range) {
+                                    agiElem.textContent = `$${parseInt(data.agi_range).toLocaleString()}`;
+
+                                    // Calculate and display OBBBA threshold (0.5% of AGI)
+                                    if (thresholdElem) {
+                                        const threshold = parseInt(data.agi_range) * 0.005;
+                                        thresholdElem.textContent = `$${Math.round(threshold).toLocaleString()}`;
+                                    }
+                                } else {
+                                    agiElem.textContent = '-';
+                                    if (thresholdElem) thresholdElem.textContent = '-';
+                                }
+                            }
+                        }
+                    } else {
+                        // No data for this year - show defaults
+                        const statusElem = document.getElementById(`status${year}`);
+                        const rateElem = document.getElementById(`rate${year}`);
+                        const deductionElem = document.getElementById(`deduction${year}`);
+
+                        if (statusElem) statusElem.textContent = 'Not Set';
+                        if (rateElem) rateElem.textContent = '-';
+                        if (deductionElem) deductionElem.textContent = '-';
+
+                        if (year === '2026') {
+                            const agiElem = document.getElementById('agi2026');
+                            const thresholdElem = document.getElementById('threshold2026');
+                            if (agiElem) agiElem.textContent = '-';
+                            if (thresholdElem) thresholdElem.textContent = '-';
                         }
                     }
-                }
-
-                if (hasOtherYears) {
-                    contentDiv.innerHTML = summaryHTML;
-                    summaryContainer.style.display = 'block';
-                } else {
-                    summaryContainer.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error loading all years summary:', error);
@@ -3983,6 +4051,9 @@
 
                         // Load tax brackets for current settings
                         await loadTaxBrackets();
+
+                        // Load all years summary
+                        await loadAllYearsSummary();
 
                         // ONE-TIME MIGRATION: If localStorage has data but database doesn't, migrate it
                         const savedProfile = localStorage.getItem('userProfile');
