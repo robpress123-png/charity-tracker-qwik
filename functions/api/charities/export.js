@@ -92,20 +92,23 @@ export async function onRequestGet(context) {
             });
         }
 
-        // Get all charities from database
+        // Get all charities from database (IRS charity database)
         const query = `
             SELECT
-                c.name,
-                c.ein,
-                c.category,
-                c.website,
-                c.description,
-                c.user_id,
-                c.created_at,
-                u.email as user_email
-            FROM charities c
-            LEFT JOIN users u ON c.user_id = u.id
-            ORDER BY c.name
+                name,
+                ein,
+                category,
+                address,
+                city,
+                state,
+                zip_code,
+                website,
+                description,
+                phone,
+                is_verified,
+                created_at
+            FROM charities
+            ORDER BY name
         `;
 
         const result = await env.DB.prepare(query).all();
@@ -115,7 +118,7 @@ export async function onRequestGet(context) {
         }
 
         // Build CSV
-        const headers = ['name', 'ein', 'category', 'website', 'description', 'user_id', 'user_email', 'created_at'];
+        const headers = ['name', 'ein', 'category', 'address', 'city', 'state', 'zip_code', 'website', 'description', 'phone', 'is_verified', 'created_at'];
         let csv = headers.join(',') + '\n';
 
         for (const charity of result.results) {
@@ -123,10 +126,14 @@ export async function onRequestGet(context) {
                 escapeCsvValue(charity.name),
                 escapeCsvValue(charity.ein),
                 escapeCsvValue(charity.category),
+                escapeCsvValue(charity.address),
+                escapeCsvValue(charity.city),
+                escapeCsvValue(charity.state),
+                escapeCsvValue(charity.zip_code),
                 escapeCsvValue(charity.website),
                 escapeCsvValue(charity.description),
-                escapeCsvValue(charity.user_id),
-                escapeCsvValue(charity.user_email),
+                escapeCsvValue(charity.phone),
+                escapeCsvValue(charity.is_verified),
                 escapeCsvValue(charity.created_at)
             ];
             csv += row.join(',') + '\n';
