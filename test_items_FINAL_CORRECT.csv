@@ -1,0 +1,6 @@
+donation_type,donation_date,charity_name,charity_ein,amount,notes,item_1_name,item_1_category,item_1_quantity,item_1_condition,item_2_name,item_2_category,item_2_quantity,item_2_condition,item_3_name,item_3_category,item_3_quantity,item_3_condition
+items,2025-03-15,"GOODWILL INDUSTRIES INTERNATIONAL, INC.",53-0196517,150,"Spring cleaning donation",Sofa - Loveseat,Furniture,1,good,Coffee Table - Wood,Furniture,1,very_good,,,,
+items,2025-04-20,"THE SALVATION ARMY",13-5562351,75,"Clothes donation",Shirt - Dress,Clothing - Men,3,excellent,Jeans,Clothing - Men,2,good,,,,
+items,2025-05-10,"HABITAT FOR HUMANITY INTERNATIONAL, INC.",91-1914868,200,"Home items",Microwave - Countertop,Appliances,1,very_good,Toaster,Appliances,1,good,Blender - High End,Appliances,1,excellent
+items,2025-06-22,"AMERICAN RED CROSS",53-0196605,120,"Kids items donation",Board Games,Toys & Games,2,good,Action Figures,Toys & Games,5,very_good,,,,
+items,2025-07-30,"ST JUDE CHILDRENS RESEARCH HOSPITAL INC",62-0646012,180,"Electronics donation",Laptop - Business,Electronics,1,good,Monitor - 1080p,Electronics,1,very_good,Keyboard - Regular,Electronics,2,excellent
