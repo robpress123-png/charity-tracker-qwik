@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.6.3</title>
+    <title>Admin Dashboard - Charity Tracker v2.7.0</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.6.3</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.7.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1141,6 +1141,15 @@
                     <div id="taxPreview" style="display: none; margin-top: 1.5rem; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 1.5rem;">
                         <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview Tax Data</h3>
                         <div id="taxPreviewContent" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+
+                    <!-- Import Progress -->
+                    <div id="taxImportProgress" style="display: none; margin-top: 1.5rem; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 1.5rem;">
+                        <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Progress</h3>
+                        <div style="background: #374151; border-radius: 4px; height: 20px; overflow: hidden;">
+                            <div id="taxProgressBar" style="background: linear-gradient(90deg, #10b981, #059669); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <p id="taxProgressText" style="margin-top: 0.5rem; color: #9ca3af; font-size: 0.875rem;">Preparing import...</p>
                     </div>
 
                     <!-- Import Results -->
@@ -3562,8 +3571,30 @@
             }
 
             const importTaxBtn = document.getElementById('importTaxBtn');
+            const progressDiv = document.getElementById('taxImportProgress');
+            const progressBar = document.getElementById('taxProgressBar');
+            const progressText = document.getElementById('taxProgressText');
+            const resultsDiv = document.getElementById('taxImportResults');
+
+            // Hide results, show progress
+            resultsDiv.style.display = 'none';
+            progressDiv.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Preparing import...';
+
             importTaxBtn.disabled = true;
             importTaxBtn.textContent = 'Importing...';
+
+            // Simulate progress updates
+            setTimeout(() => {
+                progressBar.style.width = '20%';
+                progressText.textContent = 'Parsing CSV data...';
+            }, 100);
+
+            setTimeout(() => {
+                progressBar.style.width = '40%';
+                progressText.textContent = 'Validating tax tables...';
+            }, 300);
 
             try {
                 const formData = new FormData();
@@ -3575,6 +3606,11 @@
                     ? 'http://localhost:8790/api/admin/tax-import-unified'
                     : '/api/admin/tax-import-unified';
 
+                setTimeout(() => {
+                    progressBar.style.width = '60%';
+                    progressText.textContent = 'Importing tax brackets...';
+                }, 500);
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -3583,7 +3619,13 @@
                     body: formData
                 });
 
+                progressBar.style.width = '80%';
+                progressText.textContent = 'Processing response...';
+
                 const data = await response.json();
+
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Import complete!';
 
                 if (data.success) {
                     // Show detailed import results
@@ -3645,6 +3687,11 @@
                     // Refresh status display
                     await checkTaxTableStatus();
 
+                    // Hide progress bar after a short delay
+                    setTimeout(() => {
+                        progressDiv.style.display = 'none';
+                    }, 1500);
+
                     // Reset form after delay
                     setTimeout(() => {
                         document.getElementById('taxCsvFile').value = '';
@@ -3652,7 +3699,7 @@
                         document.getElementById('taxPreview').style.display = 'none';
                         importTaxBtn.disabled = true;
                         taxCsvData = null;
-                    }, 3000);
+                    }, 5000);
                 } else {
                     alert(`Error: ${data.error}`);
                 }

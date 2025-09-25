@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.6.3</title>
+    <title>Dashboard - Charity Tracker v2.7.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -735,13 +735,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.6.3</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.7.0</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.6.3</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.7.0</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1012,28 +1012,34 @@
                     <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 2rem; font-size: 1.1rem;">💰 Tax Information</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div class="form-group">
+                            <label>Tax Year</label>
+                            <select id="taxYear" style="width: 100%;" onchange="loadTaxBrackets()">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026 (with OBBBA rules)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>Filing Status</label>
-                        <select id="filingStatus" style="width: 100%;" onchange="updateTaxRate()">
-                            <option value="single">Single</option>
-                            <option value="married_jointly">Married Filing Jointly</option>
-                            <option value="married_separately">Married Filing Separately</option>
-                            <option value="head_of_household">Head of Household</option>
-                        </select>
+                            <select id="filingStatus" style="width: 100%;" onchange="loadTaxBrackets()">
+                                <option value="single">Single</option>
+                                <option value="married_jointly">Married Filing Jointly</option>
+                                <option value="married_separately">Married Filing Separately</option>
+                                <option value="head_of_household">Head of Household</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Annual Income</label>
-                        <select id="incomeBracket" style="width: 100%;" onchange="updateTaxRate()">
-                            <option value="22000">Up to $22,000</option>
-                            <option value="50000">$22,001 - $50,000</option>
-                            <option value="89075">$50,001 - $89,075</option>
-                            <option value="100000">$89,076 - $100,000</option>
-                            <option value="190750">$100,001 - $190,750</option>
-                            <option value="200000">$190,751 - $200,000</option>
-                            <option value="364200">$200,001 - $364,200</option>
-                            <option value="500000">$364,201 - $500,000</option>
-                            <option value="600000">$500,001+</option>
-                        </select>
-                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Tax Bracket <small>(Privacy: Select bracket, not income)</small></label>
+                            <select id="taxBracket" style="width: 100%;" onchange="updateTaxDisplay()">
+                                <option value="">Loading brackets...</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="agiEstimateGroup" style="display: none;">
+                            <label>AGI Estimate (for 2026 OBBBA) <small>Optional</small></label>
+                            <input type="number" id="agiEstimate" placeholder="Estimated AGI (optional)" style="width: 100%;">
+                        </div>
                     </div>
 
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
@@ -3587,7 +3593,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.6.3</p>
+                            <p>Generated by Charity Tracker v2.7.0</p>
                         </div>
                     </body>
                     </html>
@@ -3671,39 +3677,91 @@
         };
 
         let currentTaxRate = 0.22; // Default 22%
+        let currentTaxBrackets = [];
+        let currentStandardDeduction = 14600;
 
-        function updateTaxRate() {
+        // Load tax brackets from database
+        async function loadTaxBrackets() {
+            const taxYear = document.getElementById('taxYear').value;
             const filingStatus = document.getElementById('filingStatus').value;
-            const income = parseInt(document.getElementById('incomeBracket').value);
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || localStorage.getItem('token') || 'test-token';
 
-            const brackets = taxBrackets[filingStatus] || taxBrackets.single;
-            let rate = 0.10;
+            // Show/hide AGI estimate field for 2026
+            document.getElementById('agiEstimateGroup').style.display =
+                taxYear === '2026' ? 'block' : 'none';
 
-            for (const bracket of brackets) {
-                if (income >= bracket.min && income <= bracket.max) {
-                    rate = bracket.rate;
-                    break;
+            try {
+                const response = await fetch(`/api/tax/rates?year=${taxYear}&filing_status=${filingStatus}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentTaxBrackets = data.brackets || [];
+                    currentStandardDeduction = data.standard_deduction || 14600;
+
+                    // Populate bracket dropdown
+                    const bracketSelect = document.getElementById('taxBracket');
+                    bracketSelect.innerHTML = '<option value="">Select your tax bracket</option>';
+
+                    currentTaxBrackets.forEach(bracket => {
+                        const rate = Math.round(bracket.rate * 100);
+                        const minFormatted = '$' + bracket.min_income.toLocaleString();
+                        const maxFormatted = bracket.max_income ?
+                            '$' + bracket.max_income.toLocaleString() :
+                            'and above';
+
+                        const option = document.createElement('option');
+                        option.value = bracket.rate;
+                        option.textContent = `${rate}% (${minFormatted} - ${maxFormatted})`;
+                        bracketSelect.appendChild(option);
+                    });
+
+                    // Update standard deduction display
+                    document.getElementById('standardDeduction').textContent =
+                        '$' + currentStandardDeduction.toLocaleString();
+
+                    // If user has saved settings, select them
+                    if (data.tax_bracket) {
+                        bracketSelect.value = data.tax_bracket;
+                        updateTaxDisplay();
+                    }
                 }
+            } catch (error) {
+                console.error('Error loading tax brackets:', error);
+                showToast('❌ Failed to load tax brackets', 'error');
             }
+        }
 
-            currentTaxRate = rate;
-            const percentage = Math.round(rate * 100);
+        // Update tax display when bracket is selected
+        function updateTaxDisplay() {
+            const bracketRate = parseFloat(document.getElementById('taxBracket').value);
+            if (bracketRate) {
+                currentTaxRate = bracketRate;
+                const percentage = Math.round(bracketRate * 100);
 
-            // Update profile display
-            document.getElementById('marginalTaxRate').textContent = percentage + '%';
-            document.getElementById('savingsPerHundred').textContent = '$' + percentage;
-            document.getElementById('standardDeduction').textContent =
-                '$' + (standardDeductions[filingStatus] || 14600).toLocaleString();
+                // Update profile display
+                document.getElementById('marginalTaxRate').textContent = percentage + '%';
+                document.getElementById('savingsPerHundred').textContent = '$' + percentage;
 
-            // Update donation form display
-            document.getElementById('taxRateDisplay').textContent = percentage;
-            updateTaxSavings();
+                // Update donation form display
+                document.getElementById('taxRateDisplay').textContent = percentage;
+                updateTaxSavings();
+            }
+        }
 
-            // No longer save to localStorage - everything goes to database via saveProfile()
+        // Legacy function for compatibility
+        function updateTaxRate() {
+            loadTaxBrackets();
         }
 
         // Save profile information
         async function saveProfile() {
+            const taxYear = document.getElementById('taxYear').value;
             const profileData = {
                 name: document.getElementById('profileName').value,
                 email: document.getElementById('profileEmail').value,
@@ -3712,8 +3770,7 @@
                 state: document.getElementById('profileState').value,
                 zipCode: document.getElementById('profileZip').value,
                 filingStatus: document.getElementById('filingStatus').value,
-                incomeRange: document.getElementById('incomeBracket').value,
-                taxBracket: currentTaxRate // Save the calculated tax rate
+                taxBracket: document.getElementById('taxBracket').value
             };
 
             try {
@@ -3733,6 +3790,32 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // Now save tax settings to user_tax_settings table
+                    const taxSettingsData = {
+                        user_id: user.id || user.userId,
+                        tax_year: parseInt(taxYear),
+                        filing_status: document.getElementById('filingStatus').value,
+                        tax_bracket: parseFloat(document.getElementById('taxBracket').value),
+                        agi_range: document.getElementById('agiEstimate') ?
+                            document.getElementById('agiEstimate').value : null
+                    };
+
+                    // Save tax settings via the tax API
+                    const taxResponse = await fetch('/api/tax/rates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(taxSettingsData)
+                    });
+
+                    const taxData = await taxResponse.json();
+
+                    if (!taxData.success) {
+                        console.error('Failed to save tax settings:', taxData.error);
+                    }
+
                     // Clear old localStorage data after successful save
                     localStorage.removeItem('userProfile');
                     localStorage.removeItem('taxRate');
@@ -3740,9 +3823,9 @@
                     localStorage.removeItem('income');
 
                     // Update tax calculations
-                    updateTaxRate();
+                    updateTaxDisplay();
 
-                    showToast('✅ Profile saved successfully!', 'success');
+                    showToast('✅ Profile and tax settings saved successfully!', 'success');
                 } else {
                     showToast('❌ Failed to save profile: ' + (data.error || 'Unknown error'), 'error');
                 }
@@ -3779,9 +3862,13 @@
                         document.getElementById('profileState').value = profile.state || '';
                         document.getElementById('profileZip').value = profile.zipCode || '';
 
-                        // Load tax information
+                        // Load tax information - set current year as default
+                        const currentYear = new Date().getFullYear();
+                        document.getElementById('taxYear').value = currentYear.toString();
                         document.getElementById('filingStatus').value = profile.filingStatus || 'single';
-                        document.getElementById('incomeBracket').value = profile.incomeRange || '50000';
+
+                        // Load tax brackets for current settings
+                        await loadTaxBrackets();
 
                         // ONE-TIME MIGRATION: If localStorage has data but database doesn't, migrate it
                         const savedProfile = localStorage.getItem('userProfile');
@@ -3827,9 +3914,20 @@
             }
 
             // Set default values if no data available
-            document.getElementById('profileEmail').value = userEmail || '';
-            document.getElementById('filingStatus').value = 'single';
-            document.getElementById('incomeBracket').value = '50000';
+            if (!document.getElementById('profileEmail').value) {
+                document.getElementById('profileEmail').value = userEmail || '';
+            }
+            if (!document.getElementById('taxYear').value) {
+                const currentYear = new Date().getFullYear();
+                document.getElementById('taxYear').value = currentYear.toString();
+            }
+            if (!document.getElementById('filingStatus').value) {
+                document.getElementById('filingStatus').value = 'single';
+            }
+            // Load tax brackets after setting defaults
+            if (document.getElementById('taxBracket').options.length <= 1) {
+                await loadTaxBrackets();
+            }
 
             // Update tax calculations with defaults
             updateTaxRate();

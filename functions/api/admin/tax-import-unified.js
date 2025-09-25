@@ -204,13 +204,13 @@ export async function onRequestGet(context) {
         }
 
         // Check each table and get row counts
+        // Note: user_tax_settings is not included here as it's for user preferences, not tax reference data
         const tables = [
             'tax_brackets',
             'capital_gains_rates',
             'standard_deductions',
             'irs_mileage_rates',
-            'contribution_limits',
-            'user_tax_settings'
+            'contribution_limits'
         ];
 
         const tableCounts = {};

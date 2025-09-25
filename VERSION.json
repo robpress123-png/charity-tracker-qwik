@@ -1,6 +1,6 @@
 {
-  "version": "2.6.3",
-  "previousVersion": "2.6.2",
-  "timestamp": "2025-09-25T15:13:56.862Z",
-  "bumpType": "patch"
+  "version": "2.7.0",
+  "previousVersion": "2.6.3",
+  "timestamp": "2025-09-25T15:32:25.959Z",
+  "bumpType": "minor"
 }
