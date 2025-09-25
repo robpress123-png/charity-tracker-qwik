@@ -235,21 +235,24 @@ export async function onRequestPost(context) {
     if (donation_type === 'items' && items && Array.isArray(items)) {
       const itemStmt = env.DB.prepare(`
         INSERT INTO donation_items (
-          donation_id, item_name, category, condition, quantity, unit_value, total_value, value_source
+          id, donation_id, item_name, category, condition, quantity, unit_value, total_value
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       for (const item of items) {
+        // Generate a simple UUID - this should work in Cloudflare Workers
+        const itemId = crypto.randomUUID();
+
         await itemStmt.bind(
+          itemId,
           donationId,
           item.item_name || item.name,
           item.category,
           item.condition,
           item.quantity || 1,
           item.unit_value || item.value,
-          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0),
-          item.value_source || null
+          item.total_value || (item.quantity || 1) * (item.unit_value || item.value || 0)
         ).run();
       }
     }

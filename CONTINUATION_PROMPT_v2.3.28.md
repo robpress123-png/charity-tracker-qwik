@@ -1,6 +1,6 @@
-# Charity Tracker Continuation Context - v2.3.27
+# Charity Tracker Continuation Context - v2.3.28
 **Generated:** 2025-09-25
-**Current Version:** 2.3.27
+**Current Version:** 2.3.28
 **Status:** ✅ FULLY FUNCTIONAL - All major features working!
 
 ## ✅ RECENT FIXES (Session 2025-09-25):
@@ -68,7 +68,7 @@ isPersonalCharity ? (data.user_charity_id || data.charity_id) : null
 isPersonalCharity ? data.user_charity_id : null
 ```
 
-**v2.3.27 Status:**
+**v2.3.28 Status:**
 - ✅ Cash edit works for both charity types
 - ✅ Mileage edit works for both charity types
 - ✅ Stock edit works for both charity types
@@ -323,8 +323,12 @@ The generator MUST:
 4. **Add year-specific mileage rates** - Store in database (2024: $0.14, 2025: $0.14)
 5. **Enhance item valuations** - Add mid_value column for three-tier system
 
-## ⚠️ v2.3.27 FIX - Let database auto-generate IDs for donation_items
-Removed explicit ID generation from INSERT statement. Database will auto-generate IDs.
+## ⚠️ v2.3.28 FIX - Restored ID generation with crypto.randomUUID()
+The database apparently needs explicit IDs. Using crypto.randomUUID() which is available in Cloudflare Workers.
+Also fixed dashboard to clear edit state when opening modal for new donations.
+
+## ⚠️ v2.3.27 BROKE - Tried to let database auto-generate IDs
+Removed explicit ID generation from INSERT statement. This caused 500 errors.
 
 ## ⚠️ v2.3.26 FIX - Removed value_source from donation_items INSERT
 The `value_source` column was never migrated to production D1, causing 500 errors when saving item edits.
