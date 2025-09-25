@@ -1,6 +1,6 @@
-# Charity Tracker Continuation Context - v2.3.18
+# Charity Tracker Continuation Context - v2.3.19
 **Generated:** 2025-09-25
-**Current Version:** 2.3.18
+**Current Version:** 2.3.19
 **Status:** ✅ FULLY FUNCTIONAL - All major features working!
 
 ## ✅ RECENT FIXES (Session 2025-09-25):
@@ -27,7 +27,7 @@
 
 ## ✅ ALL MAJOR ISSUES RESOLVED!
 
-### v2.3.17-2.3.18 Fixed Personal Charities:
+### v2.3.17-2.3.19 Fixed Personal Charities:
 **GET Fix:** Updated API endpoint `/api/donations/[id].js` to JOIN both tables:
 ```sql
 LEFT JOIN charities c ON d.charity_id = c.id
@@ -35,15 +35,18 @@ LEFT JOIN user_charities uc ON d.user_charity_id = uc.id
 COALESCE(c.name, uc.name) as charity_name
 ```
 
-**PUT Fix:** Updated PUT endpoint to properly handle dual charity fields:
+**PUT Fix:** Two-part solution:
+1. API endpoint now properly handles dual charity fields
+2. Dashboard forms now send `charity_source` field explicitly:
 ```javascript
-// Determine charity type from data
-const isPersonalCharity = data.charity_source === 'personal' ||
-                         (data.user_charity_id && !data.charity_id);
-// Set appropriate field
-SET
-    charity_id = ?, // NULL for personal charities
-    user_charity_id = ?, // NULL for system charities
+// Dashboard now sends:
+if (charitySource === 'personal') {
+    formData.user_charity_id = charityId;
+    formData.charity_source = 'personal';
+} else {
+    formData.charity_id = charityId;
+    formData.charity_source = 'system';
+}
 ```
 
 **Result:** Personal charities now work in all edit forms and save correctly
@@ -97,7 +100,7 @@ SET
 - ✅ Type filter now reapplies when year changes
 - ✅ Fixed donation filtering persistence
 
-### v2.3.12-2.3.18: Complete Feature Set
+### v2.3.12-2.3.19: Complete Feature Set
 - ✅ Real data test CSV generator created
 - ✅ Fixed item edit value calculations
 - ✅ UI improvements (Unit FMV, icons, button styling)
@@ -255,7 +258,7 @@ npm run bump:patch  # 2.3.11 → 2.3.12
 - Token-based auth (localStorage)
 - Test user: test@example.com / test123
 
-## ✅ WORKING FEATURES (v2.3.18):
+## ✅ WORKING FEATURES (v2.3.19):
 - ✅ Chunked CSV import (no timeout on 175+ donations)
 - ✅ All donation types display and edit correctly
 - ✅ Personal AND system charities work in all forms
@@ -311,7 +314,7 @@ The generator MUST:
 - Edit views need proper column data, not notes
 
 ## 🚀 DEPLOYMENT STATUS:
-- **Version:** 2.3.18
+- **Version:** 2.3.19
 - **GitHub:** https://github.com/robpress123-png/charity-tracker-qwik
 - **Production:** https://charity-tracker-qwik.pages.dev
 - **Status:** Fully functional with real test data
@@ -326,4 +329,4 @@ The generator MUST:
 All major functionality is now working! Personal charities display and save correctly in all donation types. The test data generator uses real charity/item data from exports. Tax savings calculate properly. The only remaining work is optional enhancements like deploying tax tables for more accurate calculations and adding year-specific mileage rates.
 
 ---
-**END OF CONTINUATION PROMPT v2.3.18**
+**END OF CONTINUATION PROMPT v2.3.19**
