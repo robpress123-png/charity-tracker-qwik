@@ -140,8 +140,9 @@ export async function onRequestPut(context) {
         const token = request.headers.get('Authorization');
         const user = getUserFromToken(token);
         console.log('[PUT AUTH] User:', user ? user.id : 'null');
+        console.log('[PUT AUTH] Full user object:', user);
 
-        if (!user) {
+        if (!user || !user.id) {
             return Response.json({
                 success: false,
                 error: 'Unauthorized'
@@ -168,6 +169,15 @@ export async function onRequestPut(context) {
         const date = data.donation_date || data.date || new Date().toISOString().split('T')[0];
         donationType = data.donation_type || 'cash';
 
+        console.log('[PUT DATA] Processing update data:', {
+            amount,
+            date,
+            donationType,
+            charity_id: data.charity_id,
+            user_charity_id: data.user_charity_id,
+            items_count: data.items ? data.items.length : 0
+        });
+
         // Notes field should ONLY contain user-entered text, never structured data
         const notesText = data.notes || '';
 
@@ -186,6 +196,39 @@ export async function onRequestPut(context) {
             amount,
             date
         });
+
+        // Prepare all bind values with explicit null handling
+        const bindValues = [
+            isPersonalCharity ? null : (data.charity_id || null),
+            isPersonalCharity ? (data.user_charity_id || null) : null,
+            amount,
+            date,
+            donationType,
+            notesText || '',
+            data.receipt_url || null,
+            donationType === 'miles' ? (data.miles_driven || null) : null,
+            donationType === 'miles' ? (data.mileage_rate || null) : null,
+            donationType === 'miles' ? (data.mileage_purpose || null) : null,
+            donationType === 'stock' ? (data.stock_symbol || null) : null,
+            donationType === 'stock' ? (data.stock_quantity || null) : null,
+            donationType === 'stock' || donationType === 'crypto' ? (data.fair_market_value || null) : null,
+            donationType === 'crypto' ? (data.crypto_symbol || null) : null,
+            donationType === 'crypto' ? (data.crypto_quantity || null) : null,
+            donationType === 'crypto' ? (data.crypto_type || null) : null,
+            null,  // item_description - deprecated, items stored in donation_items table
+            donationType === 'items' ? amount : null,  // estimated_value - use total amount for items
+            donationId,
+            user.id
+        ];
+
+        console.log('[PUT UPDATE] Bind values:', bindValues.map((v, i) => `[${i}]: ${v === null ? 'null' : v === undefined ? 'UNDEFINED!' : v}`));
+
+        // Check for undefined values
+        const undefinedIndex = bindValues.findIndex(v => v === undefined);
+        if (undefinedIndex !== -1) {
+            console.error('[PUT UPDATE] UNDEFINED value found at index:', undefinedIndex);
+            throw new Error(`Undefined value at bind position ${undefinedIndex}`);
+        }
 
         // Update the donation with proper charity field handling
         // NOTE: cost_basis column removed - not in production DB
@@ -211,28 +254,7 @@ export async function onRequestPut(context) {
                 item_description = ?,
                 estimated_value = ?
             WHERE id = ? AND user_id = ?
-        `).bind(
-            isPersonalCharity ? null : data.charity_id,
-            isPersonalCharity ? data.user_charity_id : null,
-            amount,
-            date,
-            donationType,
-            notesText,
-            data.receipt_url || null,
-            donationType === 'miles' ? data.miles_driven : null,
-            donationType === 'miles' ? data.mileage_rate : null,
-            donationType === 'miles' ? data.mileage_purpose : null,
-            donationType === 'stock' ? data.stock_symbol : null,
-            donationType === 'stock' ? data.stock_quantity : null,
-            donationType === 'stock' || donationType === 'crypto' ? data.fair_market_value : null,
-            donationType === 'crypto' ? data.crypto_symbol : null,
-            donationType === 'crypto' ? data.crypto_quantity : null,
-            donationType === 'crypto' ? data.crypto_type : null,
-            donationType === 'items' ? data.item_description : null,
-            donationType === 'items' ? data.estimated_value : null,
-            donationId,
-            user.id
-        ).run();
+        `).bind(...bindValues).run();
 
         if (result.meta.changes === 0) {
             return Response.json({
