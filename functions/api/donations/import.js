@@ -34,9 +34,8 @@ export async function onRequestPost(context) {
     try {
         // Check authentication
         const token = request.headers.get('Authorization');
-        console.log('[IMPORT DEBUG] Token received:', token ? token.substring(0, 20) + '...' : 'None');
+        // Removed debug logging for performance
         let user = getUserFromToken(token);
-        console.log('[IMPORT DEBUG] Initial user from token:', user);
 
         if (!user) {
             // Try to get real user ID from database
@@ -48,9 +47,7 @@ export async function onRequestPost(context) {
                     if (userCheck) {
                         // Create a user object since it was null
                         user = { id: userId, email: 'user@example.com' };
-                        console.log('[IMPORT DEBUG] Created user object from token:', user);
                     } else {
-                        console.log('[IMPORT DEBUG] User ID not found in database:', userId);
                     }
                 }
             }
@@ -107,28 +104,22 @@ export async function onRequestPost(context) {
             }
         }
 
-        // First, get all charities for name matching
+        // First, get all charities for name matching - LIMIT to speed up
         let allCharities = { results: [] };
         try {
-            // Try to get system charities - get ALL of them for better matching
-            const systemCharities = await env.DB.prepare(`
-                SELECT id, name, ein, 'system' as type FROM charities
-            `).all();
-
-            // Try to get user charities
-            const userCharities = await env.DB.prepare(`
+            // Get top 1000 system charities and all user charities
+            const charityQuery = await env.DB.prepare(`
+                SELECT id, name, ein, 'system' as type FROM charities LIMIT 1000
+                UNION ALL
                 SELECT id, name, ein, 'personal' as type FROM user_charities WHERE user_id = ?
             `).bind(user.id).all();
 
-            allCharities.results = [
-                ...(systemCharities.results || []),
-                ...(userCharities.results || [])
-            ];
+            allCharities = charityQuery;
 
-            console.log(`[DEBUG] Found ${systemCharities.results?.length || 0} system charities and ${userCharities.results?.length || 0} user charities`);
         } catch (charityError) {
             console.error('[ERROR] Failed to load charities:', charityError);
             // Continue with empty charity list - all will need to be personal charities
+            allCharities = { results: [] };
         }
 
         // Create a lookup map for charity names (case-insensitive)
@@ -160,9 +151,7 @@ export async function onRequestPost(context) {
             }
         };
 
-        console.log('[IMPORT DEBUG] Starting import for user:', user.id);
-        console.log('[IMPORT DEBUG] Total donations to process:', donations.length);
-        console.log('[IMPORT DEBUG] Total charities in DB:', allCharities.results.length);
+        // Starting import
 
         // Process donations
         for (const donation of donations) {
@@ -206,7 +195,6 @@ export async function onRequestPost(context) {
                             charityType = 'system';
                         }
                         results.charityMatches.found++;
-                        console.log(`[IMPORT DEBUG] Found exact match for "${donation.charity_name}"`);
                     } else {
                         // Try cleaned name for fuzzy matching
                         const cleanName = searchName
@@ -224,7 +212,6 @@ export async function onRequestPost(context) {
                                 charityType = 'system';
                             }
                             results.charityMatches.found++;
-                            console.log(`[IMPORT DEBUG] Found fuzzy match for "${donation.charity_name}" -> "${cleanMatch.name}"`);
                         } else {
                             // Try partial match
                             let foundPartialMatch = false;
@@ -239,14 +226,12 @@ export async function onRequestPost(context) {
                                     }
                                     results.charityMatches.found++;
                                     foundPartialMatch = true;
-                                    console.log(`[IMPORT DEBUG] Found partial match for "${donation.charity_name}" -> "${charity.name}"`);
                                     break;
                                 }
                             }
 
                             if (!foundPartialMatch) {
                                 // No matches at all - check if personal charity already exists or create new one
-                                console.log(`[IMPORT DEBUG] No match for "${donation.charity_name}" - checking for existing personal charity`);
                                 try {
                                     // First check if this personal charity already exists for this user
                                     const existingPersonalCharity = await env.DB.prepare(`
@@ -258,7 +243,6 @@ export async function onRequestPost(context) {
                                         // Reuse existing personal charity
                                         userCharityId = existingPersonalCharity.id;
                                         charityType = 'personal';
-                                        console.log(`[IMPORT DEBUG] Found existing personal charity with ID: ${userCharityId}`);
 
                                         // Update charity map to include this for future donations in same import
                                         charityMap.set(donation.charity_name.toLowerCase(), {
@@ -283,7 +267,6 @@ export async function onRequestPost(context) {
                                             results.personalCharitiesCreated = 0;
                                         }
                                         results.personalCharitiesCreated++;
-                                        console.log(`[IMPORT DEBUG] Created new personal charity with ID: ${newCharityId}`);
 
                                         // Add to charity map for future donations in same import
                                         charityMap.set(donation.charity_name.toLowerCase(), {
@@ -369,15 +352,7 @@ export async function onRequestPost(context) {
                 }
 
                 // Insert donation with ALL proper columns
-                console.log(`[IMPORT DEBUG] Inserting donation ${results.processed}:`, {
-                    donationId,
-                    userId: user.id,
-                    charityId,
-                    userCharityId,
-                    donationType,
-                    amount,
-                    donationDate
-                });
+                // Insert donation
 
                 await env.DB.prepare(`
                     INSERT INTO donations (
@@ -410,7 +385,6 @@ export async function onRequestPost(context) {
                     item_description, estimated_value
                 ).run();
 
-                console.log(`[IMPORT DEBUG] Successfully inserted donation ${donationId}`);
 
                 // For items donations, parse items from notes or items column
                 if (donationType === 'items') {
@@ -426,45 +400,12 @@ export async function onRequestPost(context) {
                             const condition = donation[`item_${i}_condition`] || 'good';
                             const quantity = parseInt(donation[`item_${i}_quantity`]) || 1;
 
-                            // Look up value from database if not provided in CSV
+                            // Skip value lookup during import to speed things up
+                            // Values will be calculated when displaying donations
                             let value = parseFloat(donation[`item_${i}_value`]) || 0;
                             let unitValue = value / quantity;
 
-                            // If no value provided, look it up from the items database
-                            if (!value || value === 0) {
-                                try {
-                                    const itemResult = await env.DB.prepare(`
-                                        SELECT low_value, high_value
-                                        FROM items
-                                        WHERE name = ? AND category = ?
-                                    `).bind(itemName, category).first();
-
-                                    if (itemResult) {
-                                        // Calculate value based on condition
-                                        const lowValue = parseFloat(itemResult.low_value) || 0;
-                                        const highValue = parseFloat(itemResult.high_value) || 0;
-
-                                        if (condition === 'excellent') {
-                                            unitValue = highValue;
-                                        } else if (condition === 'very_good') {
-                                            unitValue = (lowValue + highValue) / 2;
-                                        } else if (condition === 'good') {
-                                            unitValue = lowValue;
-                                        } else { // fair
-                                            unitValue = 0; // Not tax deductible
-                                        }
-
-                                        value = unitValue * quantity;
-                                        console.log(`[IMPORT DEBUG] Calculated value for ${itemName}: ${condition} = $${unitValue} x ${quantity} = $${value}`);
-                                    } else {
-                                        console.log(`[IMPORT DEBUG] Item not found in database: ${itemName} (${category})`);
-                                    }
-                                } catch (lookupError) {
-                                    console.error(`[IMPORT DEBUG] Error looking up item value:`, lookupError);
-                                }
-                            }
-
-                            console.log(`[IMPORT DEBUG] Adding item ${i}: ${itemName}, ${category}, ${condition}, qty=${quantity}, value=${value}`);
+                            // Removed debug logging to speed up import
 
                             await env.DB.prepare(`
                                 INSERT INTO donation_items (
@@ -580,8 +521,6 @@ export async function onRequestPost(context) {
                                 avgValue
                             ).run();
                         }
-                    } else {
-                        console.log(`[IMPORT DEBUG] Created ${itemsCreated.length} items for donation ${donationId}`);
                     }
                 }
 
