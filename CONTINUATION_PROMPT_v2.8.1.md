@@ -1,14 +1,39 @@
-# Charity Tracker Qwik - Continuation Prompt v2.8.3
+# Charity Tracker Qwik - Continuation Prompt v2.8.8
 
-## 🎉 Version 2.8.3 - Authentication Documentation Update
+## 🎉 Version 2.8.8 - Edit Item Form Improvements & Tax Fixes
 
-### Latest Updates (v2.8.3)
-- ✅ **Documentation Update**: Corrected authentication section
-  - Clarified test@example.com is primary test account with live data
-  - Documented separate admin authentication system
-  - Noted 'test-token' fallbacks need removal
+### Latest Updates (v2.8.8)
+- ✅ **Edit Item Donation Form Improvements**:
+  - Tax savings now uses donation year's rate (was using current rate)
+  - Tax recalculates when date changes
+  - Fixed scrolling container (300px fixed height)
+  - Delete button now inline with total value field
+  - Fixed "Std." to "Standard Deduction" everywhere
+- ⚠️ **Found Tax Rate Issues**:
+  - viewSummary() function uses currentTaxRate instead of year's rate
+  - Edit item form "Add New Item" needs category selector like main form
+- ✅ **Continuation Prompt Updated**: All recent changes documented
 
-### Previous Updates (v2.8.2)
+### Previous Updates (v2.8.7)
+- ✅ **Tax System Completely Fixed**:
+  - All tax calculations now use year-specific rates from database
+  - Fixed hardcoded 22% default (now 0% until loaded)
+  - Fixed hardcoded standard deduction (now from database)
+  - Edit forms fetch correct year's tax rate
+- ✅ **Filing Status Display Fixed**:
+  - API now returns actual filing status from database
+  - 3-column display shows correct status for each year
+  - All years' tax info cached at startup for performance
+- ✅ **Unsaved Changes Indicator**:
+  - Save button turns orange when tax settings modified
+  - Shows "⚠️ Save Changes" until saved
+  - Clears after successful save
+- ✅ **Cache Management**:
+  - Tax rates cached at startup for all years
+  - Cache refreshes after profile save
+  - No stale data issues
+
+### Previous Updates (v2.8.2-2.8.6)
 - ✅ **3-Column Tax Display**: Shows all years (2024-2026) side-by-side
   - Each year shows: Filing Status, Tax Bracket, Standard Deduction
   - 2026 includes AGI Estimate and OBBBA Threshold (0.5% of AGI)
@@ -93,7 +118,9 @@
   - Hardcoded credentials: admin/admin123 (development only)
   - Admin dashboard requires adminToken in localStorage
   - No database role field - admin handled separately
-- **Known issue**: Dashboard has 'test-token' fallbacks that should be removed
+- **Known issues**:
+  - Dashboard has 'test-token' fallbacks that should be removed
+  - Admin authentication needs database integration (see priority tasks)
 
 ## Complete Database Schema
 
@@ -167,15 +194,29 @@ npm run bump:major  # 2.6.0 → 3.0.0
 
 ## Current Known Issues & In Progress
 
-### Edit Item Donation Form Issues:
-1. **Missing tax savings display** - Other forms show it, edit items doesn't
-2. **Scrolling problem** - Items list grows without limit (needs fixed height)
-3. **Layout issues** - Delete button on own row wastes space
-4. **Category selection** - New items default to "Miscellaneous" without dropdown
+### Known Issues
+
+#### Edit Item Donation Form:
+1. ✅ ~~**Missing tax savings display**~~ - Fixed, now year-aware (v2.8.8)
+2. ✅ ~~**Scrolling problem**~~ - Fixed with 300px height (v2.8.8)
+3. ✅ ~~**Layout issues**~~ - Delete button now inline (v2.8.8)
+4. **Category selection** - New items still default to "Miscellaneous" without dropdown
+   - Need to add category selector and item search like main donation form
 5. **No receipt preview** - Add form has nice receipt, edit doesn't
 
-### Dashboard Display:
-- Need to show tax bracket (e.g., "22%") with tax savings amount
+#### Receipt Upload Flow:
+- **Current limitation**: System assumes users don't have receipts when creating donations
+- **Reality**: Users often have receipts at creation/edit time (e.g., just left store, emailed receipts)
+- **Current workaround**: Must save donation, then go to My Donations to add receipt
+- **Needed**: Non-disruptive way to upload receipt during donation creation/editing
+- **Design consideration**: Should be optional/skippable to maintain quick entry flow
+
+#### Remaining Tax Issues:
+- ✅ ~~Dashboard shows "Not Set" even when tax rate exists~~ (Fixed in v2.8.4)
+- ✅ ~~Filing status shows "Single" for all years~~ (Fixed in v2.8.6)
+- ✅ ~~Tax calculations not year-aware~~ (Fixed in v2.8.7)
+- ⚠️ **viewSummary() function** - Still uses currentTaxRate instead of year's rate
+- ⚠️ **Need to audit** - All tax calculations for year-awareness
 
 ## Next Priority Tasks
 
@@ -187,10 +228,13 @@ npm run bump:major  # 2.6.0 → 3.0.0
 - **CRITICAL**: Currently using hardcoded credentials - security risk!
 
 ### 2. Fix Edit Item Form (HIGH PRIORITY - BE CAREFUL!)
-- ⏳ Add tax savings calculation display
-- ⏳ Fix scrolling with fixed height container
-- ⏳ Improve layout (delete button on same row)
-- ⏳ Add category dropdown for new items
+- ✅ ~~Add tax savings calculation display~~ (Fixed v2.8.8)
+- ✅ ~~Fix scrolling with fixed height container~~ (Fixed v2.8.8)
+- ✅ ~~Improve layout (delete button on same row)~~ (Fixed v2.8.8)
+- ⏳ Add category dropdown and item search for new items
+  - Currently just creates "Miscellaneous" item
+  - Should work like main donation form
+- ⏳ Add receipt preview
 - **CRITICAL**: This form was difficult to get working with both system and personal charities
 - **APPROACH**: Make incremental changes, test thoroughly, have backup ready
 
@@ -198,10 +242,20 @@ npm run bump:major  # 2.6.0 → 3.0.0
 - ✅ API endpoints created (/api/tax/rates GET and POST)
 - ✅ User tax settings UI in profile (bracket selection)
 - ✅ Tax calculations use database rates
+- ✅ All calculations are year-aware
+- ✅ Tax bracket shown on dashboard with savings
+- ✅ Cache system for performance
 - ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor calculation)
-- ⏳ Show tax bracket on dashboard with savings
 
-### 4. Monetization Implementation
+### 4. Improve Receipt Upload Flow (UX Enhancement)
+- **Problem**: Users often have receipts when creating/editing donations
+- **Solution ideas**:
+  - Add optional receipt upload field to donation forms
+  - Show "Add Receipt" button after successful save
+  - Keep it skippable to maintain quick entry flow
+- **Priority**: Medium - current workaround exists but UX could be better
+
+### 5. Monetization Implementation
 - **Model**: Freemium
 - **Free**: 3 donation limit for new users
 - **Premium**: $49/year unlimited
@@ -234,6 +288,12 @@ npx wrangler pages dev --local --port 8788
 - v2.4.0: Tax tables feature release
 - v2.5.0: Admin console reorganization with collapsible menus
 - v2.6.0: Fixed tax import drag-and-drop, refined menu structure
+- v2.8.3: Authentication documentation update
+- v2.8.4: Fixed tax savings label display
+- v2.8.5: Added cache refresh on profile save
+- v2.8.6: Fixed filing status display from database
+- v2.8.7: Complete tax system fixes and year-awareness
+- v2.8.8: Edit item form improvements (scrolling, layout, tax calculations)
 
 ## File Structure
 ```

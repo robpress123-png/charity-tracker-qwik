@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.8.6</title>
+    <title>Dashboard - Charity Tracker v2.9.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -735,13 +735,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.8.6</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.9.0</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.8.6</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.9.0</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1054,7 +1054,7 @@
                                 <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2024">Not Set</div>
                                 <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
                                 <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2024">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
                                 <div style="font-size: 0.875rem;" id="deduction2024">-</div>
                             </div>
 
@@ -1065,7 +1065,7 @@
                                 <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2025">Not Set</div>
                                 <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
                                 <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2025">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
                                 <div style="font-size: 0.875rem;" id="deduction2025">-</div>
                             </div>
 
@@ -1080,7 +1080,7 @@
                                 <div style="font-size: 0.875rem; margin-bottom: 0.5rem;" id="agi2026">-</div>
                                 <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">OBBBA Threshold (0.5%)</div>
                                 <div style="font-size: 0.875rem; font-weight: 500; color: #fbbf24; margin-bottom: 0.5rem;" id="threshold2026" title="First 0.5% of AGI must be donated before tax benefits apply">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Std. Deduction</div>
+                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
                                 <div style="font-size: 0.875rem;" id="deduction2026">-</div>
                             </div>
                         </div>
@@ -1765,14 +1765,14 @@
                     </div>
                     <div>
                         <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Donation Date</label>
-                        <input type="date" id="editItemDate" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <input type="date" id="editItemDate" onchange="renderEditItems()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
                     </div>
                 </div>
 
                 <!-- Items List Section -->
                 <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                     <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Donated Items</h3>
-                    <div id="editItemsList" style="max-height: 50vh; overflow-y: auto; overflow-x: hidden;">
+                    <div id="editItemsList" style="max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 0.5rem;">
                         <!-- Items will be loaded here -->
                     </div>
 
@@ -3651,7 +3651,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.8.6</p>
+                            <p>Generated by Charity Tracker v2.9.0</p>
                         </div>
                     </body>
                     </html>
@@ -5159,7 +5159,17 @@
                 // Calculate summary statistics
                 const donations = data.donations;
                 const totalAmount = donations.reduce((sum, d) => sum + parseFloat(d.amount), 0);
-                const taxSavings = totalAmount * currentTaxRate;
+
+                // Get tax rate for the selected year
+                let taxRate = 0;
+                if (selectedYear === 'all') {
+                    // Use current year's rate for 'all years' view
+                    const currentYear = new Date().getFullYear().toString();
+                    taxRate = taxRatesByYear[currentYear] || 0;
+                } else {
+                    taxRate = taxRatesByYear[selectedYear] || 0;
+                }
+                const taxSavings = totalAmount * taxRate;
 
                 // Group by charity
                 const charityTotals = {};
@@ -5244,7 +5254,7 @@
 
                         <div style="margin-top: 1.5rem; padding: 1rem; background: #fef3c7; border-radius: 8px;">
                             <p style="font-size: 0.875rem; color: #92400e;">
-                                <strong>Note:</strong> Tax savings shown are estimates based on your ${Math.round(currentTaxRate * 100)}% marginal tax rate.
+                                <strong>Note:</strong> Tax savings shown are estimates based on your ${Math.round(taxRate * 100)}% marginal tax rate.
                                 Actual savings depend on itemizing deductions vs. standard deduction ($${(standardDeductions[document.getElementById('filingStatus')?.value] || 14600).toLocaleString()}).
                             </p>
                         </div>
@@ -7217,7 +7227,7 @@
             editingItemsArray = [];
         }
 
-        function renderEditItems() {
+        async function renderEditItems() {
             const container = document.getElementById('editItemsList');
             const totalElement = document.getElementById('editItemTotal');
 
@@ -7226,6 +7236,9 @@
             if (editingItemsArray.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 2rem;">No items added yet</p>';
                 if (totalElement) totalElement.textContent = '0.00';
+                // Clear tax savings display
+                const taxSavingsElem = document.getElementById('editItemTaxSavings');
+                if (taxSavingsElem) taxSavingsElem.textContent = '0.00';
                 return;
             }
 
@@ -7237,8 +7250,8 @@
                 total += itemTotal;
 
                 html += `
-                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem;">
-                        <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr auto; gap: 0.5rem; align-items: start;">
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; position: relative;">
+                        <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr; gap: 0.5rem; align-items: start;">
                             <!-- Category -->
                             <div>
                                 <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Category</label>
@@ -7291,24 +7304,23 @@
                                        style="width: 100%; padding: 0.375rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
                             </div>
 
-                            <!-- Total Value -->
+                            <!-- Total Value with Delete -->
                             <div>
                                 <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Total $</label>
-                                <input type="number"
-                                       value="${itemTotal.toFixed(2)}"
-                                       ${item.category === 'Other' ? `onchange="updateEditItemValue(${index}, this.value)"` : 'readonly'}
-                                       step="0.01"
-                                       min="0"
-                                       style="width: 100%; padding: 0.375rem; border: 1px solid ${item.category === 'Other' ? '#d1d5db' : '#e5e7eb'}; border-radius: 4px; font-size: 0.875rem; background: ${item.category === 'Other' ? 'white' : '#f9fafb'}; color: ${item.category === 'Other' ? '#374151' : '#6b7280'};">
-                            </div>
-
-                            <!-- Delete Button -->
-                            <div>
-                                <button type="button"
-                                        onclick="removeEditItem(${index})"
-                                        style="padding: 0.375rem 0.75rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
-                                    ×
-                                </button>
+                                <div style="display: flex; gap: 0.25rem; align-items: center;">
+                                    <input type="number"
+                                           value="${itemTotal.toFixed(2)}"
+                                           ${item.category === 'Other' ? `onchange="updateEditItemValue(${index}, this.value)"` : 'readonly'}
+                                           step="0.01"
+                                           min="0"
+                                           style="flex: 1; padding: 0.375rem; border: 1px solid ${item.category === 'Other' ? '#d1d5db' : '#e5e7eb'}; border-radius: 4px; font-size: 0.875rem; background: ${item.category === 'Other' ? 'white' : '#f9fafb'}; color: ${item.category === 'Other' ? '#374151' : '#6b7280'};">
+                                    <button type="button"
+                                            onclick="removeEditItem(${index})"
+                                            title="Remove item"
+                                            style="width: 28px; height: 28px; padding: 0; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1.125rem; line-height: 1; display: flex; align-items: center; justify-content: center;">
+                                        ×
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         ${item.category === 'Other' ? `
@@ -7333,13 +7345,27 @@
             container.innerHTML = html;
             if (totalElement) totalElement.textContent = total.toFixed(2);
 
-            // Update tax savings display
+            // Update tax savings display using donation year's rate
             const taxRateElem = document.getElementById('editItemTaxRate');
             const taxSavingsElem = document.getElementById('editItemTaxSavings');
             if (taxRateElem && taxSavingsElem) {
-                const percentage = Math.round((currentTaxRate || 0) * 100);
+                // Get the donation date to determine year
+                const dateStr = document.getElementById('editItemDate')?.value;
+                let taxRate = 0;
+
+                if (dateStr) {
+                    const year = dateStr.split('-')[0];
+                    // Use cached rate if available
+                    taxRate = taxRatesByYear[year] || 0;
+                } else {
+                    // Fallback to current year's rate
+                    const currentYear = new Date().getFullYear().toString();
+                    taxRate = taxRatesByYear[currentYear] || 0;
+                }
+
+                const percentage = Math.round(taxRate * 100);
                 taxRateElem.textContent = percentage;
-                const savings = total * (currentTaxRate || 0);
+                const savings = total * taxRate;
                 taxSavingsElem.textContent = savings.toFixed(2);
             }
         }
@@ -7508,14 +7534,269 @@
         }
 
         function addNewItemRow() {
+            // Show category selection modal instead of adding default item
+            showEditItemCategoryModal();
+        }
+
+        function showEditItemCategoryModal() {
+            // Create modal for category selection
+            const modalHtml = `
+                <div id="editItemCategoryModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 12px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 600;">Select Item Category</h3>
+
+                        <!-- Search box -->
+                        <input type="text"
+                               id="editItemCategorySearch"
+                               placeholder="Search categories..."
+                               oninput="filterEditItemCategories(this.value)"
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1rem;">
+
+                        <!-- Categories grid -->
+                        <div id="editItemCategoriesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem;">
+                            <!-- Will be populated dynamically -->
+                        </div>
+
+                        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                            <button onclick="closeEditItemCategoryModal()"
+                                    style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to page
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = modalHtml;
+            document.body.appendChild(modalDiv.firstElementChild);
+
+            // Populate categories
+            populateEditItemCategories();
+        }
+
+        function populateEditItemCategories() {
+            const grid = document.getElementById('editItemCategoriesGrid');
+            if (!grid || !itemCategories) return;
+
+            let html = '';
+            itemCategories.forEach(cat => {
+                html += `
+                    <div onclick="selectEditItemCategory(${cat.id}, '${cat.name}', '${cat.icon || '📦'}')"
+                         style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s;"
+                         onmouseover="this.style.borderColor='#3b82f6'; this.style.background='#eff6ff';"
+                         onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white';">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${cat.icon || '📦'}</div>
+                        <div style="font-size: 0.875rem; font-weight: 500;">${cat.name}</div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        function filterEditItemCategories(search) {
+            const grid = document.getElementById('editItemCategoriesGrid');
+            if (!grid || !itemCategories) return;
+
+            const searchLower = search.toLowerCase();
+            let html = '';
+
+            itemCategories.forEach(cat => {
+                if (cat.name.toLowerCase().includes(searchLower)) {
+                    html += `
+                        <div onclick="selectEditItemCategory(${cat.id}, '${cat.name}', '${cat.icon || '📦'}')"
+                             style="padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s;"
+                             onmouseover="this.style.borderColor='#3b82f6'; this.style.background='#eff6ff';"
+                             onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='white';">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">${cat.icon || '📦'}</div>
+                            <div style="font-size: 0.875rem; font-weight: 500;">${cat.name}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            grid.innerHTML = html || '<p style="text-align: center; color: #6b7280; grid-column: 1/-1;">No categories found</p>';
+        }
+
+        function closeEditItemCategoryModal() {
+            const modal = document.getElementById('editItemCategoryModal');
+            if (modal) modal.remove();
+        }
+
+        async function selectEditItemCategory(categoryId, categoryName, categoryIcon) {
+            // Close category modal
+            closeEditItemCategoryModal();
+
+            // Now show item selection modal for this category
+            showEditItemSelectionModal(categoryId, categoryName, categoryIcon);
+        }
+
+        async function showEditItemSelectionModal(categoryId, categoryName, categoryIcon) {
+            // Create item selection modal
+            const modalHtml = `
+                <div id="editItemSelectionModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 12px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600;">
+                            <span style="font-size: 1.5rem; margin-right: 0.5rem;">${categoryIcon}</span>
+                            Select ${categoryName} Item
+                        </h3>
+
+                        <!-- Search box -->
+                        <input type="text"
+                               id="editItemSearch"
+                               placeholder="Search items in ${categoryName}..."
+                               oninput="searchEditItems(${categoryId}, this.value)"
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1rem;">
+
+                        <!-- Items list -->
+                        <div id="editItemsList" style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <div style="padding: 1rem; text-align: center; color: #6b7280;">Loading items...</div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <button onclick="showEditItemCategoryModal()"
+                                    style="padding: 0.5rem 1rem; color: #3b82f6; background: white; border: none; cursor: pointer; text-decoration: underline;">
+                                ← Back to categories
+                            </button>
+                            <button onclick="closeEditItemSelectionModal()"
+                                    style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to page
+            const modalDiv = document.createElement('div');
+            modalDiv.innerHTML = modalHtml;
+            document.body.appendChild(modalDiv.firstElementChild);
+
+            // Load items for this category
+            await loadEditItemsForCategory(categoryId, categoryName);
+        }
+
+        async function loadEditItemsForCategory(categoryId, categoryName) {
+            try {
+                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                const data = await response.json();
+
+                const listDiv = document.getElementById('editItemsList');
+                if (!listDiv) return;
+
+                if (data.success && data.items && data.items.length > 0) {
+                    let html = '';
+                    data.items.forEach(item => {
+                        const values = [
+                            item.value_good || item.low_value || 0,
+                            item.value_verygood || item.mid_value || ((parseFloat(item.low_value) + parseFloat(item.high_value)) / 2) || 0,
+                            item.value_excellent || item.high_value || 0
+                        ];
+
+                        html += `
+                            <div onclick="selectEditItem('${item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${categoryName}', ${values[0]}, ${item.id})"
+                                 style="padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background 0.2s;"
+                                 onmouseover="this.style.background='#f9fafb';"
+                                 onmouseout="this.style.background='white';">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 500; color: #111827;">${item.name}</div>
+                                        <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
+                                            Good: $${values[0].toFixed(2)} | Very Good: $${values[1].toFixed(2)} | Excellent: $${values[2].toFixed(2)}
+                                        </div>
+                                    </div>
+                                    <div style="color: #3b82f6; font-size: 1.25rem;">→</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    listDiv.innerHTML = html;
+                } else {
+                    listDiv.innerHTML = '<div style="padding: 1rem; text-align: center; color: #6b7280;">No items found in this category</div>';
+                }
+            } catch (error) {
+                console.error('Error loading items:', error);
+                const listDiv = document.getElementById('editItemsList');
+                if (listDiv) {
+                    listDiv.innerHTML = '<div style="padding: 1rem; text-align: center; color: #ef4444;">Error loading items</div>';
+                }
+            }
+        }
+
+        async function searchEditItems(categoryId, searchTerm) {
+            const listDiv = document.getElementById('editItemsList');
+            if (!listDiv) return;
+
+            try {
+                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                const data = await response.json();
+
+                if (data.success && data.items) {
+                    const filtered = data.items.filter(item =>
+                        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+
+                    if (filtered.length > 0) {
+                        let html = '';
+                        const category = itemCategories.find(c => c.id == categoryId);
+                        const categoryName = category ? category.name : 'Unknown';
+
+                        filtered.forEach(item => {
+                            const values = [
+                                item.value_good || item.low_value || 0,
+                                item.value_verygood || item.mid_value || ((parseFloat(item.low_value) + parseFloat(item.high_value)) / 2) || 0,
+                                item.value_excellent || item.high_value || 0
+                            ];
+
+                            html += `
+                                <div onclick="selectEditItem('${item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${categoryName}', ${values[0]}, ${item.id})"
+                                     style="padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; transition: background 0.2s;"
+                                     onmouseover="this.style.background='#f9fafb';"
+                                     onmouseout="this.style.background='white';">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="font-weight: 500; color: #111827;">${item.name}</div>
+                                            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
+                                                Good: $${values[0].toFixed(2)} | Very Good: $${values[1].toFixed(2)} | Excellent: $${values[2].toFixed(2)}
+                                            </div>
+                                        </div>
+                                        <div style="color: #3b82f6; font-size: 1.25rem;">→</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        listDiv.innerHTML = html;
+                    } else {
+                        listDiv.innerHTML = '<div style="padding: 1rem; text-align: center; color: #6b7280;">No matching items found</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error searching items:', error);
+            }
+        }
+
+        function closeEditItemSelectionModal() {
+            const modal = document.getElementById('editItemSelectionModal');
+            if (modal) modal.remove();
+        }
+
+        function selectEditItem(itemName, categoryName, defaultValue, itemId) {
+            // Add the selected item to the array
             editingItemsArray.push({
-                item_name: 'New Item',
-                category: 'Miscellaneous',
+                item_name: itemName,
+                category: categoryName,
                 condition: 'good',
                 quantity: 1,
-                unit_value: 10,
-                total_value: 10
+                unit_value: defaultValue,
+                total_value: defaultValue,
+                item_id: itemId  // Store item ID for reference
             });
+
+            // Close the modal
+            closeEditItemSelectionModal();
+
+            // Re-render the items list
             renderEditItems();
         }
 
