@@ -242,16 +242,12 @@ export async function onRequestPut(context) {
 
             const itemStmt = env.DB.prepare(`
                 INSERT INTO donation_items (
-                    id, donation_id, item_name, category, condition, quantity, unit_value, total_value
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    donation_id, item_name, category, condition, quantity, unit_value, total_value
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
             `);
 
             for (const item of data.items) {
-                // Generate a simple unique ID that works in Cloudflare Workers
-                const itemId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${Math.random().toString(36).substr(2, 9)}`;
-
                 await itemStmt.bind(
-                    itemId,
                     donationId,
                     item.item_name || item.name,
                     item.category,
