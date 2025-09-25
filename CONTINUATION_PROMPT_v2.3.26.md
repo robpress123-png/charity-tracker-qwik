@@ -1,6 +1,6 @@
-# Charity Tracker Continuation Context - v2.3.25
+# Charity Tracker Continuation Context - v2.3.26
 **Generated:** 2025-09-25
-**Current Version:** 2.3.25
+**Current Version:** 2.3.26
 **Status:** ✅ FULLY FUNCTIONAL - All major features working!
 
 ## ✅ RECENT FIXES (Session 2025-09-25):
@@ -68,7 +68,7 @@ isPersonalCharity ? (data.user_charity_id || data.charity_id) : null
 isPersonalCharity ? data.user_charity_id : null
 ```
 
-**v2.3.25 Status:**
+**v2.3.26 Status:**
 - ✅ Cash edit works for both charity types
 - ✅ Mileage edit works for both charity types
 - ✅ Stock edit works for both charity types
@@ -322,6 +322,10 @@ The generator MUST:
 3. **Implement capital gains calculations** - Optimize stock/crypto deductions
 4. **Add year-specific mileage rates** - Store in database (2024: $0.14, 2025: $0.14)
 5. **Enhance item valuations** - Add mid_value column for three-tier system
+
+## ⚠️ v2.3.26 FIX - Removed value_source from donation_items INSERT
+The `value_source` column was never migrated to production D1, causing 500 errors when saving item edits.
+Fixed by removing it from the INSERT statement in `/api/donations/[id].js`
 
 ## ⚠️ v2.3.25 CRITICAL FIX - Item Names Must Match Database!
 
