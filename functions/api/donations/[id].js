@@ -124,8 +124,10 @@ export async function onRequestGet(context) {
 
 // PUT /api/donations/{id} - Update a donation
 export async function onRequestPut(context) {
+    console.log('[PUT START] onRequestPut called');
     const { params, env, request } = context;
     const donationId = params.id;
+    console.log('[PUT START] Donation ID:', donationId);
 
     // Define these outside try block for error handler
     let donationType = null;
@@ -133,9 +135,11 @@ export async function onRequestPut(context) {
     let data = {};
 
     try {
+        console.log('[PUT AUTH] Checking authentication');
         // Verify authentication
         const token = request.headers.get('Authorization');
         const user = getUserFromToken(token);
+        console.log('[PUT AUTH] User:', user ? user.id : 'null');
 
         if (!user) {
             return Response.json({
@@ -239,44 +243,85 @@ export async function onRequestPut(context) {
 
         // If this is an items donation, update the items in donation_items table
         if (donationType === 'items' && data.items && Array.isArray(data.items)) {
+            console.log('[ITEMS UPDATE] Starting items update for donation:', donationId);
+            console.log('[ITEMS UPDATE] Number of items:', data.items.length);
+            console.log('[ITEMS UPDATE] Items data:', JSON.stringify(data.items, null, 2));
+
             try {
                 // First, delete existing items for this donation
-                console.log('Deleting existing items for donation:', donationId);
+                console.log('[ITEMS DELETE] Deleting existing items for donation:', donationId);
                 const deleteResult = await env.DB.prepare('DELETE FROM donation_items WHERE donation_id = ?')
                     .bind(donationId)
                     .run();
-                console.log('Delete result:', deleteResult);
+                console.log('[ITEMS DELETE] Delete result:', {
+                    success: deleteResult.success,
+                    meta: deleteResult.meta
+                });
 
-                console.log('Inserting new items:', data.items.length);
+                console.log('[ITEMS INSERT] Starting to insert', data.items.length, 'new items');
 
                 // Insert new items one by one for better error tracking
                 for (let i = 0; i < data.items.length; i++) {
                     const item = data.items[i];
-                    console.log(`Inserting item ${i + 1}:`, JSON.stringify(item));
+                    console.log(`[ITEMS INSERT] Processing item ${i + 1}/${data.items.length}:`, {
+                        item_name: item.item_name || item.name,
+                        category: item.category,
+                        condition: item.condition,
+                        quantity: item.quantity,
+                        unit_value: item.unit_value || item.value,
+                        total_value: item.total_value
+                    });
 
                     try {
+                        // Prepare values with detailed logging
+                        const itemName = item.item_name || item.name || 'Unknown Item';
+                        const category = item.category || 'General';
+                        const condition = item.condition || 'good';
+                        const quantity = parseInt(item.quantity) || 1;
+                        const unitValue = parseFloat(item.unit_value) || parseFloat(item.value) || 0;
+                        const totalValue = parseFloat(item.total_value) || 0;
+
+                        console.log(`[ITEMS INSERT] Binding values for item ${i + 1}:`, {
+                            donation_id: donationId,
+                            item_name: itemName,
+                            category: category,
+                            condition: condition,
+                            quantity: quantity,
+                            unit_value: unitValue,
+                            total_value: totalValue
+                        });
+
                         // Simplify to bare minimum INSERT
                         const insertResult = await env.DB.prepare(`
                             INSERT INTO donation_items (donation_id, item_name, category, condition, quantity, unit_value, total_value)
                             VALUES (?, ?, ?, ?, ?, ?, ?)
                         `).bind(
                             donationId,
-                            item.item_name || item.name || 'Unknown Item',
-                            item.category || 'General',
-                            item.condition || 'good',
-                            parseInt(item.quantity) || 1,
-                            parseFloat(item.unit_value) || parseFloat(item.value) || 0,
-                            parseFloat(item.total_value) || 0
+                            itemName,
+                            category,
+                            condition,
+                            quantity,
+                            unitValue,
+                            totalValue
                         ).run();
-                        console.log(`Item ${i + 1} insert result:`, insertResult);
+
+                        console.log(`[ITEMS INSERT] Item ${i + 1} insert result:`, {
+                            success: insertResult.success,
+                            meta: insertResult.meta
+                        });
                     } catch (itemError) {
-                        console.error(`Failed to insert item ${i + 1}:`, itemError);
-                        console.error('Item data was:', JSON.stringify(item));
+                        console.error(`[ITEMS ERROR] Failed to insert item ${i + 1}:`, itemError);
+                        console.error('[ITEMS ERROR] Item data was:', JSON.stringify(item));
+                        console.error('[ITEMS ERROR] Error details:', {
+                            message: itemError.message,
+                            stack: itemError.stack
+                        });
                         // Return error response instead of throwing
                         return Response.json({
                             success: false,
                             error: `Failed to insert item: ${itemError.message}`,
-                            item: item
+                            item: item,
+                            itemIndex: i + 1
                         }, { status: 500 });
                     }
                 }
