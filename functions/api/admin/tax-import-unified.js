@@ -119,11 +119,11 @@ export async function onRequestPost(context) {
                             (tax_year, purpose, rate, effective_date)
                             VALUES (?, ?, ?, ?)
                         `;
-                        // For mileage_rates: purpose is in gain_type column, rate is in min_income column
+                        // For mileage_rates: purpose is in gain_type column (col 3), rate is in max_income column (col 7)
                         bindValues = [
                             parseInt(row.tax_year),
                             row.gain_type || row.purpose,  // purpose is in gain_type column
-                            parseFloat(row.min_income || row.rate),  // rate is in min_income column
+                            parseFloat(row.max_income || row.rate),  // rate is actually in max_income column!
                             row.effective_date
                         ];
                         break;
