@@ -3769,9 +3769,11 @@
                         bracketSelect.appendChild(option);
                     });
 
-                    // Update standard deduction display
-                    document.getElementById('standardDeduction').textContent =
-                        '$' + currentStandardDeduction.toLocaleString();
+                    // Update standard deduction display if element exists
+                    const standardDeductionElem = document.getElementById('standardDeduction');
+                    if (standardDeductionElem) {
+                        standardDeductionElem.textContent = '$' + currentStandardDeduction.toLocaleString();
+                    }
 
                     // If user has saved settings for this year, select them
                     if (data.tax_bracket) {
