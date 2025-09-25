@@ -216,9 +216,14 @@ charity-tracker-qwik/
 │   └── auto-version-bump.js # Deployment automation
 ├── data/
 │   └── items_database_497.csv # Source items (1 rejected on import = 496)
+├── charities_export_2025-09-25.csv # 10,000 charities from database
 ├── package.json            # Version tracking
 └── wrangler.toml          # Cloudflare configuration
 ```
+
+### Key Data Files:
+- **Items Database:** `/data/items_database_497.csv` - 496 valid donation items
+- **Charities Database:** `/charities_export_2025-09-25.csv` - 10,000 IRS charities
 
 ## 🛠 COMMON COMMANDS
 ```bash

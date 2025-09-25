@@ -425,8 +425,44 @@ export async function onRequestPost(context) {
                             const category = donation[`item_${i}_category`] || 'General';
                             const condition = donation[`item_${i}_condition`] || 'good';
                             const quantity = parseInt(donation[`item_${i}_quantity`]) || 1;
-                            const value = parseFloat(donation[`item_${i}_value`]) || 0;
-                            const unitValue = value / quantity;
+
+                            // Look up value from database if not provided in CSV
+                            let value = parseFloat(donation[`item_${i}_value`]) || 0;
+                            let unitValue = value / quantity;
+
+                            // If no value provided, look it up from the items database
+                            if (!value || value === 0) {
+                                try {
+                                    const itemResult = await env.DB.prepare(`
+                                        SELECT low_value, high_value
+                                        FROM items
+                                        WHERE name = ? AND category = ?
+                                    `).bind(itemName, category).first();
+
+                                    if (itemResult) {
+                                        // Calculate value based on condition
+                                        const lowValue = parseFloat(itemResult.low_value) || 0;
+                                        const highValue = parseFloat(itemResult.high_value) || 0;
+
+                                        if (condition === 'excellent') {
+                                            unitValue = highValue;
+                                        } else if (condition === 'very_good') {
+                                            unitValue = (lowValue + highValue) / 2;
+                                        } else if (condition === 'good') {
+                                            unitValue = lowValue;
+                                        } else { // fair
+                                            unitValue = 0; // Not tax deductible
+                                        }
+
+                                        value = unitValue * quantity;
+                                        console.log(`[IMPORT DEBUG] Calculated value for ${itemName}: ${condition} = $${unitValue} x ${quantity} = $${value}`);
+                                    } else {
+                                        console.log(`[IMPORT DEBUG] Item not found in database: ${itemName} (${category})`);
+                                    }
+                                } catch (lookupError) {
+                                    console.error(`[IMPORT DEBUG] Error looking up item value:`, lookupError);
+                                }
+                            }
 
                             console.log(`[IMPORT DEBUG] Adding item ${i}: ${itemName}, ${category}, ${condition}, qty=${quantity}, value=${value}`);
 
