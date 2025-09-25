@@ -1,0 +1,10 @@
+charity_name,donation_date,amount,donation_type,notes,stock_symbol,stock_quantity,cost_basis,fair_market_value
+World Wildlife Fund,2025-03-15,1250.00,stock,"User3: Environmental stock gift",TSLA,5,800.00,1250.00
+Nature Conservancy,2025-07-20,980.00,stock,"User3: Green energy stock",ENPH,10,600.00,980.00
+ASPCA,2025-10-10,1500.00,stock,"User3: Animal welfare donation",PFE,30,1000.00,1500.00
+Catholic Charities,2025-02-28,2100.00,stock,"User4: Faith-based giving",JNJ,12,1500.00,2100.00
+Habitat for Humanity,2025-06-15,1800.00,stock,"User4: Community building",HD,8,1200.00,1800.00
+Local Church,2025-09-30,2400.00,stock,"User4: Religious donation",MSFT,8,1600.00,2400.00
+International Red Cross,2025-04-10,3500.00,stock,"User5: Disaster relief",AMZN,25,2500.00,3500.00
+UNICEF,2025-08-25,4200.00,stock,"User5: International aid",AAPL,20,3000.00,4200.00
+Doctors Without Borders,2025-11-05,2800.00,stock,"User5: Medical aid",GOOGL,15,2000.00,2800.00

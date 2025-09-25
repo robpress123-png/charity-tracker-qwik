@@ -1,0 +1,11 @@
+charity_name,donation_date,amount,donation_type,notes,stock_symbol,stock_quantity,cost_basis,fair_market_value
+American Red Cross,2025-01-20,4500.00,stock,"Q1 stock donation",AAPL,25,2500.00,4500.00
+St. Jude Children's Research Hospital,2025-02-15,3200.00,stock,"Tech stock for charity",MSFT,10,2000.00,3200.00
+Doctors Without Borders,2025-03-10,5750.00,stock,"Amazon shares donation",AMZN,50,3500.00,5750.00
+American Cancer Society,2025-04-25,2400.00,stock,"Spring stock gift",GOOGL,20,1800.00,2400.00
+United Way,2025-05-18,8100.00,stock,"Tesla donation",TSLA,30,5000.00,8100.00
+Mayo Clinic,2025-06-30,3600.00,stock,"Mid-year healthcare stock",JNJ,20,2800.00,3600.00
+American Heart Association,2025-08-12,4950.00,stock,"Index fund donation",SPY,15,3500.00,4950.00
+Make-A-Wish Foundation,2025-09-20,2800.00,stock,"Berkshire shares",BRK.B,10,2000.00,2800.00
+Salvation Army,2025-11-15,6300.00,stock,"Holiday stock gift",QQQ,25,4500.00,6300.00
+Children's Hospital,2025-12-20,5500.00,stock,"Year-end VTI donation",VTI,25,4000.00,5500.00

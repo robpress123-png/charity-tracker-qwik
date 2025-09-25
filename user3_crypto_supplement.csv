@@ -1,0 +1,6 @@
+charity_name,donation_date,amount,donation_type,notes,crypto_symbol,crypto_quantity,crypto_type
+World Wildlife Fund,2025-02-14,325.00,crypto,"Valentine's Day crypto gift for wildlife",ETH,0.13,Ethereum
+ASPCA,2025-04-22,275.00,crypto,"Earth Day DOGE donation",DOGE,2000,Dogecoin
+Nature Conservancy,2025-06-05,450.00,crypto,"World Environment Day - SOL",SOL,3,Solana
+Humane Society,2025-08-15,180.00,crypto,"Small crypto for animals",MATIC,200,Polygon
+Sierra Club,2025-10-31,520.00,crypto,"Halloween BTC for environment",BTC,0.006,Bitcoin
