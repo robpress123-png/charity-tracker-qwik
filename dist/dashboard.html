@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.9.0</title>
+    <title>Dashboard - Charity Tracker v2.9.1</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -735,13 +735,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.9.0</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.9.1</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.9.0</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.9.1</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -1738,7 +1738,7 @@
 
     <!-- Edit Item Donation Modal -->
     <div id="editItemDonationModal" class="modal">
-        <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-content" style="max-width: 1200px;">
             <div class="modal-header">
                 <h2>✏️ Edit Item Donation</h2>
                 <button class="close-btn" onclick="closeEditItemModal()">&times;</button>
@@ -1769,27 +1769,58 @@
                     </div>
                 </div>
 
-                <!-- Items List Section -->
-                <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
-                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Donated Items</h3>
-                    <div id="editItemsList" style="max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 0.5rem;">
-                        <!-- Items will be loaded here -->
+                <!-- Two column layout: Items on left, Receipt on right -->
+                <div style="display: grid; grid-template-columns: 1.8fr 1fr; gap: 1.5rem;">
+                    <!-- Left Column: Items List -->
+                    <div>
+                        <!-- Items List Section -->
+                        <div style="background: #f9fafb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Donated Items</h3>
+                            <div id="editItemsList" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; padding-right: 0.5rem;">
+                                <!-- Items will be loaded here -->
+                            </div>
+
+                            <!-- Add New Item Button -->
+                            <button type="button" onclick="addNewItemRow()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                + Add New Item
+                            </button>
+                        </div>
+
+                        <!-- Notes Section -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
+                            <textarea id="editItemNotes" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
+                        </div>
                     </div>
 
-                    <!-- Add New Item Button -->
-                    <button type="button" onclick="addNewItemRow()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                        + Add New Item
-                    </button>
+                    <!-- Right Column: Receipt Preview -->
+                    <div>
+                        <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:1rem; position: sticky; top: 0;">
+                            <div style="border-bottom:2px dashed #d1d5db; padding-bottom:0.5rem; margin-bottom:0.75rem;">
+                                <h4 style="font-size:1rem;font-weight:700;color:#374151;text-align:center;margin:0;">📋 DONATION RECEIPT</h4>
+                                <p style="font-size:0.75rem;color:#6b7280;text-align:center;margin-top:0.25rem;">Items for Tax Deduction</p>
+                            </div>
+                            <div id="editReceiptItemsList" style="min-height:200px; max-height:350px; overflow-y:auto;font-size:0.875rem;">
+                                <div class="empty-state" style="color:#9ca3af; text-align:center; padding:2rem; font-size:0.875rem;">
+                                    No items added yet
+                                </div>
+                            </div>
+                            <div style="border-top:2px solid #374151; margin-top:0.75rem; padding-top:0.75rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong style="font-size:1rem;">Total Value:</strong>
+                                    <span style="font-size:1.5rem; font-weight:bold; color:#667eea;">$<span id="editReceiptTotal">0.00</span></span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e5e7eb;">
+                                    <span style="font-size: 0.875rem; color: #6b7280;">Tax Savings (<span id="editReceiptTaxRate">0</span>%):</span>
+                                    <span style="font-size: 1rem; font-weight: bold; color: #10b981;">$<span id="editReceiptTaxSavings">0.00</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Notes Section -->
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
-                    <textarea id="editItemNotes" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
-                </div>
-
-                <!-- Total and Tax Savings Section -->
-                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <!-- Bottom Total Section (simplified since receipt shows details) -->
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; margin-bottom: 1.5rem; display: none;" id="editItemTotalSection">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 1.125rem; font-weight: 600;">Total Donation Value:</span>
                         <span style="font-size: 1.5rem; font-weight: bold; color: #0284c7;">$<span id="editItemTotal">0.00</span></span>
@@ -3651,7 +3682,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.9.0</p>
+                            <p>Generated by Charity Tracker v2.9.1</p>
                         </div>
                     </body>
                     </html>
@@ -7249,28 +7280,71 @@
                 const itemTotal = parseFloat(item.total_value) || 0;
                 total += itemTotal;
 
-                html += `
-                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; position: relative;">
-                        <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr; gap: 0.5rem; align-items: start;">
-                            <!-- Category -->
-                            <div>
-                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Category</label>
-                                <input type="text"
-                                       value="${item.category}"
-                                       readonly
-                                       style="width: 100%; padding: 0.375rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                            </div>
+                // Check if this is a new item that needs dropdowns
+                if (item.is_new) {
+                    html += `
+                        <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; position: relative;">
+                            <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr; gap: 0.5rem; align-items: start;">
+                                <!-- Category Dropdown -->
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 0.25rem;">Category</label>
+                                    <select id="editItemCategory_${index}"
+                                            onchange="editCategoryChanged(${index})"
+                                            style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
+                                        <option value="">Select category...</option>
+                                        ${itemCategories ? itemCategories.map(cat =>
+                                            `<option value="${cat.id}">${cat.name}</option>`
+                                        ).join('') : ''}
+                                    </select>
+                                </div>
 
-                            <!-- Item Name -->
-                            <div>
-                                <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">
-                                    ${item.category === 'Other' ? 'Custom Item Description' : 'Item Name'}
-                                </label>
-                                <input type="text"
-                                       value="${item.item_name}"
-                                       readonly
-                                       style="width: 100%; padding: 0.375rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
-                            </div>
+                                <!-- Item Dropdown -->
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #374151; font-weight: 600; display: block; margin-bottom: 0.25rem;">Item</label>
+                                    <div style="position: relative;">
+                                        <input type="text"
+                                               id="editItemSearch_${index}"
+                                               placeholder="${item.category_id ? 'Search items...' : 'Select category first'}"
+                                               oninput="searchEditItemsInline(${index}, this.value)"
+                                               onfocus="showEditItemDropdown(${index})"
+                                               ${!item.category_id ? 'disabled' : ''}
+                                               style="width: 100%; padding: 0.375rem; border: 1px solid ${item.category_id ? '#d1d5db' : '#e5e7eb'}; border-radius: 4px; font-size: 0.875rem;">
+                                        <input type="hidden" id="editItemSelect_${index}">
+                                        <!-- Item Dropdown -->
+                                        <div id="editItemDropdown_${index}" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                            <!-- Populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                    `;
+                } else {
+                    // Existing item - show as readonly
+                    html += `
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; position: relative;">
+                            <div style="display: grid; grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr; gap: 0.5rem; align-items: start;">
+                                <!-- Category -->
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">Category</label>
+                                    <input type="text"
+                                           value="${item.category}"
+                                           readonly
+                                           style="width: 100%; padding: 0.375rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                                </div>
+
+                                <!-- Item Name -->
+                                <div>
+                                    <label style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.25rem;">
+                                        ${item.category === 'Other' ? 'Custom Item Description' : 'Item Name'}
+                                    </label>
+                                    <input type="text"
+                                           value="${item.item_name}"
+                                           readonly
+                                           style="width: 100%; padding: 0.375rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem; background: #f9fafb; color: #6b7280;">
+                                </div>
+                    `;
+                }
+
+                html += `
 
                             <!-- Condition -->
                             <div>
@@ -7323,7 +7397,14 @@
                                 </div>
                             </div>
                         </div>
-                        ${item.category === 'Other' ? `
+                        ${item.is_new ? `
+                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #dbeafe; border-radius: 4px;">
+                            <small style="color: #1e40af; font-size: 0.75rem;">
+                                💡 Select a category, then search and select an item from the dropdown
+                            </small>
+                        </div>
+                        ` : ''}
+                        ${item.category === 'Other' && !item.is_new ? `
                         <div style="margin-top: 0.5rem; padding: 0.75rem; background: #fef3c7; border-radius: 4px;">
                             <label style="font-size: 0.75rem; color: #92400e; font-weight: 600; display: block; margin-bottom: 0.25rem;">
                                 Value Source/Justification
@@ -7344,6 +7425,9 @@
 
             container.innerHTML = html;
             if (totalElement) totalElement.textContent = total.toFixed(2);
+
+            // Update receipt preview
+            updateEditReceiptPreview(total);
 
             // Update tax savings display using donation year's rate
             const taxRateElem = document.getElementById('editItemTaxRate');
@@ -7367,6 +7451,69 @@
                 taxRateElem.textContent = percentage;
                 const savings = total * taxRate;
                 taxSavingsElem.textContent = savings.toFixed(2);
+            }
+        }
+
+        function updateEditReceiptPreview(total) {
+            const receiptItemsList = document.getElementById('editReceiptItemsList');
+            const receiptTotal = document.getElementById('editReceiptTotal');
+            const receiptTaxRate = document.getElementById('editReceiptTaxRate');
+            const receiptTaxSavings = document.getElementById('editReceiptTaxSavings');
+
+            if (!receiptItemsList) return;
+
+            // Update items list in receipt
+            if (editingItemsArray.length === 0) {
+                receiptItemsList.innerHTML = '<div class="empty-state" style="color:#9ca3af; text-align:center; padding:2rem; font-size:0.875rem;">No items added yet</div>';
+                if (receiptTotal) receiptTotal.textContent = '0.00';
+                if (receiptTaxSavings) receiptTaxSavings.textContent = '0.00';
+            } else {
+                let receiptHtml = '';
+                editingItemsArray.forEach((item, index) => {
+                    if (!item.is_new || (item.is_new && item.item_name)) {  // Only show items that are complete
+                        const itemTotal = parseFloat(item.total_value) || 0;
+                        receiptHtml += `
+                            <div style="padding: 0.5rem 0; border-bottom: 1px dashed #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: #111827; font-size: 0.875rem;">${item.item_name || 'New Item'}</div>
+                                        <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.125rem;">
+                                            ${item.category} • ${item.condition ? item.condition.replace('_', ' ') : 'good'} • Qty: ${item.quantity}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right; white-space: nowrap;">
+                                        <div style="font-weight: 600; color: #374151;">$${itemTotal.toFixed(2)}</div>
+                                        ${item.quantity > 1 ? `<div style="font-size: 0.75rem; color: #9ca3af;">$${(item.unit_value || 0).toFixed(2)} each</div>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (receiptHtml === '') {
+                    receiptHtml = '<div style="color:#9ca3af; text-align:center; padding:2rem; font-size:0.875rem;">Add items to see receipt preview</div>';
+                }
+
+                receiptItemsList.innerHTML = receiptHtml;
+                if (receiptTotal) receiptTotal.textContent = total.toFixed(2);
+
+                // Update tax savings in receipt
+                const dateStr = document.getElementById('editItemDate')?.value;
+                let taxRate = 0;
+
+                if (dateStr) {
+                    const year = dateStr.split('-')[0];
+                    taxRate = taxRatesByYear[year] || 0;
+                } else {
+                    const currentYear = new Date().getFullYear().toString();
+                    taxRate = taxRatesByYear[currentYear] || 0;
+                }
+
+                const percentage = Math.round(taxRate * 100);
+                if (receiptTaxRate) receiptTaxRate.textContent = percentage;
+                const savings = total * taxRate;
+                if (receiptTaxSavings) receiptTaxSavings.textContent = savings.toFixed(2);
             }
         }
 
@@ -7534,8 +7681,18 @@
         }
 
         function addNewItemRow() {
-            // Show category selection modal instead of adding default item
-            showEditItemCategoryModal();
+            // Add a new empty row with category dropdown (like the main add form)
+            editingItemsArray.push({
+                item_name: '',
+                category: '',
+                category_id: '',
+                condition: 'good',
+                quantity: 1,
+                unit_value: 0,
+                total_value: 0,
+                is_new: true  // Flag to identify new rows that need dropdowns
+            });
+            renderEditItems();
         }
 
         function showEditItemCategoryModal() {
@@ -7800,6 +7957,123 @@
             renderEditItems();
         }
 
+        // New inline functions for edit form
+        async function editCategoryChanged(index) {
+            const categorySelect = document.getElementById(`editItemCategory_${index}`);
+            const itemSearch = document.getElementById(`editItemSearch_${index}`);
+
+            if (!categorySelect || !itemSearch) return;
+
+            const categoryId = categorySelect.value;
+            const category = itemCategories.find(c => c.id == categoryId);
+
+            if (categoryId && category) {
+                // Update the item in the array
+                editingItemsArray[index].category_id = categoryId;
+                editingItemsArray[index].category = category.name;
+
+                // Enable item search
+                itemSearch.disabled = false;
+                itemSearch.placeholder = `Search ${category.name} items...`;
+                itemSearch.value = '';
+
+                // Load items for this category
+                await loadEditItemsForCategory(index, categoryId);
+            } else {
+                // Disable item search if no category
+                itemSearch.disabled = true;
+                itemSearch.placeholder = 'Select category first';
+                itemSearch.value = '';
+                editingItemsArray[index].category_id = '';
+                editingItemsArray[index].category = '';
+            }
+        }
+
+        async function loadEditItemsForCategory(index, categoryId) {
+            try {
+                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                const data = await response.json();
+
+                if (data.success && data.items) {
+                    // Store items for this category
+                    window[`editCategoryItems_${index}`] = data.items;
+                }
+            } catch (error) {
+                console.error('Error loading items for category:', error);
+            }
+        }
+
+        function showEditItemDropdown(index) {
+            const dropdown = document.getElementById(`editItemDropdown_${index}`);
+            const searchInput = document.getElementById(`editItemSearch_${index}`);
+
+            if (!dropdown || !searchInput || searchInput.disabled) return;
+
+            const items = window[`editCategoryItems_${index}`] || [];
+            const searchTerm = searchInput.value.toLowerCase();
+
+            if (items.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 0.75rem; color: #6b7280; text-align: center;">No items in this category</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            const filteredItems = searchTerm
+                ? items.filter(item => item.name.toLowerCase().includes(searchTerm))
+                : items.slice(0, 10); // Show first 10 if no search
+
+            if (filteredItems.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 0.75rem; color: #6b7280; text-align: center;">No matching items found</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            let html = '';
+            filteredItems.forEach(item => {
+                const goodValue = item.value_good || item.low_value || 0;
+                html += `
+                    <div onclick="selectEditItemInline(${index}, '${item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', ${goodValue}, ${item.id})"
+                         style="padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;"
+                         onmouseover="this.style.background='#f9fafb';"
+                         onmouseout="this.style.background='white';">
+                        <div style="font-size: 0.875rem; font-weight: 500;">${item.name}</div>
+                        <div style="font-size: 0.75rem; color: #6b7280;">Value: $${goodValue.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.style.display = 'block';
+        }
+
+        function searchEditItemsInline(index, searchTerm) {
+            showEditItemDropdown(index);
+        }
+
+        function selectEditItemInline(index, itemName, defaultValue, itemId) {
+            // Update the item in the array
+            editingItemsArray[index].item_name = itemName;
+            editingItemsArray[index].item_id = itemId;
+            editingItemsArray[index].unit_value = defaultValue;
+            editingItemsArray[index].total_value = defaultValue * editingItemsArray[index].quantity;
+            editingItemsArray[index].is_new = false; // No longer a new item
+
+            // Update the search input
+            const searchInput = document.getElementById(`editItemSearch_${index}`);
+            if (searchInput) {
+                searchInput.value = itemName;
+            }
+
+            // Hide dropdown
+            const dropdown = document.getElementById(`editItemDropdown_${index}`);
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
+
+            // Re-render to show as regular item
+            renderEditItems();
+        }
+
         // Charity search functions for edit modal
         function searchEditCharities(query) {
             const dropdown = document.getElementById('editCharityDropdown');
@@ -7858,6 +8132,14 @@
                 const dropdown = document.getElementById('editCharityDropdown');
                 if (dropdown) dropdown.style.display = 'none';
             }
+
+            // Hide edit item dropdowns
+            editingItemsArray.forEach((item, index) => {
+                if (!e.target.matches(`#editItemSearch_${index}`) && !e.target.closest(`#editItemDropdown_${index}`)) {
+                    const dropdown = document.getElementById(`editItemDropdown_${index}`);
+                    if (dropdown) dropdown.style.display = 'none';
+                }
+            });
         });
 
         async function saveEditedItemDonation() {

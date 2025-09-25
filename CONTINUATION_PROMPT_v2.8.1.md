@@ -1,18 +1,23 @@
-# Charity Tracker Qwik - Continuation Prompt v2.8.8
+# Charity Tracker Qwik - Continuation Prompt v2.9.0
 
-## 🎉 Version 2.8.8 - Edit Item Form Improvements & Tax Fixes
+## 🎉 Version 2.9.0 - Complete Edit Item Form & Tax System Fixes
 
-### Latest Updates (v2.8.8)
-- ✅ **Edit Item Donation Form Improvements**:
-  - Tax savings now uses donation year's rate (was using current rate)
-  - Tax recalculates when date changes
-  - Fixed scrolling container (300px fixed height)
-  - Delete button now inline with total value field
-  - Fixed "Std." to "Standard Deduction" everywhere
-- ⚠️ **Found Tax Rate Issues**:
-  - viewSummary() function uses currentTaxRate instead of year's rate
-  - Edit item form "Add New Item" needs category selector like main form
-- ✅ **Continuation Prompt Updated**: All recent changes documented
+### Latest Updates (v2.9.0)
+- ✅ **Edit Item Form Complete Overhaul**:
+  - Added full category and item selection modal (like main form)
+  - No more default "Miscellaneous" items
+  - Users can search and select from database items
+  - Proper value calculation based on condition
+  - Tax savings uses correct year's rate
+  - Scrolling container fixed (300px height)
+  - Delete button inline with total value field
+- ✅ **Tax System Fully Year-Aware**:
+  - Fixed viewSummary() to use year-specific rates
+  - All tax calculations now properly use donation year's rate
+  - Comprehensive audit completed - no remaining issues found
+- ✅ **UI Improvements**:
+  - Changed all "Std. Deduction" to "Standard Deduction"
+  - Added proper modals for item selection in edit form
 
 ### Previous Updates (v2.8.7)
 - ✅ **Tax System Completely Fixed**:
@@ -200,8 +205,7 @@ npm run bump:major  # 2.6.0 → 3.0.0
 1. ✅ ~~**Missing tax savings display**~~ - Fixed, now year-aware (v2.8.8)
 2. ✅ ~~**Scrolling problem**~~ - Fixed with 300px height (v2.8.8)
 3. ✅ ~~**Layout issues**~~ - Delete button now inline (v2.8.8)
-4. **Category selection** - New items still default to "Miscellaneous" without dropdown
-   - Need to add category selector and item search like main donation form
+4. ✅ ~~**Category selection**~~ - Full modal system implemented (v2.9.0)
 5. **No receipt preview** - Add form has nice receipt, edit doesn't
 
 #### Receipt Upload Flow:
@@ -211,38 +215,51 @@ npm run bump:major  # 2.6.0 → 3.0.0
 - **Needed**: Non-disruptive way to upload receipt during donation creation/editing
 - **Design consideration**: Should be optional/skippable to maintain quick entry flow
 
-#### Remaining Tax Issues:
-- ✅ ~~Dashboard shows "Not Set" even when tax rate exists~~ (Fixed in v2.8.4)
-- ✅ ~~Filing status shows "Single" for all years~~ (Fixed in v2.8.6)
-- ✅ ~~Tax calculations not year-aware~~ (Fixed in v2.8.7)
-- ⚠️ **viewSummary() function** - Still uses currentTaxRate instead of year's rate
-- ⚠️ **Need to audit** - All tax calculations for year-awareness
+#### Tax System Status:
+- ✅ All tax calculations are now year-aware (v2.9.0)
+- ✅ Dashboard shows correct tax rate from user settings
+- ✅ Filing status displays correctly from database
+- ✅ viewSummary() function uses year-specific rates
+- ✅ Comprehensive audit completed - system fully year-aware
 
 ## Next Priority Tasks
 
-### 1. Secure Admin Access (SECURITY PRIORITY)
+### 1. Simplify Edit Item Form to Match Add Form (HIGH PRIORITY - UX CONSISTENCY)
+- **Problem**: Current implementation (v2.9.0) is too fancy with modal popups
+- **Solution**: Match the simpler inline approach from add item donation form:
+  - Category dropdown in each item row (not modal)
+  - Selecting category populates item dropdown in same row
+  - Select item, then condition - all inline
+  - No modal popups needed
+- **Enhancement**: Add receipt preview on right side that updates with changes
+- **Benefits**:
+  - Consistent UX between add and edit forms
+  - Simpler, more intuitive workflow
+  - Live receipt preview during editing
+- **Note**: Revert the v2.9.0 modal approach, use inline dropdowns instead
+
+### 2. Secure Admin Access (SECURITY PRIORITY)
 - ⏳ Add 'role' field to users table (admin/user)
 - ⏳ Replace hardcoded admin credentials with database authentication
 - ⏳ Verify admin endpoints check role properly
 - ⏳ Remove hardcoded admin/admin123 from admin-login.html
 - **CRITICAL**: Currently using hardcoded credentials - security risk!
 
-### 2. Fix Edit Item Form (HIGH PRIORITY - BE CAREFUL!)
-- ✅ ~~Add tax savings calculation display~~ (Fixed v2.8.8)
-- ✅ ~~Fix scrolling with fixed height container~~ (Fixed v2.8.8)
-- ✅ ~~Improve layout (delete button on same row)~~ (Fixed v2.8.8)
-- ⏳ Add category dropdown and item search for new items
-  - Currently just creates "Miscellaneous" item
-  - Should work like main donation form
-- ⏳ Add receipt preview
-- **CRITICAL**: This form was difficult to get working with both system and personal charities
-- **APPROACH**: Make incremental changes, test thoroughly, have backup ready
+### 2. Edit Item Form Status (NEEDS REVISION)
+- ✅ Tax savings calculation display (v2.8.8)
+- ✅ Scrolling with fixed height container (v2.8.8)
+- ✅ Improved layout with inline delete button (v2.8.8)
+- ⚠️ Category/item selection system (v2.9.0) - **Too complex, needs simplification**
+  - Current: Modal-based selection (too fancy)
+  - Needed: Inline dropdowns like add form
+  - Should match the simpler UX of add item donation
+- ⏳ **Still needed**: Receipt preview on right side
 
-### 3. Complete Tax Integration
+### 3. Complete Tax Integration (MOSTLY DONE)
 - ✅ API endpoints created (/api/tax/rates GET and POST)
 - ✅ User tax settings UI in profile (bracket selection)
 - ✅ Tax calculations use database rates
-- ✅ All calculations are year-aware
+- ✅ All calculations are year-aware (v2.9.0)
 - ✅ Tax bracket shown on dashboard with savings
 - ✅ Cache system for performance
 - ⏳ Apply 2026 OBBBA special rules (0.5% AGI floor calculation)
@@ -254,6 +271,56 @@ npm run bump:major  # 2.6.0 → 3.0.0
   - Show "Add Receipt" button after successful save
   - Keep it skippable to maintain quick entry flow
 - **Priority**: Medium - current workaround exists but UX could be better
+
+### 5. Admin Console UI Improvements (UX Enhancement)
+- **Action Buttons**: Switch from vertical dots (⋮) to horizontal dots (⋯)
+  - Match the nicer style used in donation history
+- **Number Display Issues**:
+  - **Problem**: Numbers showing 3 decimal places (e.g., 123.456)
+  - **Solution**: Remove decimal points for cleaner display
+  - **Problem**: Numbers too large for column widths
+  - **Solutions to consider**:
+    - Use abbreviations (e.g., 1.2K, 3.5M)
+    - Responsive column widths
+    - Tooltip on hover for full values
+    - Smaller font size for large numbers
+- **Scope**: All admin console tables and list views
+- **Priority**: Medium - affects readability and usability
+
+### 6. Test Data Location (REFERENCE)
+- **Location**: `/data/imports/test_data/`
+- **Format**: Compliant v2.2.23+ CSV format
+- **Available files**:
+  - user2_test_real_data.csv
+  - user3_test_real_data.csv
+  - user4_test_real_data.csv
+  - user5_test_v2.3.11.csv
+- **Usage**: Import through dashboard CSV import feature
+
+### 7. Tax Package Integration (FUTURE FEATURE)
+- **Goal**: Enable direct export to tax software
+- **Target integrations**:
+  - TurboTax (Intuit API)
+  - H&R Block
+  - FreeTaxUSA
+  - Generic tax form exports (8283, Schedule A)
+- **Implementation needs**:
+  - API integration placeholders
+  - Export format handlers
+  - OAuth authentication flow
+- **Priority**: High - key differentiator for product
+
+### 8. Stripe Payment Integration (MONETIZATION)
+- **Model**: Freemium with premium features
+- **Free tier**: 3 donation limit for new users
+- **Premium**: $49/year unlimited
+- **Implementation needs**:
+  - Stripe payment gateway integration
+  - Subscription management
+  - Payment status tracking in user table
+  - Grace period handling
+  - Grandfathering logic for existing users
+- **Priority**: High - required for monetization
 
 ### 5. Monetization Implementation
 - **Model**: Freemium
@@ -294,14 +361,15 @@ npx wrangler pages dev --local --port 8788
 - v2.8.6: Fixed filing status display from database
 - v2.8.7: Complete tax system fixes and year-awareness
 - v2.8.8: Edit item form improvements (scrolling, layout, tax calculations)
+- v2.9.0: Full category/item selection for edit form, complete tax audit
 
 ## File Structure
 ```
 charity-tracker-qwik/
 ├── dist/
-│   ├── dashboard.html          # v2.6.1 - Main user dashboard
-│   ├── admin-dashboard.html    # v2.6.1 - Fixed drag-drop, reorganized menu
-│   └── admin.html             # v2.6.1 - Legacy admin page
+│   ├── dashboard.html          # v2.9.0 - Main user dashboard with complete edit forms
+│   ├── admin-dashboard.html    # v2.9.0 - Admin console with all features
+│   └── admin.html             # v2.9.0 - Legacy admin page
 ├── functions/api/             # Cloudflare Pages Functions
 │   ├── donations/
 │   │   └── import.js         # CSV import with value calculation
