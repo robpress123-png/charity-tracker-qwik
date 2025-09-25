@@ -104,10 +104,12 @@ export async function onRequestPost(context) {
             }
         }
 
-        // First, get all charities for name matching - LIMIT to speed up
+        // Pre-load ALL lookup data at once to avoid repeated queries
         let allCharities = { results: [] };
+        let itemsLookup = new Map(); // For fast item value lookups
+
         try {
-            // Get top 1000 system charities and all user charities
+            // Load charities (limited for speed)
             const charityQuery = await env.DB.prepare(`
                 SELECT id, name, ein, 'system' as type FROM charities LIMIT 1000
                 UNION ALL
@@ -116,9 +118,22 @@ export async function onRequestPost(context) {
 
             allCharities = charityQuery;
 
-        } catch (charityError) {
-            console.error('[ERROR] Failed to load charities:', charityError);
-            // Continue with empty charity list - all will need to be personal charities
+            // Load ALL items at once for value lookups
+            const itemsQuery = await env.DB.prepare(`
+                SELECT name, category, low_value, high_value FROM items
+            `).all();
+
+            // Create fast lookup map: "name|category" -> values
+            itemsQuery.results.forEach(item => {
+                const key = `${item.name}|${item.category}`;
+                itemsLookup.set(key, {
+                    low: parseFloat(item.low_value) || 0,
+                    high: parseFloat(item.high_value) || 0
+                });
+            });
+
+        } catch (loadError) {
+            console.error('[ERROR] Failed to load data:', loadError);
             allCharities = { results: [] };
         }
 
@@ -400,10 +415,30 @@ export async function onRequestPost(context) {
                             const condition = donation[`item_${i}_condition`] || 'good';
                             const quantity = parseInt(donation[`item_${i}_quantity`]) || 1;
 
-                            // Skip value lookup during import to speed things up
-                            // Values will be calculated when displaying donations
+                            // Look up value from pre-loaded items map
                             let value = parseFloat(donation[`item_${i}_value`]) || 0;
                             let unitValue = value / quantity;
+
+                            // If no value provided, look it up from the items map
+                            if (!value || value === 0) {
+                                const lookupKey = `${itemName}|${category}`;
+                                const itemValues = itemsLookup.get(lookupKey);
+
+                                if (itemValues) {
+                                    // Calculate value based on condition
+                                    if (condition === 'excellent') {
+                                        unitValue = itemValues.high;
+                                    } else if (condition === 'very_good') {
+                                        unitValue = (itemValues.low + itemValues.high) / 2;
+                                    } else if (condition === 'good') {
+                                        unitValue = itemValues.low;
+                                    } else { // fair
+                                        unitValue = 0; // Not tax deductible
+                                    }
+
+                                    value = unitValue * quantity;
+                                }
+                            }
 
                             // Removed debug logging to speed up import
 
