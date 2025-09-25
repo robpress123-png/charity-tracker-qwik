@@ -485,15 +485,6 @@
                         </button>
                     </div>
                     <div class="sidebar-subsection">
-                        <div class="sidebar-subtitle">Donations</div>
-                        <button class="sidebar-item" onclick="showSection('donations-management')">
-                            💰 View All
-                        </button>
-                        <button class="sidebar-item" onclick="showSection('donations-backup')">
-                            💾 Backup/Restore
-                        </button>
-                    </div>
-                    <div class="sidebar-subsection">
                         <div class="sidebar-subtitle">Items Database</div>
                         <button class="sidebar-item" onclick="showSection('items')">
                             📝 Manage Items
@@ -508,23 +499,32 @@
                             📊 Price History
                         </button>
                     </div>
+                    <div class="sidebar-subsection">
+                        <div class="sidebar-subtitle">Tax Configuration</div>
+                        <button class="sidebar-item" onclick="showSection('tax-tables')">
+                            📊 Tax Tables Import
+                        </button>
+                        <button class="sidebar-item" onclick="showSection('tax-rates')">
+                            💰 Tax Rate Overview
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Users & Tax Management (Collapsible) -->
+            <!-- Users & Donations (Collapsible) -->
             <div class="sidebar-section collapsible">
                 <div class="sidebar-title" onclick="toggleSection(this)">
-                    <span class="toggle-icon">▼</span> Users & Tax
+                    <span class="toggle-icon">▼</span> Users & Donations
                 </div>
                 <div class="sidebar-content">
                     <button class="sidebar-item" onclick="showSection('users')">
                         👥 Manage Users
                     </button>
-                    <button class="sidebar-item" onclick="showSection('tax-tables')">
-                        📊 Tax Tables Import
+                    <button class="sidebar-item" onclick="showSection('donations-management')">
+                        💰 View All Donations
                     </button>
-                    <button class="sidebar-item" onclick="showSection('tax-rates')">
-                        💰 Tax Rate Overview
+                    <button class="sidebar-item" onclick="showSection('donations-backup')">
+                        💾 Donation Backup/Restore
                     </button>
                 </div>
             </div>
@@ -3425,6 +3425,205 @@
                 });
             }
 
+            // Tax tables drop zone
+            const taxDropZone = document.getElementById('taxDropZone');
+            if (taxDropZone) {
+                taxDropZone.addEventListener('click', () => {
+                    document.getElementById('taxCsvFile').click();
+                });
+
+                taxDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    taxDropZone.classList.add('active');
+                });
+
+                taxDropZone.addEventListener('dragleave', () => {
+                    taxDropZone.classList.remove('active');
+                });
+
+                taxDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    taxDropZone.classList.remove('active');
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        document.getElementById('taxCsvFile').files = files;
+                        handleTaxFile(files[0]);
+                    }
+                });
+
+                // Also add change event for file input
+                const taxFileInput = document.getElementById('taxCsvFile');
+                if (taxFileInput) {
+                    taxFileInput.addEventListener('change', (e) => {
+                        if (e.target.files.length > 0) {
+                            handleTaxFile(e.target.files[0]);
+                        }
+                    });
+                }
+            }
+
+        });
+
+        // Tax import functions
+        let taxCsvData = null;
+
+        function handleTaxFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Please select a CSV file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                taxCsvData = e.target.result;
+                const taxFileInfo = document.getElementById('taxFileInfo');
+                if (taxFileInfo) {
+                    taxFileInfo.innerHTML = `
+                        <p style="color: #10b981; font-weight: 500;">✓ ${file.name}</p>
+                        <p style="color: #6b7280; font-size: 0.875rem;">Size: ${(file.size / 1024).toFixed(2)} KB</p>
+                    `;
+                }
+                const importTaxBtn = document.getElementById('importTaxBtn');
+                if (importTaxBtn) {
+                    importTaxBtn.disabled = false;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function importTaxData() {
+            if (!taxCsvData) {
+                alert('Please select a tax data CSV file');
+                return;
+            }
+
+            const importTaxBtn = document.getElementById('importTaxBtn');
+            importTaxBtn.disabled = true;
+            importTaxBtn.textContent = 'Importing...';
+
+            try {
+                const formData = new FormData();
+                const blob = new Blob([taxCsvData], { type: 'text/csv' });
+                formData.append('file', blob, 'tax_data.csv');
+
+                const adminToken = localStorage.getItem('adminToken');
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:8790/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+
+                    // Show detailed stats
+                    if (data.stats) {
+                        let statsMsg = '\nDetails:\n';
+                        for (const [table, info] of Object.entries(data.stats)) {
+                            statsMsg += `${table}: ${info.success} success, ${info.errors} errors\n`;
+                        }
+                        console.log(statsMsg);
+                    }
+
+                    // Refresh status display
+                    await checkTaxTableStatus();
+
+                    // Reset form
+                    document.getElementById('taxCsvFile').value = '';
+                    document.getElementById('taxFileInfo').innerHTML = '';
+                    importTaxBtn.disabled = true;
+                    taxCsvData = null;
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Import failed: ${error.message}`);
+            } finally {
+                importTaxBtn.textContent = '📥 Import Tax Data';
+                importTaxBtn.disabled = !taxCsvData;
+            }
+        }
+
+        async function checkTaxTableStatus() {
+            const taxTableStatus = document.getElementById('taxTableStatus');
+            if (!taxTableStatus) return;
+
+            try {
+                const adminToken = localStorage.getItem('adminToken');
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:8790/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(`${apiUrl}?action=status`, {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let statusHtml = '';
+                    for (const [table, count] of Object.entries(data.tables)) {
+                        const icon = count > 0 ? '✅' : '❌';
+                        const color = count > 0 ? '#10b981' : '#ef4444';
+                        statusHtml += `<p style="color: ${color};">${icon} ${table}: ${count} records</p>`;
+                    }
+                    taxTableStatus.innerHTML = statusHtml;
+                } else {
+                    taxTableStatus.innerHTML = `<p style="color: #ef4444;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                taxTableStatus.innerHTML = `<p style="color: #ef4444;">Failed to check tax tables: ${error.message}</p>`;
+            }
+        }
+
+        async function clearTaxTables() {
+            if (!confirm('⚠️ This will DELETE all tax data from the database. Are you sure?')) {
+                return;
+            }
+
+            try {
+                const adminToken = localStorage.getItem('adminToken');
+                const apiUrl = window.location.hostname === 'localhost'
+                    ? 'http://localhost:8790/api/admin/tax-import-unified'
+                    : '/api/admin/tax-import-unified';
+
+                const response = await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    await checkTaxTableStatus();
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert(`Failed to clear tables: ${error.message}`);
+            }
+        }
+
+        // Initialize tax table status on page load
+        window.addEventListener('load', () => {
+            if (document.getElementById('taxTableStatus')) {
+                checkTaxTableStatus();
+            }
         });
     </script>
 </body>
