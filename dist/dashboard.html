@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.11.10</title>
+    <title>Dashboard - Charity Tracker v2.11.11</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -738,13 +738,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.11.10</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.11.11</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.11.10</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.11.11</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -845,10 +845,19 @@
                 </div>
                 <div style="display: flex; gap: 1rem; flex: 1; min-height: 0; padding: 1rem;">
                     <!-- Left side: Charity list (60%) -->
-                    <div id="charitiesContent" style="flex: 0 0 60%; overflow-y: auto; border-right: 1px solid #e5e7eb; padding-right: 1rem;">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🏛️</div>
-                            <p>Loading your charities...</p>
+                    <div style="flex: 0 0 60%; display: flex; flex-direction: column; border-right: 1px solid #e5e7eb; padding-right: 1rem;">
+                        <!-- Fixed header -->
+                        <div style="display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 2px solid #e5e7eb; background: white; font-weight: 600; font-size: 0.875rem; color: #6b7280;">
+                            <div style="flex: 1;">Charity Name</div>
+                            <div style="width: 90px; text-align: right;">2024</div>
+                            <div style="width: 90px; text-align: right; margin-right: 60px;">2025</div>
+                        </div>
+                        <!-- Scrollable content -->
+                        <div id="charitiesContent" style="flex: 1; overflow-y: auto;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏛️</div>
+                                <p>Loading your charities...</p>
+                            </div>
                         </div>
                     </div>
                     <!-- Right side: Quick insights (40%) -->
@@ -3418,11 +3427,8 @@
                 // Get auth token
                 const token = localStorage.getItem('token');
 
-                // Fetch all donations to get unique charities
+                // Fetch all donations to get unique charities (get all years for comparison)
                 let url = '/api/donations?limit=10000';
-                if (year && year !== 'all') {
-                    url += `&year=${year}`;
-                }
 
                 const response = await fetch(url, {
                     headers: {
@@ -3432,12 +3438,16 @@
                 const data = await response.json();
 
                 if (data.success && data.donations && data.donations.length > 0) {
-                    // Group donations by charity
+                    // Group donations by charity and year
                     const charitiesMap = new Map();
                     data.donations.forEach(donation => {
                         // Use unified_charity_id which combines charity_id and user_charity_id
                         const charityId = donation.unified_charity_id || donation.charity_id || donation.user_charity_id;
                         if (!charityId) return; // Skip if no charity ID
+
+                        // Get donation year
+                        const donationDate = new Date(donation.date || donation.donation_date);
+                        const donationYear = donationDate.getFullYear();
 
                         if (!charitiesMap.has(charityId)) {
                             charitiesMap.set(charityId, {
@@ -3446,15 +3456,25 @@
                                 ein: donation.charity_ein,
                                 category: donation.charity_category || 'Other',
                                 source: donation.charity_source || 'system',
-                                total: 0,
-                                count: 0,
+                                total2024: 0,
+                                total2025: 0,
+                                count2024: 0,
+                                count2025: 0,
                                 lastDonation: donation.date || donation.donation_date
                             });
                         }
                         const charity = charitiesMap.get(charityId);
                         const donationAmount = donation.donation_type === 'items' ? parseFloat(donation.estimated_value || donation.amount || 0) : parseFloat(donation.amount || 0);
-                        charity.total += donationAmount;
-                        charity.count++;
+
+                        // Add to appropriate year
+                        if (donationYear === 2024) {
+                            charity.total2024 += donationAmount;
+                            charity.count2024++;
+                        } else if (donationYear === 2025) {
+                            charity.total2025 += donationAmount;
+                            charity.count2025++;
+                        }
+
                         if ((donation.date || donation.donation_date) > charity.lastDonation) {
                             charity.lastDonation = donation.date || donation.donation_date;
                         }
@@ -3464,27 +3484,14 @@
                     const charities = Array.from(charitiesMap.values())
                         .sort((a, b) => a.name.localeCompare(b.name));
 
-                    // Create minimalist list for left side
+                    // Create minimalist list for left side with 2024/2025 columns
                     let html = '<div style="font-size: 0.9rem;">';
 
                     charities.forEach(charity => {
-                        // Indicate if it's a personal charity
-                        const personalBadge = charity.source === 'personal'
-                            ? '<span style="background: #fef3c7; color: #92400e; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem;">Personal</span>'
-                            : '';
+                        // Create compact single-line format with year columns
+                        const format2024 = charity.total2024 > 0 ? `$${formatCurrency(charity.total2024, true)}` : '-';
+                        const format2025 = charity.total2025 > 0 ? `$${formatCurrency(charity.total2025, true)}` : '-';
 
-                        // Parse last donation date
-                        let lastDonationDate = '';
-                        if (charity.lastDonation) {
-                            if (charity.lastDonation.includes('-')) {
-                                const [year, month, day] = charity.lastDonation.split('-');
-                                lastDonationDate = `${month}/${day}/${year}`;
-                            } else {
-                                lastDonationDate = new Date(charity.lastDonation).toLocaleDateString();
-                            }
-                        }
-
-                        // Create compact single-line format
                         html += `
                             <div style="display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; cursor: pointer;"
                                  onmouseover="this.style.backgroundColor='#f9fafb'"
@@ -3495,13 +3502,13 @@
                                         ${charity.name}
                                     </span>
                                 </div>
-                                <div style="text-align: right; margin: 0 0.75rem; color: #059669; font-weight: 600; white-space: nowrap;">
-                                    $${formatCurrency(charity.total, true)}
+                                <div style="width: 90px; text-align: right; color: #059669; font-weight: 600;">
+                                    ${format2024}
                                 </div>
-                                <div style="margin-right: 0.75rem; color: #6b7280; white-space: nowrap;">
-                                    (${charity.count})
+                                <div style="width: 90px; text-align: right; color: #059669; font-weight: 600;">
+                                    ${format2025}
                                 </div>
-                                <button class="btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; white-space: nowrap;"
+                                <button class="btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; white-space: nowrap; margin-left: 10px;"
                                         onclick="event.stopPropagation(); quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">
                                     + Add
                                 </button>
@@ -3511,59 +3518,75 @@
                     html += '</div>';
                     container.innerHTML = html;
 
-                    // Update insights panel
+                    // Update insights panel with year-over-year data
                     const insightsContainer = document.getElementById('insightsContent');
                     if (insightsContainer && charities.length > 0) {
-                        // Find top charity by amount
-                        const topCharity = charities.reduce((max, charity) =>
-                            charity.total > max.total ? charity : max, charities[0]);
+                        // Calculate totals for each year
+                        let total2024 = 0;
+                        let total2025 = 0;
+                        let charitiesWithBothYears = 0;
 
-                        // Find most frequent charity
-                        const mostFrequent = charities.reduce((max, charity) =>
-                            charity.count > max.count ? charity : max, charities[0]);
+                        charities.forEach(charity => {
+                            total2024 += charity.total2024;
+                            total2025 += charity.total2025;
+                            if (charity.total2024 > 0 && charity.total2025 > 0) {
+                                charitiesWithBothYears++;
+                            }
+                        });
 
-                        // Calculate current month and last month totals
-                        const now = new Date();
-                        const currentMonth = now.getMonth();
-                        const currentYear = now.getFullYear();
+                        // Find top charity by total amount
+                        const topCharity = charities.reduce((max, charity) => {
+                            const charityTotal = charity.total2024 + charity.total2025;
+                            const maxTotal = max.total2024 + max.total2025;
+                            return charityTotal > maxTotal ? charity : max;
+                        }, charities[0]);
 
-                        let currentMonthTotal = 0;
-                        let lastMonthTotal = 0;
-
-                        data.donations.forEach(donation => {
-                            const donationDate = new Date(donation.date || donation.donation_date);
-                            const amount = donation.donation_type === 'items'
-                                ? parseFloat(donation.estimated_value || donation.amount || 0)
-                                : parseFloat(donation.amount || 0);
-
-                            if (donationDate.getFullYear() === currentYear) {
-                                if (donationDate.getMonth() === currentMonth) {
-                                    currentMonthTotal += amount;
-                                } else if (donationDate.getMonth() === currentMonth - 1) {
-                                    lastMonthTotal += amount;
+                        // Find charity with biggest YoY growth
+                        let topGrowthCharity = null;
+                        let topGrowthPercent = 0;
+                        charities.forEach(charity => {
+                            if (charity.total2024 > 0 && charity.total2025 > 0) {
+                                const growthPercent = ((charity.total2025 - charity.total2024) / charity.total2024) * 100;
+                                if (growthPercent > topGrowthPercent) {
+                                    topGrowthPercent = growthPercent;
+                                    topGrowthCharity = charity;
                                 }
                             }
                         });
 
+                        // Calculate YoY change
+                        const yoyChange = total2024 > 0 ? ((total2025 - total2024) / total2024 * 100).toFixed(1) : 0;
+                        const yoyColor = yoyChange > 0 ? '#059669' : yoyChange < 0 ? '#dc2626' : '#6b7280';
+                        const yoySymbol = yoyChange > 0 ? '↑' : yoyChange < 0 ? '↓' : '';
+
                         insightsContainer.innerHTML = `
                             <div style="margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Top Charity</div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Year-over-Year</div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                    <span style="color: #6b7280; font-size: 0.875rem;">2024:</span>
+                                    <span style="font-weight: 500;">$${formatCurrency(total2024, true)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                                    <span style="color: #6b7280; font-size: 0.875rem;">2025:</span>
+                                    <span style="font-weight: 500;">$${formatCurrency(total2025, true)}</span>
+                                </div>
+                                ${total2024 > 0 ? `
+                                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                                    <span style="color: #6b7280; font-size: 0.875rem;">Change:</span>
+                                    <span style="color: ${yoyColor}; font-weight: 600;">${yoySymbol} ${Math.abs(yoyChange)}%</span>
+                                </div>` : ''}
+                            </div>
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Top Charity Overall</div>
                                 <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${topCharity.name}</div>
-                                <div style="color: #059669; font-weight: 500;">$${formatCurrency(topCharity.total, true)}</div>
+                                <div style="color: #059669; font-weight: 500;">$${formatCurrency(topCharity.total2024 + topCharity.total2025, true)}</div>
                             </div>
-                            <div style="margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Most Frequent</div>
-                                <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${mostFrequent.name}</div>
-                                <div style="color: #667eea; font-weight: 500;">${mostFrequent.count} donations</div>
-                            </div>
-                            <div style="margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">This Month</div>
-                                <div style="color: #1f2937; font-weight: 600; font-size: 1.125rem;">$${formatCurrency(currentMonthTotal, true)}</div>
-                            </div>
+                            ${topGrowthCharity ? `
                             <div>
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Last Month</div>
-                                <div style="color: #6b7280; font-weight: 600; font-size: 1.125rem;">$${formatCurrency(lastMonthTotal, true)}</div>
-                            </div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Highest Growth</div>
+                                <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${topGrowthCharity.name}</div>
+                                <div style="color: #059669; font-size: 0.875rem;">↑ ${topGrowthPercent.toFixed(0)}% YoY</div>
+                            </div>` : ''}
                         `;
                     } else if (insightsContainer) {
                         insightsContainer.innerHTML = '<p style="color: #9ca3af; font-size: 0.875rem;">Add donations to see insights</p>';
@@ -3754,7 +3777,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.10</p>
+                            <p>Generated by Charity Tracker v2.11.11</p>
                         </div>
                     </body>
                     </html>
