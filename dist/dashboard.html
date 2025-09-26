@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.11.14</title>
+    <title>Dashboard - Charity Tracker v2.11.15</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -738,13 +738,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.11.14</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.11.15</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.11.14</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.11.15</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -849,7 +849,7 @@
                     <div style="display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 1rem;">
                         <!-- Fixed header -->
                         <div style="display: flex; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 2px solid #667eea; background: #f9fafb; font-weight: 700; font-size: 0.875rem; color: #374151;">
-                            <div style="flex: 1;">Charity Name</div>
+                            <div style="flex: 1; padding-right: 1rem;">Charity Name</div>
                             <div style="width: 100px; text-align: center;">2024</div>
                             <div style="width: 100px; text-align: center;">2025</div>
                             <div style="width: 60px; text-align: center;">Actions</div>
@@ -2735,26 +2735,74 @@
         }
 
         // Show charity info modal
-        function showCharityInfo(charityId, charityName, ein, category, source) {
+        async function showCharityInfo(charityId, charityName, ein, category, source) {
             // Close any open dropdown menus
             document.querySelectorAll('.dropdown-menu').forEach(m => {
                 m.style.display = 'none';
             });
 
+            // Try to fetch more details about the charity
+            let charityDetails = null;
+            let description = '';
+            let address = '';
+            let city = '';
+            let state = '';
+            let website = '';
+
+            try {
+                const token = localStorage.getItem('token');
+                // Try personal charity endpoint first if it's a personal charity
+                const endpoint = source === 'personal'
+                    ? `/api/charities/personal/${charityId}`
+                    : `/api/charities/${charityId}`;
+
+                const response = await fetch(endpoint, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.charity) {
+                        charityDetails = data.charity;
+                        description = charityDetails.description || charityDetails.mission || charityDetails.purpose || '';
+                        address = charityDetails.address || '';
+                        city = charityDetails.city || '';
+                        state = charityDetails.state || '';
+                        website = charityDetails.website || '';
+                        // Update ein and category if we got more info
+                        ein = ein || charityDetails.ein || '';
+                        category = category || charityDetails.category || '';
+                    }
+                }
+            } catch (error) {
+                console.log('Could not fetch additional charity details');
+            }
+
             // Create modal content
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
             modal.innerHTML = `
-                <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 500px; margin: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                <div style="background: white; padding: 2rem; border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; margin: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
                     <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1.5rem;">
-                        <h2 style="color: #1f2937; margin: 0; flex: 1;">${charityName}</h2>
+                        <div style="flex: 1;">
+                            <h2 style="color: #1f2937; margin: 0;">${charityName}</h2>
+                            ${source === 'personal' ? '<span style="display: inline-block; margin-top: 0.5rem; background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem; font-weight: 600;">✨ Personal Charity</span>' : ''}
+                        </div>
                         <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0; margin-left: 1rem;">×</button>
                     </div>
+
+                    ${description ? `
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <label style="font-size: 0.875rem; color: #4b5563; font-weight: 600; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.5rem; display: block;">Purpose / Mission</label>
+                        <div style="color: #1f2937; line-height: 1.6;">${description}</div>
+                    </div>` : ''}
 
                     <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
                         ${ein ? `
                         <div>
-                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">EIN</label>
+                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">EIN (Tax ID)</label>
                             <div style="color: #1f2937; font-weight: 500; margin-top: 0.25rem;">${ein}</div>
                         </div>` : ''}
 
@@ -2763,9 +2811,29 @@
                             <div style="color: #1f2937; font-weight: 500; margin-top: 0.25rem;">${category || 'Not specified'}</div>
                         </div>
 
+                        ${(address || city || state) ? `
                         <div>
-                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Source</label>
-                            <div style="color: #1f2937; font-weight: 500; margin-top: 0.25rem;">${source === 'personal' ? 'Personal Charity' : 'IRS Database'}</div>
+                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Location</label>
+                            <div style="color: #1f2937; font-weight: 500; margin-top: 0.25rem;">
+                                ${address ? address + '<br>' : ''}
+                                ${city ? city + ', ' : ''}${state || ''}
+                            </div>
+                        </div>` : ''}
+
+                        ${website ? `
+                        <div>
+                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Website</label>
+                            <div style="margin-top: 0.25rem;">
+                                <a href="${website.startsWith('http') ? website : 'https://' + website}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    ${website}
+                                    <span style="font-size: 0.75rem;">↗</span>
+                                </a>
+                            </div>
+                        </div>` : ''}
+
+                        <div>
+                            <label style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Data Source</label>
+                            <div style="color: #1f2937; font-weight: 500; margin-top: 0.25rem;">${source === 'personal' ? '👤 User Added' : '🏛️ IRS Database'}</div>
                         </div>
                     </div>
 
@@ -3876,7 +3944,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.14</p>
+                            <p>Generated by Charity Tracker v2.11.15</p>
                         </div>
                     </body>
                     </html>
