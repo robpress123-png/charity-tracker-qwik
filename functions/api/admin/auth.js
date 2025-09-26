@@ -1,5 +1,3 @@
-import { createHash } from 'crypto';
-
 export async function onRequestPost(context) {
     const { env, request } = context;
 
@@ -17,7 +15,11 @@ export async function onRequestPost(context) {
         }
 
         // Hash the password with SHA-256 (same as regular login)
-        const passwordHash = createHash('sha256').update(password).digest('hex');
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
         // Check if user exists and has admin role
         const user = await env.DB.prepare(
