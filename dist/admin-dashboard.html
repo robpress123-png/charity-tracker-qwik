@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.11.1</title>
+    <title>Admin Dashboard - Charity Tracker v2.11.2</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.1</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.2</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1373,7 +1373,7 @@
                     // Update stat cards with real values
                     document.getElementById('totalUsers').textContent = stats.totalUsers.toLocaleString();
                     document.getElementById('donationCount').textContent = (stats.totalDonationCount || 0).toLocaleString();
-                    document.getElementById('totalDonations').textContent = `$${(stats.totalDonations || 0).toLocaleString()}`;
+                    document.getElementById('totalDonations').textContent = `$${Math.round(stats.totalDonations || 0).toLocaleString()}`;
                     document.getElementById('activeCharities').textContent = stats.activeCharities.toLocaleString();
                     document.getElementById('databaseItems').textContent = stats.databaseItems.toLocaleString();
 
@@ -1412,7 +1412,7 @@
                         if (data) {
                             yearCard.innerHTML = `
                                 <h3>${year} Donations</h3>
-                                <div class="value">$${data.total.toLocaleString()}</div>
+                                <div class="value">$${Math.round(data.total).toLocaleString()}</div>
                                 <div class="change">${data.count} donation${data.count !== 1 ? 's' : ''}</div>
                             `;
                         } else {

@@ -417,7 +417,7 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#pricing">Pricing</a>
-                <a href="/login.html" class="btn-login">Login</a>
+                <a href="#login" class="btn-login">Login</a>
             </nav>
         </div>
     </header>
@@ -429,7 +429,7 @@
                 <h1>Turn Charitable Donations into Maximum Tax Deductions</h1>
                 <p>Track donations year-round with our secure, IRS-compliant system. Get accurate values instantly and maximize your tax savings.</p>
                 <div class="cta-buttons">
-                    <a href="/register.html" class="btn-primary">Try Free →</a>
+                    <a href="#login" class="btn-primary">Get Started →</a>
                     <a href="#features" class="btn-secondary">Learn More</a>
                 </div>
             </div>
@@ -568,7 +568,7 @@
                     <li style="margin-bottom: 0.5rem;">✓ Tax calculations</li>
                     <li style="margin-bottom: 0.5rem;">✓ Receipt storage</li>
                 </ul>
-                <a href="/register.html" class="btn-primary" style="display: block;">Start Free</a>
+                <a href="#login" class="btn-primary" style="display: block;">Start Free</a>
             </div>
 
             <!-- Premium Plan -->
@@ -584,13 +584,87 @@
                     <li style="margin-bottom: 0.5rem;">✓ Priority support</li>
                     <li style="margin-bottom: 0.5rem;">✓ Tax package export</li>
                 </ul>
-                <a href="/register.html" class="btn-primary" style="display: block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Get Premium</a>
+                <a href="#login" class="btn-primary" style="display: block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">Get Premium</a>
             </div>
         </div>
 
         <p style="margin-top: 2rem; opacity: 0.9;">
             💡 Average user saves $3,847 in taxes. Premium pays for itself with just one donation!
         </p>
+    </section>
+
+    <!-- Login/Register Section -->
+    <section id="login" style="padding: 5rem 2rem; background: #f7f9fc;">
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="font-size: 2.5rem; color: #1a1a1a; margin-bottom: 1rem;">Get Started</h2>
+                <p style="font-size: 1.2rem; color: #6b7280;">Login to your account or create a new one</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+                <!-- Login Form -->
+                <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #1a1a1a;">Welcome Back</h3>
+                    <form id="loginForm">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Email</label>
+                            <input type="email" id="loginEmail" required
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Password</label>
+                            <input type="password" id="loginPassword" required
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        <button type="submit"
+                                style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            Login to Dashboard
+                        </button>
+                    </form>
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                        <p style="color: #6b7280; text-align: center; font-size: 0.875rem;">
+                            Admin? <a href="/admin-login.html" style="color: #667eea; text-decoration: none;">Admin Login</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #1a1a1a;">Create Account</h3>
+                    <form id="registerForm">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Full Name</label>
+                            <input type="text" id="registerName" required
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Email</label>
+                            <input type="email" id="registerEmail" required
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Password</label>
+                            <input type="password" id="registerPassword" required
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        <button type="submit"
+                                style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            Start Free (3 Donations)
+                        </button>
+                    </form>
+                    <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem; text-align: center;">
+                        By creating an account, you agree to our Terms of Service and Privacy Policy
+                    </p>
+                </div>
+            </div>
+
+            <!-- Dev Mode Note -->
+            <div style="margin-top: 2rem; padding: 1rem; background: #fef3c7; border-radius: 8px; border: 1px solid #fbbf24;">
+                <p style="color: #92400e; font-size: 0.875rem; text-align: center; margin: 0;">
+                    <strong>🔧 DEV MODE:</strong> Test Account: test@example.com / password123
+                </p>
+            </div>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -626,7 +700,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Charity Tracker v2.11.1. All rights reserved.</p>
+            <p>&copy; 2025 Charity Tracker v2.11.2. All rights reserved.</p>
         </div>
     </footer>
 
@@ -662,6 +736,97 @@
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'opacity 0.5s, transform 0.5s';
             observer.observe(card);
+        });
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const button = e.target.querySelector('button[type="submit"]');
+
+            button.disabled = true;
+            button.textContent = 'Logging in...';
+
+            try {
+                // For development - check test credentials
+                if (email === 'test@example.com' && password === 'password123') {
+                    localStorage.setItem('token', 'test-token');
+                    localStorage.setItem('userEmail', email);
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userEmail', email);
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert(data.error || 'Invalid credentials');
+                    button.disabled = false;
+                    button.textContent = 'Login to Dashboard';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+                button.disabled = false;
+                button.textContent = 'Login to Dashboard';
+            }
+        });
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const button = e.target.querySelector('button[type="submit"]');
+
+            button.disabled = true;
+            button.textContent = 'Creating account...';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Account created successfully! Please login.');
+                    // Clear form and switch to login
+                    document.getElementById('registerForm').reset();
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginEmail').focus();
+                    button.disabled = false;
+                    button.textContent = 'Start Free (3 Donations)';
+                } else {
+                    alert(data.error || 'Registration failed');
+                    button.disabled = false;
+                    button.textContent = 'Start Free (3 Donations)';
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed. Please try again.');
+                button.disabled = false;
+                button.textContent = 'Start Free (3 Donations)';
+            }
         });
     </script>
 </body>
