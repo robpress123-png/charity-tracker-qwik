@@ -415,9 +415,10 @@
             </a>
             <nav class="nav-links">
                 <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
                 <a href="#pricing">Pricing</a>
-                <a href="#login" class="btn-login">Login</a>
+                <a href="/login.html" class="btn-login">Login</a>
+                <a href="/register.html" class="btn-login" style="background: #10b981;">Register</a>
+                <a href="/admin-login.html" class="btn-login" style="background: #ef4444;">Admin</a>
             </nav>
         </div>
     </header>
@@ -429,14 +430,14 @@
                 <h1>Turn Charitable Donations into Maximum Tax Deductions</h1>
                 <p>Track donations year-round with our secure, IRS-compliant system. Get accurate values instantly and maximize your tax savings.</p>
                 <div class="cta-buttons">
-                    <a href="#login" class="btn-primary">Get Started →</a>
+                    <a href="/register.html" class="btn-primary">Get Started →</a>
                     <a href="#features" class="btn-secondary">Learn More</a>
                 </div>
             </div>
             <div class="hero-image">
                 <div class="savings-display">
-                    <div class="savings-amount">$3,847</div>
-                    <div class="savings-label">Estimated Tax Savings</div>
+                    <div class="savings-amount" style="font-size: 1.5rem;">Maximize</div>
+                    <div class="savings-label">Your Tax Deductions</div>
                 </div>
                 <div class="app-preview">
                     <p>📱 Track donations on any device</p>
@@ -452,7 +453,7 @@
         <div class="features-container">
             <div class="section-title">
                 <h2>Everything You Need for Smart Donation Tracking</h2>
-                <p>More powerful than ItsDeductible, easier to use, and better value</p>
+                <p>Track every donation type with confidence and ease</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
@@ -489,67 +490,6 @@
         </div>
     </section>
 
-    <!-- Comparison Section -->
-    <section class="comparison">
-        <div class="features-container">
-            <div class="section-title">
-                <h2>See How We Compare</h2>
-                <p>More features, better accuracy, completely free</p>
-            </div>
-            <div class="comparison-table">
-                <div class="comparison-header">
-                    <div>Feature</div>
-                    <div style="text-align: center;">Charity Tracker</div>
-                    <div style="text-align: center;">ItsDeductible</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Price</div>
-                    <div class="check">✓ $49/year</div>
-                    <div class="cross">✗ $99+/year</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Free Trial</div>
-                    <div class="check">✓ 3 donations</div>
-                    <div class="cross">✗ None</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Cryptocurrency Donations</div>
-                    <div class="check">✓</div>
-                    <div class="cross">✗</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Stock Donations</div>
-                    <div class="check">✓</div>
-                    <div class="check">✓</div>
-                </div>
-                <div class="comparison-row">
-                    <div>2026 Tax Law Updates</div>
-                    <div class="check">✓</div>
-                    <div class="cross">✗</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Bulk CSV Import</div>
-                    <div class="check">✓</div>
-                    <div class="cross">✗</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Personal Charities</div>
-                    <div class="check">✓</div>
-                    <div class="cross">✗</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Receipt Upload & Storage</div>
-                    <div class="check">✓</div>
-                    <div class="check">✓</div>
-                </div>
-                <div class="comparison-row">
-                    <div>Real-time Tax Calculations</div>
-                    <div class="check">✓</div>
-                    <div class="cross">✗</div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Pricing Section -->
     <section class="cta-section" id="pricing">
@@ -589,83 +529,10 @@
         </div>
 
         <p style="margin-top: 2rem; opacity: 0.9;">
-            💡 Average user saves $3,847 in taxes. Premium pays for itself with just one donation!
+            💡 Join thousands of users maximizing their charitable deductions. Premium pays for itself!
         </p>
     </section>
 
-    <!-- Login/Register Section -->
-    <section id="login" style="padding: 5rem 2rem; background: #f7f9fc;">
-        <div style="max-width: 900px; margin: 0 auto;">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h2 style="font-size: 2.5rem; color: #1a1a1a; margin-bottom: 1rem;">Get Started</h2>
-                <p style="font-size: 1.2rem; color: #6b7280;">Login to your account or create a new one</p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
-                <!-- Login Form -->
-                <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #1a1a1a;">Welcome Back</h3>
-                    <form id="loginForm">
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Email</label>
-                            <input type="email" id="loginEmail" required
-                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Password</label>
-                            <input type="password" id="loginPassword" required
-                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
-                        </div>
-                        <button type="submit"
-                                style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                            Login to Dashboard
-                        </button>
-                    </form>
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
-                        <p style="color: #6b7280; text-align: center; font-size: 0.875rem;">
-                            Admin? <a href="/admin-login.html" style="color: #667eea; text-decoration: none;">Admin Login</a>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Register Form -->
-                <div style="background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: #1a1a1a;">Create Account</h3>
-                    <form id="registerForm">
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Full Name</label>
-                            <input type="text" id="registerName" required
-                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Email</label>
-                            <input type="email" id="registerEmail" required
-                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500;">Password</label>
-                            <input type="password" id="registerPassword" required
-                                   style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
-                        </div>
-                        <button type="submit"
-                                style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                            Start Free (3 Donations)
-                        </button>
-                    </form>
-                    <p style="margin-top: 1rem; color: #6b7280; font-size: 0.875rem; text-align: center;">
-                        By creating an account, you agree to our Terms of Service and Privacy Policy
-                    </p>
-                </div>
-            </div>
-
-            <!-- Dev Mode Note -->
-            <div style="margin-top: 2rem; padding: 1rem; background: #fef3c7; border-radius: 8px; border: 1px solid #fbbf24;">
-                <p style="color: #92400e; font-size: 0.875rem; text-align: center; margin: 0;">
-                    <strong>🔧 DEV MODE:</strong> Test Account: test@example.com / password123
-                </p>
-            </div>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer>
@@ -700,7 +567,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Charity Tracker v2.11.6. All rights reserved.</p>
+            <p>&copy; 2025 Charity Tracker v2.11.7. All rights reserved.</p>
         </div>
     </footer>
 
@@ -738,96 +605,6 @@
             observer.observe(card);
         });
 
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const button = e.target.querySelector('button[type="submit"]');
-
-            button.disabled = true;
-            button.textContent = 'Logging in...';
-
-            try {
-                // For development - check test credentials
-                if (email === 'test@example.com' && password === 'password123') {
-                    localStorage.setItem('token', 'test-token');
-                    localStorage.setItem('userEmail', email);
-                    window.location.href = '/dashboard.html';
-                    return;
-                }
-
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userEmail', email);
-                    window.location.href = '/dashboard.html';
-                } else {
-                    alert(data.error || 'Invalid credentials');
-                    button.disabled = false;
-                    button.textContent = 'Login to Dashboard';
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed. Please try again.');
-                button.disabled = false;
-                button.textContent = 'Login to Dashboard';
-            }
-        });
-
-        // Register form handler
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const button = e.target.querySelector('button[type="submit"]');
-
-            button.disabled = true;
-            button.textContent = 'Creating account...';
-
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, password })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('Account created successfully! Please login.');
-                    // Clear form and switch to login
-                    document.getElementById('registerForm').reset();
-                    document.getElementById('loginEmail').value = email;
-                    document.getElementById('loginEmail').focus();
-                    button.disabled = false;
-                    button.textContent = 'Start Free (3 Donations)';
-                } else {
-                    alert(data.error || 'Registration failed');
-                    button.disabled = false;
-                    button.textContent = 'Start Free (3 Donations)';
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                alert('Registration failed. Please try again.');
-                button.disabled = false;
-                button.textContent = 'Start Free (3 Donations)';
-            }
-        });
     </script>
 </body>
 </html>
