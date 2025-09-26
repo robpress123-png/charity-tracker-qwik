@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.11.13</title>
+    <title>Dashboard - Charity Tracker v2.11.14</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -738,13 +738,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.11.13</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.11.14</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.11.13</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.11.14</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -848,11 +848,11 @@
                     </div>
                     <div style="display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 1rem;">
                         <!-- Fixed header -->
-                        <div style="display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 2px solid #e5e7eb; background: white; font-weight: 600; font-size: 0.875rem; color: #6b7280;">
+                        <div style="display: flex; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 2px solid #667eea; background: #f9fafb; font-weight: 700; font-size: 0.875rem; color: #374151;">
                             <div style="flex: 1;">Charity Name</div>
-                            <div style="width: 80px; text-align: right;">2024</div>
-                            <div style="width: 80px; text-align: right;">2025</div>
-                            <div style="width: 40px; text-align: center;">Actions</div>
+                            <div style="width: 100px; text-align: center;">2024</div>
+                            <div style="width: 100px; text-align: center;">2025</div>
+                            <div style="width: 60px; text-align: center;">Actions</div>
                         </div>
                         <!-- Scrollable content -->
                         <div id="charitiesContent" style="flex: 1; overflow-y: auto;">
@@ -3575,24 +3575,24 @@
                         const charityIndex = 'charity_' + index;
 
                         html += `
-                            <div style="display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; position: relative;"
+                            <div style="display: flex; align-items: center; padding: 0.625rem 0.5rem; border-bottom: 1px solid #e5e7eb; position: relative;"
                                  onmouseover="this.style.backgroundColor='#f9fafb'"
                                  onmouseout="this.style.backgroundColor='transparent'">
-                                <div style="flex: 1; min-width: 0; overflow: hidden;">
+                                <div style="flex: 1; min-width: 0; overflow: hidden; padding-right: 1rem;">
                                     <span style="font-weight: 500; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
                                         ${charity.name}
                                     </span>
                                 </div>
-                                <div style="width: 80px; text-align: right; color: #059669; font-weight: 600;">
+                                <div style="width: 100px; text-align: center; color: #059669; font-weight: 600;">
                                     ${format2024}
                                 </div>
-                                <div style="width: 80px; text-align: right; color: #059669; font-weight: 600;">
+                                <div style="width: 100px; text-align: center; color: #059669; font-weight: 600;">
                                     ${format2025}
                                 </div>
-                                <div style="width: 40px; text-align: center; position: relative;">
-                                    <button onclick="toggleCharityMenu(event, '${charityIndex}')"
-                                            style="background: none; border: none; cursor: pointer; padding: 0.25rem; color: #6b7280; font-size: 1.25rem; line-height: 1;">
-                                        ⋮
+                                <div style="width: 60px; text-align: center; position: relative;">
+                                    <button class="btn-action" onclick="toggleCharityMenu(event, '${charityIndex}')"
+                                            style="padding: 0.25rem 0.4rem; font-size: 0.875rem;" title="Actions">
+                                        ⋯
                                     </button>
                                     <div id="charityMenu-${charityIndex}" class="dropdown-menu"
                                          style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid #e5e7eb;
@@ -3660,7 +3660,7 @@
 
                         insightsContainer.innerHTML = `
                             <div style="margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Year-over-Year</div>
+                                <div style="font-size: 0.875rem; color: #1f2937; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.5rem; border-bottom: 2px solid #10b981; padding-bottom: 0.25rem;">Year-over-Year</div>
                                 <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
                                     <span style="color: #6b7280; font-size: 0.875rem;">2024:</span>
                                     <span style="font-weight: 500;">$${formatCurrency(total2024, true)}</span>
@@ -3676,13 +3676,13 @@
                                 </div>` : ''}
                             </div>
                             <div style="margin-bottom: 1.25rem;">
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Top Charity Overall</div>
+                                <div style="font-size: 0.875rem; color: #1f2937; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.5rem; border-bottom: 2px solid #10b981; padding-bottom: 0.25rem;">Top Charity Overall</div>
                                 <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${topCharity.name}</div>
                                 <div style="color: #059669; font-weight: 500;">$${formatCurrency(topCharity.total2024 + topCharity.total2025, true)}</div>
                             </div>
                             ${topGrowthCharity ? `
                             <div>
-                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Highest Growth</div>
+                                <div style="font-size: 0.875rem; color: #1f2937; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: 0.5rem; border-bottom: 2px solid #10b981; padding-bottom: 0.25rem;">Highest Growth</div>
                                 <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${topGrowthCharity.name}</div>
                                 <div style="color: #059669; font-size: 0.875rem;">↑ ${topGrowthPercent.toFixed(0)}% YoY</div>
                             </div>` : ''}
@@ -3876,7 +3876,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.13</p>
+                            <p>Generated by Charity Tracker v2.11.14</p>
                         </div>
                     </body>
                     </html>
