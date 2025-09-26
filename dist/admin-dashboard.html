@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.11.5</title>
+    <title>Admin Dashboard - Charity Tracker v2.11.6</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.5</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.6</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1343,7 +1343,9 @@
                 return;
             }
 
-            document.getElementById('adminName').textContent = adminUser;
+            // Parse the admin user object and display the name
+            const user = JSON.parse(adminUser);
+            document.getElementById('adminName').textContent = user.name || user.email;
 
             // Initialize auto-logout
             initializeAutoLogout();
