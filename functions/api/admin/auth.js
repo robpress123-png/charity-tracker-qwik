@@ -23,7 +23,7 @@ export async function onRequestPost(context) {
 
         // Check if user exists and has admin role
         const user = await env.DB.prepare(
-            'SELECT id, email, username, role FROM users WHERE email = ? AND password = ? AND role = ?'
+            'SELECT id, email, name, role FROM users WHERE email = ? AND password = ? AND role = ?'
         ).bind(email, passwordHash, 'admin').first();
 
         if (!user) {
@@ -45,7 +45,7 @@ export async function onRequestPost(context) {
             user: {
                 id: user.id,
                 email: user.email,
-                username: user.username,
+                name: user.name,
                 role: user.role
             }
         }), {

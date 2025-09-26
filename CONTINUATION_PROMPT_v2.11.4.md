@@ -1,8 +1,9 @@
-# Charity Tracker Qwik - Continuation Prompt v2.11.2
+# Charity Tracker Qwik - Continuation Prompt v2.11.4
 
-## 🎉 Version 2.11.2 - Professional Landing Page with Integrated Auth
+## 🎉 Version 2.11.4 - Fixed Cloudflare Deployment
 
-### Latest Updates (v2.11.2)
+### Latest Updates (v2.11.4)
+- ✅ **Deployment Fix**: Replaced Node.js crypto with Web Crypto API for Cloudflare compatibility
 - ✅ **Professional Home Page**: Complete landing page with features, pricing, and integrated login/register
 - ✅ **Number Formatting Fixed**: Admin dashboard no longer shows decimals in dollar amounts
 - ✅ **Integrated Authentication**: Login and register forms built into home page (not separate pages)
@@ -231,19 +232,21 @@ npx wrangler pages dev --local --port 8788
 - v2.11.0: Professional landing page
 - v2.11.1: Fixed freemium pricing display
 - v2.11.2: Integrated login/register + number formatting
+- v2.11.3: Version bump (deployment failed due to crypto import)
+- v2.11.4: Fixed crypto import for Cloudflare compatibility
 
 ## File Structure
 ```
 charity-tracker-qwik/
 ├── dist/
-│   ├── index.html             # v2.11.2 - Professional landing with integrated auth
-│   ├── dashboard.html          # v2.11.2 - Main dashboard
-│   ├── admin-dashboard.html    # v2.11.2 - Admin console with fixed formatting
-│   ├── admin-login.html       # v2.11.2 - Secure admin login
+│   ├── index.html             # v2.11.4 - Professional landing with integrated auth
+│   ├── dashboard.html          # v2.11.4 - Main dashboard
+│   ├── admin-dashboard.html    # v2.11.4 - Admin console with fixed formatting
+│   ├── admin-login.html       # v2.11.4 - Secure admin login
 │   └── [other pages]
 ├── functions/api/              # Cloudflare Pages Functions
 │   ├── admin/
-│   │   └── auth.js            # Admin authentication endpoint
+│   │   └── auth.js            # Admin auth (uses Web Crypto API, NOT Node.js crypto)
 │   ├── donations/
 │   └── [other endpoints]
 ├── sql/
@@ -260,6 +263,10 @@ charity-tracker-qwik/
 4. **All database changes** via Cloudflare Console, not CLI
 5. **Custom items** require value_source for IRS compliance
 6. **Freemium model**: 3 free donations, then $49/year
+7. **Authentication MUST use Web Crypto API** (crypto.subtle.digest), NOT Node.js crypto module
+   - Correct: `await crypto.subtle.digest('SHA-256', data)`
+   - Wrong: `import { createHash } from 'crypto'`
+   - This is required for Cloudflare Workers compatibility
 
 ## About This Continuation Prompt
 This document enables seamless continuation across sessions by preserving:
@@ -268,4 +275,4 @@ This document enables seamless continuation across sessions by preserving:
 - Known issues and priorities
 - Development guidelines
 
-Ready for continued development at v2.11.2!
+Ready for continued development at v2.11.4!
