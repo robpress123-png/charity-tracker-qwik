@@ -1,12 +1,14 @@
-# Charity Tracker Qwik - Continuation Prompt v2.11.4
+# Charity Tracker Qwik - Continuation Prompt v2.11.9
 
-## 🎉 Version 2.11.4 - Fixed Cloudflare Deployment
+## 🎉 Version 2.11.9 - UI Improvements
 
-### Latest Updates (v2.11.4)
-- ✅ **Deployment Fix**: Replaced Node.js crypto with Web Crypto API for Cloudflare compatibility
-- ✅ **Professional Home Page**: Complete landing page with features, pricing, and integrated login/register
-- ✅ **Number Formatting Fixed**: Admin dashboard no longer shows decimals in dollar amounts
-- ✅ **Integrated Authentication**: Login and register forms built into home page (not separate pages)
+### Latest Updates (v2.11.9)
+- ✅ **Simplified Landing Page**: Removed integrated login forms, added clean navigation buttons
+- ✅ **Dashboard Stats Enhanced**: Bigger stat cards with better visual hierarchy
+- ✅ **My Charities Compact View**: More efficient table layout for charity list
+- ✅ **Landing Page Version**: Version number in header (top-left next to logo)
+- ✅ **Removed IRS Claims**: Updated to generic "fair market value" language
+- ✅ **Removed Comparison**: No more ItsDeductible comparisons
 
 ### Previous Updates (v2.10.0 - v2.11.1)
 - ✅ **Secure Admin Access**: Database-driven admin authentication with role field
@@ -234,15 +236,20 @@ npx wrangler pages dev --local --port 8788
 - v2.11.2: Integrated login/register + number formatting
 - v2.11.3: Version bump (deployment failed due to crypto import)
 - v2.11.4: Fixed crypto import for Cloudflare compatibility
+- v2.11.5: Fixed admin auth username field
+- v2.11.6: Fixed admin welcome message display
+- v2.11.7: Simplified landing page, removed integrated forms
+- v2.11.8: Updated messaging, removed IRS claims
+- v2.11.9: Enhanced dashboard stats, compact charity view
 
 ## File Structure
 ```
 charity-tracker-qwik/
 ├── dist/
-│   ├── index.html             # v2.11.4 - Professional landing with integrated auth
-│   ├── dashboard.html          # v2.11.4 - Main dashboard
-│   ├── admin-dashboard.html    # v2.11.4 - Admin console with fixed formatting
-│   ├── admin-login.html       # v2.11.4 - Secure admin login
+│   ├── index.html             # v2.11.9 - Simplified landing with navigation buttons
+│   ├── dashboard.html          # v2.11.9 - Enhanced stats display
+│   ├── admin-dashboard.html    # v2.11.9 - Admin console with proper name display
+│   ├── admin-login.html       # v2.11.9 - Secure admin login
 │   └── [other pages]
 ├── functions/api/              # Cloudflare Pages Functions
 │   ├── admin/
@@ -275,4 +282,4 @@ This document enables seamless continuation across sessions by preserving:
 - Known issues and priorities
 - Development guidelines
 
-Ready for continued development at v2.11.4!
+Ready for continued development at v2.11.9!
