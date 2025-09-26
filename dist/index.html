@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charity Tracker v2.10.0 - Smart Donation Management</title>
+    <title>Charity Tracker - Turn Donations into Maximum Tax Deductions</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="description" content="Track your charitable donations and maximize your tax benefits">
-    <link rel="manifest" href="/manifest.json">
-    <script type="module" crossorigin src="/build/q-D-3l6r4m.js"></script>
-    <link rel="prefetch" href="/build/q-DFdllWhi.js">
-    <link rel="prefetch" href="/build/q-C7Lrucvk.js">
+    <meta name="description" content="Track charitable donations year-round and maximize your tax benefits. Free, secure, and IRS-compliant donation tracking.">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
 
         * {
             margin: 0;
@@ -21,109 +17,614 @@
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            line-height: 1.6;
+            color: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
-        }
-
-        .version {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
-        }
-
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        a {
-            display: block;
-            padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
             text-decoration: none;
-            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #4a4a4a;
+            text-decoration: none;
             font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .btn-login {
+            padding: 0.5rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        a:hover {
+        .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .subtitle {
-            color: #666;
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,138.7C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat center;
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
             margin-bottom: 2rem;
+            opacity: 0.95;
         }
 
-        .test-info {
-            background: #f3f4f6;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 2rem;
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
-        .test-info h3 {
-            color: #333;
-            font-size: 0.9rem;
+        .btn-primary {
+            padding: 1rem 2rem;
+            background: white;
+            color: #667eea;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background 0.3s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+
+        .hero-image {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .savings-display {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .savings-amount {
+            font-size: 3rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
-        .test-info p {
-            color: #666;
-            font-size: 0.85rem;
-            margin: 0.25rem 0;
+        .savings-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .app-preview {
+            color: #4a4a4a;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: #f7f9fc;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.2rem;
+            color: #6b7280;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Comparison Section */
+        .comparison {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .comparison-table {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .comparison-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            font-weight: 600;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+        }
+
+        .comparison-row:hover {
+            background: #f9fafb;
+        }
+
+        .check {
+            color: #10b981;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .cross {
+            color: #ef4444;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .footer-section a {
+            color: #9ca3af;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #667eea;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .comparison-header,
+            .comparison-row {
+                grid-template-columns: 2fr 1fr 1fr;
+                font-size: 0.9rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎯 Charity Tracker</h1>
-        <div class="version">Version 2.10.0</div>
-        <p class="subtitle">Smart donation tracking for maximum tax benefits</p>
-
-        <div class="links">
-            <a href="/login.html">Login to Your Account</a>
-            <a href="/register.html">Create New Account</a>
-            <a href="/admin-login.html" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">Admin Login (Dev Mode)</a>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                💝 Charity Tracker
+            </a>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/login.html" class="btn-login">Login</a>
+            </nav>
         </div>
+    </header>
 
-        <div style="background: #ecfdf5; border: 2px solid #86efac; padding: 1rem; border-radius: 10px; margin-top: 1.5rem;">
-            <p style="color: #14532d; font-weight: 600; margin-bottom: 0.5rem;">✅ Application Ready</p>
-            <p style="color: #166534; font-size: 0.85rem;">The Charity Tracker is now connected to Cloudflare D1 database.</p>
-            <p style="color: #166534; font-size: 0.85rem; margin-top: 0.5rem;">Login with the test credentials below to explore the dashboard.</p>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Turn Charitable Donations into Maximum Tax Deductions</h1>
+                <p>Track donations year-round with our free, secure, IRS-compliant system. Get accurate values instantly and maximize your tax savings.</p>
+                <div class="cta-buttons">
+                    <a href="/register.html" class="btn-primary">Start Free →</a>
+                    <a href="#features" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="savings-display">
+                    <div class="savings-amount">$3,847</div>
+                    <div class="savings-label">Estimated Tax Savings</div>
+                </div>
+                <div class="app-preview">
+                    <p>📱 Track donations on any device</p>
+                    <p>🔒 Bank-level security</p>
+                    <p>📊 Real-time tax calculations</p>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="test-info">
-            <h3>Test Credentials:</h3>
-            <p>Email: test@example.com</p>
-            <p>Password: password123</p>
-            <p style="margin-top: 0.5rem; font-style: italic; color: #888;">Or click Admin Login for quick dev access</p>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <div class="section-title">
+                <h2>Everything You Need for Smart Donation Tracking</h2>
+                <p>More powerful than ItsDeductible, easier to use, and completely free</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>All Donation Types</h3>
+                    <p>Track cash, items, stocks, crypto, and mileage. Support for 496+ IRS-valued items across 12 categories.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Real-Time Tax Savings</h3>
+                    <p>See your exact tax savings instantly with year-specific tax rates and 2026 OBBBA rules built-in.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>10,000+ Verified Charities</h3>
+                    <p>IRS database of verified charities plus ability to add your own personal charitable organizations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Receipt Management</h3>
+                    <p>Upload and store receipts digitally. Never lose documentation for your tax deductions again.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Bulk Import</h3>
+                    <p>Import hundreds of donations via CSV. Perfect for migrating from spreadsheets or other systems.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted and secure. We never share your information with third parties.</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <div id="qwik-root"></div>
+    <!-- Comparison Section -->
+    <section class="comparison">
+        <div class="features-container">
+            <div class="section-title">
+                <h2>See How We Compare</h2>
+                <p>More features, better accuracy, completely free</p>
+            </div>
+            <div class="comparison-table">
+                <div class="comparison-header">
+                    <div>Feature</div>
+                    <div style="text-align: center;">Charity Tracker</div>
+                    <div style="text-align: center;">ItsDeductible</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Price</div>
+                    <div class="check">✓ Free</div>
+                    <div class="cross">✗ Paid</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Cryptocurrency Donations</div>
+                    <div class="check">✓</div>
+                    <div class="cross">✗</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Stock Donations</div>
+                    <div class="check">✓</div>
+                    <div class="check">✓</div>
+                </div>
+                <div class="comparison-row">
+                    <div>2026 Tax Law Updates</div>
+                    <div class="check">✓</div>
+                    <div class="cross">✗</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Bulk CSV Import</div>
+                    <div class="check">✓</div>
+                    <div class="cross">✗</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Personal Charities</div>
+                    <div class="check">✓</div>
+                    <div class="cross">✗</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Receipt Upload & Storage</div>
+                    <div class="check">✓</div>
+                    <div class="check">✓</div>
+                </div>
+                <div class="comparison-row">
+                    <div>Real-time Tax Calculations</div>
+                    <div class="check">✓</div>
+                    <div class="cross">✗</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="pricing">
+        <h2>Start Maximizing Your Tax Deductions Today</h2>
+        <p>Join thousands who save more on taxes with smart donation tracking. Free to start, no credit card required.</p>
+        <div class="cta-buttons" style="justify-content: center;">
+            <a href="/register.html" class="btn-primary">Create Free Account</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Product</h3>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="/dashboard.html">Dashboard</a>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#">Tax Guide</a>
+                <a href="#">IRS Resources</a>
+                <a href="#">Blog</a>
+                <a href="#">Support</a>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <a href="#">About</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <a href="#">Twitter</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">GitHub</a>
+                <a href="/admin-login.html">Admin</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Charity Tracker v2.11.0. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            observer.observe(card);
+        });
+    </script>
 </body>
 </html>
