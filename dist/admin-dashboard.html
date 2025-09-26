@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.9.7</title>
+    <title>Admin Dashboard - Charity Tracker v2.10.0</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.9.7</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.10.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -2023,7 +2023,7 @@
                         data.users.forEach(user => {
                             const row = document.createElement('tr');
                             const createdDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
-                            const totalDonations = user.total_donations ? `$${parseFloat(user.total_donations).toLocaleString()}` : '$0';
+                            const totalDonations = user.total_donations ? `$${Math.round(parseFloat(user.total_donations)).toLocaleString()}` : '$0';
 
                             // Add data attributes for filtering
                             row.setAttribute('data-email', user.email);
@@ -2038,8 +2038,8 @@
                                 <td>${totalDonations}</td>
                                 <td>
                                     <div class="dropdown-container" style="position: relative;">
-                                        <button onclick="toggleUserMenu('${user.id}')" style="background: #374151; color: #f3f4f6; border: none; padding: 0.5rem; border-radius: 4px; cursor: pointer; font-size: 1.2rem; line-height: 1;">
-                                            ⋮
+                                        <button onclick="toggleUserMenu('${user.id}')" style="background: #374151; color: #f3f4f6; border: none; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 1rem; line-height: 1; font-weight: bold;">
+                                            ⋯
                                         </button>
                                         <div id="menu-${user.id}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: #1f2937; border: 1px solid #374151; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; min-width: 180px; margin-top: 0.25rem;">
                                             <button onclick="resetUserPassword('${user.id}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer; hover: background: #374151;">
