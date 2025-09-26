@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Charity Tracker v2.11.9</title>
+    <title>Dashboard - Charity Tracker v2.11.10</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -738,13 +738,13 @@
 <body>
     <!-- Version Announcement Banner -->
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; text-align: center; font-size: 0.875rem; border-bottom: 2px solid rgba(255,255,255,0.3);">
-        <strong>🎯 Charity Tracker v2.11.9</strong> - Proper relational items tracking with donation_items table!
+        <strong>🎯 Charity Tracker v2.11.10</strong> - Proper relational items tracking with donation_items table!
     </div>
     <header class="header">
         <div class="header-top">
             <div class="header-content">
                 <div>
-                    <h1>🎯 Charity Tracker <span class="version">v2.11.9</span></h1>
+                    <h1>🎯 Charity Tracker <span class="version">v2.11.10</span></h1>
                 </div>
                 <div class="user-info">
                     <span id="userName">Loading...</span>
@@ -843,10 +843,22 @@
                 <div class="section-header" style="flex-shrink: 0;">
                     <h2>My Charities</h2>
                 </div>
-                <div id="charitiesContent" style="overflow-y: auto; flex: 1; min-height: 0;">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🏛️</div>
-                        <p>Loading your charities...</p>
+                <div style="display: flex; gap: 1rem; flex: 1; min-height: 0; padding: 1rem;">
+                    <!-- Left side: Charity list (60%) -->
+                    <div id="charitiesContent" style="flex: 0 0 60%; overflow-y: auto; border-right: 1px solid #e5e7eb; padding-right: 1rem;">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🏛️</div>
+                            <p>Loading your charities...</p>
+                        </div>
+                    </div>
+                    <!-- Right side: Quick insights (40%) -->
+                    <div id="charityInsights" style="flex: 0 0 38%; padding-left: 0.5rem;">
+                        <div style="background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); padding: 1rem; border-radius: 8px;">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #4b5563;">Quick Insights</h3>
+                            <div id="insightsContent">
+                                <p style="color: #6b7280; font-size: 0.875rem;">Loading insights...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3452,19 +3464,8 @@
                     const charities = Array.from(charitiesMap.values())
                         .sort((a, b) => a.name.localeCompare(b.name));
 
-                    // Create a more compact table view
-                    let html = `
-                        <div style="padding: 0.5rem;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                                <thead>
-                                    <tr style="border-bottom: 2px solid #e5e7eb;">
-                                        <th style="text-align: left; padding: 0.5rem; font-weight: 600; color: #6b7280;">Charity</th>
-                                        <th style="text-align: center; padding: 0.5rem; font-weight: 600; color: #6b7280;">Donations</th>
-                                        <th style="text-align: right; padding: 0.5rem; font-weight: 600; color: #6b7280;">Total</th>
-                                        <th style="text-align: center; padding: 0.5rem; font-weight: 600; color: #6b7280;">Quick Add</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+                    // Create minimalist list for left side
+                    let html = '<div style="font-size: 0.9rem;">';
 
                     charities.forEach(charity => {
                         // Indicate if it's a personal charity
@@ -3483,41 +3484,90 @@
                             }
                         }
 
+                        // Create compact single-line format
                         html += `
-                            <div class="charity-card enhanced">
-                                <div class="charity-header">
-                                    <h3 class="charity-name">
+                            <div style="display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; cursor: pointer;"
+                                 onmouseover="this.style.backgroundColor='#f9fafb'"
+                                 onmouseout="this.style.backgroundColor='transparent'"
+                                 title="EIN: ${charity.ein || 'Not specified'} | Category: ${charity.category || 'Not specified'}">
+                                <div style="flex: 1; min-width: 0; overflow: hidden;">
+                                    <span style="font-weight: 500; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
                                         ${charity.name}
-                                        ${charity.category ? `<span style="background: #3b82f6; color: white; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.7rem; margin-left: 0.5rem; font-weight: normal;">${charity.category}</span>` : ''}
-                                        ${personalBadge}
-                                    </h3>
+                                    </span>
                                 </div>
-
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.75rem 0;">
-                                    ${charity.ein ? `<p class="charity-ein" style="margin: 0; font-size: 0.875rem;"><strong>EIN:</strong> ${charity.ein}</p>` : '<span></span>'}
-                                    <button class="btn-primary" style="padding: 0.375rem 0.75rem; font-size: 0.8rem;" onclick="quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">+ Quick Donation</button>
+                                <div style="text-align: right; margin: 0 0.75rem; color: #059669; font-weight: 600; white-space: nowrap;">
+                                    $${formatCurrency(charity.total, true)}
                                 </div>
-
-                                <div class="charity-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-label">Donations:</span>
-                                        <span class="stat-value">${charity.count}</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-label">Total Donated:</span>
-                                        <span class="stat-value">$${formatCurrency(charity.total, true)}</span>
-                                    </div>
-                                    ${lastDonationDate ? `
-                                    <div class="stat-item">
-                                        <span class="stat-label">Last Donation:</span>
-                                        <span class="stat-value">${lastDonationDate}</span>
-                                    </div>` : ''}
+                                <div style="margin-right: 0.75rem; color: #6b7280; white-space: nowrap;">
+                                    (${charity.count})
                                 </div>
+                                <button class="btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; white-space: nowrap;"
+                                        onclick="event.stopPropagation(); quickAddDonation('${charity.id}', '${charity.name.replace(/'/g, "\\'")}', '${charity.source || 'system'}')">
+                                    + Add
+                                </button>
                             </div>
                         `;
                     });
                     html += '</div>';
                     container.innerHTML = html;
+
+                    // Update insights panel
+                    const insightsContainer = document.getElementById('insightsContent');
+                    if (insightsContainer && charities.length > 0) {
+                        // Find top charity by amount
+                        const topCharity = charities.reduce((max, charity) =>
+                            charity.total > max.total ? charity : max, charities[0]);
+
+                        // Find most frequent charity
+                        const mostFrequent = charities.reduce((max, charity) =>
+                            charity.count > max.count ? charity : max, charities[0]);
+
+                        // Calculate current month and last month totals
+                        const now = new Date();
+                        const currentMonth = now.getMonth();
+                        const currentYear = now.getFullYear();
+
+                        let currentMonthTotal = 0;
+                        let lastMonthTotal = 0;
+
+                        data.donations.forEach(donation => {
+                            const donationDate = new Date(donation.date || donation.donation_date);
+                            const amount = donation.donation_type === 'items'
+                                ? parseFloat(donation.estimated_value || donation.amount || 0)
+                                : parseFloat(donation.amount || 0);
+
+                            if (donationDate.getFullYear() === currentYear) {
+                                if (donationDate.getMonth() === currentMonth) {
+                                    currentMonthTotal += amount;
+                                } else if (donationDate.getMonth() === currentMonth - 1) {
+                                    lastMonthTotal += amount;
+                                }
+                            }
+                        });
+
+                        insightsContainer.innerHTML = `
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Top Charity</div>
+                                <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${topCharity.name}</div>
+                                <div style="color: #059669; font-weight: 500;">$${formatCurrency(topCharity.total, true)}</div>
+                            </div>
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Most Frequent</div>
+                                <div style="font-weight: 600; color: #1f2937; margin-top: 0.25rem; font-size: 0.95rem;">${mostFrequent.name}</div>
+                                <div style="color: #667eea; font-weight: 500;">${mostFrequent.count} donations</div>
+                            </div>
+                            <div style="margin-bottom: 1.25rem;">
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">This Month</div>
+                                <div style="color: #1f2937; font-weight: 600; font-size: 1.125rem;">$${formatCurrency(currentMonthTotal, true)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em;">Last Month</div>
+                                <div style="color: #6b7280; font-weight: 600; font-size: 1.125rem;">$${formatCurrency(lastMonthTotal, true)}</div>
+                            </div>
+                        `;
+                    } else if (insightsContainer) {
+                        insightsContainer.innerHTML = '<p style="color: #9ca3af; font-size: 0.875rem;">Add donations to see insights</p>';
+                    }
                 } else {
                     // Show empty state when no donations exist
                     container.innerHTML = `
@@ -3704,7 +3754,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.9</p>
+                            <p>Generated by Charity Tracker v2.11.10</p>
                         </div>
                     </body>
                     </html>
