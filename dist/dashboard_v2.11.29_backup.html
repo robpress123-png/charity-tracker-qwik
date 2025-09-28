@@ -2500,9 +2500,7 @@
                     const user = JSON.parse(localStorage.getItem('user') || '{}');
                     const token = user.token || localStorage.getItem('token') || 'test-token';
 
-                    // Load a reasonable subset for instant local search (500 most common)
-                    // The full database search will happen via the /api/charities/search endpoint
-                    const response = await fetch('/api/charities?limit=500', {
+                    const response = await fetch('/api/charities?limit=2000', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -2510,7 +2508,7 @@
                     const data = await response.json();
                     if (data.success && data.charities) {
                         allCharities = data.charities;
-                        console.log(`Loaded ${allCharities.length} charities for instant search. Full database search via API.`);
+                        console.log(`Loaded ${allCharities.length} charities (including personal)`);
                     }
                 } catch (error) {
                     console.error('Failed to load charities:', error);
@@ -2591,45 +2589,35 @@
                     (charity.ein && charity.ein.toLowerCase().includes(query))
                 ).slice(0, 10);
 
-                // Show immediate results
-                displayCharityResults(results, query, true); // true = show loading indicator
-
-                // Then search the full database using the dedicated search endpoint
+                // Always search the full database to ensure we find all matches
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/charities/search?q=${encodeURIComponent(query)}&limit=50`, {
+                    const response = await fetch(`/api/charities?search=${encodeURIComponent(query)}&limit=100`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
                     const data = await response.json();
-
                     if (data.success && data.charities) {
-                        // Merge results, avoiding duplicates and prioritizing API results (they're ranked)
+                        // Merge results, avoiding duplicates and prioritizing local results
                         const existingIds = new Set(results.map(r => r.id));
                         const newResults = data.charities.filter(c => !existingIds.has(c.id));
-
-                        // Combine: API results first (ranked), then local results
-                        results = [...data.charities.slice(0, 30), ...results.filter(r => !data.charities.find(c => c.id === r.id))];
-                        results = results.slice(0, 50); // Limit total results
-
-                        console.log(`Found ${data.total} total matches, displaying ${results.length}`);
-
-                        // Update display with full results
-                        displayCharityResults(results, query, false); // false = hide loading indicator
+                        // Keep local results first (they're ranked higher), then add API results
+                        results = [...results, ...newResults].slice(0, 100);
+                        console.log(`Found ${results.length} total charities matching "${query}"`);
                     }
                 } catch (error) {
-                    console.error('Full database search failed:', error);
-                    // Keep showing local results even if API search fails
-                    displayCharityResults(results, query, false);
+                    console.error('Search failed:', error);
                 }
+
+                displayCharityResults(results, query);
             }, 300);
         }
 
-        function displayCharityResults(results, query, showLoadingIndicator = false) {
+        function displayCharityResults(results, query) {
             const dropdown = document.getElementById('charityDropdown');
 
-            if (results.length === 0 && !showLoadingIndicator) {
+            if (results.length === 0) {
                 dropdown.innerHTML = `
                     <div class="autocomplete-add-new" onclick="showAddCharityFromSearch('${query}')">
                         + Add new charity "${query}"
@@ -2654,20 +2642,11 @@
                     `;
                 });
 
-                // Add loading indicator if we're still searching
-                if (showLoadingIndicator) {
-                    html += `
-                        <div style="padding: 8px 12px; color: #6b7280; font-size: 0.875rem; text-align: center; border-top: 1px solid #e5e7eb;">
-                            ⏳ Searching all 10,000+ charities...
-                        </div>
-                    `;
-                }
-
                 // If we have many results, we likely hit the limit - show indicator
-                if (!showLoadingIndicator && results.length >= 50) {
+                if (results.length >= 100) {
                     html += `
                         <div style="padding: 8px 12px; color: #6b7280; font-size: 0.875rem; text-align: center; border-top: 1px solid #e5e7eb;">
-                            Showing first ${results.length} results - keep typing to refine search
+                            Showing first 100 results - keep typing to refine search
                         </div>
                     `;
                 }
