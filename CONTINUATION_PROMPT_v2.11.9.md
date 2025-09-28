@@ -1,8 +1,11 @@
-# Charity Tracker Qwik - Continuation Prompt v2.11.9
+# Charity Tracker Qwik - Continuation Prompt v2.11.20
 
-## 🎉 Version 2.11.9 - UI Improvements
+## 🎉 Version 2.11.20 - Ultrawide Display Fix
 
-### Latest Updates (v2.11.9)
+### Latest Updates (v2.11.20)
+- ✅ **Ultrawide Monitor Support**: Enabled page scrolling for better display on ultrawide screens
+
+### Previous Updates (v2.11.9)
 - ✅ **Simplified Landing Page**: Removed integrated login forms, added clean navigation buttons
 - ✅ **Dashboard Stats Enhanced**: Bigger stat cards with better visual hierarchy
 - ✅ **My Charities Compact View**: More efficient table layout for charity list
@@ -241,6 +244,7 @@ npx wrangler pages dev --local --port 8788
 - v2.11.7: Simplified landing page, removed integrated forms
 - v2.11.8: Updated messaging, removed IRS claims
 - v2.11.9: Enhanced dashboard stats, compact charity view
+- v2.11.20: Fixed ultrawide monitor display issues with scrolling
 
 ## File Structure
 ```
@@ -282,4 +286,4 @@ This document enables seamless continuation across sessions by preserving:
 - Known issues and priorities
 - Development guidelines
 
-Ready for continued development at v2.11.9!
+Ready for continued development at v2.11.20!
