@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Charity Tracker v2.11.49</title>
+    <title>Login - Charity Tracker v2.11.50</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -152,7 +152,7 @@
 <body>
     <div class="container">
         <h1>🎯 Charity Tracker</h1>
-        <div class="version">Version 2.11.49</div>
+        <div class="version">Version 2.11.50</div>
 
         <div id="error" class="error"></div>
         <div id="success" class="success"></div>
@@ -160,12 +160,12 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required value="test@example.com" autocomplete="email">
+                <input type="email" id="email" name="email" required autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required value="password123" autocomplete="current-password">
+                <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
 
             <button type="submit" id="submitBtn">Sign In</button>
@@ -177,11 +177,6 @@
             <a href="#" onclick="showLostPasswordModal(); return false;">Lost Password?</a>
         </div>
 
-        <div class="test-info">
-            <h3>Test Credentials (Pre-filled):</h3>
-            <p>Email: test@example.com</p>
-            <p>Password: password123</p>
-        </div>
     </div>
 
     <script>
@@ -278,28 +273,11 @@
                     submitBtn.textContent = 'Sign In';
                 }
             } catch (error) {
-                // If API fails, do client-side validation for demo
-                if (email === 'test@example.com' && password === 'password123') {
-                    successDiv.textContent = 'Demo login successful! (Note: API not available)';
-                    successDiv.style.display = 'block';
-
-                    localStorage.setItem('token', 'demo-token');
-                    localStorage.setItem('user', JSON.stringify({
-                        id: '1',
-                        email: 'test@example.com',
-                        name: 'Test User',
-                        plan: 'free'
-                    }));
-
-                    setTimeout(() => {
-                        window.location.href = '/dashboard.html';
-                    }, 1500);
-                } else {
-                    errorDiv.textContent = 'Invalid credentials (Demo mode: use test@example.com)';
-                    errorDiv.style.display = 'block';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Sign In';
-                }
+                // If API fails, show error
+                errorDiv.textContent = 'Login service unavailable. Please try again later.';
+                errorDiv.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
             }
         });
     </script>
