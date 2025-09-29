@@ -129,96 +129,6 @@
             color: #6b7280;
             margin-top: 0.5rem;
         }
-        /* Step indicators */
-        .step-indicators {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            gap: 2rem;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #9ca3af;
-            font-weight: 500;
-        }
-
-        .step.active {
-            color: #667eea;
-        }
-
-        .step.completed {
-            color: #10b981;
-        }
-
-        .step-number {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #e5e7eb;
-            color: white;
-            font-weight: bold;
-        }
-
-        .step.active .step-number {
-            background: #667eea;
-        }
-
-        .step.completed .step-number {
-            background: #10b981;
-        }
-
-        .step-content {
-            display: none;
-        }
-
-        .step-content.active {
-            display: block;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 1rem;
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .privacy-notice {
-            background: #f0f9ff;
-            border: 1px solid #0284c7;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            color: #0369a1;
-        }
-
-        .privacy-notice strong {
-            color: #075985;
-        }
-
     </style>
 </head>
 <body>
@@ -226,24 +136,10 @@
         <h2>🎯 Create Account</h2>
         <p class="subtitle">Join Charity Tracker to manage your donations</p>
 
-        <!-- Step Indicators -->
-        <div class="step-indicators">
-            <div class="step active" id="step1Indicator">
-                <span class="step-number">1</span>
-                <span>Account Info</span>
-            </div>
-            <div class="step" id="step2Indicator">
-                <span class="step-number">2</span>
-                <span>Profile (Optional)</span>
-            </div>
-        </div>
-
         <div id="errorMessage" class="error-message"></div>
         <div id="successMessage" class="success-message"></div>
 
         <form id="registerForm">
-            <!-- Step 1: Basic Account Info -->
-            <div id="step1Content" class="step-content active">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
@@ -267,15 +163,9 @@
                 <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name" required>
             </div>
 
-            <button type="button" class="btn-primary" onclick="proceedToStep2()">Continue to Profile Setup</button>
-            </div>
-
-            <!-- Step 2: Optional Profile Info -->
-            <div id="step2Content" class="step-content">
-
             <!-- Address Information -->
-            <div>
-                <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.1rem;">📍 Address Information (Optional)</h3>
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.1rem;">📍 Address Information</h3>
 
                 <div class="form-group">
                     <label for="address">Street Address</label>
@@ -355,12 +245,6 @@
             <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
                 <h3 style="color: #667eea; margin-bottom: 1rem; font-size: 1.1rem;">💰 Tax Information (Optional)</h3>
 
-                <!-- Privacy Notice -->
-                <div class="privacy-notice">
-                    <strong>🔒 Your Privacy is Protected</strong><br>
-                    Your tax information is encrypted and stored securely. We use this data solely to calculate your potential tax savings from charitable donations. This information is never shared with third parties and helps us provide accurate deduction estimates based on your tax bracket.
-                </div>
-
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label for="taxYear">Tax Year</label>
@@ -397,14 +281,9 @@
                 </div>
             </div>
 
-            <div class="button-group">
-                <button type="button" class="btn-secondary" onclick="backToStep1()">← Back</button>
-                <button type="submit" class="btn-primary" id="registerButton">
-                    Complete Registration
-                </button>
-            </div>
-            <button type="button" class="btn-secondary" onclick="skipStep2()">Skip & Go to Dashboard</button>
-            </div>
+            <button type="submit" class="btn-primary" id="registerButton">
+                Create Account
+            </button>
         </form>
 
         <div class="login-link">
@@ -413,92 +292,39 @@
     </div>
 
     <script>
-        // Step navigation functions
-        function proceedToStep2() {
-            // Validate Step 1 fields first
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const name = document.getElementById('name').value;
 
             const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            const registerButton = document.getElementById('registerButton');
+
+            // Reset messages
             errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
 
-            if (!email || !password || !confirmPassword || !name) {
-                errorDiv.textContent = 'Please fill in all required fields';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
+            // Validate passwords match
             if (password !== confirmPassword) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.style.display = 'block';
                 return;
             }
 
+            // Validate password length
             if (password.length < 8) {
                 errorDiv.textContent = 'Password must be at least 8 characters';
                 errorDiv.style.display = 'block';
                 return;
             }
 
-            // Hide step 1, show step 2
-            document.getElementById('step1Content').classList.remove('active');
-            document.getElementById('step2Content').classList.add('active');
-
-            // Update indicators
-            document.getElementById('step1Indicator').classList.remove('active');
-            document.getElementById('step1Indicator').classList.add('completed');
-            document.getElementById('step2Indicator').classList.add('active');
-        }
-
-        function backToStep1() {
-            // Show step 1, hide step 2
-            document.getElementById('step1Content').classList.add('active');
-            document.getElementById('step2Content').classList.remove('active');
-
-            // Update indicators
-            document.getElementById('step1Indicator').classList.add('active');
-            document.getElementById('step1Indicator').classList.remove('completed');
-            document.getElementById('step2Indicator').classList.remove('active');
-        }
-
-        async function skipStep2() {
-            // Register with just the basic info from step 1
-            await registerUser(true);
-        }
-
-        async function registerUser(skipProfile = false) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const name = document.getElementById('name').value;
-
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
-            const registerButton = document.getElementById('registerButton');
-
-            // Collect profile data if not skipping
-            let profileData = {};
-            if (!skipProfile) {
-                profileData = {
-                    address: document.getElementById('address').value,
-                    city: document.getElementById('city').value,
-                    state: document.getElementById('state').value,
-                    zip: document.getElementById('zip').value,
-                    filingStatus: document.getElementById('filingStatus').value,
-                    taxBracket: document.getElementById('taxBracket').value
-                };
-            }
-
-            // Reset messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            // Update button text
-            if (registerButton) {
-                registerButton.disabled = true;
-                registerButton.textContent = 'Creating Account...';
-            }
+            // Disable button
+            registerButton.disabled = true;
+            registerButton.textContent = 'Creating Account...';
 
             try {
                 const response = await fetch('/api/auth/register', {
@@ -509,52 +335,31 @@
                     body: JSON.stringify({
                         email,
                         password,
-                        name,
-                        ...profileData,
-                        profileCompleted: !skipProfile
+                        name
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store token if provided
-                    if (data.token) {
-                        localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('userId', data.userId);
-                        localStorage.setItem('userEmail', email);
-                    }
-
-                    successDiv.textContent = skipProfile ?
-                        'Account created! Redirecting to dashboard...' :
-                        'Registration complete! Redirecting to dashboard...';
+                    successDiv.textContent = 'Account created successfully! Redirecting to login...';
                     successDiv.style.display = 'block';
 
                     setTimeout(() => {
-                        window.location.href = '/dashboard.html';
-                    }, 1500);
+                        window.location.href = '/login.html';
+                    }, 2000);
                 } else {
                     errorDiv.textContent = data.error || 'Registration failed. Please try again.';
                     errorDiv.style.display = 'block';
-                    if (registerButton) {
-                        registerButton.disabled = false;
-                        registerButton.textContent = 'Complete Registration';
-                    }
+                    registerButton.disabled = false;
+                    registerButton.textContent = 'Create Account';
                 }
             } catch (error) {
                 errorDiv.textContent = 'Network error. Please check your connection and try again.';
                 errorDiv.style.display = 'block';
-                if (registerButton) {
-                    registerButton.disabled = false;
-                    registerButton.textContent = 'Complete Registration';
-                }
+                registerButton.disabled = false;
+                registerButton.textContent = 'Create Account';
             }
-        }
-
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            // Call the unified registerUser function with profile data
-            await registerUser(false);
         });
     </script>
 </body>

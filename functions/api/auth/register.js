@@ -2,13 +2,25 @@ export async function onRequestPost(context) {
     const { request, env } = context;
 
     try {
-        const { email, password, name } = await request.json();
+        const {
+            email,
+            password,
+            name,
+            // Optional profile fields
+            address,
+            city,
+            state,
+            zip,
+            filingStatus,
+            taxBracket,
+            profileCompleted
+        } = await request.json();
 
-        // Validate input
-        if (!email || !password) {
+        // Validate required fields
+        if (!email || !password || !name) {
             return new Response(JSON.stringify({
                 success: false,
-                error: 'Email and password are required'
+                error: 'Email, password, and name are required'
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
@@ -60,20 +72,57 @@ export async function onRequestPost(context) {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashedPassword = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        // Create user
+        // Create user with optional profile data
         const result = await env.DB.prepare(`
-            INSERT INTO users (email, password, name, created_at)
-            VALUES (?, ?, ?, datetime('now'))
+            INSERT INTO users (
+                email, password, name,
+                address, city, state, zip_code,
+                filing_status, tax_bracket,
+                plan, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'free', datetime('now'))
         `).bind(
             email.toLowerCase(),
             hashedPassword,
-            name || email.split('@')[0]
+            name,
+            address || null,
+            city || null,
+            state || null,
+            zip || null,
+            filingStatus || null,
+            taxBracket || null
         ).run();
 
         if (result.success) {
+            // Generate auth token for automatic login
+            const userId = result.meta.last_row_id;
+            const token = `token-${userId}-${Date.now()}`;
+
+            // If tax settings were provided, also create user_tax_settings entry
+            if (filingStatus && taxBracket) {
+                const currentYear = new Date().getFullYear();
+                await env.DB.prepare(`
+                    INSERT OR REPLACE INTO user_tax_settings (
+                        user_id, tax_year, filing_status, tax_bracket,
+                        created_at, updated_at
+                    )
+                    VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+                `).bind(
+                    userId.toString(),
+                    currentYear,
+                    filingStatus,
+                    taxBracket
+                ).run();
+            }
+
             return new Response(JSON.stringify({
                 success: true,
-                message: 'Account created successfully'
+                message: profileCompleted ?
+                    'Registration complete with profile!' :
+                    'Account created successfully!',
+                token: token,
+                userId: userId.toString(),
+                profileCompleted: profileCompleted || false
             }), {
                 headers: { 'Content-Type': 'application/json' }
             });
