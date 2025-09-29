@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.11.36</title>
+    <title>Admin Dashboard - Charity Tracker v2.11.37</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.36</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.37</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -2245,9 +2245,44 @@
             }
         }
 
-        function confirmDeleteUser(userId, userEmail) {
-            if (confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
-                alert('Delete user feature coming soon. User ID: ' + userId);
+        async function confirmDeleteUser(userId, userEmail) {
+            if (confirm(`⚠️ WARNING: Are you sure you want to delete user: ${userEmail}?\n\nThis will permanently delete:\n• The user account\n• All their donations\n• All their personal charities\n• All their tax settings\n\nThis action CANNOT be undone!`)) {
+                try {
+                    // Show loading notification
+                    const notification = document.createElement('div');
+                    notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 10000;';
+                    notification.textContent = `Deleting user ${userEmail}...`;
+                    document.body.appendChild(notification);
+
+                    const response = await fetch(`/api/admin/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        notification.style.background = '#10b981';
+                        notification.textContent = `User ${userEmail} deleted successfully!`;
+
+                        // Reload the user list
+                        loadUsers();
+
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+                    } else {
+                        const data = await response.json();
+                        notification.style.background = '#ef4444';
+                        notification.textContent = `Failed to delete user: ${data.error || 'Unknown error'}`;
+
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 5000);
+                    }
+                } catch (error) {
+                    alert(`Error deleting user: ${error.message}`);
+                }
             }
         }
 
