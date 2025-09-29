@@ -1,13 +1,23 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.51
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.53
 
-## 🎉 Version 2.11.51 - Registration & Tax API Fixes
+## 🚨 Version 2.11.53 - CRITICAL SECURITY FIX
+
+### CRITICAL Updates (v2.11.53)
+- 🚨 **v2.11.53**: **CRITICAL SECURITY FIX** - Registration session management
+  - **Fixed wrong user data loading**: Registration was not storing user data correctly
+  - **Session management**: Now clears localStorage before storing new user data
+  - **Correct data format**: Stores `token` and `user` object as dashboard expects
+  - **Prevents cross-user data exposure**: Fixed issue where new users saw test@example.com data
+
+### Latest Updates (v2.11.52)
+- ✅ **v2.11.52**: Registration field fix
+  - **Fixed field ID bug**: Changed `getElementById('zip')` to `getElementById('zipCode')`
 
 ### Latest Updates (v2.11.51)
 - ✅ **v2.11.51**: Registration Step 2 fixes
   - **Fixed scrolling**: Changed body to `min-height: 100vh` with `overflow-y: auto`
   - **Fixed income range dropdown**: API now allows unauthenticated requests for registration
   - **Made form compact**: Reduced sizes to fit on 1080p monitors
-  - **Fixed field ID bug**: Changed `getElementById('zip')` to `getElementById('zipCode')`
 
 ### Latest Updates (v2.11.49-50)
 - ✅ **v2.11.49-50**: Tax brackets and security fixes

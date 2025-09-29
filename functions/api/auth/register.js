@@ -94,9 +94,23 @@ export async function onRequestPost(context) {
         ).run();
 
         if (result.success) {
-            // Generate auth token for automatic login
-            const userId = result.meta.last_row_id;
-            const token = `token-${userId}-${Date.now()}`;
+            // Query for the newly created user to get the actual ID from the database
+            const newUser = await env.DB.prepare(
+                'SELECT id, email, name FROM users WHERE email = ?'
+            ).bind(email.toLowerCase()).first();
+
+            if (!newUser) {
+                return new Response(JSON.stringify({
+                    success: false,
+                    error: 'Failed to retrieve created user'
+                }), {
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+
+            // Generate auth token using the actual database ID
+            const token = `token-${newUser.id}-${Date.now()}`;
 
             // If tax settings were provided, also create user_tax_settings entry
             if (filingStatus && taxBracket) {
@@ -108,7 +122,7 @@ export async function onRequestPost(context) {
                     )
                     VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
                 `).bind(
-                    userId.toString(),
+                    newUser.id.toString(),
                     currentYear,
                     filingStatus,
                     taxBracket
@@ -121,7 +135,7 @@ export async function onRequestPost(context) {
                     'Registration complete with profile!' :
                     'Account created successfully!',
                 token: token,
-                userId: userId.toString(),
+                userId: newUser.id.toString(),
                 profileCompleted: profileCompleted || false
             }), {
                 headers: { 'Content-Type': 'application/json' }
