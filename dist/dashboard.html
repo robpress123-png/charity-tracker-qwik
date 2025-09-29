@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.39</title>
+    <title>Dashboard - Charity Tracker v2.11.40</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -35,8 +35,8 @@
         /* Responsive scaling for different resolutions */
         @media (max-width: 1440px) {
             body { font-size: 14px; }
-            .stat-card { padding: 1rem !important; }
-            .section { margin-bottom: 0.75rem !important; }
+            .stat-card { padding: 0.875rem !important; }
+            .section { margin-bottom: 0.375rem !important; }
         }
 
         @media (min-width: 2560px) {
@@ -126,7 +126,7 @@
         .main-content {
             flex: 1;
             overflow: hidden;
-            padding: 0.5rem;
+            padding: 0.25rem;
             display: flex;
             flex-direction: column;
         }
@@ -166,13 +166,13 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .stat-card {
             background: white;
-            padding: 1.75rem;
+            padding: 1.25rem;
             border-radius: 12px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             transition: transform 0.2s, box-shadow 0.2s;
@@ -187,27 +187,27 @@
 
         .stat-label {
             color: #6b7280;
-            font-size: 0.95rem;
-            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         .stat-value {
-            font-size: 2.25rem;
+            font-size: 1.875rem;
             font-weight: 700;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .section {
             background: white;
             border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 0.875rem;
+            margin-bottom: 0.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
@@ -215,8 +215,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
+            margin-bottom: 0.625rem;
+            padding-bottom: 0.375rem;
             border-bottom: 1px solid #e5e7eb;
         }
 
@@ -337,13 +337,28 @@
         .modal-content {
             background: white;
             border-radius: 12px;
-            padding: 2rem;
+            padding: 1.5rem;
             max-width: 500px;
             width: 90%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+        }
+
+        /* For standard monitors, ensure modals fit without scrolling */
+        @media (min-height: 900px) and (max-height: 1080px) {
+            .modal-content {
+                max-height: 80vh;
+                padding: 1.25rem;
+            }
+        }
+
+        /* Allow more height on larger screens */
+        @media (min-height: 1440px) {
+            .modal-content {
+                max-height: 90vh;
+            }
         }
 
         .modal-content > div:not(.modal-header) {
@@ -796,7 +811,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.39</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.40</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -837,7 +852,7 @@
     <main class="main-content">
     <div class="container" style="width: 100%; max-width: 1600px; margin: 0 auto; padding: 1rem;">
         <!-- Dashboard Section -->
-        <div id="dashboardSection" class="section-content dashboard-content dashboard-wrapper" style="display: flex; flex-direction: column; height: 100%; overflow: hidden; gap: 0.5rem;">
+        <div id="dashboardSection" class="section-content dashboard-content dashboard-wrapper" style="display: flex; flex-direction: column; height: 100%; overflow: hidden; gap: 0.25rem;">
             <div class="stats-grid">
                 <div class="stat-card">
                     <div>
@@ -865,12 +880,12 @@
                 </div>
             </div>
 
-            <div class="section" style="flex: 1; display: flex; flex-direction: column; min-height: 0; max-height: 35%; width: 100%;">
+            <div class="section" style="flex: 1.3; display: flex; flex-direction: column; min-height: 0; width: 100%;">
                 <div class="section-header" style="flex-shrink: 0;">
                     <h2 id="donationHistoryTitle">Donation History</h2>
                 </div>
                 <!-- Search/Filter Bar -->
-                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; padding: 0.75rem; background: #f9fafb; border-radius: 8px;">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 0.5rem; padding: 0.5rem; background: #f9fafb; border-radius: 8px;">
                     <input type="text" id="donationSearch" placeholder="Search by charity or notes..."
                            style="flex: 1; padding: 0.4rem; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.875rem;"
                            oninput="filterDonations()">
@@ -895,13 +910,13 @@
             </div>
 
             <!-- Row with My Charities and Quick Insights as separate boxes -->
-            <div style="display: flex; gap: 1.5rem; height: 35%; overflow: hidden;">
+            <div style="display: flex; gap: 1rem; flex: 1.3; min-height: 0; overflow: hidden;">
                 <!-- My Charities Box (60% width) -->
                 <div class="section" style="flex: 1 1 500px; min-width: 0; display: flex; flex-direction: column; height: 100%;">
                     <div class="section-header" style="flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                         <h2 style="color: white; font-weight: 600;">My Charities</h2>
                     </div>
-                    <div style="display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 1rem; overflow: hidden;">
+                    <div style="display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 0.75rem; overflow: hidden;">
                         <!-- Fixed header -->
                         <div style="display: flex; align-items: center; padding: 0.75rem 0.5rem; border-bottom: 2px solid #667eea; background: #f9fafb; font-weight: 700; font-size: 0.875rem; color: #374151;">
                             <div style="flex: 1; padding-right: 1rem;">Charity Name</div>
@@ -1728,21 +1743,23 @@
                     <label for="donationNotes">Notes (optional)</label>
                     <textarea id="donationNotes" rows="3"></textarea>
                 </div>
-                <!-- Tax Savings Calculator -->
-                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    <h4 style="color: #166534; margin-bottom: 0.5rem;">💰 Estimated Tax Savings</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Tax Savings Calculator (Compact) -->
+                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 0.625rem; border-radius: 8px; margin: 0.5rem 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
+                        <h4 style="color: #166534; margin: 0; font-size: 0.875rem;">💰 Estimated Tax Savings</h4>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                         <div>
-                            <div style="font-size: 0.875rem; color: #666;">Donation Amount</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;" id="donationAmountDisplay">$0</div>
+                            <div style="font-size: 0.75rem; color: #666;">Donation Amount</div>
+                            <div style="font-size: 1.125rem; font-weight: bold; color: #166534;" id="donationAmountDisplay">$0</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.875rem; color: #666;">Tax Savings (<span id="taxRateDisplay">22</span>%)</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;" id="taxSavingsDisplay">$0</div>
+                            <div style="font-size: 0.75rem; color: #666;">Savings (<span id="taxRateDisplay">22</span>%)</div>
+                            <div style="font-size: 1.125rem; font-weight: bold; color: #059669;" id="taxSavingsDisplay">$0</div>
                         </div>
                     </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
-                        * Based on your marginal tax rate. Actual savings depend on itemizing deductions.
+                    <div style="margin-top: 0.25rem; font-size: 0.675rem; color: #666; line-height: 1.2;">
+                        * Based on marginal tax rate. Actual savings depend on itemizing.
                     </div>
                 </div>
                 </div><!-- End scrollable content -->
@@ -1791,11 +1808,11 @@
                                oninput="updateEditCashTaxSavings()">
                     </div>
 
-                    <!-- Tax Savings Display -->
-                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <!-- Tax Savings Display (Compact) -->
+                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 0.625rem; border-radius: 8px; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.875rem; color: #0369a1;">Estimated Tax Savings:</span>
-                            <span style="font-size: 1.25rem; font-weight: bold; color: #0284c7;">$<span id="editCashTaxSavings">0</span></span>
+                            <span style="font-size: 0.8rem; color: #0369a1;">Estimated Tax Savings:</span>
+                            <span style="font-size: 1.125rem; font-weight: bold; color: #0284c7;">$<span id="editCashTaxSavings">0</span></span>
                         </div>
                     </div>
 
@@ -1905,21 +1922,21 @@
                     </div>
                 </div>
 
-                <!-- Tax Savings Calculator (Green Box like Add Form) -->
-                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 1rem; border-radius: 8px; margin-top: 1rem; margin-bottom: 1.5rem;">
-                    <h4 style="color: #166534; margin-bottom: 0.5rem;">💰 Estimated Tax Savings</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Tax Savings Calculator (Compact) -->
+                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 0.625rem; border-radius: 8px; margin-top: 0.75rem; margin-bottom: 1rem;">
+                    <h4 style="color: #166534; margin-bottom: 0.375rem; font-size: 0.875rem;">💰 Estimated Tax Savings</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                         <div>
-                            <div style="font-size: 0.875rem; color: #666;">Donation Amount</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;">$<span id="editItemTotal">0.00</span></div>
+                            <div style="font-size: 0.75rem; color: #666;">Donation Amount</div>
+                            <div style="font-size: 1.125rem; font-weight: bold; color: #166534;">$<span id="editItemTotal">0.00</span></div>
                         </div>
                         <div>
-                            <div style="font-size: 0.875rem; color: #666;">Tax Savings (<span id="editItemTaxRate">0</span>%)</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #166534;">$<span id="editItemTaxSavings">0.00</span></div>
+                            <div style="font-size: 0.75rem; color: #666;">Savings (<span id="editItemTaxRate">0</span>%)</div>
+                            <div style="font-size: 1.125rem; font-weight: bold; color: #059669;">$<span id="editItemTaxSavings">0.00</span></div>
                         </div>
                     </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
-                        * Based on your marginal tax rate. Actual savings depend on itemizing deductions.
+                    <div style="margin-top: 0.25rem; font-size: 0.675rem; color: #666; line-height: 1.2;">
+                        * Based on marginal tax rate. Actual savings depend on itemizing.
                     </div>
                 </div>
 
@@ -4063,7 +4080,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.39</p>
+                            <p>Generated by Charity Tracker v2.11.40</p>
                         </div>
                     </body>
                     </html>
