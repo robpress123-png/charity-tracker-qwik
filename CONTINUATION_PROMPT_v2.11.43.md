@@ -1,8 +1,17 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.42
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.43
 
-## 🎉 Version 2.11.42 - Optimized for Standard Monitors
+## 🎉 Version 2.11.43 - Further Display Optimizations
 
-### Latest Updates (v2.11.39 - v2.11.42)
+### Latest Updates (v2.11.43)
+- ✅ **v2.11.43**: Additional space-saving optimizations
+  - Fixed: Profile page - Tax Year, Filing Status, and Tax Bracket now on ONE row (4-digit year input)
+  - Fixed: Tools page - Removed "Powerful Tools" intro block, reduced icon sizes (40px), smaller headers
+  - Improved: Modal widths - Only Items modal uses 1600px width, all others (Cash, Mileage, Stock, Crypto) use standard 800px
+  - Applied: Universal space-saving pattern - Total Donation and Tax Savings always side-by-side
+  - Consolidated: Crypto modal from 4 field rows to 3 rows (Name/Symbol/Time, Quantity/Price/Cost, Exchange/Period)
+  - 🔍 **NEEDS INVESTIGATION**: Tax bracket dropdown may not update income ranges when filing status changes
+
+### Previous Updates (v2.11.39 - v2.11.42)
 - ✅ **v2.11.42**: Major display optimizations for 1920x1080 monitors
   - Fixed: Quick Insights scrolling by reducing font sizes (0.75rem-0.813rem)
   - Fixed: My Charities height increased to 650px min/75vh max on Add Donation page
