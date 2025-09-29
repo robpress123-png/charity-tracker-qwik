@@ -1,8 +1,29 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.38
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.42
 
-## 🎉 Version 2.11.38 - Enhanced Admin Console & Registration
+## 🎉 Version 2.11.42 - Optimized for Standard Monitors
 
-### Latest Updates (v2.11.30 - v2.11.38)
+### Latest Updates (v2.11.39 - v2.11.42)
+- ✅ **v2.11.42**: Major display optimizations for 1920x1080 monitors
+  - Fixed: Quick Insights scrolling by reducing font sizes (0.75rem-0.813rem)
+  - Fixed: My Charities height increased to 650px min/75vh max on Add Donation page
+  - Fixed: Profile and Tools pages better height calc (100vh - 120px)
+  - Added: Dynamic modal width based on type (Cash/Mileage: 800px, Complex forms: 1600px)
+  - Improved: Stat cards more compact (padding 1.25rem, values 1.875rem)
+- ✅ **v2.11.41**: Initial fixes for standard monitor optimization
+  - Increased modal heights to 95vh on standard monitors
+  - Added wide-modal class for complex forms
+  - Fixed My Charities height from 400px to 600px/70vh
+  - Adjusted Profile/Tools to calc(100vh - 140px)
+- ✅ **v2.11.40**: Responsive layout improvements
+  - Dashboard sections use percentage heights instead of calc()
+  - Reduced spacing throughout (gaps, margins, padding)
+  - Consolidated header to save 40px vertical space
+  - Tax savings display made more compact
+- ✅ **v2.11.39**: Header consolidation
+  - Removed redundant version banner
+  - Version number integrated into main header with gold styling
+
+### Previous Updates (v2.11.30 - v2.11.38)
 - ✅ **v2.11.38**: Admin console improvements
   - Added: Plan column showing Free/Premium status in user table
   - Visual badges: Free (gray), Premium (gold star)
@@ -40,7 +61,7 @@
   - Added `max-height: 90vh` to modals for ultrawide monitors
   - Forms now scroll when content exceeds viewport height
 
-### Current Status (v2.11.30)
+### Current Status (v2.11.42)
 - ✅ **Display Issues RESOLVED** (from v2.11.29):
   - Dashboard scrolling works perfectly on standard and ultrawide monitors
   - My Charities has working scroll bar (fixed with explicit height)
@@ -653,4 +674,71 @@ This is a comprehensive state snapshot of the Charity Tracker project that allow
 - Maintains development velocity
 - Documents institutional knowledge
 
-Ready for continued development at v2.11.38!
+## 🎯 CRITICAL: Outstanding Issues for v2.11.43
+
+### User Testing Results (v2.11.42)
+#### ✅ What's Working:
+- **Quick Insights**: No more internal scrolling - PERFECT
+- **My Charities on Add Donation**: Height is PERFECT at 650px/75vh
+- **Cash Modal Width**: PERFECT at 800px
+- **Dynamic Modal Widths**: Working (but needs refinement - see below)
+
+#### ❌ Still Needs Fixes:
+
+### 1. **PROFILE PAGE** - Still Scrolling
+- **Problem**: Too much vertical space wasted
+- **Solution**: Combine Tax Year (4-digit field), Filing Status, and Tax Bracket on ONE row
+- **🔴 CRITICAL**: Need to verify tax brackets dynamically adjust based on filing status selection
+  - User concern: "Not sure if we are adjusting the tax bracket based on what the user says is their filing status in any given year"
+  - This is a CORE calculation that must work correctly
+
+### 2. **TOOLS PAGE** - Significant Scrolling
+- **Remove**: "Powerful Tools to Manage Your Charitable Giving" intro block (waste of space)
+- **Reduce/Remove**: Icons/emojis from headers - unprofessional for financial tool
+- **Make headers smaller**: Current headers with icons are too large
+
+### 3. **MODAL WIDTH ADJUSTMENTS**
+- **Stock Modal**: Currently 1600px but "unnecessarily wide" - reduce to standard width
+- **Mileage Modal**: Should be standard width (800px) like Cash
+- **Crypto Modal**: Can likely be standard width with field consolidation
+- **Items Modal**: May be only one needing extra width due to receipt display
+
+### 4. **UNIVERSAL SPACE-SAVING PATTERN** 🔑
+**Apply to ALL donation forms:**
+- Put **Donation Total** and **Tax Savings** side-by-side (currently stacked)
+- Put **Notes** field next to Tax Savings box (2/3 Notes, 1/3 Tax)
+- Move tax disclaimer inline: "💰 Tax Savings (if itemizing)"
+- Remove separate disclaimer line "*Based on marginal tax rate..."
+
+### 5. **CRYPTO MODAL** - Major Consolidation Needed
+- Combine Date and Time fields on same row
+- Put Crypto Name, Symbol, and Time on one row
+- Put Quantity, Price, Cost Basis on one row
+- Apply universal pattern (Total + Tax side-by-side)
+
+### 6. **EDIT MODALS** - Various Issues
+- **Edit Cash**: Width is good but needs Notes/Tax side-by-side
+- **Edit Mileage**: Too wide (uses main modal width) - needs standard width
+- **Edit Item**: Slight scrolling for buttons - needs height adjustment
+- **Edit Stock**: Unnecessary scroll bar - needs minor height tweak
+- **Edit Crypto**: Lots of scrolling - needs same consolidation as Add Crypto
+
+### 7. **OTHER IMPROVEMENTS NOTED**
+- **View Summary in Reports**: Convert to modal popup instead of inline display
+- **Dashboard My Charities**: Consider tighter spacing and smaller font to show more charities
+- **Dashboard Donation History**: Same - tighter spacing to show more donations
+
+## 📢 Implementation Strategy
+The universal patterns (side-by-side layouts, inline disclaimers) will solve most scrolling issues across all modals. Focus on:
+1. Consistent side-by-side layouts for Total/Tax/Notes
+2. Standard modal widths (800px) except Items
+3. Field consolidation on complex forms
+4. Remove decorative elements from professional interfaces
+
+## 🔄 Current State Summary
+- Version: 2.11.42
+- Goal: App-like experience on 1920x1080 monitors at 100% zoom
+- Progress: ~60% complete - main layouts working, modals need refinement
+- Context usage when stopped: 11%
+
+Ready for continued development at v2.11.43!
