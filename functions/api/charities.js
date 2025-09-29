@@ -191,14 +191,17 @@ export async function onRequestGet(context) {
       } else {
         if (user) {
           // If authenticated, include user's personal charities
+          // Personal charities should be prioritized in the results
           query = `
-            SELECT id, name, ein, category, website, description, 'system' as source
-            FROM charities
-            UNION ALL
-            SELECT id, name, ein, category, website, description, 'personal' as source
-            FROM user_charities
-            WHERE user_id = ?
-            ORDER BY name
+            SELECT id, name, ein, category, website, description, source FROM (
+              SELECT id, name, ein, category, website, description, 'personal' as source, 0 as priority
+              FROM user_charities
+              WHERE user_id = ?
+              UNION ALL
+              SELECT id, name, ein, category, website, description, 'system' as source, 1 as priority
+              FROM charities
+            )
+            ORDER BY priority, name
             LIMIT ? OFFSET ?
           `;
           queryParams = [user.id, limit, offset];
