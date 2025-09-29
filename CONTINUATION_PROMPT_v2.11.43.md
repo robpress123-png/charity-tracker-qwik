@@ -3,13 +3,30 @@
 ## 🎉 Version 2.11.43 - Further Display Optimizations
 
 ### Latest Updates (v2.11.43)
-- ✅ **v2.11.43**: Additional space-saving optimizations
-  - Fixed: Profile page - Tax Year, Filing Status, and Tax Bracket now on ONE row (4-digit year input)
-  - Fixed: Tools page - Removed "Powerful Tools" intro block, reduced icon sizes (40px), smaller headers
-  - Improved: Modal widths - Only Items modal uses 1600px width, all others (Cash, Mileage, Stock, Crypto) use standard 800px
-  - Applied: Universal space-saving pattern - Total Donation and Tax Savings always side-by-side
-  - Consolidated: Crypto modal from 4 field rows to 3 rows (Name/Symbol/Time, Quantity/Price/Cost, Exchange/Period)
-  - 🔍 **NEEDS INVESTIGATION**: Tax bracket dropdown may not update income ranges when filing status changes
+- ✅ **v2.11.43**: Major space-saving optimizations for standard monitors
+  - **Profile Page**: Tax Year (select), Filing Status, and Income Range on ONE row
+    - ⚠️ BROKEN: Tax Year changed back to select but some JS expects number input
+    - Changed label from "Tax Bracket" to "Income Range" for clarity
+    - Compact 3-column tax info display (2024/2025 narrow, 2026 split into 2 sub-columns)
+  - **Tools Page**: Professional card design
+    - Removed intro block completely
+    - Removed all icons/emojis
+    - Added thin colored bars (4px) at top of each card for visual distinction
+    - Consistent font sizes: 1rem titles, 0.875rem descriptions
+    - Consistent padding and hover effects
+  - **Donation Modals**: Universal patterns applied
+    - Notes field ABOVE Total/Tax Savings (user input → results flow)
+    - Total Donation and Tax Savings ALWAYS side-by-side at BOTTOM
+    - Modal widths: 800px standard (only Items uses 1600px for receipt display)
+  - **Crypto Modal**: Removed redundancy
+    - Eliminated separate "Total Crypto Value" block
+    - Donation Total now shows calculation inline (e.g., "2.5 × $42,000")
+    - Consolidated to 3 field rows from 4
+  - 🔍 **NEEDS FIXING**:
+    - Profile page tax functionality partially broken
+    - Tax bracket dropdown not updating when filing status changes
+    - Edit modals need same optimizations
+    - View Summary should be modal popup
 
 ### Previous Updates (v2.11.39 - v2.11.42)
 - ✅ **v2.11.42**: Major display optimizations for 1920x1080 monitors
@@ -83,6 +100,23 @@
   - Ranked results (exact match > starts with > contains)
   - Loading indicator shows during full database search
   - Results limited to 50 for performance
+
+## 📐 Design Principles (ESTABLISHED v2.11.43)
+
+### Form Layout Standards
+1. **Universal Pattern**: Total Donation and Tax Savings ALWAYS at bottom, side-by-side
+2. **Field Order**: User inputs → Notes → Calculations (logical flow)
+3. **Modal Widths**: 800px standard (exception: Items modal 1600px for receipt display)
+4. **No Redundancy**: Show calculations inline, avoid duplicate displays
+5. **Professional Look**: No emojis/icons in tools, use colored bars for distinction
+6. **Compact Spacing**: Reduce all margins/padding to fit 1080p without scrolling
+
+### Space-Saving Techniques
+- Combine related fields on same row where possible
+- Use smaller font sizes (0.875rem labels, 0.75rem-0.625rem helper text)
+- Inline calculations in display fields (e.g., "2.5 × $42,000" under total)
+- Remove unnecessary intro blocks and decorative elements
+- Consolidate multi-column layouts for complex data (like 2026 tax info)
 
 ## 🔍 Hybrid Charity Search Logic (NEW in v2.11.30)
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.43</title>
+    <title>Dashboard - Charity Tracker v2.11.44</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -816,7 +816,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.43</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.44</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -1117,7 +1117,11 @@
                     <div style="display: grid; grid-template-columns: 150px 1fr 1fr; gap: 1rem; align-items: end;">
                         <div class="form-group">
                             <label style="font-size: 0.875rem;">Tax Year</label>
-                            <input type="number" id="taxYear" min="2024" max="2026" value="2025" style="width: 100%;" onchange="loadTaxBrackets()">
+                            <select id="taxYear" style="width: 100%;" onchange="loadTaxBrackets()">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label style="font-size: 0.875rem;">Filing Status</label>
@@ -1129,9 +1133,9 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label style="font-size: 0.875rem;">Tax Bracket <small style="font-size: 0.75rem;">(Select bracket, not income)</small></label>
+                            <label style="font-size: 0.875rem;">Income Range <small style="font-size: 0.75rem;">(Select your range)</small></label>
                             <select id="taxBracket" style="width: 100%;" onchange="updateTaxDisplay()">
-                                <option value="">Loading brackets...</option>
+                                <option value="">Loading income ranges...</option>
                             </select>
                         </div>
                     </div>
@@ -1143,43 +1147,51 @@
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
                         <h3 style="margin-bottom: 1rem;">Your Tax Information</h3>
 
-                        <!-- All Years Grid Display -->
-                        <div id="allYearsTaxInfo" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                            <!-- 2024 Column -->
-                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
-                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2024</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
-                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2024">Not Set</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
-                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2024">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
-                                <div style="font-size: 0.875rem;" id="deduction2024">-</div>
+                        <!-- All Years Grid Display - Compact -->
+                        <div id="allYearsTaxInfo" style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 0.75rem;">
+                            <!-- 2024 Column - Narrower -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.125rem; font-size: 0.875rem;">2024</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Filing Status</div>
+                                <div style="font-size: 0.75rem; font-weight: 500; margin-bottom: 0.25rem;" id="status2024">Not Set</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Tax Bracket</div>
+                                <div style="font-size: 1rem; font-weight: bold; margin-bottom: 0.25rem;" id="rate2024">-</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Std Deduction</div>
+                                <div style="font-size: 0.75rem;" id="deduction2024">-</div>
                             </div>
 
-                            <!-- 2025 Column -->
-                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
-                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2025</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
-                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2025">Not Set</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
-                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2025">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
-                                <div style="font-size: 0.875rem;" id="deduction2025">-</div>
+                            <!-- 2025 Column - Narrower -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.125rem; font-size: 0.875rem;">2025</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Filing Status</div>
+                                <div style="font-size: 0.75rem; font-weight: 500; margin-bottom: 0.25rem;" id="status2025">Not Set</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Tax Bracket</div>
+                                <div style="font-size: 1rem; font-weight: bold; margin-bottom: 0.25rem;" id="rate2025">-</div>
+                                <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Std Deduction</div>
+                                <div style="font-size: 0.75rem;" id="deduction2025">-</div>
                             </div>
 
-                            <!-- 2026 Column -->
-                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.75rem; border-radius: 6px;">
-                                <div style="font-weight: 600; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.25rem;">2026 (OBBBA)</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Filing Status</div>
-                                <div style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;" id="status2026">Not Set</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Tax Bracket</div>
-                                <div style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem;" id="rate2026">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">AGI Estimate</div>
-                                <div style="font-size: 0.875rem; margin-bottom: 0.5rem;" id="agi2026">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">OBBBA Threshold (0.5%)</div>
-                                <div style="font-size: 0.875rem; font-weight: 500; color: #fbbf24; margin-bottom: 0.5rem;" id="threshold2026" title="First 0.5% of AGI must be donated before tax benefits apply">-</div>
-                                <div style="font-size: 0.75rem; opacity: 0.9; margin-bottom: 0.25rem;">Standard Deduction</div>
-                                <div style="font-size: 0.875rem;" id="deduction2026">-</div>
+                            <!-- 2026 Column - Wider with 2 sub-columns -->
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 0.5rem; border-radius: 6px;">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 0.125rem; font-size: 0.875rem;">2026 (OBBBA)</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <!-- Left sub-column -->
+                                    <div>
+                                        <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Filing Status</div>
+                                        <div style="font-size: 0.75rem; font-weight: 500; margin-bottom: 0.25rem;" id="status2026">Not Set</div>
+                                        <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Tax Bracket</div>
+                                        <div style="font-size: 1rem; font-weight: bold; margin-bottom: 0.25rem;" id="rate2026">-</div>
+                                        <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">Std Deduction</div>
+                                        <div style="font-size: 0.75rem;" id="deduction2026">-</div>
+                                    </div>
+                                    <!-- Right sub-column -->
+                                    <div>
+                                        <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">AGI Estimate</div>
+                                        <div style="font-size: 0.75rem; margin-bottom: 0.25rem;" id="agi2026">-</div>
+                                        <div style="font-size: 0.625rem; opacity: 0.9; margin-bottom: 0.125rem;">OBBBA (0.5%)</div>
+                                        <div style="font-size: 0.75rem; font-weight: 500; color: #fbbf24;" id="threshold2026" title="First 0.5% of AGI must be donated before tax benefits apply">-</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1209,98 +1221,56 @@
                     <div class="tools-grid" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
 
                         <!-- Import Donations Tool -->
-                        <div class="tool-card" onclick="showImportDonations()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); width: 40px; height: 40px; font-size: 1.25rem;">
-                                📥
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Import Donations</h4>
-                                <p class="tool-description">Upload CSV files to bulk import your donation records. Automatically matches charity names to our database.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">CSV Upload</span>
-                                    <span class="feature-tag">Auto-matching</span>
-                                    <span class="feature-tag">Bulk Import</span>
-                                </div>
+                        <div class="tool-card" onclick="showImportDonations()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Import Donations</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Upload CSV files to bulk import your donation records with automatic charity matching.</p>
                             </div>
                         </div>
 
                         <!-- Personal Charity Management Tool -->
-                        <div class="tool-card" onclick="showPersonalCharities()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 40px; height: 40px; font-size: 1.25rem;">
-                                🏛️
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Personal Charities</h4>
-                                <p class="tool-description">Manage your personal charity list. Add, edit, and track charities not in our database.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">Add Custom</span>
-                                    <span class="feature-tag">Edit Details</span>
-                                    <span class="feature-tag">Track Status</span>
-                                </div>
+                        <div class="tool-card" onclick="showPersonalCharities()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Personal Charities</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Manage your personal charity list. Add, edit, and track charities not in our database.</p>
                             </div>
                         </div>
 
                         <!-- Verify Charity Tool -->
-                        <div class="tool-card" onclick="showCharityVerification()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); width: 40px; height: 40px; font-size: 1.25rem;">
-                                🔍
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Verify Charity</h4>
-                                <p class="tool-description">Check if a charity is IRS-approved and eligible for tax-deductible donations.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">IRS Database</span>
-                                    <span class="feature-tag">EIN Lookup</span>
-                                    <span class="feature-tag">Instant Verify</span>
-                                </div>
+                        <div class="tool-card" onclick="showCharityVerification()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Verify Charity</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Check if a charity is IRS-approved and eligible for tax-deductible donations.</p>
                             </div>
                         </div>
 
                         <!-- Tax Calculator Tool -->
-                        <div class="tool-card" onclick="calculateTaxSavings()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 40px; height: 40px; font-size: 1.25rem;">
-                                💰
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Tax Savings Calculator</h4>
-                                <p class="tool-description">Calculate potential tax deductions and savings from your charitable donations based on your tax bracket.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">Tax Deductions</span>
-                                    <span class="feature-tag">Savings Analysis</span>
-                                    <span class="feature-tag">Bracket Aware</span>
-                                </div>
+                        <div class="tool-card" onclick="calculateTaxSavings()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Tax Savings Calculator</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Calculate potential tax deductions and savings from your charitable donations.</p>
                             </div>
                         </div>
 
                         <!-- Receipt Manager Tool -->
-                        <div class="tool-card" onclick="manageReceipts()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-                                📸
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title">Receipt Manager</h4>
-                                <p class="tool-description">Upload, organize, and manage receipt photos for your donations. Keep digital records for tax purposes.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">Photo Upload</span>
-                                    <span class="feature-tag">Organization</span>
-                                    <span class="feature-tag">Tax Records</span>
-                                </div>
+                        <div class="tool-card" onclick="manageReceipts()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Receipt Manager</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Upload, organize, and manage receipt photos for your donations. Keep digital records for tax purposes.</p>
                             </div>
                         </div>
 
                         <!-- Data Export Tool -->
-                        <div class="tool-card" onclick="backupData()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                                💾
-                            </div>
-                            <div class="tool-content">
-                                <h4 class="tool-title">Data Export & Backup</h4>
-                                <p class="tool-description">Export all your donation data for backup or use in external applications. Multiple formats supported.</p>
-                                <div class="tool-features">
-                                    <span class="feature-tag">Full Export</span>
-                                    <span class="feature-tag">Backup Ready</span>
-                                    <span class="feature-tag">Multiple Formats</span>
-                                </div>
+                        <div class="tool-card" onclick="backupData()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"></div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">Data Export & Backup</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Export all your donation data for backup or use in external applications.</p>
                             </div>
                         </div>
 
@@ -1610,52 +1580,43 @@
                 </div>
                 <!-- Mileage donation fields -->
                 <div id="milesFields" class="donation-type-fields" style="display:none;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div style="display:grid; grid-template-columns:1fr 2fr; gap:0.75rem;">
                         <div class="form-group">
-                            <label for="milesDriven">Miles Driven</label>
+                            <label for="milesDriven" style="font-size:0.875rem;">Miles Driven</label>
                             <input type="number" id="milesDriven" step="0.1" min="0" onchange="calculateMileageDeduction()" oninput="calculateMileageDeduction()">
                         </div>
                         <div class="form-group">
-                            <label for="mileagePurpose">Purpose</label>
-                            <input type="text" id="mileagePurpose" placeholder="e.g., Deliver meals">
+                            <label for="mileagePurpose" style="font-size:0.875rem;">Purpose of Trip</label>
+                            <input type="text" id="mileagePurpose" placeholder="Delivering food to food bank">
                         </div>
-                    </div>
-                    <div style="background:#f3f4f6; padding:0.5rem; border-radius:8px; margin-top:0.5rem;">
-                        <small>IRS Rate: $<span id="mileageRateDisplay">0.14</span>/mile | Deduction: $<span id="mileageDeduction">0.00</span></small>
                     </div>
                 </div>
                 <!-- Stock donation fields -->
                 <div id="stockFields" class="donation-type-fields" style="display:none;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <!-- Row 1: Name and Symbol -->
+                    <div style="display:grid; grid-template-columns:2fr 1fr; gap:0.75rem;">
                         <div class="form-group">
-                            <label for="stockName">Stock Name</label>
-                            <input type="text" id="stockName" placeholder="e.g., Apple Inc." required>
+                            <label for="stockName" style="font-size:0.875rem;">Stock Name</label>
+                            <input type="text" id="stockName" placeholder="Apple Inc." required>
                         </div>
                         <div class="form-group">
-                            <label for="stockSymbol">Stock Symbol</label>
-                            <input type="text" id="stockSymbol" placeholder="e.g., AAPL" style="text-transform:uppercase;" required>
+                            <label for="stockSymbol" style="font-size:0.875rem;">Symbol</label>
+                            <input type="text" id="stockSymbol" placeholder="AAPL" style="text-transform:uppercase;" required>
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <!-- Row 2: Shares, Price, Cost Basis -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
                         <div class="form-group">
-                            <label for="stockQuantity">Number of Shares</label>
+                            <label for="stockQuantity" style="font-size:0.875rem;">Shares</label>
                             <input type="number" id="stockQuantity" step="0.001" min="0" onchange="calculateStockTotal()" oninput="calculateStockTotal()" required>
                         </div>
                         <div class="form-group">
-                            <label for="fairMarketValue">Closing Price per Share</label>
-                            <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="$ per share" onchange="calculateStockTotal()" oninput="calculateStockTotal()" required>
+                            <label for="fairMarketValue" style="font-size:0.875rem;">Price/Share</label>
+                            <input type="number" id="fairMarketValue" step="0.01" min="0" placeholder="0.00" onchange="calculateStockTotal()" oninput="calculateStockTotal()" required>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="costBasis">Cost Basis (optional)</label>
-                        <input type="number" id="costBasis" step="0.01" min="0" placeholder="Total cost basis">
-                        <small style="color:#6b7280;">Automatic price lookup coming soon</small>
-                    </div>
-                    <div style="background:#f0f9ff; padding:0.75rem; border-radius:6px; margin-top:1rem; border:1px solid #bae6fd;">
-                        <div style="font-size:0.875rem; color:#0369a1; font-weight:600;">Total Stock Donation:</div>
-                        <div id="stockTotalDisplay" style="font-size:1.5rem; font-weight:bold; color:#075985;">$0.00</div>
-                        <div style="font-size:0.75rem; color:#0c4a6e; margin-top:0.25rem;">
-                            <span id="stockCalculation">0 shares × $0.00 = $0.00</span>
+                        <div class="form-group">
+                            <label for="costBasis" style="font-size:0.875rem;">Cost Basis</label>
+                            <input type="number" id="costBasis" step="0.01" min="0" placeholder="Optional">
                         </div>
                     </div>
                 </div>
@@ -1717,20 +1678,13 @@
                             </select>
                         </div>
                     </div>
-
-                    <!-- Total Display -->
-                    <div style="background:#f0f9ff; padding:0.5rem; border-radius:6px; margin-top:0.75rem; border:1px solid #bae6fd;">
-                        <div style="font-size:0.75rem; color:#0369a1; font-weight:600;">Total Crypto Value:</div>
-                        <div id="cryptoTotalDisplay" style="font-size:1.25rem; font-weight:bold; color:#075985;">$0.00</div>
-                        <div style="font-size:0.625rem; color:#0c4a6e; margin-top:0.125rem;">
-                            <span id="cryptoCalculation">0 units × $0.00 = $0.00</span>
-                        </div>
-                        <div id="cryptoDeductionNote" style="font-size:0.75rem; color:#0c4a6e; margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #bae6fd;">
-                            <strong>Tax Deduction:</strong> <span id="cryptoDeductionAmount">$0.00</span>
-                        </div>
-                    </div>
                 </div>
                 <!-- Date field moved to be side-by-side with Charity above -->
+                <!-- Notes Field -->
+                <div class="form-group">
+                    <label for="donationNotes">Notes (optional)</label>
+                    <textarea id="donationNotes" rows="2" style="width: 100%;"></textarea>
+                </div>
                 <!-- Total and Tax Savings Side by Side -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
                     <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px; border: 1px solid #dee2e6;">
@@ -1746,11 +1700,6 @@
                         <div style="font-size: 0.625rem; color: #666; margin-top: 0.25rem;">*If itemizing</div>
                     </div>
                 </div>
-                <!-- Notes Field -->
-                <div class="form-group">
-                    <label for="donationNotes">Notes (optional)</label>
-                    <textarea id="donationNotes" rows="2" style="width: 100%;"></textarea>
-                </div>
                 </div><!-- End scrollable content -->
                         <div class="modal-footer" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
                             <button type="button" class="btn-secondary" onclick="closeDonationModal()">Cancel</button>
@@ -1763,53 +1712,58 @@
 
     <!-- Edit Cash Donation Modal -->
     <div id="editCashDonationModal" class="modal">
-        <div class="modal-content wide-modal" style="max-width: 1200px; width: 90%;">
+        <div class="modal-content" style="max-width: 800px; width: 90%;">
             <div class="modal-header">
-                <h2>✏️ Edit Cash Donation</h2>
+                <h2 style="font-size: 1.25rem;">Edit Cash Donation</h2>
                 <button class="close-btn" onclick="closeEditCashModal()">&times;</button>
             </div>
-            <div style="padding: 1.5rem;">
+            <div style="padding: 1rem;">
                 <form id="editCashDonationForm">
                     <input type="hidden" id="editCashDonationId">
                     <input type="hidden" id="editCashCharityId">
                     <input type="hidden" id="editCashCharitySource">
 
-                    <!-- Charity Section -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Charity</label>
-                        <div style="padding: 0.75rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;">
-                            <div id="editCashCharityName" style="font-weight: 500; color: #111827;"></div>
-                            <div id="editCashCharityEIN" style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;"></div>
+                    <!-- Charity and Date on same row -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div>
+                            <label style="font-size: 0.875rem; color: #374151;">Charity</label>
+                            <div style="padding: 0.5rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;">
+                                <div id="editCashCharityName" style="font-size: 0.875rem; font-weight: 500;"></div>
+                                <div id="editCashCharityEIN" style="font-size: 0.625rem; color: #6b7280;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="editCashDate" style="font-size: 0.875rem; color: #374151;">Date</label>
+                            <input type="date" id="editCashDate" required style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
                         </div>
                     </div>
 
-                    <!-- Date Section -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label for="editCashDate" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Donation Date</label>
-                        <input type="date" id="editCashDate" required style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
-                    </div>
-
-                    <!-- Amount Section -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label for="editCashAmount" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Amount ($)</label>
+                    <!-- Amount field -->
+                    <div style="margin-bottom: 0.75rem;">
+                        <label for="editCashAmount" style="font-size: 0.875rem; color: #374151;">Amount ($)</label>
                         <input type="number" id="editCashAmount" step="0.01" min="0" required
                                style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;"
                                oninput="updateEditCashTaxSavings()">
                     </div>
 
-                    <!-- Tax Savings Display (Compact) -->
-                    <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-left: 4px solid #0284c7; padding: 0.625rem; border-radius: 8px; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.8rem; color: #0369a1;">Estimated Tax Savings:</span>
-                            <span style="font-size: 1.125rem; font-weight: bold; color: #0284c7;">$<span id="editCashTaxSavings">0</span></span>
-                        </div>
+                    <!-- Notes Section -->
+                    <div style="margin-bottom: 0.75rem;">
+                        <label for="editCashNotes" style="font-size: 0.875rem; color: #374151;">Notes (optional)</label>
+                        <textarea id="editCashNotes" rows="2"
+                                  style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;"></textarea>
                     </div>
 
-                    <!-- Notes Section -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label for="editCashNotes" style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
-                        <textarea id="editCashNotes" rows="3"
-                                  style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
+                    <!-- Total and Tax Savings Side by Side -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0;">
+                        <div style="background: #f8f9fa; padding: 0.5rem; border-radius: 6px; border: 1px solid #dee2e6;">
+                            <div style="font-size: 0.625rem; color: #666;">Donation Total</div>
+                            <div style="font-size: 1.25rem; font-weight: bold; color: #166534;" id="editCashAmountDisplay">$0</div>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 0.5rem; border-radius: 6px; border: 2px solid #86efac;">
+                            <div style="font-size: 0.625rem; color: #666;">💰 Tax Savings</div>
+                            <div style="font-size: 1.25rem; font-weight: bold; color: #059669;" id="editCashTaxSavings">$0</div>
+                            <div style="font-size: 0.5rem; color: #666;">*If itemizing</div>
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->
@@ -1832,14 +1786,14 @@
     <div id="editItemDonationModal" class="modal">
         <div class="modal-content wide-modal" style="max-width: 1600px; width: 95%;">
             <div class="modal-header">
-                <h2>✏️ Edit Item Donation</h2>
+                <h2 style="font-size: 1.25rem;">Edit Item Donation</h2>
                 <button class="close-btn" onclick="closeEditItemModal()">&times;</button>
             </div>
-            <div style="padding: 1.5rem;">
+            <div style="padding: 1rem;">
                 <!-- Charity and Date Section -->
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                     <div>
-                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Charity</label>
+                        <label style="font-size: 0.875rem; color: #374151;">Charity</label>
                         <div style="position: relative;">
                             <input type="text"
                                    id="editItemCharity"
@@ -1847,7 +1801,7 @@
                                    autocomplete="off"
                                    oninput="searchEditCharities(this.value)"
                                    onfocus="showEditCharityDropdown()"
-                                   style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
+                                   style="padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 6px; width: 100%;">
                             <input type="hidden" id="editItemCharityId">
                             <!-- Dropdown for charity search results -->
                             <div id="editCharityDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-radius: 6px; margin-top: 2px; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100;">
@@ -1856,8 +1810,8 @@
                         </div>
                     </div>
                     <div>
-                        <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Donation Date</label>
-                        <input type="date" id="editItemDate" onchange="renderEditItems()" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <label style="font-size: 0.875rem; color: #374151;">Date</label>
+                        <input type="date" id="editItemDate" onchange="renderEditItems()" style="padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 6px;">
                     </div>
                 </div>
 
@@ -1878,54 +1832,46 @@
                             </button>
                         </div>
 
-                        <!-- Notes Section -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Notes</label>
-                            <textarea id="editItemNotes" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical;"></textarea>
-                        </div>
                     </div>
 
                     <!-- Right Column: Receipt Preview -->
                     <div>
-                        <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:1rem; position: sticky; top: 0;">
-                            <div style="border-bottom:2px dashed #d1d5db; padding-bottom:0.5rem; margin-bottom:0.75rem;">
-                                <h4 style="font-size:1rem;font-weight:700;color:#374151;text-align:center;margin:0;">📋 DONATION RECEIPT</h4>
-                                <p style="font-size:0.75rem;color:#6b7280;text-align:center;margin-top:0.25rem;">Items for Tax Deduction</p>
+                        <div style="background:white; border:2px solid #e5e7eb; border-radius:8px; padding:0.75rem; position: sticky; top: 0;">
+                            <div style="border-bottom:2px dashed #d1d5db; padding-bottom:0.25rem; margin-bottom:0.5rem;">
+                                <h4 style="font-size:0.875rem;font-weight:700;color:#374151;text-align:center;margin:0;">📋 DONATION RECEIPT</h4>
+                                <p style="font-size:0.625rem;color:#6b7280;text-align:center;margin-top:0.125rem;">Items for Tax Deduction</p>
                             </div>
-                            <div id="editReceiptItemsList" style="min-height:200px; max-height:350px; overflow-y:auto;font-size:0.875rem;">
-                                <div class="empty-state" style="color:#9ca3af; text-align:center; padding:2rem; font-size:0.875rem;">
+                            <div id="editReceiptItemsList" style="min-height:150px; max-height:300px; overflow-y:auto;font-size:0.75rem;">
+                                <div class="empty-state" style="color:#9ca3af; text-align:center; padding:1rem; font-size:0.75rem;">
                                     No items added yet
                                 </div>
                             </div>
-                            <div style="border-top:2px solid #374151; margin-top:0.75rem; padding-top:0.75rem;">
+                            <div style="border-top:2px solid #374151; margin-top:0.5rem; padding-top:0.5rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <strong style="font-size:1rem;">Total Value:</strong>
-                                    <span style="font-size:1.5rem; font-weight:bold; color:#667eea;">$<span id="editReceiptTotal">0.00</span></span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e5e7eb;">
-                                    <span style="font-size: 0.875rem; color: #6b7280;">Tax Savings (<span id="editReceiptTaxRate">0</span>%):</span>
-                                    <span style="font-size: 1rem; font-weight: bold; color: #10b981;">$<span id="editReceiptTaxSavings">0.00</span></span>
+                                    <strong style="font-size:0.875rem;">Total:</strong>
+                                    <span style="font-size:1.25rem; font-weight:bold; color:#667eea;">$<span id="editReceiptTotal">0.00</span></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tax Savings Calculator (Compact) -->
-                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 0.625rem; border-radius: 8px; margin-top: 0.75rem; margin-bottom: 1rem;">
-                    <h4 style="color: #166534; margin-bottom: 0.375rem; font-size: 0.875rem;">💰 Estimated Tax Savings</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div>
-                            <div style="font-size: 0.75rem; color: #666;">Donation Amount</div>
-                            <div style="font-size: 1.125rem; font-weight: bold; color: #166534;">$<span id="editItemTotal">0.00</span></div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.75rem; color: #666;">Savings (<span id="editItemTaxRate">0</span>%)</div>
-                            <div style="font-size: 1.125rem; font-weight: bold; color: #059669;">$<span id="editItemTaxSavings">0.00</span></div>
-                        </div>
+                <!-- Notes Section -->
+                <div style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
+                    <label style="font-size: 0.875rem; color: #374151;">Notes (optional)</label>
+                    <textarea id="editItemNotes" rows="2" style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 6px;"></textarea>
+                </div>
+
+                <!-- Total and Tax Savings Side by Side -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0;">
+                    <div style="background: #f8f9fa; padding: 0.5rem; border-radius: 6px; border: 1px solid #dee2e6;">
+                        <div style="font-size: 0.625rem; color: #666;">Donation Total</div>
+                        <div style="font-size: 1.25rem; font-weight: bold; color: #166534;">$<span id="editItemTotal">0.00</span></div>
                     </div>
-                    <div style="margin-top: 0.25rem; font-size: 0.675rem; color: #666; line-height: 1.2;">
-                        * Based on marginal tax rate. Actual savings depend on itemizing.
+                    <div style="background: #f0fdf4; padding: 0.5rem; border-radius: 6px; border: 2px solid #86efac;">
+                        <div style="font-size: 0.625rem; color: #666;">💰 Tax Savings (<span id="editItemTaxRate">0</span>%)</div>
+                        <div style="font-size: 1.25rem; font-weight: bold; color: #059669;">$<span id="editItemTaxSavings">0.00</span></div>
+                        <div style="font-size: 0.5rem; color: #666;">*If itemizing</div>
                     </div>
                 </div>
 
@@ -4069,7 +4015,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.43</p>
+                            <p>Generated by Charity Tracker v2.11.44</p>
                         </div>
                     </body>
                     </html>
@@ -4250,7 +4196,7 @@
                 return;
             }
 
-            const taxYear = taxYearElem.value.toString();
+            const taxYear = taxYearElem.value;
             const filingStatus = filingStatusElem.value;
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const token = user.token || localStorage.getItem('token') || 'test-token';
@@ -4338,7 +4284,7 @@
                 return; // Elements not ready yet
             }
 
-            const taxYear = taxYearElem.value.toString();
+            const taxYear = taxYearElem.value;
             const bracketRate = parseFloat(taxBracketElem.value);
 
             // Update current editing year
@@ -4512,7 +4458,7 @@
 
         // Save profile information
         async function saveProfile() {
-            const taxYear = document.getElementById('taxYear').value.toString();
+            const taxYear = document.getElementById('taxYear').value;
             const profileData = {
                 name: document.getElementById('profileName').value,
                 email: document.getElementById('profileEmail').value,
@@ -6974,9 +6920,15 @@
             const pricePerShare = parseFloat(document.getElementById('fairMarketValue').value) || 0;
             const total = shares * pricePerShare;
 
-            document.getElementById('stockTotalDisplay').textContent = '$' + total.toFixed(2);
-            document.getElementById('stockCalculation').textContent =
-                `${shares} shares × $${pricePerShare.toFixed(2)} = $${total.toFixed(2)}`;
+            // Update the main donation amount display with the calculation
+            const amountDisplay = document.getElementById('donationAmountDisplay');
+            if (amountDisplay) {
+                if (shares > 0 && pricePerShare > 0) {
+                    amountDisplay.innerHTML = `$${total.toFixed(2)}<br><span style="font-size: 0.625rem; color: #666;">${shares} shares × $${pricePerShare.toFixed(2)}</span>`;
+                } else {
+                    amountDisplay.textContent = '$0';
+                }
+            }
 
             // Update tax savings when stock total changes
             updateTaxSavings();
@@ -6987,25 +6939,19 @@
             const quantity = parseFloat(document.getElementById('cryptoQuantity').value) || 0;
             const pricePerUnit = parseFloat(document.getElementById('cryptoPricePerUnit').value) || 0;
             const total = quantity * pricePerUnit;
-            const costBasis = parseFloat(document.getElementById('cryptoCostBasis').value) || 0;
-            const holdingPeriod = document.getElementById('cryptoHoldingPeriod').value;
 
-            document.getElementById('cryptoTotalDisplay').textContent = '$' + total.toFixed(2);
-            document.getElementById('cryptoCalculation').textContent =
-                `${quantity} units × $${pricePerUnit.toFixed(2)} = $${total.toFixed(2)}`;
+            // Update the main donation amount display with the calculation
+            const amountDisplay = document.getElementById('donationAmountDisplay');
+            if (amountDisplay) {
+                if (quantity > 0 && pricePerUnit > 0) {
+                    amountDisplay.innerHTML = `$${total.toFixed(2)}<br><span style="font-size: 0.625rem; color: #666;">${quantity} × $${pricePerUnit.toFixed(2)}</span>`;
+                } else {
+                    amountDisplay.textContent = '$0';
+                }
+            }
 
             // Update tax savings display
             updateTaxSavings();
-
-            // Calculate tax deduction based on holding period
-            let deduction = total;
-            let note = '';
-            if (holdingPeriod === 'short' && costBasis > 0) {
-                deduction = Math.min(costBasis, total);
-                note = deduction === costBasis ? ' (limited to cost basis)' : ' (at fair market value)';
-            }
-
-            document.getElementById('cryptoDeductionAmount').textContent = '$' + deduction.toFixed(2) + note;
         }
 
         // Calculate mileage deduction
@@ -7020,8 +6966,22 @@
                 }
             }
             const deduction = miles * rate;
-            document.getElementById('mileageDeduction').textContent = deduction.toFixed(2);
-            // Update the rate display
+
+            // Update the main donation amount display with the calculation
+            const amountDisplay = document.getElementById('donationAmountDisplay');
+            if (amountDisplay) {
+                if (miles > 0) {
+                    amountDisplay.innerHTML = `$${deduction.toFixed(2)}<br><span style="font-size: 0.625rem; color: #666;">${miles} miles × $${rate}/mile</span>`;
+                } else {
+                    amountDisplay.textContent = '$0';
+                }
+            }
+
+            // Keep updating old fields for compatibility
+            const mileageDeductionElem = document.getElementById('mileageDeduction');
+            if (mileageDeductionElem) {
+                mileageDeductionElem.textContent = deduction.toFixed(2);
+            }
             const rateDisplay = document.getElementById('mileageRateDisplay');
             if (rateDisplay) {
                 rateDisplay.textContent = rate.toFixed(2);
@@ -7510,6 +7470,12 @@
             const amount = parseFloat(document.getElementById('editCashAmount').value) || 0;
             const dateStr = document.getElementById('editCashDate').value;
 
+            // Update the donation total display
+            const totalDisplay = document.getElementById('editCashAmountDisplay');
+            if (totalDisplay) {
+                totalDisplay.textContent = '$' + amount.toFixed(2);
+            }
+
             // Get year from donation date
             let taxRate = 0;
             if (dateStr) {
@@ -7522,7 +7488,7 @@
             }
 
             const savings = (amount * taxRate).toFixed(2);
-            document.getElementById('editCashTaxSavings').textContent = formatCurrency(savings, true);
+            document.getElementById('editCashTaxSavings').textContent = '$' + savings;
         }
 
         // Handle Edit Cash Donation Form Submit
