@@ -1,14 +1,20 @@
-# Charity Tracker Qwik - Continuation Prompt v2.11.30
+# Charity Tracker Qwik - Continuation Prompt v2.11.32
 
-## 🎉 Version 2.11.30 - Hybrid Charity Search Implementation COMPLETE
+## 🎉 Version 2.11.32 - Modal Scrolling Fix & Hybrid Search Complete
 
-### Latest Updates (v2.11.30)
+### Latest Updates (v2.11.30 - v2.11.32)
 - ✅ **v2.11.30**: Implemented hybrid progressive charity search
   - Updated `handleCharitySearch` to use new `/api/charities/search` endpoint
   - Reduced initial load from 2000 to 500 charities for faster page load
   - Added "⏳ Searching all 10,000+ charities..." loading indicator
   - Improved result ranking and deduplication
   - Backup created as `dashboard_v2.11.29_backup.html` for rollback
+- ✅ **v2.11.31**: Fixed stock/crypto donation report display
+  - Stock: Changed `shares_donated` → `stock_quantity`
+  - Crypto: Added missing `crypto_price_per_unit` assignment
+- ✅ **v2.11.32**: Applied scrolling fix to modal forms
+  - Added `max-height: 90vh` to modals for ultrawide monitors
+  - Forms now scroll when content exceeds viewport height
 
 ### Current Status (v2.11.30)
 - ✅ **Display Issues RESOLVED** (from v2.11.29):
@@ -24,27 +30,52 @@
   - Loading indicator shows during full database search
   - Results limited to 50 for performance
 
-### ⚠️ CRITICAL ISSUE DISCOVERED - Charity Search Limitations
+## 🔍 Hybrid Charity Search Logic (NEW in v2.11.30)
 
-#### Problems Found:
-1. **Missing Major Charities**: Salvation Army, Purple Heart NOT in database
+### How It Works:
+1. **Initial Load**: 500 most common charities preloaded for instant search
+2. **Stage 1 - Instant Results** (< 300ms):
+   - Searches preloaded charities locally
+   - Shows up to 10 instant results
+   - Displays "⏳ Searching all 10,000+ charities..." indicator
+3. **Stage 2 - Full Database Search** (after 300ms):
+   - Calls `/api/charities/search?q=${query}&limit=50`
+   - Searches entire database with smart ranking:
+     - Rank 1: Exact name match
+     - Rank 2: Name starts with query
+     - Rank 3: Name contains query
+     - Rank 4: Exact EIN match
+     - Rank 5: Other matches
+   - Merges and deduplicates with local results
+   - Shows up to 50 total results
+
+### Examples of Charities Requiring Database Search:
+These charities are NOT in the first 500 preloaded (will only appear after database search):
+1. **MARRAKECH HOUSING OPTIONS INC** (EIN: 061319874)
+2. **MICCOSUKEE CORPORATION** (EIN: 591374440)
+3. **BREAKING GROUND HOUSING DEVELOPMENT FUND CORPORATION** (EIN: 113048002)
+4. **NATIONS FINEST** (EIN: 942699571)
+5. **JEWISH FOUNDATION FOR GROUP HOMES** (EIN: 521263608)
+
+### ✅ RESOLVED - Charity Search Issues (Fixed in v2.11.30)
+
+#### Problems That Were Fixed:
+1. ✅ **Search Limitations** - RESOLVED:
+   - Reduced initial load from 2000 to 500 (faster page load)
+   - Created new `/api/charities/search` endpoint (no hardcoded limits)
+   - Implemented hybrid search with full database access
+   - Dashboard now searches all 10,000+ charities
+
+2. ✅ **Subset Issues** - RESOLVED:
+   - Audited and fixed charity loading functions
+   - Hybrid search ensures full database coverage
+   - Progressive loading with clear UI indicators
+
+#### Remaining Issue:
+1. ⚠️ **Missing Major Charities**: Some major charities (Salvation Army, Purple Heart) not in database
    - Current CSV has 10,000 charities but missing some major ones
-   - Need updated/complete charity database
-
-2. **Search Limitations**:
-   - Initial load: Only 2000 charities (not 10,000)
-   - Search API: Hardcoded LIMIT 100 in `/api/charities.js` lines 155, 180
-   - Dashboard requests limit=2000 but API ignores for searches
-
-3. **Subset Issues Throughout Code**:
-   - Need to audit all charity search/load functions
-   - Multiple places may be limiting results unintentionally
-
-#### Planned Solution - Hybrid Progressive Search:
-- **Phase 1**: Load 500-1000 common charities locally for instant results
-- **Phase 2**: After 300ms, search full database on server
-- **UI**: Show "⏳ Searching all 10,000 charities..." indicator
-- **Future**: Scale to full IRS database (1M+ charities)
+   - **TODO**: Need updated/complete charity database from IRS
+   - **Future Goal**: Scale to full IRS database (1M+ charities)
 
 ### Previous Updates (v2.11.20 - v2.11.26)
 - **v2.11.19**: Last stable before display issues
