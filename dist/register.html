@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Charity Tracker v2.11.52</title>
+    <title>Register - Charity Tracker v2.11.53</title>
     <!-- Inline styles only, no external stylesheet needed -->
     <style>
         body {
@@ -601,12 +601,23 @@
                 console.log('Registration API response:', data);
 
                 if (data.success) {
-                    // Store token if provided
+                    // CRITICAL: Clear any existing session data first
+                    localStorage.clear();
+
+                    // Store token and user data in the format dashboard expects
                     if (data.token) {
-                        console.log('Storing auth token and user data');
-                        localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('userId', data.userId);
-                        localStorage.setItem('userEmail', email);
+                        console.log('Storing auth token and user data for:', email);
+                        localStorage.setItem('token', data.token);
+
+                        // Store user object as dashboard expects
+                        const userData = {
+                            id: data.userId || data.user_id,
+                            email: email,
+                            name: name,
+                            plan: data.plan || 'free'
+                        };
+                        localStorage.setItem('user', JSON.stringify(userData));
+                        console.log('User data stored:', userData);
                     } else {
                         console.warn('No token received from API');
                     }
