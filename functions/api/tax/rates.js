@@ -48,8 +48,9 @@ export async function onRequestGet(context) {
         }
 
         // Get tax brackets for this year and filing status
-        // Use the user's saved filing status if available, otherwise use the query parameter
-        const effectiveFilingStatus = response.filing_status;
+        // Use the filing status from query parameter, NOT the saved one
+        // This allows users to explore different filing statuses
+        const effectiveFilingStatus = filingStatus; // Use query param, not saved
         const brackets = await env.DB.prepare(`
             SELECT min_income, max_income, rate
             FROM tax_brackets
@@ -79,7 +80,7 @@ export async function onRequestGet(context) {
             SELECT amount
             FROM standard_deductions
             WHERE tax_year = ? AND filing_status = ?
-        `).bind(year, effectiveFilingStatus).first();
+        `).bind(year, filingStatus).first();
 
         if (deduction) {
             response.standard_deduction = deduction.amount;
@@ -91,7 +92,7 @@ export async function onRequestGet(context) {
             FROM contribution_limits
             WHERE tax_year = ?
             AND (filing_status = ? OR filing_status IS NULL)
-        `).bind(year, effectiveFilingStatus).all();
+        `).bind(year, filingStatus).all();
 
         if (limits.results && limits.results.length > 0) {
             response.contribution_rules = {};
@@ -109,7 +110,7 @@ export async function onRequestGet(context) {
             FROM capital_gains_rates
             WHERE tax_year = ? AND filing_status = ? AND gain_type = 'long_term'
             ORDER BY min_income ASC
-        `).bind(year, effectiveFilingStatus).all();
+        `).bind(year, filingStatus).all();
 
         response.capital_gains_rates = capitalGains.results || [];
 
