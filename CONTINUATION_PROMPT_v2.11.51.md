@@ -1,22 +1,26 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.47
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.51
 
-## 🎉 Version 2.11.47 - Dashboard Navigation & Modal Fixes
+## 🎉 Version 2.11.51 - Registration & Tax API Fixes
 
-### Latest Updates (v2.11.47)
-- ✅ **v2.11.47**: Critical dashboard and navigation fixes
+### Latest Updates (v2.11.51)
+- ✅ **v2.11.51**: Registration Step 2 fixes
+  - **Fixed scrolling**: Changed body to `min-height: 100vh` with `overflow-y: auto`
+  - **Fixed income range dropdown**: API now allows unauthenticated requests for registration
+  - **Made form compact**: Reduced sizes to fit on 1080p monitors
+  - **Fixed field ID bug**: Changed `getElementById('zip')` to `getElementById('zipCode')`
+
+### Latest Updates (v2.11.49-50)
+- ✅ **v2.11.49-50**: Tax brackets and security fixes
+  - **API Fix**: Tax API now uses filing_status from query param, not saved user settings
+  - **Registration**: Made `loadRegTaxBrackets()` globally accessible
+  - **Security**: Removed test credentials from login page
+
+### Latest Updates (v2.11.47-48)
+- ✅ **v2.11.47-48**: Dashboard navigation fixes
   - **Dashboard Navigation**: Fixed layout breaking when returning from other sections
     - Dashboard now maintains proper `display: flex` when navigating back
-    - My Charities scrollbar fixed by removing `overflow: hidden` conflicts
-    - Dashboard wrapper changed from `overflow: hidden` to `overflow: auto`
   - **Edit Mileage Modal**: Now shows inline calculation (e.g., "500 miles × $0.14/mile")
   - **Profile Page**: Filing Status now properly updates Income Range dropdown
-    - Made `loadTaxBrackets()` and `updateTaxDisplay()` globally accessible
-
-### Latest Updates (v2.11.46)
-- ✅ **v2.11.46**: Completed form optimizations
-  - **All Edit Modals**: Tested and verified working
-    - Edit Stock, Mileage, Crypto all confirmed with proper layouts
-    - Edit Item modal optimized (except Other Items layout issue)
 
 ### Previous Updates (v2.11.44-45)
 - ✅ **v2.11.44-45**: Applied universal space-saving patterns to ALL forms
