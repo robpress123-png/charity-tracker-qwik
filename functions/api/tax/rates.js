@@ -6,19 +6,20 @@ export async function onRequestGet(context) {
     const url = new URL(request.url);
 
     try {
-        const token = request.headers.get('Authorization');
-        if (!token) {
-            return Response.json({
-                success: false,
-                error: 'Unauthorized'
-            }, { status: 401 });
-        }
-
         // Get query parameters
         const year = parseInt(url.searchParams.get('year')) || new Date().getFullYear();
         const filingStatus = url.searchParams.get('filing_status') || 'single';
         const income = parseFloat(url.searchParams.get('income')) || null;
         const userId = url.searchParams.get('user_id');
+
+        // Only require auth if user_id is provided (for saved settings)
+        const token = request.headers.get('Authorization');
+        if (userId && !token) {
+            return Response.json({
+                success: false,
+                error: 'Unauthorized - token required when user_id provided'
+            }, { status: 401 });
+        }
 
         const response = {
             success: true,
