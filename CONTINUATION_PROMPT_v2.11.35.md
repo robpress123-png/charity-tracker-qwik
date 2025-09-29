@@ -1,8 +1,12 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.34
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.35
 
-## 🎉 Version 2.11.34 - Two-Step Registration & Enhanced Onboarding
+## 🎉 Version 2.11.35 - Two-Step Registration & UX Improvements
 
-### Latest Updates (v2.11.30 - v2.11.34)
+### Latest Updates (v2.11.30 - v2.11.35)
+- ✅ **v2.11.35**: Fixed registration flow and Quick Insights
+  - Fixed: Step 2 profile screen now properly shows after Step 1
+  - Fixed: Quick Insights shows helpful message for new users instead of "Loading..."
+  - Added: Better empty state messaging throughout dashboard
 - ✅ **v2.11.34**: Implemented two-step registration flow
   - Step 1: Basic account info (email, password, name)
   - Step 2: Optional profile completion (address, tax settings)
@@ -440,9 +444,9 @@ All types store type-specific data in dedicated columns:
 
 ### Commands
 ```bash
-npm run bump:patch  # 2.11.34 → 2.11.35
-npm run bump:minor  # 2.11.34 → 2.12.0
-npm run bump:major  # 2.11.34 → 3.0.0
+npm run bump:patch  # 2.11.35 → 2.11.36
+npm run bump:minor  # 2.11.35 → 2.12.0
+npm run bump:major  # 2.11.35 → 3.0.0
 ```
 
 ### Process
@@ -636,4 +640,4 @@ This is a comprehensive state snapshot of the Charity Tracker project that allow
 - Maintains development velocity
 - Documents institutional knowledge
 
-Ready for continued development at v2.11.34!
+Ready for continued development at v2.11.35!

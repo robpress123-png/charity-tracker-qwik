@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Charity Tracker v2.11.34</title>
+    <title>Register - Charity Tracker v2.11.35</title>
     <!-- Inline styles only, no external stylesheet needed -->
     <style>
         body {
@@ -415,6 +415,8 @@
     <script>
         // Step navigation functions
         function proceedToStep2() {
+            console.log('proceedToStep2 called');
+
             // Validate Step 1 fields first
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -422,25 +424,29 @@
             const name = document.getElementById('name').value;
 
             const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
             errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
 
             if (!email || !password || !confirmPassword || !name) {
                 errorDiv.textContent = 'Please fill in all required fields';
                 errorDiv.style.display = 'block';
-                return;
+                return false;
             }
 
             if (password !== confirmPassword) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.style.display = 'block';
-                return;
+                return false;
             }
 
             if (password.length < 8) {
                 errorDiv.textContent = 'Password must be at least 8 characters';
                 errorDiv.style.display = 'block';
-                return;
+                return false;
             }
+
+            console.log('Validation passed, switching to step 2');
 
             // Hide step 1, show step 2
             document.getElementById('step1Content').classList.remove('active');
@@ -450,6 +456,11 @@
             document.getElementById('step1Indicator').classList.remove('active');
             document.getElementById('step1Indicator').classList.add('completed');
             document.getElementById('step2Indicator').classList.add('active');
+
+            // Scroll to top of form
+            document.querySelector('.register-container').scrollTop = 0;
+
+            return false; // Prevent any form submission
         }
 
         function backToStep1() {
@@ -553,8 +564,14 @@
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // Call the unified registerUser function with profile data
-            await registerUser(false);
+
+            // Only process if we're on step 2 (profile completion)
+            const step2Content = document.getElementById('step2Content');
+            if (step2Content && step2Content.classList.contains('active')) {
+                // Call the unified registerUser function with profile data
+                await registerUser(false);
+            }
+            // If on step 1, do nothing (handled by proceedToStep2 button)
         });
     </script>
 </body>
