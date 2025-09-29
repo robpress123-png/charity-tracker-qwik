@@ -4,11 +4,25 @@
 
 ### Latest Updates (v2.11.44)
 - ✅ **v2.11.44**: Applied universal space-saving patterns to ALL forms
-  - **Add Modals**: Stock (2 rows), Mileage (1 row), all show inline calculations
-  - **Edit Modals**: Cash (800px, compact), Item (optimized spacing)
-  - **Fixed**: Profile tax year back to select dropdown
+  - **Add Modals**: All optimized and tested
+    - Cash: 800px width, compact 2-row layout
+    - Stock: 800px width, 2-row layout with inline calculations
+    - Mileage: 800px width, single row layout
+    - Crypto: 800px width, removed redundant total block, inline calculations
+    - Items: 1600px width, fixed-height receipt (280px) with scrollbar
+  - **Edit Modals**: Optimizations applied
+    - Edit Cash: 800px width, compact layout tested
+    - Edit Item: Fixed alignment, receipt improvements applied
+    - Edit Stock/Mileage/Crypto: Space-saving patterns pending
+  - **Profile Page**: Tax fields on one row, 4-column layout for 2026 AGI
+  - **Tools Page**: Professional cards without icons, colored bars
   - **Universal Pattern**: Notes above, Total/Tax side-by-side at bottom
-  - **All forms now fit on 1080p monitors without scrolling**
+  - **All ADD forms now fit on 1080p monitors without scrolling**
+
+### Known Issues (v2.11.44)
+- ⚠️ **Filing Status Bug**: Changing filing status does not update Income Range dropdown
+- ⚠️ **Edit Item - Other Items**: Condition/Quantity layout needs fixing for custom items
+- 🔍 **Pending**: Edit Stock/Mileage/Crypto modals need space-saving patterns applied
 
 ### Previous Updates (v2.11.43)
 - ✅ **v2.11.43**: Major space-saving optimizations for standard monitors
