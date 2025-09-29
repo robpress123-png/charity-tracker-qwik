@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.42</title>
+    <title>Dashboard - Charity Tracker v2.11.43</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -816,7 +816,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.42</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.43</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -1114,17 +1114,13 @@
 
                     <!-- Tax Information Section -->
                     <h3 style="color: #667eea; margin-bottom: 1rem; margin-top: 2rem; font-size: 1.1rem;">💰 Tax Information</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: 150px 1fr 1fr; gap: 1rem; align-items: end;">
                         <div class="form-group">
-                            <label>Tax Year</label>
-                            <select id="taxYear" style="width: 100%;" onchange="loadTaxBrackets()">
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
-                                <option value="2026">2026 (with OBBBA rules)</option>
-                            </select>
+                            <label style="font-size: 0.875rem;">Tax Year</label>
+                            <input type="number" id="taxYear" min="2024" max="2026" value="2025" style="width: 100%;" onchange="loadTaxBrackets()">
                         </div>
                         <div class="form-group">
-                            <label>Filing Status</label>
+                            <label style="font-size: 0.875rem;">Filing Status</label>
                             <select id="filingStatus" style="width: 100%;" onchange="loadTaxBrackets()">
                                 <option value="single">Single</option>
                                 <option value="married_jointly">Married Filing Jointly</option>
@@ -1132,18 +1128,16 @@
                                 <option value="head_of_household">Head of Household</option>
                             </select>
                         </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <div class="form-group">
-                            <label>Tax Bracket <small>(Privacy: Select bracket, not income)</small></label>
+                            <label style="font-size: 0.875rem;">Tax Bracket <small style="font-size: 0.75rem;">(Select bracket, not income)</small></label>
                             <select id="taxBracket" style="width: 100%;" onchange="updateTaxDisplay()">
                                 <option value="">Loading brackets...</option>
                             </select>
                         </div>
-                        <div class="form-group" id="agiEstimateGroup" style="display: none;">
-                            <label>AGI Estimate (for 2026 OBBBA) <small>Optional</small></label>
-                            <input type="number" id="agiEstimate" placeholder="Estimated AGI (optional)" style="width: 100%;">
-                        </div>
+                    </div>
+                    <div class="form-group" id="agiEstimateGroup" style="display: none; margin-top: 1rem;">
+                        <label>AGI Estimate (for 2026 OBBBA) <small>Optional</small></label>
+                        <input type="number" id="agiEstimate" placeholder="Estimated AGI (optional)" style="width: 100%;">
                     </div>
 
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
@@ -1210,23 +1204,17 @@
                 <div class="section-header">
                     <h2>🛠️ Tools & Utilities</h2>
                 </div>
-                <div style="padding: 2rem;">
-                    <!-- Tools Introduction -->
-                    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #cbd5e1;">
-                        <h3 style="color: #334155; margin: 0 0 0.5rem 0; font-size: 1.1rem;">Powerful Tools to Manage Your Charitable Giving</h3>
-                        <p style="color: #64748b; margin: 0; font-size: 0.875rem; line-height: 1.5;">Streamline your donation tracking with our comprehensive suite of tools designed to make charitable giving easier and more organized.</p>
-                    </div>
-
+                <div style="padding: 1rem;">
                     <!-- Tools Grid -->
-                    <div class="tools-grid" style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div class="tools-grid" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
 
                         <!-- Import Donations Tool -->
                         <div class="tool-card" onclick="showImportDonations()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); width: 40px; height: 40px; font-size: 1.25rem;">
                                 📥
                             </div>
                             <div class="tool-content">
-                                <h4 class="tool-title">Import Donations</h4>
+                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Import Donations</h4>
                                 <p class="tool-description">Upload CSV files to bulk import your donation records. Automatically matches charity names to our database.</p>
                                 <div class="tool-features">
                                     <span class="feature-tag">CSV Upload</span>
@@ -1238,11 +1226,11 @@
 
                         <!-- Personal Charity Management Tool -->
                         <div class="tool-card" onclick="showPersonalCharities()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 40px; height: 40px; font-size: 1.25rem;">
                                 🏛️
                             </div>
                             <div class="tool-content">
-                                <h4 class="tool-title">Personal Charities</h4>
+                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Personal Charities</h4>
                                 <p class="tool-description">Manage your personal charity list. Add, edit, and track charities not in our database.</p>
                                 <div class="tool-features">
                                     <span class="feature-tag">Add Custom</span>
@@ -1254,11 +1242,11 @@
 
                         <!-- Verify Charity Tool -->
                         <div class="tool-card" onclick="showCharityVerification()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); width: 40px; height: 40px; font-size: 1.25rem;">
                                 🔍
                             </div>
                             <div class="tool-content">
-                                <h4 class="tool-title">Verify Charity</h4>
+                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Verify Charity</h4>
                                 <p class="tool-description">Check if a charity is IRS-approved and eligible for tax-deductible donations.</p>
                                 <div class="tool-features">
                                     <span class="feature-tag">IRS Database</span>
@@ -1270,11 +1258,11 @@
 
                         <!-- Tax Calculator Tool -->
                         <div class="tool-card" onclick="calculateTaxSavings()">
-                            <div class="tool-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <div class="tool-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 40px; height: 40px; font-size: 1.25rem;">
                                 💰
                             </div>
                             <div class="tool-content">
-                                <h4 class="tool-title">Tax Savings Calculator</h4>
+                                <h4 class="tool-title" style="margin: 0.5rem 0; font-size: 1rem;">Tax Savings Calculator</h4>
                                 <p class="tool-description">Calculate potential tax deductions and savings from your charitable donations based on your tax bracket.</p>
                                 <div class="tool-features">
                                     <span class="feature-tag">Tax Deductions</span>
@@ -1674,14 +1662,15 @@
                 <!-- Crypto donation fields -->
                 <div id="cryptoFields" class="donation-type-fields" style="display:none;">
                     <!-- IRS Notice -->
-                    <div class="alert" style="background:#e0f2fe;border:1px solid #0284c7;color:#075985;padding:0.5rem;border-radius:6px;margin-bottom:0.75rem;font-size:0.875rem;">
-                        <strong>📊 IRS Rule:</strong> Use fair market value at exact time of donation. For crypto held >1 year, deduct full FMV. For ≤1 year, deduct lesser of cost basis or FMV.
+                    <div class="alert" style="background:#e0f2fe;border:1px solid #0284c7;color:#075985;padding:0.375rem;border-radius:6px;margin-bottom:0.5rem;font-size:0.75rem;">
+                        <strong>📊 IRS:</strong> Use FMV at exact time. >1 year: full FMV. ≤1 year: lesser of cost/FMV.
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <!-- Row 1: Name, Symbol, Time -->
+                    <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.75rem;">
                         <div class="form-group" style="position:relative;">
-                            <label for="cryptoName">Cryptocurrency Name</label>
-                            <input type="text" id="cryptoName" placeholder="Start typing to search..." required
+                            <label for="cryptoName" style="font-size:0.875rem;">Cryptocurrency</label>
+                            <input type="text" id="cryptoName" placeholder="Bitcoin, Ethereum..." required
                                    oninput="searchCrypto(this.value)" onfocus="showCryptoDropdown()" autocomplete="off">
                             <!-- Crypto Dropdown -->
                             <div id="cryptoDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
@@ -1689,53 +1678,51 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="cryptoSymbol">Symbol/Ticker</label>
-                            <input type="text" id="cryptoSymbol" placeholder="Auto-populated or enter manually" style="text-transform:uppercase;" required>
+                            <label for="cryptoSymbol" style="font-size:0.875rem;">Symbol</label>
+                            <input type="text" id="cryptoSymbol" placeholder="BTC" style="text-transform:uppercase;" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cryptoDonationTime" style="font-size:0.875rem;">Time</label>
+                            <input type="time" id="cryptoDonationTime" step="1" required>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="cryptoDonationTime">Exact Time (for price verification)</label>
-                        <input type="time" id="cryptoDonationTime" step="1" required>
-                        <small style="color:#6b7280;">Critical for IRS valuation - use with date field below</small>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+                    <!-- Row 2: Quantity, Price, Cost Basis -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
                         <div class="form-group">
-                            <label for="cryptoQuantity">Quantity</label>
-                            <input type="number" id="cryptoQuantity" step="0.00000001" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="Amount" required>
+                            <label for="cryptoQuantity" style="font-size:0.875rem;">Quantity</label>
+                            <input type="number" id="cryptoQuantity" step="0.00000001" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="0.0" required>
                         </div>
                         <div class="form-group">
-                            <label for="cryptoPricePerUnit">Price per Unit (USD)</label>
-                            <input type="number" id="cryptoPricePerUnit" step="0.01" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="$ per coin/token at exact time" required>
+                            <label for="cryptoPricePerUnit" style="font-size:0.875rem;">Price/Unit ($)</label>
+                            <input type="number" id="cryptoPricePerUnit" step="0.01" min="0" onchange="calculateCryptoTotal()" oninput="calculateCryptoTotal()" placeholder="0.00" required>
                         </div>
                         <div class="form-group">
-                            <label for="cryptoExchange">Exchange/Source</label>
-                            <input type="text" id="cryptoExchange" placeholder="e.g., Coinbase, Binance" required>
+                            <label for="cryptoCostBasis" style="font-size:0.875rem;">Cost Basis</label>
+                            <input type="number" id="cryptoCostBasis" step="0.01" min="0" placeholder="Optional">
                         </div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <!-- Row 3: Exchange and Holding Period -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
                         <div class="form-group">
-                            <label for="cryptoCostBasis">Cost Basis (optional)</label>
-                            <input type="number" id="cryptoCostBasis" step="0.01" min="0" placeholder="Total purchase cost">
-                            <small style="color:#6b7280;">Your original purchase price</small>
+                            <label for="cryptoExchange" style="font-size:0.875rem;">Exchange/Source</label>
+                            <input type="text" id="cryptoExchange" placeholder="Coinbase, Binance, etc." required>
                         </div>
                         <div class="form-group">
-                            <label for="cryptoHoldingPeriod">Holding Period</label>
+                            <label for="cryptoHoldingPeriod" style="font-size:0.875rem;">Holding Period</label>
                             <select id="cryptoHoldingPeriod">
-                                <option value="long">Over 1 year (Long-term)</option>
-                                <option value="short">1 year or less (Short-term)</option>
+                                <option value="long">Over 1 year</option>
+                                <option value="short">1 year or less</option>
                             </select>
-                            <small style="color:#6b7280;">Affects deduction calculation</small>
                         </div>
                     </div>
 
                     <!-- Total Display -->
-                    <div style="background:#f0f9ff; padding:0.75rem; border-radius:6px; margin-top:1rem; border:1px solid #bae6fd;">
-                        <div style="font-size:0.875rem; color:#0369a1; font-weight:600;">Total Crypto Donation Value:</div>
-                        <div id="cryptoTotalDisplay" style="font-size:1.5rem; font-weight:bold; color:#075985;">$0.00</div>
-                        <div style="font-size:0.75rem; color:#0c4a6e; margin-top:0.25rem;">
+                    <div style="background:#f0f9ff; padding:0.5rem; border-radius:6px; margin-top:0.75rem; border:1px solid #bae6fd;">
+                        <div style="font-size:0.75rem; color:#0369a1; font-weight:600;">Total Crypto Value:</div>
+                        <div id="cryptoTotalDisplay" style="font-size:1.25rem; font-weight:bold; color:#075985;">$0.00</div>
+                        <div style="font-size:0.625rem; color:#0c4a6e; margin-top:0.125rem;">
                             <span id="cryptoCalculation">0 units × $0.00 = $0.00</span>
                         </div>
                         <div id="cryptoDeductionNote" style="font-size:0.75rem; color:#0c4a6e; margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #bae6fd;">
@@ -1744,28 +1731,25 @@
                     </div>
                 </div>
                 <!-- Date field moved to be side-by-side with Charity above -->
+                <!-- Total and Tax Savings Side by Side -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.25rem;">Donation Total</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #166534;" id="donationAmountDisplay">$0</div>
+                    </div>
+                    <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 8px; border: 2px solid #86efac;">
+                        <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.25rem;">
+                            💰 Tax Savings
+                            <span style="font-weight: normal;">(<span id="taxRateDisplay">0</span>%)</span>
+                        </div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #059669;" id="taxSavingsDisplay">$0</div>
+                        <div style="font-size: 0.625rem; color: #666; margin-top: 0.25rem;">*If itemizing</div>
+                    </div>
+                </div>
+                <!-- Notes Field -->
                 <div class="form-group">
                     <label for="donationNotes">Notes (optional)</label>
-                    <textarea id="donationNotes" rows="3"></textarea>
-                </div>
-                <!-- Tax Savings Calculator (Compact) -->
-                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 0.625rem; border-radius: 8px; margin: 0.5rem 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.375rem;">
-                        <h4 style="color: #166534; margin: 0; font-size: 0.875rem;">💰 Estimated Tax Savings</h4>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div>
-                            <div style="font-size: 0.75rem; color: #666;">Donation Amount</div>
-                            <div style="font-size: 1.125rem; font-weight: bold; color: #166534;" id="donationAmountDisplay">$0</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.75rem; color: #666;">Savings (<span id="taxRateDisplay">22</span>%)</div>
-                            <div style="font-size: 1.125rem; font-weight: bold; color: #059669;" id="taxSavingsDisplay">$0</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 0.25rem; font-size: 0.675rem; color: #666; line-height: 1.2;">
-                        * Based on marginal tax rate. Actual savings depend on itemizing.
-                    </div>
+                    <textarea id="donationNotes" rows="2" style="width: 100%;"></textarea>
                 </div>
                 </div><!-- End scrollable content -->
                         <div class="modal-footer" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
@@ -4085,7 +4069,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.42</p>
+                            <p>Generated by Charity Tracker v2.11.43</p>
                         </div>
                     </body>
                     </html>
@@ -4266,7 +4250,7 @@
                 return;
             }
 
-            const taxYear = taxYearElem.value;
+            const taxYear = taxYearElem.value.toString();
             const filingStatus = filingStatusElem.value;
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const token = user.token || localStorage.getItem('token') || 'test-token';
@@ -4354,7 +4338,7 @@
                 return; // Elements not ready yet
             }
 
-            const taxYear = taxYearElem.value;
+            const taxYear = taxYearElem.value.toString();
             const bracketRate = parseFloat(taxBracketElem.value);
 
             // Update current editing year
@@ -4528,7 +4512,7 @@
 
         // Save profile information
         async function saveProfile() {
-            const taxYear = document.getElementById('taxYear').value;
+            const taxYear = document.getElementById('taxYear').value.toString();
             const profileData = {
                 name: document.getElementById('profileName').value,
                 email: document.getElementById('profileEmail').value,
@@ -6695,12 +6679,12 @@
             const modal = document.getElementById('donationModal');
             const modalContent = modal.querySelector('.modal-content');
 
-            // Complex forms need more width
-            if (type === 'items' || type === 'stock' || type === 'crypto') {
+            // Only items form needs extra width for receipt display
+            if (type === 'items') {
                 modalContent.style.maxWidth = '1600px';
                 modalContent.style.width = '95%';
             } else {
-                // Simple forms (cash, mileage) use standard width
+                // All other forms (cash, mileage, stock, crypto) use standard width
                 modalContent.style.maxWidth = '800px';
                 modalContent.style.width = '90%';
             }
