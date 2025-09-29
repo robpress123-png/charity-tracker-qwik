@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Charity Tracker v2.11.35</title>
+    <title>Register - Charity Tracker v2.11.36</title>
     <!-- Inline styles only, no external stylesheet needed -->
     <style>
         body {
@@ -244,30 +244,30 @@
         <form id="registerForm">
             <!-- Step 1: Basic Account Info -->
             <div id="step1Content" class="step-content active">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter a strong password" autocomplete="new-password">
-                <div class="password-requirements">
-                    Minimum 8 characters
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password" autocomplete="new-password">
-            </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter a strong password" autocomplete="new-password">
+                    <div class="password-requirements">
+                        Minimum 8 characters
+                    </div>
+                </div>
 
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name" required>
-            </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password" autocomplete="new-password">
+                </div>
 
-            <button type="button" class="btn-primary" onclick="proceedToStep2()">Continue to Profile Setup</button>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name" required>
+                </div>
+
+                <button type="button" class="btn-primary" onclick="event.preventDefault(); proceedToStep2(); return false;">Continue to Profile Setup</button>
             </div>
 
             <!-- Step 2: Optional Profile Info -->
@@ -480,6 +480,8 @@
         }
 
         async function registerUser(skipProfile = false) {
+            console.log('registerUser called, skipProfile:', skipProfile);
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const name = document.getElementById('name').value;
@@ -527,13 +529,17 @@
                 });
 
                 const data = await response.json();
+                console.log('Registration API response:', data);
 
                 if (data.success) {
                     // Store token if provided
                     if (data.token) {
+                        console.log('Storing auth token and user data');
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('userId', data.userId);
                         localStorage.setItem('userEmail', email);
+                    } else {
+                        console.warn('No token received from API');
                     }
 
                     successDiv.textContent = skipProfile ?
@@ -541,6 +547,7 @@
                         'Registration complete! Redirecting to dashboard...';
                     successDiv.style.display = 'block';
 
+                    console.log('Redirecting to dashboard in 1.5 seconds...');
                     setTimeout(() => {
                         window.location.href = '/dashboard.html';
                     }, 1500);
@@ -565,13 +572,16 @@
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Only process if we're on step 2 (profile completion)
+            const step1Content = document.getElementById('step1Content');
             const step2Content = document.getElementById('step2Content');
-            if (step2Content && step2Content.classList.contains('active')) {
-                // Call the unified registerUser function with profile data
+
+            if (step1Content && step1Content.classList.contains('active')) {
+                // If on step 1, pressing Enter should proceed to step 2
+                proceedToStep2();
+            } else if (step2Content && step2Content.classList.contains('active')) {
+                // If on step 2, submit the complete registration
                 await registerUser(false);
             }
-            // If on step 1, do nothing (handled by proceedToStep2 button)
         });
     </script>
 </body>
