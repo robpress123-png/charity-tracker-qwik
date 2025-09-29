@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.11.37</title>
+    <title>Admin Dashboard - Charity Tracker v2.11.38</title>
     <style>
         * {
             margin: 0;
@@ -444,7 +444,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.37</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.38</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -833,6 +833,7 @@
                             <th>ID</th>
                             <th>Email</th>
                             <th>Name</th>
+                            <th>Plan</th>
                             <th>Registered</th>
                             <th>Total Donations</th>
                             <th>Actions</th>
@@ -2036,6 +2037,14 @@
                                 <td>${user.id}</td>
                                 <td>${user.email}</td>
                                 <td>${user.name || 'No name'}</td>
+                                <td>
+                                    <span style="padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: 500;
+                                                ${user.plan === 'premium' || user.plan === 'pro' ?
+                                                    'background: #fbbf24; color: #78350f;' :
+                                                    'background: #6b7280; color: white;'}">
+                                        ${user.plan === 'premium' || user.plan === 'pro' ? '⭐ Premium' : 'Free'}
+                                    </span>
+                                </td>
                                 <td>${createdDate}</td>
                                 <td>${totalDonations}</td>
                                 <td>

@@ -1,8 +1,21 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.35
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.38
 
-## 🎉 Version 2.11.35 - Two-Step Registration & UX Improvements
+## 🎉 Version 2.11.38 - Enhanced Admin Console & Registration
 
-### Latest Updates (v2.11.30 - v2.11.35)
+### Latest Updates (v2.11.30 - v2.11.38)
+- ✅ **v2.11.38**: Admin console improvements
+  - Added: Plan column showing Free/Premium status in user table
+  - Visual badges: Free (gray), Premium (gold star)
+  - Filter for plan type already existed
+- ✅ **v2.11.37**: Major fixes to registration and admin
+  - Fixed: Registration Step 2 tax fields now ask for income range (not tax bracket)
+  - Dynamic income ranges based on year/filing status from tax tables
+  - 2026 shows AGI field for OBBBA calculations
+  - Added: Working delete user function in admin console
+  - Deletes all associated data (donations, items, charities, tax settings)
+- ✅ **v2.11.36**: Registration flow improvements
+  - Fixed: Form now properly proceeds from Step 1 to Step 2
+  - Fixed: Pressing Enter on Step 1 goes to Step 2 (not submit)
 - ✅ **v2.11.35**: Fixed registration flow and Quick Insights
   - Fixed: Step 2 profile screen now properly shows after Step 1
   - Fixed: Quick Insights shows helpful message for new users instead of "Loading..."
@@ -444,9 +457,9 @@ All types store type-specific data in dedicated columns:
 
 ### Commands
 ```bash
-npm run bump:patch  # 2.11.35 → 2.11.36
-npm run bump:minor  # 2.11.35 → 2.12.0
-npm run bump:major  # 2.11.35 → 3.0.0
+npm run bump:patch  # 2.11.38 → 2.11.39
+npm run bump:minor  # 2.11.38 → 2.12.0
+npm run bump:major  # 2.11.38 → 3.0.0
 ```
 
 ### Process
@@ -640,4 +653,4 @@ This is a comprehensive state snapshot of the Charity Tracker project that allow
 - Maintains development velocity
 - Documents institutional knowledge
 
-Ready for continued development at v2.11.35!
+Ready for continued development at v2.11.38!
