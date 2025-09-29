@@ -1,28 +1,38 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.11.44
+# Charity Tracker Qwik - Complete Continuation Prompt v2.11.47
 
-## 🎉 Version 2.11.44 - Complete Form Optimization
+## 🎉 Version 2.11.47 - Dashboard Navigation & Modal Fixes
 
-### Latest Updates (v2.11.44)
-- ✅ **v2.11.44**: Applied universal space-saving patterns to ALL forms
+### Latest Updates (v2.11.47)
+- ✅ **v2.11.47**: Critical dashboard and navigation fixes
+  - **Dashboard Navigation**: Fixed layout breaking when returning from other sections
+    - Dashboard now maintains proper `display: flex` when navigating back
+    - My Charities scrollbar fixed by removing `overflow: hidden` conflicts
+    - Dashboard wrapper changed from `overflow: hidden` to `overflow: auto`
+  - **Edit Mileage Modal**: Now shows inline calculation (e.g., "500 miles × $0.14/mile")
+  - **Profile Page**: Filing Status now properly updates Income Range dropdown
+    - Made `loadTaxBrackets()` and `updateTaxDisplay()` globally accessible
+
+### Latest Updates (v2.11.46)
+- ✅ **v2.11.46**: Completed form optimizations
+  - **All Edit Modals**: Tested and verified working
+    - Edit Stock, Mileage, Crypto all confirmed with proper layouts
+    - Edit Item modal optimized (except Other Items layout issue)
+
+### Previous Updates (v2.11.44-45)
+- ✅ **v2.11.44-45**: Applied universal space-saving patterns to ALL forms
   - **Add Modals**: All optimized and tested
     - Cash: 800px width, compact 2-row layout
     - Stock: 800px width, 2-row layout with inline calculations
     - Mileage: 800px width, single row layout
     - Crypto: 800px width, removed redundant total block, inline calculations
     - Items: 1600px width, fixed-height receipt (280px) with scrollbar
-  - **Edit Modals**: Optimizations applied
-    - Edit Cash: 800px width, compact layout tested
-    - Edit Item: Fixed alignment, receipt improvements applied
-    - Edit Stock/Mileage/Crypto: Space-saving patterns pending
   - **Profile Page**: Tax fields on one row, 4-column layout for 2026 AGI
   - **Tools Page**: Professional cards without icons, colored bars
   - **Universal Pattern**: Notes above, Total/Tax side-by-side at bottom
-  - **All ADD forms now fit on 1080p monitors without scrolling**
+  - **All forms now fit on 1080p monitors without scrolling**
 
-### Known Issues (v2.11.44)
-- ⚠️ **Filing Status Bug**: Changing filing status does not update Income Range dropdown
-- ⚠️ **Edit Item - Other Items**: Condition/Quantity layout needs fixing for custom items
-- 🔍 **Pending**: Edit Stock/Mileage/Crypto modals need space-saving patterns applied
+### Known Issues (v2.11.47)
+- ⚠️ **Edit Item - Other Items**: Condition/Quantity layout needs fixing for custom items (tabled for later)
 
 ### Previous Updates (v2.11.43)
 - ✅ **v2.11.43**: Major space-saving optimizations for standard monitors
