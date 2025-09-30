@@ -128,7 +128,7 @@ const ReportDataFetcher = {
         try {
             const response = await fetch(`/api/donations?year=${year}`, {
                 headers: {
-                    'Authorization': token
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -146,7 +146,7 @@ const ReportDataFetcher = {
                         // Fetch item details for this donation
                         const itemsResponse = await fetch(`/api/donations/${donation.id}/items`, {
                             headers: {
-                                'Authorization': token
+                                'Authorization': `Bearer ${token}`
                             }
                         });
 
@@ -185,7 +185,7 @@ const ReportDataFetcher = {
         try {
             const response = await fetch(`/api/donations?year=${year}`, {
                 headers: {
-                    'Authorization': token
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -211,9 +211,10 @@ const ReportDataFetcher = {
         }
 
         try {
-            const response = await fetch(`/api/users/tax-settings?year=${year}`, {
+            // Use correct endpoint - /api/users/settings not tax-settings
+            const response = await fetch(`/api/users/settings`, {
                 headers: {
-                    'Authorization': token
+                    'Authorization': `Bearer ${token}`  // Add Bearer prefix
                 }
             });
 
@@ -227,7 +228,14 @@ const ReportDataFetcher = {
             }
 
             const data = await response.json();
-            return data;
+            // Extract tax settings for the specified year
+            const taxSettings = data.tax_settings?.[year] || data;
+
+            return {
+                filing_status: taxSettings.filing_status || 'single',
+                tax_bracket: taxSettings.tax_bracket || 22,
+                income_range: taxSettings.income_range || null
+            };
         } catch (error) {
             console.error('Error fetching tax settings:', error);
             // Return defaults
@@ -869,12 +877,91 @@ const ReportGenerators = {
 </body>
 </html>`;
 
-        // Open in new window for printing
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(html);
-        printWindow.document.close();
+        // Create modal instead of popup window
+        const existingModal = document.getElementById('taxSummaryModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
 
-        return { success: true, type: 'html' };
+        const modal = document.createElement('div');
+        modal.id = 'taxSummaryModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            width: 90%;
+            max-width: 1000px;
+            height: 90vh;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        `;
+
+        const modalHeader = document.createElement('div');
+        modalHeader.style.cssText = `
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        `;
+        modalHeader.innerHTML = `
+            <h2 style="margin: 0; color: #667eea;">Annual Tax Summary - ${year}</h2>
+            <div>
+                <button onclick="window.print()" style="background: #667eea; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+                    Print / Save PDF
+                </button>
+                <button onclick="document.getElementById('taxSummaryModal').remove()" style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer;">
+                    Close
+                </button>
+            </div>
+        `;
+
+        const modalBody = document.createElement('div');
+        modalBody.style.cssText = `
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        `;
+
+        // Create iframe for print-friendly content
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'width: 100%; height: 100%; border: none;';
+        modalBody.appendChild(iframe);
+
+        modalContent.appendChild(modalHeader);
+        modalContent.appendChild(modalBody);
+        modal.appendChild(modalContent);
+
+        // Add to page
+        document.body.appendChild(modal);
+
+        // Write content to iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(html);
+        iframeDoc.close();
+
+        // Update print functionality to print iframe content
+        const printBtn = modalHeader.querySelector('button[onclick*="print"]');
+        printBtn.onclick = () => {
+            iframe.contentWindow.print();
+        };
+
+        return { success: true, type: 'modal' };
     }
 };
 
@@ -933,7 +1020,7 @@ const ReportUI = {
 
                 case 'tax-summary':
                     result = await ReportGenerators.generateAnnualTaxSummary(year);
-                    this.showSuccess('Tax summary generated - check popup window');
+                    this.showSuccess('Tax summary generated');
                     break;
 
                 default:
