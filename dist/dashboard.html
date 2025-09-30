@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.62</title>
+    <title>Dashboard - Charity Tracker v2.12.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -807,6 +807,7 @@
         }
     </style>
     <script src="/js/storage-helper.js"></script>
+    <script src="/js/reports-module.js"></script>
 </head>
 <body>
     <!-- Header Container -->
@@ -817,7 +818,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.62</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.12.0</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -999,29 +1000,132 @@
         <!-- Reports Section (hidden by default) -->
         <div id="reportsSection" class="section-content dashboard-wrapper" style="display:none; height: 100%;">
             <div class="section" style="height: 100%; overflow-y: auto;">
-            <div class="section-header">
-                <h2>📈 Tax Reports & Export</h2>
-            </div>
-            <div style="display: grid; gap: 1rem;">
-                <div class="form-group">
-                    <label>Report Tax Year</label>
-                    <select id="reportYear" style="width: 200px;">
-                        <!-- Will be populated dynamically -->
-                    </select>
+                <!-- Reports Section -->
+                <div id="reports" style="display: block;">
+                    <h2 style="color: #667eea; margin-bottom: 1.5rem;">Reports & Exports</h2>
+
+                    <!-- Report Messages -->
+                    <div id="reportMessages" style="margin-bottom: 20px;"></div>
+
+                    <!-- Quick Actions -->
+                    <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                        <h3 style="margin-top: 0; color: #333; margin-bottom: 1rem;">Quick Reports</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <button onclick="CharityReports.generateTaxSummary()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                📄 Annual Tax Summary
+                            </button>
+                            <button onclick="CharityReports.exportScheduleA()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                📊 Schedule A Export
+                            </button>
+                            <button onclick="CharityReports.exportAllDonations()" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                💾 Export All Data
+                            </button>
+                            <button onclick="CharityReports.generateReceiptAudit()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                🔍 Receipt Audit
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Report Options -->
+                    <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h3 style="margin-top: 0; color: #333; margin-bottom: 1rem;">Custom Report Generator</h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Tax Year</label>
+                                <select id="reportYear" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    <option value="2024" selected>2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026 (OBBBA)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Report Type</label>
+                                <select id="reportType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    <option value="tax-summary">Annual Tax Summary (PDF)</option>
+                                    <option value="schedule-a">Schedule A Export (CSV)</option>
+                                    <option value="all-donations">All Donations (CSV)</option>
+                                    <option value="receipt-audit">Receipt Audit (CSV)</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; align-items: flex-end;">
+                                <button onclick="generateCustomReport()" style="width: 100%; background: #667eea; color: white; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                    Generate Report
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Report Info -->
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h4 style="margin-top: 0; color: #667eea;">About These Reports</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; color: #666;">
+                                <li><strong>Annual Tax Summary:</strong> Complete PDF document for tax filing with all donations, totals by charity, and estimated tax savings.</li>
+                                <li><strong>Schedule A Export:</strong> CSV format compatible with TurboTax, H&R Block, and other tax software for direct import.</li>
+                                <li><strong>All Donations:</strong> Complete CSV export of all donation data including receipts and notes.</li>
+                                <li><strong>Receipt Audit:</strong> Shows which donations need receipts for IRS compliance.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Loading indicator -->
+                    <div id="reportLoader" style="display: none; text-align: center; padding: 2rem;">
+                        <div style="display: inline-block; padding: 1rem 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            Generating report...
+                        </div>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button class="btn-primary" onclick="exportCSV()">
-                        📄 Download CSV
-                    </button>
-                    <button class="btn-primary" onclick="exportPDF()">
-                        📑 Download PDF Report
-                    </button>
-                    <button class="btn-primary" onclick="viewSummary()">
-                        👁️ View Summary
-                    </button>
-                </div>
-                <div id="reportSummary" style="margin-top: 2rem;"></div>
-                </div>
+
+                <style>
+                /* Report message styles */
+                .report-message {
+                    padding: 1rem;
+                    border-radius: 6px;
+                    margin-bottom: 1rem;
+                    animation: slideIn 0.3s ease;
+                }
+                .report-success {
+                    background: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
+                }
+                .report-error {
+                    background: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                }
+                .report-warning {
+                    background: #fff3cd;
+                    color: #856404;
+                    border: 1px solid #ffeeba;
+                }
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                </style>
+
+                <script>
+                // Custom report generator
+                function generateCustomReport() {
+                    const year = document.getElementById('reportYear').value;
+                    const type = document.getElementById('reportType').value;
+
+                    if (window.CharityReports && window.CharityReports.ReportUI) {
+                        window.CharityReports.ReportUI.generateReport(type, year);
+                    } else {
+                        console.error('Reports module not loaded');
+                        alert('Reports module is not available. Please refresh the page.');
+                    }
+                }
+                </script>
             </div>
         </div>
 
@@ -2036,30 +2140,51 @@
     </div>
 
     <script>
-        // Check authentication - handle both new secure storage and fallback
-        let user = null;
-
-        // Try secure storage first if available
-        if (typeof secureStorage !== 'undefined' && secureStorage.getAuth) {
-            const auth = secureStorage.getAuth();
-            user = auth?.user;
+        // Safe storage utility functions
+        function getAuthToken() {
+            // Check secureStorage first if available
+            if (typeof secureStorage !== 'undefined' && secureStorage.getAuth) {
+                const auth = secureStorage.getAuth();
+                if (auth?.token) return auth.token;
+            }
+            // Fallback to direct storage access
+            return sessionStorage.getItem('token') || localStorage.getItem('token');
         }
 
-        // Fallback to direct storage access
-        if (!user) {
-            // Check sessionStorage first, then localStorage
+        function getAuthUser() {
+            // Check secureStorage first if available
+            if (typeof secureStorage !== 'undefined' && secureStorage.getAuth) {
+                const auth = secureStorage.getAuth();
+                if (auth?.user) return auth.user;
+            }
+            // Fallback to direct storage access
             const sessionUser = sessionStorage.getItem('user');
             const localUser = localStorage.getItem('user');
             const userStr = sessionUser || localUser;
-
             if (userStr) {
                 try {
-                    user = JSON.parse(userStr);
+                    return JSON.parse(userStr);
                 } catch (e) {
                     console.error('Failed to parse user data:', e);
                 }
             }
+            return null;
         }
+
+        function clearAuthStorage() {
+            // Clear from secureStorage if available
+            if (typeof secureStorage !== 'undefined' && secureStorage.clearAuth) {
+                clearAuthStorage();
+            }
+            // Always clear from both storages
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
+
+        // Check authentication using safe utility function
+        const user = getAuthUser();
 
         if (!user) {
             window.location.href = '/login.html';
@@ -2267,7 +2392,7 @@
             const year = document.getElementById('globalYearFilter')?.value || '2025';
 
             try {
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 // Fetch all donations to get unique charities
                 let url = '/api/donations?limit=10000';
@@ -2449,7 +2574,7 @@
                 console.log('Opening edit modal for charity ID:', charityId);
 
                 // Get auth token
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 // Fetch charity data
                 const response = await fetch(`/api/charities/personal/${charityId}`, {
@@ -2496,7 +2621,7 @@
                 console.log('Deleting charity ID:', charityId);
 
                 // Get auth token
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 const response = await fetch(`/api/charities/delete-personal/${charityId}`, {
                     method: 'DELETE',
@@ -2527,7 +2652,7 @@
 
         // Logout function
         function logout() {
-            secureStorage.clearAuth();
+            clearAuthStorage();
             // Also clear localStorage for backward compatibility
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -2545,8 +2670,8 @@
             // Load top charities for quick access
             if (allCharities.length === 0) {
                 try {
-                    const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                    const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                    const user = getAuthUser() || {};
+                    const token = user.token || getAuthToken() || 'test-token';
 
                     // Load a reasonable subset for instant local search (500 most common)
                     // The full database search will happen via the /api/charities/search endpoint
@@ -2647,7 +2772,7 @@
 
                 // Then search the full database using the dedicated search endpoint
                 try {
-                    const token = secureStorage.getAuth()?.token;
+                    const token = getAuthToken();
                     const response = await fetch(`/api/charities/search?q=${encodeURIComponent(query)}&limit=50`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -2826,7 +2951,7 @@
             let website = '';
 
             try {
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
                 // Try personal charity endpoint first if it's a personal charity
                 const endpoint = source === 'personal'
                     ? `/api/charities/personal/${charityId}`
@@ -3198,8 +3323,8 @@
                 const method = isEditing ? 'PUT' : 'POST';
 
                 // Get user token for authorization
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 console.log('[DEBUG] Sending request to:', url);
                 console.log('[DEBUG] Request method:', method);
@@ -3294,8 +3419,8 @@
             console.log('Form data collected:', formData);
 
             try {
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 console.log('Sending request to /api/charities/add-personal');
                 console.log('Auth token:', token ? 'Present' : 'Missing');
@@ -3392,8 +3517,8 @@
             console.log('Charity ID:', charityId);
 
             try {
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 console.log(`Sending request to /api/charities/update-personal/${charityId}`);
                 console.log('Auth token:', token ? 'Present' : 'Missing');
@@ -3478,8 +3603,8 @@
                 console.log('[LOAD DONATIONS] API URL:', url);
 
                 // Get auth token
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -3595,8 +3720,8 @@
                 }
 
                 // Get auth token
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -3671,7 +3796,7 @@
 
             try {
                 // Get auth token
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 // Fetch all donations to get unique charities (get all years for comparison)
                 let url = '/api/donations?limit=10000';
@@ -3923,8 +4048,8 @@
                 }
 
                 // Get auth token
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -4028,8 +4153,8 @@
                 }
 
                 // Get auth token
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -4101,7 +4226,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.62</p>
+                            <p>Generated by Charity Tracker v2.12.0</p>
                         </div>
                     </body>
                     </html>
@@ -4194,8 +4319,8 @@
 
         // Load all tax info for all years at startup
         async function loadAllYearsTaxInfo() {
-            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || secureStorage.getAuth()?.token;
+            const user = getAuthUser() || {};
+            const token = user.token || getAuthToken();
             const userId = user.id || user.userId;
 
             if (!userId || !token) return;
@@ -4287,8 +4412,8 @@
 
             const taxYear = taxYearElem.value;
             const filingStatus = filingStatusElem.value;
-            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+            const user = getAuthUser() || {};
+            const token = user.token || getAuthToken() || 'test-token';
 
             // Show/hide AGI estimate field for 2026
             if (agiEstimateGroup) {
@@ -4401,8 +4526,8 @@
 
         // Load and display tax settings for all configured years
         async function loadAllYearsSummary() {
-            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+            const user = getAuthUser() || {};
+            const token = user.token || getAuthToken() || 'test-token';
             const userId = user.id || user.userId;
 
             if (!userId) return;
@@ -4515,8 +4640,8 @@
             }
 
             // Load it from database
-            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+            const user = getAuthUser() || {};
+            const token = user.token || getAuthToken() || 'test-token';
             const userId = user.id || user.userId;
 
             if (!userId) {
@@ -4560,8 +4685,8 @@
             };
 
             try {
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 // Save to database via API
                 const response = await fetch('/api/users/settings', {
@@ -4636,8 +4761,8 @@
         // Load profile information
         async function loadProfile() {
             const userEmail = localStorage.getItem('userEmail');
-            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+            const user = getAuthUser() || {};
+            const token = user.token || getAuthToken() || 'test-token';
 
             try {
                 // First try to load from database
@@ -4841,7 +4966,7 @@
 
         async function loadPersonalCharities() {
             const container = document.getElementById('personalCharitiesList');
-            const token = secureStorage.getAuth()?.token;
+            const token = getAuthToken();
 
             try {
                 const response = await fetch('/api/charities/personal', {
@@ -5101,8 +5226,8 @@
             document.getElementById('importStatusText').textContent = 'Validating donations and matching charities...';
 
             try {
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 // Call validation API
                 const response = await fetch('/api/donations/validate-import', {
@@ -5333,8 +5458,8 @@
             updateProgress(15, 'Creating charity mappings...');
 
             try {
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 // Apply charity mappings from user selections
                 const mappedData = importData.map((donation, index) => {
@@ -5594,8 +5719,8 @@
                 }
 
                 // Get auth token
-                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
+                const user = getAuthUser() || {};
+                const token = user.token || getAuthToken() || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -6283,7 +6408,7 @@
         async function editDonation(donationId) {
             try {
                 let donation = null;
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 // First try to fetch from API for the most accurate data
                 try {
@@ -6516,7 +6641,7 @@
 
             try {
                 // Get auth token
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
 
                 const response = await fetch(`/api/donations/${donationId}`, {
                     method: 'DELETE',
@@ -7603,7 +7728,7 @@
             }
 
             try {
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
                 const response = await fetch(`/api/donations/${donationId}`, {
                     method: 'PUT',
                     headers: {
@@ -8871,7 +8996,7 @@
             console.log('[SAVE EDIT] Donation ID:', window.editingDonationId);
 
             try {
-                const token = secureStorage.getAuth()?.token || 'test-token';
+                const token = getAuthToken() || 'test-token';
                 const requestBody = JSON.stringify(formData);
                 console.log('[SAVE EDIT] Request body length:', requestBody.length);
 
@@ -9376,7 +9501,7 @@
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': secureStorage.getAuth()?.token
+                        'Authorization': getAuthToken()
                     },
                     body: JSON.stringify(receiptData)
                 });
@@ -9480,7 +9605,7 @@
 
         async function fetchLogoutTimeout() {
             try {
-                const token = secureStorage.getAuth()?.token;
+                const token = getAuthToken();
                 const response = await fetch('/api/settings/auto-logout-timeout', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -9532,7 +9657,7 @@
 
                 warningTimer = setTimeout(() => {
                     // Perform logout
-                    secureStorage.clearAuth();
+                    clearAuthStorage();
                     // Also clear localStorage for backward compatibility
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
@@ -9584,8 +9709,8 @@
 
             // Check local storage
             console.log('\nLocal Storage:');
-            console.log('- Token:', (secureStorage.getAuth()?.token || localStorage.getItem('token')) ? 'Set' : 'Not set');
-            console.log('- User:', secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}'));
+            console.log('- Token:', getAuthToken() ? 'Set' : 'Not set');
+            console.log('- User:', getAuthUser() || {});
 
             console.log('\n=== END DIAGNOSTIC REPORT ===');
             console.log('\nTo test a quick donation, run:');
