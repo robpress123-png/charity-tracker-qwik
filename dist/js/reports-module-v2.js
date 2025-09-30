@@ -211,10 +211,10 @@ const ReportDataFetcher = {
         }
 
         try {
-            // Use correct endpoint - /api/users/settings not tax-settings
-            const response = await fetch(`/api/users/settings`, {
+            // Use the correct tax-settings endpoint with year parameter
+            const response = await fetch(`/api/users/tax-settings?year=${year}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`  // Add Bearer prefix
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -228,13 +228,12 @@ const ReportDataFetcher = {
             }
 
             const data = await response.json();
-            // Extract tax settings for the specified year
-            const taxSettings = data.tax_settings?.[year] || data;
 
+            // The endpoint now returns the data directly
             return {
-                filing_status: taxSettings.filing_status || 'single',
-                tax_bracket: taxSettings.tax_bracket || 22,
-                income_range: taxSettings.income_range || null
+                filing_status: data.filing_status || 'single',
+                tax_bracket: data.tax_bracket || 22,
+                income_range: data.income_range || null
             };
         } catch (error) {
             console.error('Error fetching tax settings:', error);
