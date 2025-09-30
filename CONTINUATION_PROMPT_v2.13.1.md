@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.13.0
+# Charity Tracker Qwik - Complete Continuation Prompt v2.13.1
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,7 +28,13 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.13.0 - ENHANCED REPORTING SYSTEM
+## 🎉 Version 2.13.1 - REPORTING SYSTEM FIXES
+
+### Latest Fixes (v2.13.1)
+- ✅ **Money Formatting**: All reports now display currency with proper comma formatting ($10,000.00)
+- ✅ **Tax Bracket Display**: Fixed percentage display (shows 12% instead of 0.12%)
+- ✅ **Item Donation Totals**: Reports now correctly calculate and include item donation values
+- ✅ **API Endpoint Created**: Added missing `/api/donations/[id]/items` endpoint
 
 ### Major Feature Release (v2.13.0)
 - 📊 **Enhanced Reporting Interface**
@@ -54,6 +60,9 @@
    - `exportFilteredDonations()` function for custom filtering
    - Optional `includeItemDetails` parameter throughout
    - Dynamic filename generation based on filters
+   - `formatMoney()` function for proper currency display
+   - `formatPercentage()` function for tax bracket display
+   - `getDonationAmount()` function handles all donation types including items
 
 ### Previous Fixes (v2.12.1-4)
 - ✅ Tax settings properly query `user_tax_settings` table
@@ -76,20 +85,10 @@
 
 ### Known Issues
 
-#### 🔴 HIGH PRIORITY - REPORTS
-1. **Annual Tax Summary Shows $0**: For certain donations, totals display as zero
-   - Likely issue with data fetching or calculation
-   - Need to verify all donation types are properly summed
-
-2. **Money Formatting Missing**: Reports don't use proper comma formatting
-   - Should use formatMoney() or similar function
-   - Example: Should show "$1,234.56" not "$1234.56"
-
-3. **Custom Reports Generate Errors**: Item detail fetching fails
-   - `/api/donations/{id}/items` endpoint returns HTML 404 instead of JSON
-   - Error: "Unexpected token '<', '<!DOCTYPE'... is not valid JSON"
-   - **Root cause**: Endpoint doesn't exist in functions/api/donations/[id]/items.js
-   - **Impact**: Item details can't be fetched for any item donations
+#### ✅ RESOLVED IN v2.13.1
+1. ~~**Annual Tax Summary Shows $0**~~: FIXED - Now properly calculates item donation totals
+2. ~~**Money Formatting Missing**~~: FIXED - All reports use formatMoney() with comma formatting
+3. ~~**Custom Reports Generate Errors**~~: FIXED - Created `/api/donations/[id]/items` endpoint
 
 #### 🔴 HIGH PRIORITY - BUSINESS
 1. **Payment Integration**: Stripe not yet implemented
@@ -252,7 +251,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Current Version**: 2.13.0
+- **Current Version**: 2.13.1
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework)
@@ -387,6 +386,7 @@ Comprehensive project state to maintain continuity across sessions, preserving c
 - v2.12.0: Phase 1 Reporting System
 - v2.12.1-4: Critical fixes (logout, API endpoints, tax settings)
 - v2.13.0: Enhanced reporting with filters and year selection
+- v2.13.1: Fixed money formatting, tax bracket display, item totals in reports
 
 ### When to Update
 - After major feature releases

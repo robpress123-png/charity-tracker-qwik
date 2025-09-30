@@ -1,6 +1,6 @@
 /**
  * Charity Tracker - Enhanced Phase 1 Reporting System with Item Details
- * Version: 2.13.1-fixed
+ * Version: 2.13.2-fixed
  *
  * FIXED ISSUES:
  * - Now includes detailed item information for item donations
@@ -9,7 +9,8 @@
  * - Fixed error handling and null checks
  * - Fixed money formatting with commas
  * - Fixed tax bracket percentage display
- * - Fixed item donation total calculations
+ * - Fixed item donation total calculations using estimated_value field
+ * - Added proper fallback when items API fails
  */
 
 // Utility function to format money with commas
@@ -36,22 +37,34 @@ function formatPercentage(value) {
 
 // Utility function to get donation amount (handles all types including items)
 function getDonationAmount(donation) {
+    // Standard amount field (cash, mileage)
     if (donation.amount) {
-        return donation.amount;
+        return parseFloat(donation.amount) || 0;
     }
 
-    // For item donations, calculate total from items
-    if (donation.donation_type === 'items' && donation.items && donation.items.length > 0) {
-        return donation.items.reduce((sum, item) => {
-            const quantity = item.quantity || 1;
-            const value = item.value || item.fair_market_value || 0;
-            return sum + (quantity * value);
-        }, 0);
+    // Item donations - check estimated_value first (from database)
+    if (donation.donation_type === 'items') {
+        // If we have estimated_value from database, use it
+        if (donation.estimated_value) {
+            return parseFloat(donation.estimated_value) || 0;
+        }
+
+        // If we have fetched item details, calculate from items
+        if (donation.items && donation.items.length > 0) {
+            return donation.items.reduce((sum, item) => {
+                const quantity = parseFloat(item.quantity) || 1;
+                const value = parseFloat(item.value) || parseFloat(item.fair_market_value) || parseFloat(item.total_value) || 0;
+                return sum + (quantity * value);
+            }, 0);
+        }
+
+        // Fallback to zero if no value found
+        return 0;
     }
 
-    // For other types, check specific fields
+    // Stock/Crypto donations - check fair_market_value
     if (donation.fair_market_value) {
-        return donation.fair_market_value;
+        return parseFloat(donation.fair_market_value) || 0;
     }
 
     return 0;
@@ -201,11 +214,23 @@ const ReportDataFetcher = {
                         if (itemsResponse.ok) {
                             const itemsData = await itemsResponse.json();
                             donation.items = itemsData.items || [];
+
+                            // Calculate total from items if not already set
+                            if (!donation.estimated_value && donation.items.length > 0) {
+                                donation.estimated_value = donation.items.reduce((sum, item) => {
+                                    const qty = parseFloat(item.quantity) || 1;
+                                    const val = parseFloat(item.value) || parseFloat(item.fair_market_value) || 0;
+                                    return sum + (qty * val);
+                                }, 0);
+                            }
                         } else {
+                            // API failed but we might have estimated_value from main donation
                             donation.items = [];
+                            console.warn(`Items API returned ${itemsResponse.status} for donation ${donation.id}, using estimated_value if available`);
                         }
                     } catch (error) {
-                        console.error(`Error fetching items for donation ${donation.id}:`, error);
+                        // Network error or other issue - use estimated_value from donation if available
+                        console.warn(`Error fetching items for donation ${donation.id}: ${error.message}`);
                         donation.items = [];
                     }
                 } else {
@@ -710,6 +735,7 @@ const ReportGenerators = {
      * Comprehensive tax document for filing
      */
     async generateAnnualTaxSummary(year) {
+        // Use fetchDonations for better performance since we have estimated_value
         const donations = await ReportDataFetcher.fetchDonations(year);
         const taxSettings = await ReportDataFetcher.fetchTaxSettings(year);
         const user = getReportAuthUser();
