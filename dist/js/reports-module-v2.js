@@ -267,16 +267,18 @@ const ReportGenerators = {
     /**
      * 1. All Donations Export (CSV) - ENHANCED WITH ITEM DETAILS
      */
-    async generateAllDonationsCSV(year) {
-        const donations = await ReportDataFetcher.fetchDonationsWithItems(year);
+    async generateAllDonationsCSV(year, includeItemDetails = true) {
+        const donations = includeItemDetails
+            ? await ReportDataFetcher.fetchDonationsWithItems(year)
+            : await ReportDataFetcher.fetchDonations(year);
         const user = getReportAuthUser();
 
         // Create flat export data with item details expanded
         const exportData = [];
 
         donations.forEach(d => {
-            if (d.donation_type === 'items' && d.items && d.items.length > 0) {
-                // For item donations, create a row for each item
+            if (d.donation_type === 'items' && includeItemDetails && d.items && d.items.length > 0) {
+                // For item donations with details, create a row for each item
                 d.items.forEach(item => {
                     exportData.push({
                         donation_date: d.donation_date,
@@ -1121,12 +1123,112 @@ if (typeof module !== 'undefined' && module.exports) {
         ReportGenerators,
         ReportUI,
 
-        // Quick access methods - ENHANCED
-        exportAllDonations: (year) => ReportGenerators.generateAllDonationsCSV(year || new Date().getFullYear()),
+        // Settings
+        includeItemDetails: true,
+
+        // Quick access methods - ENHANCED with optional parameters
+        exportAllDonations: async (year, includeDetails = true) => {
+            const yearValue = year || new Date().getFullYear();
+            if (!includeDetails) {
+                // Export summary only without fetching item details
+                return ReportGenerators.generateAllDonationsCSV(yearValue, false);
+            }
+            return ReportGenerators.generateAllDonationsCSV(yearValue, true);
+        },
+
         exportItemDetails: (year) => ReportGenerators.generateItemDonationsReport(year || new Date().getFullYear()),
         exportScheduleA: (year) => ReportGenerators.generateScheduleAExport(year || new Date().getFullYear()),
         generateReceiptAudit: (year) => ReportGenerators.generateReceiptAudit(year || new Date().getFullYear()),
         generateTaxSummary: (year) => ReportGenerators.generateAnnualTaxSummary(year || new Date().getFullYear()),
+
+        // NEW: Filtered export function
+        exportFilteredDonations: async (year, types, format, includeDetails = true) => {
+            try {
+                const donations = await ReportDataFetcher.fetchDonationsWithItems(year);
+
+                // Filter by donation types
+                const filtered = donations.filter(d => types.includes(d.donation_type));
+
+                if (format === 'summary') {
+                    // Generate summary report
+                    const summary = {
+                        year: year,
+                        types: types,
+                        totalDonations: filtered.length,
+                        totalAmount: filtered.reduce((sum, d) => sum + (d.amount || 0), 0),
+                        byType: {}
+                    };
+
+                    types.forEach(type => {
+                        const typeDonations = filtered.filter(d => d.donation_type === type);
+                        summary.byType[type] = {
+                            count: typeDonations.length,
+                            total: typeDonations.reduce((sum, d) => sum + (d.amount || 0), 0)
+                        };
+                    });
+
+                    // Create summary HTML
+                    const html = `
+                        <div style="padding: 20px; max-width: 800px; margin: auto;">
+                            <h2>Filtered Donation Summary - ${year}</h2>
+                            <p>Types: ${types.join(', ')}</p>
+                            <p>Total Donations: ${summary.totalDonations}</p>
+                            <p>Total Amount: $${summary.totalAmount.toFixed(2)}</p>
+                            <h3>By Type:</h3>
+                            <ul>
+                                ${types.map(type => `
+                                    <li>${type}: ${summary.byType[type].count} donations,
+                                    $${summary.byType[type].total.toFixed(2)}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+
+                    // Display in modal
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 10000;';
+                    modal.innerHTML = html + '<button onclick="this.parentElement.remove()" style="margin-top: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>';
+                    document.body.appendChild(modal);
+
+                    return { success: true, format: 'summary' };
+                } else {
+                    // Generate CSV with optional item details
+                    const exportData = [];
+
+                    filtered.forEach(d => {
+                        if (d.donation_type === 'items' && includeDetails && d.items && d.items.length > 0) {
+                            d.items.forEach(item => {
+                                exportData.push({
+                                    date: d.donation_date,
+                                    charity: d.charity_name || 'Unknown',
+                                    type: d.donation_type,
+                                    item_name: item.item_name || item.name || '',
+                                    quantity: item.quantity || 1,
+                                    value: item.value || 0,
+                                    total: (item.value || 0) * (item.quantity || 1)
+                                });
+                            });
+                        } else {
+                            exportData.push({
+                                date: d.donation_date,
+                                charity: d.charity_name || 'Unknown',
+                                type: d.donation_type,
+                                amount: d.amount || 0
+                            });
+                        }
+                    });
+
+                    const csv = CSVExporter.arrayToCSV(exportData);
+                    const filename = `filtered_donations_${year}_${types.join('-')}.csv`;
+                    CSVExporter.downloadCSV(csv, filename);
+
+                    return { success: true, format: 'csv', count: exportData.length };
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                throw error;
+            }
+        },
 
         // Initialize UI if needed
         init: () => ReportUI.init()

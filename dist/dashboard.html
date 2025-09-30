@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.12.4</title>
+    <title>Dashboard - Charity Tracker v2.13.0</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -818,7 +818,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.12.4</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.13.0</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -1007,33 +1007,47 @@
                     <!-- Report Messages -->
                     <div id="reportMessages" style="margin-bottom: 20px;"></div>
 
-                    <!-- Quick Actions -->
+                    <!-- Quick Reports with Year Selector -->
                     <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                        <h3 style="margin-top: 0; color: #333; margin-bottom: 1rem;">Quick Reports</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="margin: 0; color: #333;">Quick Reports</h3>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label style="color: #555; font-weight: 500;">Year:</label>
+                                <select id="quickReportYear" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                                    <option value="2024" selected>2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026 (OBBBA)</option>
+                                </select>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: 1rem;">
+                                    <input type="checkbox" id="includeItemDetails" checked>
+                                    <label for="includeItemDetails" style="color: #555; font-size: 0.9rem;">Include item details</label>
+                                </div>
+                            </div>
+                        </div>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            <button onclick="CharityReportsV2.generateTaxSummary()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <button onclick="generateQuickReport('tax-summary')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                 📄 Annual Tax Summary
                             </button>
-                            <button onclick="CharityReportsV2.exportScheduleA()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <button onclick="generateQuickReport('schedule-a')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                 📊 Schedule A Export
                             </button>
-                            <button onclick="CharityReportsV2.exportAllDonations()" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <button onclick="generateQuickReport('all-donations')" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                 💾 Export All Data
                             </button>
-                            <button onclick="CharityReportsV2.generateReceiptAudit()" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <button onclick="generateQuickReport('receipt-audit')" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                 🔍 Receipt Audit
                             </button>
                         </div>
                     </div>
 
-                    <!-- Advanced Report Options -->
+                    <!-- Custom Report Generator with Filters -->
                     <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <h3 style="margin-top: 0; color: #333; margin-bottom: 1rem;">Custom Report Generator</h3>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                             <div>
                                 <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Tax Year</label>
-                                <select id="reportYear" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                                <select id="customReportYear" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
                                     <option value="2024" selected>2024</option>
                                     <option value="2025">2025</option>
                                     <option value="2026">2026 (OBBBA)</option>
@@ -1041,20 +1055,49 @@
                             </div>
 
                             <div>
-                                <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Report Type</label>
-                                <select id="reportType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                                    <option value="tax-summary">Annual Tax Summary (PDF)</option>
-                                    <option value="schedule-a">Schedule A Export (CSV)</option>
-                                    <option value="all-donations">All Donations (CSV)</option>
-                                    <option value="receipt-audit">Receipt Audit (CSV)</option>
+                                <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Report Format</label>
+                                <select id="customReportFormat" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                                    <option value="csv">CSV Export</option>
+                                    <option value="summary">Summary Report</option>
+                                    <option value="detailed">Detailed Report</option>
                                 </select>
                             </div>
+                        </div>
 
-                            <div style="display: flex; align-items: flex-end;">
-                                <button onclick="generateCustomReport()" style="width: 100%; background: #667eea; color: white; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                    Generate Report
-                                </button>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500;">Filter by Donation Type</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="filterCash" value="cash" checked>
+                                    <span>💵 Cash</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="filterItems" value="items" checked>
+                                    <span>📦 Items</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="filterMiles" value="miles" checked>
+                                    <span>🚗 Mileage</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="filterStock" value="stock" checked>
+                                    <span>📈 Stock</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="filterCrypto" value="crypto" checked>
+                                    <span>🪙 Crypto</span>
+                                </label>
                             </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="customIncludeItemDetails" checked>
+                                <label for="customIncludeItemDetails" style="color: #555; font-size: 0.9rem;">Include detailed item breakdown</label>
+                            </div>
+                            <button onclick="generateCustomFilteredReport()" style="background: #667eea; color: white; border: none; padding: 0.75rem 2rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                Generate Custom Report
+                            </button>
                         </div>
 
                         <!-- Report Info -->
@@ -1113,13 +1156,57 @@
                 </style>
 
                 <script>
-                // Custom report generator
-                function generateCustomReport() {
-                    const year = document.getElementById('reportYear').value;
-                    const type = document.getElementById('reportType').value;
+                // Quick report generator with year selector
+                function generateQuickReport(type) {
+                    const year = document.getElementById('quickReportYear').value;
+                    const includeDetails = document.getElementById('includeItemDetails').checked;
 
-                    if (window.CharityReportsV2 && window.CharityReportsV2.ReportUI) {
-                        window.CharityReportsV2.ReportUI.generateReport(type, year);
+                    if (window.CharityReportsV2) {
+                        // Store preference for item details
+                        window.CharityReportsV2.includeItemDetails = includeDetails;
+
+                        switch(type) {
+                            case 'tax-summary':
+                                window.CharityReportsV2.generateTaxSummary(year);
+                                break;
+                            case 'schedule-a':
+                                window.CharityReportsV2.exportScheduleA(year);
+                                break;
+                            case 'all-donations':
+                                window.CharityReportsV2.exportAllDonations(year, includeDetails);
+                                break;
+                            case 'receipt-audit':
+                                window.CharityReportsV2.generateReceiptAudit(year);
+                                break;
+                        }
+                    } else {
+                        console.error('Reports module not loaded');
+                        alert('Reports module is not available. Please refresh the page.');
+                    }
+                }
+
+                // Custom filtered report generator
+                function generateCustomFilteredReport() {
+                    const year = document.getElementById('customReportYear').value;
+                    const format = document.getElementById('customReportFormat').value;
+                    const includeDetails = document.getElementById('customIncludeItemDetails').checked;
+
+                    // Get selected donation types
+                    const selectedTypes = [];
+                    if (document.getElementById('filterCash').checked) selectedTypes.push('cash');
+                    if (document.getElementById('filterItems').checked) selectedTypes.push('items');
+                    if (document.getElementById('filterMiles').checked) selectedTypes.push('miles');
+                    if (document.getElementById('filterStock').checked) selectedTypes.push('stock');
+                    if (document.getElementById('filterCrypto').checked) selectedTypes.push('crypto');
+
+                    if (selectedTypes.length === 0) {
+                        alert('Please select at least one donation type to include in the report.');
+                        return;
+                    }
+
+                    if (window.CharityReportsV2) {
+                        // Call enhanced export with filters
+                        window.CharityReportsV2.exportFilteredDonations(year, selectedTypes, format, includeDetails);
                     } else {
                         console.error('Reports module not loaded');
                         alert('Reports module is not available. Please refresh the page.');
@@ -4226,7 +4313,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.12.4</p>
+                            <p>Generated by Charity Tracker v2.13.0</p>
                         </div>
                     </body>
                     </html>
