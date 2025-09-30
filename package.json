@@ -1,6 +1,6 @@
 {
   "name": "charity-tracker-qwik",
-  "version": "2.12.1",
+  "version": "2.12.2",
   "description": "Smart donation tracking for maximum tax benefits",
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
