@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.57</title>
+    <title>Dashboard - Charity Tracker v2.11.58</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -816,7 +816,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.57</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.58</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -2197,7 +2197,15 @@
             const miles = parseFloat(e.target.value) || 0;
             const rate = 0.14; // 2024 IRS rate
             const deduction = (miles * rate).toFixed(2);
-            document.getElementById('mileageDeduction').textContent = deduction;
+            const deductionElement = document.getElementById('mileageDeduction');
+            if (deductionElement) {
+                deductionElement.textContent = deduction;
+            }
+            // Update the amount field if it exists
+            const amountField = document.getElementById('donationAmount');
+            if (amountField) {
+                amountField.value = deduction;
+            }
         });
 
         // Modal functions
@@ -3904,39 +3912,58 @@
                     'miles_driven,mileage_rate,mileage_purpose,' +
                     'stock_symbol,stock_quantity,fair_market_value,' +
                     'crypto_symbol,crypto_quantity,crypto_type,' +
-                    'item_description,estimated_value,description\n';
+                    'item_name,item_category,item_condition,item_quantity,item_value,description\n';
 
                 data.donations.forEach(donation => {
                     const date = new Date(donation.donation_date || donation.date).toLocaleDateString();
                     const charity = (donation.charity_name || 'Unknown').replace(/,/g, ';');
                     const type = donation.donation_type || 'cash';
-                    const amount = parseFloat(donation.amount).toFixed(2);
                     const notes = (donation.notes || '').replace(/,/g, ';').replace(/"/g, '""');
 
-                    // Type-specific fields
-                    const miles_driven = donation.miles_driven || '';
-                    const mileage_rate = donation.mileage_rate || '';
-                    const mileage_purpose = (donation.mileage_purpose || '').replace(/,/g, ';');
+                    // For item donations with multiple items, create a row for each item
+                    if (type === 'items' && donation.items && donation.items.length > 0) {
+                        donation.items.forEach(item => {
+                            const itemAmount = parseFloat(item.total_value || item.unit_value || 0).toFixed(2);
+                            const itemName = (item.item_name || '').replace(/,/g, ';');
+                            const itemCategory = (item.category || '').replace(/,/g, ';');
+                            const itemCondition = (item.condition || '').replace(/,/g, ';');
+                            const itemQuantity = item.quantity || 1;
+                            const itemValue = parseFloat(item.unit_value || 0).toFixed(2);
+                            const description = `${itemName} (${itemCondition}) - ${itemQuantity} @ $${itemValue} each`;
 
-                    const stock_symbol = donation.stock_symbol || '';
-                    const stock_quantity = donation.stock_quantity || '';
-                    const fair_market_value = donation.fair_market_value || '';
+                            csvContent += `${date},"${charity}",${type},${itemAmount},"${notes}",` +
+                                `,,,` + // empty mileage fields
+                                `,,,` + // empty stock fields
+                                `,,,` + // empty crypto fields
+                                `"${itemName}","${itemCategory}","${itemCondition}",${itemQuantity},${itemValue},"${description}"\n`;
+                        });
+                    } else {
+                        // Handle other donation types
+                        const amount = parseFloat(donation.amount).toFixed(2);
 
-                    const crypto_symbol = donation.crypto_symbol || '';
-                    const crypto_quantity = donation.crypto_quantity || '';
-                    const crypto_type = (donation.crypto_type || '').replace(/,/g, ';');
+                        // Type-specific fields
+                        const miles_driven = donation.miles_driven || '';
+                        const mileage_rate = donation.mileage_rate || '';
+                        const mileage_purpose = (donation.mileage_purpose || '').replace(/,/g, ';');
 
-                    const item_description = (donation.item_description || '').replace(/,/g, ';');
-                    const estimated_value = donation.estimated_value || '';
+                        const stock_symbol = donation.stock_symbol || '';
+                        const stock_quantity = donation.stock_quantity || '';
+                        const fair_market_value = donation.fair_market_value || '';
 
-                    // Human-readable description for reference
-                    const description = getDescriptionForType(donation).replace(/,/g, ';').replace(/"/g, '""');
+                        const crypto_symbol = donation.crypto_symbol || '';
+                        const crypto_quantity = donation.crypto_quantity || '';
+                        const crypto_type = (donation.crypto_type || '').replace(/,/g, ';');
 
-                    csvContent += `${date},"${charity}",${type},${amount},"${notes}",` +
-                        `${miles_driven},${mileage_rate},"${mileage_purpose}",` +
-                        `${stock_symbol},${stock_quantity},${fair_market_value},` +
-                        `${crypto_symbol},${crypto_quantity},"${crypto_type}",` +
-                        `"${item_description}",${estimated_value},"${description}"\n`;
+                        // Human-readable description for reference
+                        const description = getDescriptionForType(donation).replace(/,/g, ';').replace(/"/g, '""');
+
+                        csvContent += `${date},"${charity}",${type},${amount},"${notes}",` +
+                            `${miles_driven},${mileage_rate},"${mileage_purpose}",` +
+                            `${stock_symbol},${stock_quantity},${fair_market_value},` +
+                            `${crypto_symbol},${crypto_quantity},"${crypto_type}",` +
+                            `,,,,,` + // empty item fields
+                            `"${description}"\n`;
+                    }
                 });
 
                 // Download CSV file
@@ -4035,7 +4062,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.57</p>
+                            <p>Generated by Charity Tracker v2.11.58</p>
                         </div>
                     </body>
                     </html>
