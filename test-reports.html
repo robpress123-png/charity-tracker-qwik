@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Reports Module</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5468d4;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #output {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            min-height: 50px;
+        }
+        .report-messages {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Reports Module v2 Fixed</h1>
+
+    <div class="section">
+        <h2>Setup Test Data</h2>
+        <button onclick="setupTestData()">Setup Test User & Data</button>
+        <button onclick="clearTestData()">Clear Test Data</button>
+    </div>
+
+    <div class="section">
+        <h2>Test Reports</h2>
+        <label>Year: <input type="number" id="reportYear" value="2024" /></label><br><br>
+
+        <button onclick="testAllDonations()">Test All Donations CSV</button>
+        <button onclick="testItemDetails()">Test Item Details CSV</button>
+        <button onclick="testScheduleA()">Test Schedule A CSV</button>
+        <button onclick="testReceiptAudit()">Test Receipt Audit</button>
+        <button onclick="testTaxSummary()">Test Tax Summary HTML</button>
+    </div>
+
+    <div class="report-messages" id="reportMessages"></div>
+
+    <div id="output">
+        <strong>Output:</strong><br>
+        <span id="outputText">Ready for testing...</span>
+    </div>
+
+    <script src="/js/reports-module-v2-fixed.js"></script>
+    <script>
+        // Mock auth functions for testing
+        function getAuthToken() {
+            return sessionStorage.getItem('token') || 'test-token-12345';
+        }
+
+        function getAuthUser() {
+            const userStr = sessionStorage.getItem('user');
+            if (userStr) {
+                try {
+                    return JSON.parse(userStr);
+                } catch (e) {
+                    return { name: 'Test User', email: 'test@example.com' };
+                }
+            }
+            return { name: 'Test User', email: 'test@example.com' };
+        }
+
+        // Setup test data
+        function setupTestData() {
+            // Set test user
+            sessionStorage.setItem('token', 'test-token-12345');
+            sessionStorage.setItem('user', JSON.stringify({
+                name: 'Test User',
+                email: 'test@example.com',
+                id: 1
+            }));
+
+            document.getElementById('outputText').textContent = 'Test data setup complete. Token and user stored in sessionStorage.';
+        }
+
+        function clearTestData() {
+            sessionStorage.clear();
+            document.getElementById('outputText').textContent = 'Test data cleared from sessionStorage.';
+        }
+
+        // Test functions
+        async function testAllDonations() {
+            try {
+                document.getElementById('outputText').textContent = 'Generating All Donations CSV...';
+                const year = document.getElementById('reportYear').value;
+                const result = await CharityReportsV2.exportAllDonations(year);
+                document.getElementById('outputText').textContent =
+                    `All Donations CSV generated: ${result.count} records from ${result.donations} donations`;
+            } catch (error) {
+                document.getElementById('outputText').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testItemDetails() {
+            try {
+                document.getElementById('outputText').textContent = 'Generating Item Details CSV...';
+                const year = document.getElementById('reportYear').value;
+                const result = await CharityReportsV2.exportItemDetails(year);
+                document.getElementById('outputText').textContent =
+                    `Item Details CSV generated: ${result.items} items from ${result.donations} donations, Total: $${result.totalValue}`;
+            } catch (error) {
+                document.getElementById('outputText').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testScheduleA() {
+            try {
+                document.getElementById('outputText').textContent = 'Generating Schedule A CSV...';
+                const year = document.getElementById('reportYear').value;
+                const result = await CharityReportsV2.exportScheduleA(year);
+                document.getElementById('outputText').textContent =
+                    `Schedule A CSV generated: ${result.charities} charities, Total: $${result.total.toFixed(2)}`;
+            } catch (error) {
+                document.getElementById('outputText').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testReceiptAudit() {
+            try {
+                document.getElementById('outputText').textContent = 'Generating Receipt Audit...';
+                const year = document.getElementById('reportYear').value;
+                const result = await CharityReportsV2.generateReceiptAudit(year);
+                const stats = result.stats;
+                document.getElementById('outputText').textContent =
+                    `Receipt Audit generated: ${stats.with_receipts}/${stats.total} documented, ` +
+                    `${stats.missing_required} missing, ${stats.needs_appraisal} need appraisal`;
+            } catch (error) {
+                document.getElementById('outputText').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function testTaxSummary() {
+            try {
+                document.getElementById('outputText').textContent = 'Generating Tax Summary HTML...';
+                const year = document.getElementById('reportYear').value;
+                const result = await CharityReportsV2.generateTaxSummary(year);
+                document.getElementById('outputText').textContent =
+                    `Tax Summary HTML generated and opened in new window (type: ${result.type})`;
+            } catch (error) {
+                document.getElementById('outputText').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            CharityReportsV2.init();
+            setupTestData();
+        });
+    </script>
+</body>
+</html>
