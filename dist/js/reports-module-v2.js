@@ -1,13 +1,61 @@
 /**
  * Charity Tracker - Enhanced Phase 1 Reporting System with Item Details
- * Version: 2.12.1-fixed
+ * Version: 2.13.1-fixed
  *
  * FIXED ISSUES:
  * - Now includes detailed item information for item donations
  * - Added missing Annual Tax Summary HTML generation
  * - Added complete ReportUI functionality
  * - Fixed error handling and null checks
+ * - Fixed money formatting with commas
+ * - Fixed tax bracket percentage display
+ * - Fixed item donation total calculations
  */
+
+// Utility function to format money with commas
+function formatMoney(amount) {
+    if (amount === null || amount === undefined || isNaN(amount)) {
+        return '$0.00';
+    }
+    const num = parseFloat(amount);
+    return '$' + num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+// Utility function to format percentage
+function formatPercentage(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '0%';
+    }
+    // If value is less than 1, it's already a decimal (0.12 = 12%)
+    const percentage = value < 1 ? value * 100 : value;
+    return percentage.toFixed(0) + '%';
+}
+
+// Utility function to get donation amount (handles all types including items)
+function getDonationAmount(donation) {
+    if (donation.amount) {
+        return donation.amount;
+    }
+
+    // For item donations, calculate total from items
+    if (donation.donation_type === 'items' && donation.items && donation.items.length > 0) {
+        return donation.items.reduce((sum, item) => {
+            const quantity = item.quantity || 1;
+            const value = item.value || item.fair_market_value || 0;
+            return sum + (quantity * value);
+        }, 0);
+    }
+
+    // For other types, check specific fields
+    if (donation.fair_market_value) {
+        return donation.fair_market_value;
+    }
+
+    return 0;
+}
 
 // Utility function to safely get auth token
 function getReportAuthToken() {
@@ -250,8 +298,10 @@ const ReportDataFetcher = {
      * Calculate tax savings
      */
     calculateTaxSavings(donations, taxBracket) {
-        const totalDonations = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
-        const taxSavings = (totalDonations * taxBracket) / 100;
+        const totalDonations = donations.reduce((sum, d) => sum + getDonationAmount(d), 0);
+        // taxBracket may be stored as decimal (0.12) or percentage (12)
+        const bracketAsPercentage = taxBracket < 1 ? taxBracket * 100 : taxBracket;
+        const taxSavings = (totalDonations * bracketAsPercentage) / 100;
         return {
             totalDonations,
             taxSavings,
@@ -295,7 +345,7 @@ const ReportGenerators = {
                         item_total_value: (item.value || 0) * (item.quantity || 1),
 
                         // Keep donation total for reference
-                        donation_total: d.amount || 0,
+                        donation_total: getDonationAmount(d),
 
                         // Empty fields for non-applicable types
                         miles_driven: '',
@@ -330,7 +380,7 @@ const ReportGenerators = {
                     item_value_per: '',
                     item_total_value: '',
 
-                    donation_total: d.amount || 0,
+                    donation_total: getDonationAmount(d),
 
                     // Type-specific fields
                     miles_driven: d.miles_driven || '',
@@ -507,7 +557,7 @@ const ReportGenerators = {
                 };
             }
 
-            const amount = d.amount || 0;
+            const amount = getDonationAmount(d);
             if (d.donation_type === 'cash') {
                 byCharity[key].cash += amount;
             } else {
@@ -520,9 +570,9 @@ const ReportGenerators = {
         const scheduleAData = Object.values(byCharity).map(charity => ({
             'Organization Name': charity.name,
             'EIN': charity.ein,
-            'Cash Contributions': charity.cash.toFixed(2),
-            'Non-Cash Contributions': charity.noncash.toFixed(2),
-            'Total Contributions': charity.total.toFixed(2),
+            'Cash Contributions': formatMoney(charity.cash).replace('$', ''),
+            'Non-Cash Contributions': formatMoney(charity.noncash).replace('$', ''),
+            'Total Contributions': formatMoney(charity.total).replace('$', ''),
             'Type': 'Charitable Contribution',
             'Tax Year': year
         }));
@@ -535,9 +585,9 @@ const ReportGenerators = {
         scheduleAData.push({
             'Organization Name': 'TOTAL',
             'EIN': '',
-            'Cash Contributions': totalCash.toFixed(2),
-            'Non-Cash Contributions': totalNonCash.toFixed(2),
-            'Total Contributions': grandTotal.toFixed(2),
+            'Cash Contributions': formatMoney(totalCash).replace('$', ''),
+            'Non-Cash Contributions': formatMoney(totalNonCash).replace('$', ''),
+            'Total Contributions': formatMoney(grandTotal).replace('$', ''),
             'Type': 'Summary',
             'Tax Year': year
         });
@@ -566,7 +616,7 @@ const ReportGenerators = {
 
         donations.forEach(d => {
             const hasReceipt = !!d.receipt_url;
-            const amount = d.amount || 0;
+            const amount = getDonationAmount(d);
             const requiresReceipt = amount >= 250; // IRS requires receipts for $250+
             const requiresAppraisal = amount >= 5000 && d.donation_type !== 'cash'; // Non-cash over $5000
 
@@ -594,7 +644,7 @@ const ReportGenerators = {
                     date: d.donation_date,
                     charity: d.charity_name || d.charity?.name || 'Unknown',
                     type: d.donation_type,
-                    amount: amount.toFixed(2),
+                    amount: formatMoney(amount).replace('$', ''),
                     has_receipt: hasReceipt ? 'Yes' : 'No',
                     status: status,
                     action_required: action,
@@ -605,7 +655,7 @@ const ReportGenerators = {
                     date: d.donation_date,
                     charity: d.charity_name || d.charity?.name || 'Unknown',
                     type: d.donation_type,
-                    amount: amount.toFixed(2),
+                    amount: formatMoney(amount).replace('$', ''),
                     has_receipt: hasReceipt ? 'Yes' : 'No',
                     status: status,
                     action_required: action,
@@ -677,7 +727,7 @@ const ReportGenerators = {
         const byCharity = {};
 
         donations.forEach(d => {
-            const amount = d.amount || 0;
+            const amount = getDonationAmount(d);
             const type = d.donation_type || 'cash';
 
             // Update type totals
@@ -767,7 +817,7 @@ const ReportGenerators = {
         <table>
             <tr>
                 <td>Total Charitable Contributions:</td>
-                <td class="amount">$${taxCalcs.totalDonations.toFixed(2)}</td>
+                <td class="amount">${formatMoney(taxCalcs.totalDonations)}</td>
             </tr>
             <tr>
                 <td>Filing Status:</td>
@@ -775,15 +825,15 @@ const ReportGenerators = {
             </tr>
             <tr>
                 <td>Tax Bracket:</td>
-                <td>${taxSettings.tax_bracket || 22}%</td>
+                <td>${formatPercentage(taxSettings.tax_bracket || 0.22)}</td>
             </tr>
             <tr>
                 <td><strong>Estimated Tax Savings:</strong></td>
-                <td class="amount"><strong>$${taxCalcs.taxSavings.toFixed(2)}</strong></td>
+                <td class="amount"><strong>${formatMoney(taxCalcs.taxSavings)}</strong></td>
             </tr>
             <tr>
                 <td>Effective Cost of Donations:</td>
-                <td class="amount">$${taxCalcs.effectiveCost.toFixed(2)}</td>
+                <td class="amount">${formatMoney(taxCalcs.effectiveCost)}</td>
             </tr>
         </table>
     </div>
@@ -805,7 +855,7 @@ const ReportGenerators = {
                     <td>${type.charAt(0).toUpperCase() + type.slice(1)}</td>
                     <td>${data.count}</td>
                     <td>${type === 'miles' ? `${data.miles} miles` : ''}</td>
-                    <td class="amount">$${data.total.toFixed(2)}</td>
+                    <td class="amount">${formatMoney(data.total)}</td>
                 </tr>
                 ` : '').join('')}
             </tbody>
@@ -814,7 +864,7 @@ const ReportGenerators = {
                     <td>Total</td>
                     <td>${donations.length}</td>
                     <td></td>
-                    <td class="amount">$${taxCalcs.totalDonations.toFixed(2)}</td>
+                    <td class="amount">${formatMoney(taxCalcs.totalDonations)}</td>
                 </tr>
             </tfoot>
         </table>
@@ -839,7 +889,7 @@ const ReportGenerators = {
                     <td>${charity.name}</td>
                     <td>${charity.ein}</td>
                     <td>${charity.donations.length}</td>
-                    <td class="amount">$${charity.total.toFixed(2)}</td>
+                    <td class="amount">${formatMoney(charity.total)}</td>
                 </tr>
                 `).join('')}
             </tbody>
@@ -848,7 +898,7 @@ const ReportGenerators = {
                     <td>Total</td>
                     <td></td>
                     <td>${donations.length}</td>
-                    <td class="amount">$${taxCalcs.totalDonations.toFixed(2)}</td>
+                    <td class="amount">${formatMoney(taxCalcs.totalDonations)}</td>
                 </tr>
             </tfoot>
         </table>
@@ -1007,7 +1057,7 @@ const ReportUI = {
 
                 case 'schedule-a':
                     result = await ReportGenerators.generateScheduleAExport(year);
-                    this.showSuccess(`Schedule A exported: ${result.charities} charities, $${result.total.toFixed(2)} total`);
+                    this.showSuccess(`Schedule A exported: ${result.charities} charities, ${formatMoney(result.total)} total`);
                     break;
 
                 case 'receipt-audit':
@@ -1155,7 +1205,7 @@ if (typeof module !== 'undefined' && module.exports) {
                         year: year,
                         types: types,
                         totalDonations: filtered.length,
-                        totalAmount: filtered.reduce((sum, d) => sum + (d.amount || 0), 0),
+                        totalAmount: filtered.reduce((sum, d) => sum + getDonationAmount(d), 0),
                         byType: {}
                     };
 
@@ -1163,7 +1213,7 @@ if (typeof module !== 'undefined' && module.exports) {
                         const typeDonations = filtered.filter(d => d.donation_type === type);
                         summary.byType[type] = {
                             count: typeDonations.length,
-                            total: typeDonations.reduce((sum, d) => sum + (d.amount || 0), 0)
+                            total: typeDonations.reduce((sum, d) => sum + getDonationAmount(d), 0)
                         };
                     });
 
@@ -1173,12 +1223,12 @@ if (typeof module !== 'undefined' && module.exports) {
                             <h2>Filtered Donation Summary - ${year}</h2>
                             <p>Types: ${types.join(', ')}</p>
                             <p>Total Donations: ${summary.totalDonations}</p>
-                            <p>Total Amount: $${summary.totalAmount.toFixed(2)}</p>
+                            <p>Total Amount: ${formatMoney(summary.totalAmount)}</p>
                             <h3>By Type:</h3>
                             <ul>
                                 ${types.map(type => `
                                     <li>${type}: ${summary.byType[type].count} donations,
-                                    $${summary.byType[type].total.toFixed(2)}</li>
+                                    ${formatMoney(summary.byType[type].total)}</li>
                                 `).join('')}
                             </ul>
                         </div>
@@ -1213,7 +1263,7 @@ if (typeof module !== 'undefined' && module.exports) {
                                 date: d.donation_date,
                                 charity: d.charity_name || 'Unknown',
                                 type: d.donation_type,
-                                amount: d.amount || 0
+                                amount: getDonationAmount(d)
                             });
                         }
                     });
