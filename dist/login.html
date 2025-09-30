@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Charity Tracker v2.11.60</title>
+    <title>Login - Charity Tracker v2.11.61</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -148,11 +148,12 @@
             margin: 0.25rem 0;
         }
     </style>
+    <script src="/js/storage-helper.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>🎯 Charity Tracker</h1>
-        <div class="version">Version 2.11.60</div>
+        <div class="version">Version 2.11.61</div>
 
         <div id="error" class="error"></div>
         <div id="success" class="success"></div>
@@ -258,9 +259,8 @@
                     successDiv.textContent = 'Login successful! Redirecting to dashboard...';
                     successDiv.style.display = 'block';
 
-                    // Store token
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Store token using secure storage
+                    secureStorage.setAuth(data.token, data.user);
 
                     // Redirect to dashboard
                     setTimeout(() => {

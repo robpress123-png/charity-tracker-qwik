@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.11.60</title>
+    <title>Admin Dashboard - Charity Tracker v2.11.61</title>
     <style>
         * {
             margin: 0;
@@ -437,6 +437,7 @@
             opacity: 0.8;
         }
     </style>
+    <script src="storage-helper.js"></script>
 </head>
 <body>
     <!-- Admin Header -->
@@ -444,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.60</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.11.61</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1265,7 +1266,7 @@
 
         async function fetchLogoutTimeout() {
             try {
-                const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+                const token = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token');
                 const response = await fetch('/api/settings/auto-logout-timeout', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1308,7 +1309,9 @@
 
                 setTimeout(() => {
                     // Perform logout
+                    sessionStorage.removeItem('adminToken');
                     localStorage.removeItem('adminToken');
+                    sessionStorage.removeItem('adminUser');
                     localStorage.removeItem('adminUser');
                     window.location.href = '/admin-login.html?timeout=true';
                 }, warningTime);
@@ -1329,15 +1332,15 @@
             resetLogoutTimer();
 
             // Store login timestamp
-            if (!localStorage.getItem('adminLoginTime')) {
-                localStorage.setItem('adminLoginTime', Date.now().toString());
+            if (!sessionStorage.getItem('adminLoginTime') && !localStorage.getItem('adminLoginTime')) {
+                sessionStorage.setItem('adminLoginTime', Date.now().toString());
             }
         }
 
         // Check admin authentication and load stats
         window.onload = async function() {
-            const adminToken = localStorage.getItem('adminToken');
-            const adminUser = localStorage.getItem('adminUser');
+            const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
+            const adminUser = sessionStorage.getItem('adminUser') || localStorage.getItem('adminUser');
 
             if (!adminToken || !adminUser) {
                 window.location.href = '/admin-login.html';
@@ -1435,7 +1438,9 @@
 
         // Logout function
         function logout() {
+            sessionStorage.removeItem('adminToken');
             localStorage.removeItem('adminToken');
+            sessionStorage.removeItem('adminUser');
             localStorage.removeItem('adminUser');
             window.location.href = '/admin-login.html';
         }
@@ -1838,7 +1843,7 @@
             }
 
             // Log token information
-            const adminToken = localStorage.getItem('adminToken');
+            const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
             const userToken = localStorage.getItem('token');
             const tokenToUse = adminToken || userToken;
 
@@ -1931,7 +1936,7 @@
             try {
                 const response = await fetch('/api/users', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 if (response.ok) {
@@ -1986,7 +1991,7 @@
                 const response = await fetch('/api/donations/clear-items', {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken')}`
                     }
                 });
 
@@ -2012,7 +2017,7 @@
             try {
                 const response = await fetch('/api/users', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2159,7 +2164,7 @@
                 const response = await fetch(`/api/users/${userId}/clear-all-data`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2205,7 +2210,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ temporaryPassword: tempPassword })
                 });
@@ -2234,7 +2239,7 @@
             try {
                 const response = await fetch(`/api/donations/export-user/${userId}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2266,7 +2271,7 @@
                     const response = await fetch(`/api/admin/users/${userId}`, {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                         }
                     });
 
@@ -2506,7 +2511,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ timeout: parseInt(newTimeout) })
                 });
@@ -2579,7 +2584,7 @@
             try {
                 const response = await fetch('/api/donations/export-all', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2633,7 +2638,7 @@
             try {
                 const response = await fetch('/api/users', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const data = await response.json();
@@ -2669,7 +2674,7 @@
             try {
                 const response = await fetch(`/api/donations/export-user/${userId}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2715,7 +2720,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ donations })
                 });
@@ -2763,7 +2768,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({ userId, donations })
                 });
@@ -2803,7 +2808,7 @@
 
                 const response = await fetch(`/api/items/price-history?${params}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2859,7 +2864,7 @@
             try {
                 const response = await fetch(`/api/items/search?q=${encodeURIComponent(searchTerm)}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2912,7 +2917,7 @@
             try {
                 const response = await fetch('/api/items/export', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -2945,7 +2950,7 @@
             try {
                 const response = await fetch('/api/items/count', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const data = await response.json();
@@ -2963,7 +2968,7 @@
             try {
                 const response = await fetch('/api/donations/count', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const data = await response.json();
@@ -2984,7 +2989,7 @@
             try {
                 const response = await fetch('/api/items/recent-price-changes', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const data = await response.json();
@@ -3041,7 +3046,7 @@
                 const response = await fetch('/api/charities/delete-all', {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -3071,7 +3076,7 @@
             try {
                 const response = await fetch('/api/charities?limit=1', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const data = await response.json();
@@ -3088,7 +3093,7 @@
                 // Update donation count
                 const donationsResponse = await fetch('/api/donations', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const donationsData = await donationsResponse.json();
@@ -3102,7 +3107,7 @@
                 // Update charity count
                 const charitiesResponse = await fetch('/api/charities?limit=1', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
                 const charitiesData = await charitiesResponse.json();
@@ -3126,7 +3131,7 @@
                 const response = await fetch('/api/charities/export', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                     }
                 });
 
@@ -3343,7 +3348,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
                         },
                         body: JSON.stringify({
                             charities: charitiesImportData,
@@ -3647,7 +3652,7 @@
                 const blob = new Blob([taxCsvData], { type: 'text/csv' });
                 formData.append('file', blob, 'tax_data.csv');
 
-                const adminToken = localStorage.getItem('adminToken');
+                const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
                 const apiUrl = window.location.hostname === 'localhost'
                     ? 'http://localhost:8790/api/admin/tax-import-unified'
                     : '/api/admin/tax-import-unified';
@@ -3762,7 +3767,7 @@
             if (!taxTableStatus) return;
 
             try {
-                const adminToken = localStorage.getItem('adminToken');
+                const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
                 const apiUrl = window.location.hostname === 'localhost'
                     ? 'http://localhost:8790/api/admin/tax-import-unified'
                     : '/api/admin/tax-import-unified';
@@ -3797,7 +3802,7 @@
             }
 
             try {
-                const adminToken = localStorage.getItem('adminToken');
+                const adminToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
                 const apiUrl = window.location.hostname === 'localhost'
                     ? 'http://localhost:8790/api/admin/tax-import-unified'
                     : '/api/admin/tax-import-unified';

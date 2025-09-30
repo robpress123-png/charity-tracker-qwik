@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Dashboard - Charity Tracker v2.11.60</title>
+    <title>Dashboard - Charity Tracker v2.11.61</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -806,6 +806,7 @@
             }
         }
     </style>
+    <script src="storage-helper.js"></script>
 </head>
 <body>
     <!-- Header Container -->
@@ -816,7 +817,7 @@
                 <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.60</span></h1>
+                            <h1 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; margin: 0;">🎯 Charity Tracker <span style="font-size: 0.9rem; color: #ffd700; font-weight: normal;">v2.11.61</span></h1>
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <span id="userName">Loading...</span>
@@ -2036,7 +2037,7 @@
 
     <script>
         // Check authentication
-        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || 'null');
         if (!user) {
             window.location.href = '/login.html';
         } else {
@@ -2239,7 +2240,7 @@
             const year = document.getElementById('globalYearFilter')?.value || '2025';
 
             try {
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 // Fetch all donations to get unique charities
                 let url = '/api/donations?limit=10000';
@@ -2421,7 +2422,7 @@
                 console.log('Opening edit modal for charity ID:', charityId);
 
                 // Get auth token
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 // Fetch charity data
                 const response = await fetch(`/api/charities/personal/${charityId}`, {
@@ -2468,7 +2469,7 @@
                 console.log('Deleting charity ID:', charityId);
 
                 // Get auth token
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 const response = await fetch(`/api/charities/delete-personal/${charityId}`, {
                     method: 'DELETE',
@@ -2499,6 +2500,8 @@
 
         // Logout function
         function logout() {
+            secureStorage.clearAuth();
+            // Also clear localStorage for backward compatibility
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/';
@@ -2515,8 +2518,8 @@
             // Load top charities for quick access
             if (allCharities.length === 0) {
                 try {
-                    const user = JSON.parse(localStorage.getItem('user') || '{}');
-                    const token = user.token || localStorage.getItem('token') || 'test-token';
+                    const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                    const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                     // Load a reasonable subset for instant local search (500 most common)
                     // The full database search will happen via the /api/charities/search endpoint
@@ -2617,7 +2620,7 @@
 
                 // Then search the full database using the dedicated search endpoint
                 try {
-                    const token = localStorage.getItem('token');
+                    const token = secureStorage.getAuth()?.token;
                     const response = await fetch(`/api/charities/search?q=${encodeURIComponent(query)}&limit=50`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -2796,7 +2799,7 @@
             let website = '';
 
             try {
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
                 // Try personal charity endpoint first if it's a personal charity
                 const endpoint = source === 'personal'
                     ? `/api/charities/personal/${charityId}`
@@ -3168,8 +3171,8 @@
                 const method = isEditing ? 'PUT' : 'POST';
 
                 // Get user token for authorization
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 console.log('[DEBUG] Sending request to:', url);
                 console.log('[DEBUG] Request method:', method);
@@ -3264,8 +3267,8 @@
             console.log('Form data collected:', formData);
 
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 console.log('Sending request to /api/charities/add-personal');
                 console.log('Auth token:', token ? 'Present' : 'Missing');
@@ -3362,8 +3365,8 @@
             console.log('Charity ID:', charityId);
 
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 console.log(`Sending request to /api/charities/update-personal/${charityId}`);
                 console.log('Auth token:', token ? 'Present' : 'Missing');
@@ -3448,8 +3451,8 @@
                 console.log('[LOAD DONATIONS] API URL:', url);
 
                 // Get auth token
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -3565,8 +3568,8 @@
                 }
 
                 // Get auth token
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -3641,7 +3644,7 @@
 
             try {
                 // Get auth token
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 // Fetch all donations to get unique charities (get all years for comparison)
                 let url = '/api/donations?limit=10000';
@@ -3893,8 +3896,8 @@
                 }
 
                 // Get auth token
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -3998,8 +4001,8 @@
                 }
 
                 // Get auth token
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -4071,7 +4074,7 @@
                         </table>
                         <div class="footer">
                             <p>This report is for tax preparation purposes. Please consult with your tax advisor.</p>
-                            <p>Generated by Charity Tracker v2.11.60</p>
+                            <p>Generated by Charity Tracker v2.11.61</p>
                         </div>
                     </body>
                     </html>
@@ -4164,8 +4167,8 @@
 
         // Load all tax info for all years at startup
         async function loadAllYearsTaxInfo() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || localStorage.getItem('token');
+            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || secureStorage.getAuth()?.token;
             const userId = user.id || user.userId;
 
             if (!userId || !token) return;
@@ -4257,8 +4260,8 @@
 
             const taxYear = taxYearElem.value;
             const filingStatus = filingStatusElem.value;
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || localStorage.getItem('token') || 'test-token';
+            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
             // Show/hide AGI estimate field for 2026
             if (agiEstimateGroup) {
@@ -4371,8 +4374,8 @@
 
         // Load and display tax settings for all configured years
         async function loadAllYearsSummary() {
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || localStorage.getItem('token') || 'test-token';
+            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
             const userId = user.id || user.userId;
 
             if (!userId) return;
@@ -4485,8 +4488,8 @@
             }
 
             // Load it from database
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || localStorage.getItem('token') || 'test-token';
+            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
             const userId = user.id || user.userId;
 
             if (!userId) {
@@ -4530,8 +4533,8 @@
             };
 
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 // Save to database via API
                 const response = await fetch('/api/users/settings', {
@@ -4606,8 +4609,8 @@
         // Load profile information
         async function loadProfile() {
             const userEmail = localStorage.getItem('userEmail');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            const token = user.token || localStorage.getItem('token') || 'test-token';
+            const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+            const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
             try {
                 // First try to load from database
@@ -4811,7 +4814,7 @@
 
         async function loadPersonalCharities() {
             const container = document.getElementById('personalCharitiesList');
-            const token = localStorage.getItem('token');
+            const token = secureStorage.getAuth()?.token;
 
             try {
                 const response = await fetch('/api/charities/personal', {
@@ -5071,8 +5074,8 @@
             document.getElementById('importStatusText').textContent = 'Validating donations and matching charities...';
 
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 // Call validation API
                 const response = await fetch('/api/donations/validate-import', {
@@ -5303,8 +5306,8 @@
             updateProgress(15, 'Creating charity mappings...');
 
             try {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 // Apply charity mappings from user selections
                 const mappedData = importData.map((donation, index) => {
@@ -5564,8 +5567,8 @@
                 }
 
                 // Get auth token
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-                const token = user.token || localStorage.getItem('token') || 'test-token';
+                const user = secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}');
+                const token = user.token || secureStorage.getAuth()?.token || 'test-token';
 
                 const response = await fetch(url, {
                     headers: {
@@ -6253,7 +6256,7 @@
         async function editDonation(donationId) {
             try {
                 let donation = null;
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 // First try to fetch from API for the most accurate data
                 try {
@@ -6486,7 +6489,7 @@
 
             try {
                 // Get auth token
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
 
                 const response = await fetch(`/api/donations/${donationId}`, {
                     method: 'DELETE',
@@ -7573,7 +7576,7 @@
             }
 
             try {
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
                 const response = await fetch(`/api/donations/${donationId}`, {
                     method: 'PUT',
                     headers: {
@@ -8841,7 +8844,7 @@
             console.log('[SAVE EDIT] Donation ID:', window.editingDonationId);
 
             try {
-                const token = localStorage.getItem('token') || 'test-token';
+                const token = secureStorage.getAuth()?.token || 'test-token';
                 const requestBody = JSON.stringify(formData);
                 console.log('[SAVE EDIT] Request body length:', requestBody.length);
 
@@ -9346,7 +9349,7 @@
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('token')
+                        'Authorization': secureStorage.getAuth()?.token
                     },
                     body: JSON.stringify(receiptData)
                 });
@@ -9450,7 +9453,7 @@
 
         async function fetchLogoutTimeout() {
             try {
-                const token = localStorage.getItem('token');
+                const token = secureStorage.getAuth()?.token;
                 const response = await fetch('/api/settings/auto-logout-timeout', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -9502,6 +9505,8 @@
 
                 warningTimer = setTimeout(() => {
                     // Perform logout
+                    secureStorage.clearAuth();
+                    // Also clear localStorage for backward compatibility
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     window.location.href = '/login.html?timeout=true';
@@ -9552,8 +9557,8 @@
 
             // Check local storage
             console.log('\nLocal Storage:');
-            console.log('- Token:', localStorage.getItem('token') ? 'Set' : 'Not set');
-            console.log('- User:', JSON.parse(localStorage.getItem('user') || '{}'));
+            console.log('- Token:', (secureStorage.getAuth()?.token || localStorage.getItem('token')) ? 'Set' : 'Not set');
+            console.log('- User:', secureStorage.getAuth()?.user || JSON.parse(localStorage.getItem('user') || '{}'));
 
             console.log('\n=== END DIAGNOSTIC REPORT ===');
             console.log('\nTo test a quick donation, run:');

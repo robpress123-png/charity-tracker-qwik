@@ -55,23 +55,8 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Get test user ID for now (in production, might want a system user)
-    const user = await env.DB.prepare(
-      'SELECT id FROM users WHERE email = ?'
-    ).bind('test@example.com').first();
-
-    if (!user) {
-      // Create test user if doesn't exist
-      await env.DB.prepare(
-        'INSERT INTO users (email, password, name, plan) VALUES (?, ?, ?, ?)'
-      ).bind('test@example.com', 'password123', 'Test User', 'free').run();
-
-      const newUser = await env.DB.prepare(
-        'SELECT id FROM users WHERE email = ?'
-      ).bind('test@example.com').first();
-
-      user.id = newUser.id;
-    }
+    // Note: Charities are imported as system charities (no user_id)
+    // This allows all users to access them
 
     // Process charities in batches of 50
     const batchSize = 50;
@@ -104,7 +89,7 @@ export async function onRequestPost(context) {
               `INSERT OR IGNORE INTO charities
                (user_id, name, ein, category, website, description)
                VALUES (?, ?, ?, ?, ?, ?)`
-            ).bind(user.id, name, ein, category, website, description)
+            ).bind(null, name, ein, category, website, description)
           );
         }
 

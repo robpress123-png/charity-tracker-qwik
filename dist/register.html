@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Charity Tracker v2.11.60</title>
+    <title>Register - Charity Tracker v2.11.61</title>
     <!-- Inline styles only, no external stylesheet needed -->
     <style>
         body {
@@ -231,6 +231,7 @@
         }
 
     </style>
+    <script src="/js/storage-helper.js"></script>
 </head>
 <body>
     <div class="register-container">
@@ -602,12 +603,11 @@
 
                 if (data.success) {
                     // CRITICAL: Clear any existing session data first
-                    localStorage.clear();
+                    secureStorage.clearAuth();
 
                     // Store token and user data in the format dashboard expects
                     if (data.token) {
                         console.log('Storing auth token and user data for:', email);
-                        localStorage.setItem('token', data.token);
 
                         // Store user object as dashboard expects
                         const userData = {
@@ -616,7 +616,7 @@
                             name: name,
                             plan: data.plan || 'free'
                         };
-                        localStorage.setItem('user', JSON.stringify(userData));
+                        secureStorage.setAuth(data.token, userData);
                         console.log('User data stored:', userData);
                     } else {
                         console.warn('No token received from API');
