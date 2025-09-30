@@ -1,6 +1,6 @@
 /**
  * Charity Tracker - Enhanced Phase 1 Reporting System with Item Details
- * Version: 2.13.2-fixed
+ * Version: 2.13.4-fixed
  *
  * FIXED ISSUES:
  * - Now includes detailed item information for item donations
@@ -11,6 +11,7 @@
  * - Fixed tax bracket percentage display
  * - Fixed item donation total calculations using estimated_value field
  * - Added proper fallback when items API fails
+ * - Fixed CSV export to show donation total only on first item row
  */
 
 // Utility function to format money with commas
@@ -354,7 +355,7 @@ const ReportGenerators = {
         donations.forEach(d => {
             if (d.donation_type === 'items' && includeItemDetails && d.items && d.items.length > 0) {
                 // For item donations with details, create a row for each item
-                d.items.forEach(item => {
+                d.items.forEach((item, index) => {
                     exportData.push({
                         donation_date: d.donation_date,
                         charity_name: d.charity_name || d.charity?.name || 'Unknown',
@@ -367,10 +368,10 @@ const ReportGenerators = {
                         item_quantity: item.quantity || 1,
                         item_condition: item.condition || '',
                         item_value_per: item.value || 0,
-                        item_total_value: (item.value || 0) * (item.quantity || 1),
+                        item_total_value: parseFloat(item.total_value) || ((item.value || 0) * (item.quantity || 1)),
 
-                        // Keep donation total for reference
-                        donation_total: getDonationAmount(d),
+                        // Show donation total only on first item row to avoid confusion
+                        donation_total: index === 0 ? getDonationAmount(d) : '',
 
                         // Empty fields for non-applicable types
                         miles_driven: '',

@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.13.2
+# Charity Tracker Qwik - Complete Continuation Prompt v2.13.4
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,12 +28,23 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.13.2 - ITEM DONATION VALUE FIXES
+## 🎉 Version 2.13.4 - CSV EXPORT DOUBLE-COUNTING FIX
 
-### Latest Fixes (v2.13.2)
-- ✅ **Item Donation Values**: Reports now correctly use `estimated_value` field from database
-- ✅ **API Fallback**: Reports gracefully handle items API failures with fallback to estimated_value
-- ✅ **getDonationAmount Function**: Enhanced to properly handle all donation types including items
+### Latest Fixes (v2.13.4)
+- ✅ **CSV Export Fix**: Donation total now only appears on first item row to prevent double-counting
+- ✅ **Clear Totaling**: When item donations have multiple items, total is shown once, not repeated
+
+### Previous Fixes (v2.13.3)
+- ✅ **Item Values from Database**: Reports now correctly sum `total_value` from `donation_items` table
+- ✅ **Fixed Items Endpoint**: `/api/donations/[id]/items` now queries actual stored values, not reference table
+- ✅ **Proper Calculation**: Total = sum of all items' `total_value` (which is quantity × unit_value)
+
+### ⚠️ IMPORTANT: Item Value Storage Pattern
+- **When Saved**: Item values are stored in `donation_items` table (unit_value, quantity, total_value)
+- **When Retrieved**: We use the STORED values from `donation_items`, NOT recalculated from items reference table
+- **Reference Table**: The `items` table (496 items) is only for suggesting values during creation
+- **Immutability**: Once saved, donation values should never change even if reference values update
+- **CSV Export**: When exporting item details, donation total appears only on first row to avoid confusion
 
 ### Previous Fixes (v2.13.1)
 - ✅ **Money Formatting**: All reports now display currency with proper comma formatting ($10,000.00)
@@ -256,7 +267,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Current Version**: 2.13.2
+- **Current Version**: 2.13.4
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework)
@@ -393,6 +404,8 @@ Comprehensive project state to maintain continuity across sessions, preserving c
 - v2.13.0: Enhanced reporting with filters and year selection
 - v2.13.1: Fixed money formatting, tax bracket display, item totals in reports
 - v2.13.2: Fixed item donation value calculation using estimated_value field
+- v2.13.3: Fixed items endpoint to use stored values from donation_items table
+- v2.13.4: Fixed CSV export to show donation total only on first item row
 
 ### When to Update
 - After major feature releases
