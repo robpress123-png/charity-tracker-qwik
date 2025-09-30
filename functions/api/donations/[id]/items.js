@@ -66,54 +66,38 @@ export async function onRequestGet(context) {
             });
         }
 
-        // Fetch donation items with item details
+        // Fetch donation items - donation_items table has the actual values
         const items = await env.DB.prepare(`
             SELECT
-                di.*,
-                i.name as item_name,
-                i.category,
-                i.low_value,
-                i.high_value,
-                i.description as item_description
+                di.id,
+                di.donation_id,
+                di.item_name,
+                di.category,
+                di.condition,
+                di.quantity,
+                di.unit_value,
+                di.total_value,
+                di.value_source,
+                di.created_at
             FROM donation_items di
-            LEFT JOIN items i ON di.item_id = i.id
             WHERE di.donation_id = ?
             ORDER BY di.created_at DESC
         `).bind(donationId).all();
 
-        // Calculate value for each item based on condition
+        // Format the items with the actual values from donation_items table
         const itemsWithValues = items.results.map(item => {
-            let value = item.value || 0;
-
-            // If no custom value set, calculate based on condition and item values
-            if (!value && item.low_value && item.high_value) {
-                switch(item.condition) {
-                    case 'good':
-                        value = item.low_value;
-                        break;
-                    case 'very_good':
-                        value = (item.low_value + item.high_value) / 2;
-                        break;
-                    case 'excellent':
-                        value = item.high_value;
-                        break;
-                    default:
-                        value = 0;
-                }
-            }
-
             return {
                 id: item.id,
                 donation_id: item.donation_id,
-                item_id: item.item_id,
-                name: item.item_name || item.name || 'Unknown Item',
+                name: item.item_name || 'Unknown Item',
                 category: item.category,
-                quantity: item.quantity || 1,
+                quantity: parseFloat(item.quantity) || 1,
                 condition: item.condition,
-                value: value,
-                fair_market_value: value * (item.quantity || 1),
+                value: parseFloat(item.unit_value) || 0,  // Value per item
+                unit_value: parseFloat(item.unit_value) || 0,
+                total_value: parseFloat(item.total_value) || 0,  // quantity × unit_value
+                fair_market_value: parseFloat(item.total_value) || 0,  // For compatibility
                 value_source: item.value_source,
-                notes: item.notes,
                 created_at: item.created_at
             };
         });

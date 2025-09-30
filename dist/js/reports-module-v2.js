@@ -49,12 +49,12 @@ function getDonationAmount(donation) {
             return parseFloat(donation.estimated_value) || 0;
         }
 
-        // If we have fetched item details, calculate from items
+        // If we have fetched item details, sum the total_value for each item
         if (donation.items && donation.items.length > 0) {
             return donation.items.reduce((sum, item) => {
-                const quantity = parseFloat(item.quantity) || 1;
-                const value = parseFloat(item.value) || parseFloat(item.fair_market_value) || parseFloat(item.total_value) || 0;
-                return sum + (quantity * value);
+                // Use total_value directly since it's already quantity × unit_value
+                const itemTotal = parseFloat(item.total_value) || parseFloat(item.fair_market_value) || 0;
+                return sum + itemTotal;
             }, 0);
         }
 
@@ -218,9 +218,9 @@ const ReportDataFetcher = {
                             // Calculate total from items if not already set
                             if (!donation.estimated_value && donation.items.length > 0) {
                                 donation.estimated_value = donation.items.reduce((sum, item) => {
-                                    const qty = parseFloat(item.quantity) || 1;
-                                    const val = parseFloat(item.value) || parseFloat(item.fair_market_value) || 0;
-                                    return sum + (qty * val);
+                                    // Use total_value directly since it's already quantity × unit_value
+                                    const itemTotal = parseFloat(item.total_value) || parseFloat(item.fair_market_value) || 0;
+                                    return sum + itemTotal;
                                 }, 0);
                             }
                         } else {

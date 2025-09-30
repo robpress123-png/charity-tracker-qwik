@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.13.1
+# Charity Tracker Qwik - Complete Continuation Prompt v2.13.2
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,9 +28,14 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.13.1 - REPORTING SYSTEM FIXES
+## 🎉 Version 2.13.2 - ITEM DONATION VALUE FIXES
 
-### Latest Fixes (v2.13.1)
+### Latest Fixes (v2.13.2)
+- ✅ **Item Donation Values**: Reports now correctly use `estimated_value` field from database
+- ✅ **API Fallback**: Reports gracefully handle items API failures with fallback to estimated_value
+- ✅ **getDonationAmount Function**: Enhanced to properly handle all donation types including items
+
+### Previous Fixes (v2.13.1)
 - ✅ **Money Formatting**: All reports now display currency with proper comma formatting ($10,000.00)
 - ✅ **Tax Bracket Display**: Fixed percentage display (shows 12% instead of 0.12%)
 - ✅ **Item Donation Totals**: Reports now correctly calculate and include item donation values
@@ -85,10 +90,10 @@
 
 ### Known Issues
 
-#### ✅ RESOLVED IN v2.13.1
-1. ~~**Annual Tax Summary Shows $0**~~: FIXED - Now properly calculates item donation totals
-2. ~~**Money Formatting Missing**~~: FIXED - All reports use formatMoney() with comma formatting
-3. ~~**Custom Reports Generate Errors**~~: FIXED - Created `/api/donations/[id]/items` endpoint
+#### ✅ RESOLVED IN v2.13.1-2.13.2
+1. ~~**Annual Tax Summary Shows $0**~~: FIXED (v2.13.2) - Now uses estimated_value field for items
+2. ~~**Money Formatting Missing**~~: FIXED (v2.13.1) - All reports use formatMoney() with comma formatting
+3. ~~**Custom Reports Generate Errors**~~: FIXED (v2.13.1-2) - Created endpoint with proper fallback handling
 
 #### 🔴 HIGH PRIORITY - BUSINESS
 1. **Payment Integration**: Stripe not yet implemented
@@ -251,7 +256,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Current Version**: 2.13.1
+- **Current Version**: 2.13.2
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework)
@@ -387,6 +392,7 @@ Comprehensive project state to maintain continuity across sessions, preserving c
 - v2.12.1-4: Critical fixes (logout, API endpoints, tax settings)
 - v2.13.0: Enhanced reporting with filters and year selection
 - v2.13.1: Fixed money formatting, tax bracket display, item totals in reports
+- v2.13.2: Fixed item donation value calculation using estimated_value field
 
 ### When to Update
 - After major feature releases
