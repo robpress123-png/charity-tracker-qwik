@@ -1,22 +1,32 @@
 // API endpoint for importing ItsDeductible donation data
 export async function onRequestPost(context) {
     try {
-        console.log('[ItsDeductible Import] Starting import process...');
-        console.log('[ItsDeductible Import] Context:', !!context);
-        console.log('[ItsDeductible Import] Context keys:', context ? Object.keys(context) : 'no context');
+        console.log('[ItsDeductible Import] Function called with:', typeof context);
 
-        if (!context) {
-            throw new Error('No context provided to function');
+        // Handle both possible calling conventions
+        let request, env;
+
+        if (context && typeof context === 'object') {
+            if (context.request && context.env) {
+                // Standard context object
+                request = context.request;
+                env = context.env;
+            } else if (context.headers && context.json) {
+                // Context IS the request object
+                request = context;
+                env = context.env || {};
+            } else {
+                console.error('[ItsDeductible Import] Unexpected context structure:', Object.keys(context));
+                throw new Error('Invalid context structure');
+            }
+        } else {
+            throw new Error('No context provided');
         }
 
-        const { request, env } = context;
-
-        if (!request) {
-            throw new Error('No request object in context');
-        }
-
-        if (!request.headers) {
-            throw new Error('No headers object in request');
+        // Verify we have what we need
+        if (!request || !request.headers) {
+            console.error('[ItsDeductible Import] Missing request or headers');
+            throw new Error('Invalid request object');
         }
 
         // Verify authentication
