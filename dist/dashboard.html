@@ -5188,16 +5188,31 @@
                         status.innerHTML += '<p style="color: #dc2626;">⚠️ Error processing ZIP file. Please extract and upload CSV files individually.</p>';
                     }
                 } else if (file.name.endsWith('.csv')) {
-                    // Add to file list display
-                    fileList.innerHTML += `
-                        <div style="padding: 0.5rem; background: #f0fdf4; border: 1px solid #10b981; border-radius: 4px; margin-bottom: 0.5rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span>📄 ${file.name}</span>
-                                <span style="color: #059669; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                    // Check if this is the overall summary file
+                    if (file.name.toLowerCase().includes('overall')) {
+                        // Show skipped file with different styling
+                        fileList.innerHTML += `
+                            <div style="padding: 0.5rem; background: #f3f4f6; border: 1px solid #9ca3af; border-radius: 4px; margin-bottom: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: #6b7280;">📊 ${file.name} (Summary - skipped)</span>
+                                    <span style="color: #9ca3af; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    await processItsDeductibleCSV(file);
+                        `;
+                        // Process it anyway to skip it gracefully
+                        await processItsDeductibleCSV(file);
+                    } else {
+                        // Regular CSV file
+                        fileList.innerHTML += `
+                            <div style="padding: 0.5rem; background: #f0fdf4; border: 1px solid #10b981; border-radius: 4px; margin-bottom: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>📄 ${file.name}</span>
+                                    <span style="color: #059669; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                                </div>
+                            </div>
+                        `;
+                        await processItsDeductibleCSV(file);
+                    }
                 }
             }
 
@@ -5253,7 +5268,12 @@
             }
 
             if (!fileType) {
-                console.error('Unknown file type:', file.name);
+                // Skip overall summary file and any other unrecognized files
+                if (file.name.toLowerCase().includes('overall')) {
+                    console.log('Skipping ItsDeductible summary file:', file.name);
+                } else {
+                    console.warn('Unknown file type (skipping):', file.name);
+                }
                 return;
             }
 
@@ -5323,9 +5343,17 @@
             const total = itemDonationCount + itsDeductibleData.money.length +
                          itsDeductibleData.mileage.length + itsDeductibleData.stock.length;
 
-            html += `<div style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 8px;">
-                        <p style="font-size: 1.125rem; font-weight: 600; color: #047857;">
-                            Total: ${total} donations ready to import
+            if (total > 0) {
+                html += `<div style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 8px;">
+                            <p style="font-size: 1.125rem; font-weight: 600; color: #047857;">
+                                Total: ${total} donations ready to import
+                            </p>
+                         </div>`;
+            }
+
+            html += `<div style="margin-top: 0.5rem; padding: 0.5rem; background: #f3f4f6; border-radius: 4px;">
+                        <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+                            💡 Note: The "overall" summary file is automatically skipped - we only import the actual donation data.
                         </p>
                      </div>`;
 
@@ -5396,6 +5424,17 @@
 
             if (!token) {
                 alert('Please log in to import donations');
+                return;
+            }
+
+            // Check if we have any data to import
+            const hasData = itsDeductibleData.items.length > 0 ||
+                           itsDeductibleData.money.length > 0 ||
+                           itsDeductibleData.mileage.length > 0 ||
+                           itsDeductibleData.stock.length > 0;
+
+            if (!hasData) {
+                alert('No donation data found to import. Please upload the correct CSV files (Items.csv, Money.csv, Mileage.csv, or Stock.csv)');
                 return;
             }
 
