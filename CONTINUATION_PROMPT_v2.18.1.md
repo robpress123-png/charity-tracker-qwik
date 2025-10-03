@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.18.0
+# Charity Tracker Qwik - Complete Continuation Prompt v2.18.1
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,9 +28,13 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.18.0 - ITSDEDUCTIBLE MIGRATION TOOL
+## 🎉 Version 2.18.1 - CATEGORY BROWSING FIX
 
-### What's New (v2.18.0)
+### What's New (v2.18.1)
+- 🔧 **Category Browsing Fix**: API now correctly uses category_id instead of category name
+- ✅ **Item Loading**: Selecting a category without typing now properly loads items
+
+### Previous (v2.18.0) - ITSDEDUCTIBLE MIGRATION TOOL
 - 🚀 **ItsDeductible Migration**: Complete import tool for users switching from ItsDeductible
 - 📂 **Multi-format Support**: Handles items, cash, mileage, and stock donation exports
 - 🎯 **Smart Grouping**: Groups item donations by charity and date automatically
@@ -183,7 +187,7 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 #### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
 1. ~~**v2.17.7 Breaking Error**: FIXED in v2.17.8~~
 
-## Current Status (v2.18.0) - System at 92% Complete
+## Current Status (v2.18.1) - System at 92% Complete
 ### What's Working:
 - ✅ All donation types functioning properly
 - ✅ Item search with infinite scroll (50 items at a time)
@@ -420,7 +424,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.18.0
+- **Version**: 2.18.1
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -497,7 +501,7 @@ Donation on Aug 15 → Uses $175
 3. **Category field**: Both ID and text name for compatibility
 4. **Infinite scroll**: Loads 50 items at a time, triggers near bottom
 5. **Display format**: Always show as "Name: Variant" if variant exists
-6. **Version**: Current version 2.17.9
+6. **Version**: Current version 2.18.1
 7. **FMV updates**: Must handle items with variants in matching logic
 8. **Loading states**: Show immediately when fetching data
 9. **Dropdown size**: 400px max-height for better visibility
