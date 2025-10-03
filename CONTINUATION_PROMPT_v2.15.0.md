@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.14.0
+# Charity Tracker Qwik - Complete Continuation Prompt v2.15.0
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -215,19 +215,20 @@ CREATE TABLE donation_items (
     FOREIGN KEY (donation_id) REFERENCES donations(id)
 );
 
--- Items reference table (being migrated)
+-- Items reference table (enhanced with versioning)
 CREATE TABLE items (
     id INTEGER PRIMARY KEY,
-    category_id INTEGER,        -- NEW
+    category_id INTEGER,
     name TEXT,
-    item_variant TEXT,          -- NEW: "Audio", "Video", etc.
+    item_variant TEXT,          -- e.g., "Audio", "Video", "Men's", "Women's"
     description TEXT,
-    value_good DECIMAL(10,2),   -- NEW name
-    value_very_good DECIMAL(10,2), -- NEW
-    value_excellent DECIMAL(10,2), -- NEW name
-    search_keywords TEXT,        -- NEW
-    source_reference TEXT,       -- NEW: "ItsDeductible 2024"
-    date_of_valuation DATE,      -- NEW: "2024-01-01"
+    value_good DECIMAL(10,2),   -- Good condition value
+    value_very_good DECIMAL(10,2), -- Very good condition value
+    value_excellent DECIMAL(10,2), -- Excellent condition value
+    search_keywords TEXT,        -- For improved search
+    source_reference TEXT,       -- e.g., "Valuation Guide 2024"
+    date_of_valuation DATE,      -- When valued
+    effective_date DATE,         -- NEW: When this valuation becomes active
     -- Legacy compatibility
     category TEXT,
     low_value DECIMAL(10,2),     -- Maps to value_good
@@ -356,7 +357,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.14.0
+- **Version**: 2.15.0
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -392,14 +393,16 @@ git push  # Auto-deploys to Cloudflare
 # Workers & Pages → D1 → charity-tracker-qwik-db
 ```
 
-## Testing Checklist for v2.14.0
-- [ ] Delete all items works with confirmations
-- [ ] Items count updates to 0
-- [ ] Schema migration runs without errors
-- [ ] ItsDeductible data imports (1,757 items)
-- [ ] Backward compatibility fields populated
-- [ ] Search works with new data
-- [ ] Donation creation works with new items
+## Testing Checklist for v2.15.0
+- [ ] Enhanced import UI shows source/date fields
+- [ ] CSV template downloads properly
+- [ ] Smart matching detects duplicates correctly
+- [ ] Match review UI displays for conflicts
+- [ ] Bulk user delete with checkboxes works
+- [ ] Dashboard auto-refreshes when switching sections
+- [ ] Dropdown menus don't get cut off
+- [ ] Import processes 1,757 items successfully
+- [ ] Effective date filtering works in donations
 
 ## Business Model
 - **Free Tier**: 3 donations limit
@@ -413,6 +416,14 @@ git push  # Auto-deploys to Cloudflare
 3. **Category field**: Both ID and text name for compatibility
 4. **Search keywords**: New field for better search
 5. **Admin delete**: Requires typing "DELETE ALL" exactly
-6. **Version**: Use minor bump (2.14.0) for database changes
+6. **Version**: Use minor bump (2.15.0) for database changes
+7. **Import endpoint**: Use `/api/items/import-enhanced` not `/api/items/import`
+8. **Condition values**: Fair=$0 (not deductible), Good/Very Good/Excellent have values
 
-Ready for ItsDeductible migration!
+## Import Strategy
+1. **Initial Import**: Use "Replace existing" for clean migration
+2. **Future Updates**: Use "Review matches" to handle duplicates carefully
+3. **Source tracking**: Always specify source for audit trail
+4. **Date management**: Items remain valid until newer version imported
+
+Ready for enhanced valuation database migration!

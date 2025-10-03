@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.15.0</title>
+    <title>Admin Dashboard - Charity Tracker v2.15.1</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.0</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.1</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1720,10 +1720,14 @@
             let html = '<table class="admin-table"><thead><tr><th>Category</th><th>Name</th><th>Good</th><th>Very Good</th><th>Excellent</th></tr></thead><tbody>';
 
             const categoryNames = {
-                '1': "Women's", '2': "Men's", '3': "Children's",
-                '4': 'Household', '5': 'Electronics', '6': 'Furniture',
-                '7': 'Books', '8': 'Sports', '9': 'Toys',
-                '10': 'Appliances', '11': 'Jewelry', '12': 'Tools'
+                '1': 'Automotive', '2': 'Baby Gear', '3': 'Bedding',
+                '4': 'Books/Media', '5': 'Cameras', '6': 'Clothing',
+                '7': 'Computers', '8': 'Furniture', '9': 'Health',
+                '10': 'Home A/V', '11': 'Housekeeping', '12': 'Kitchen',
+                '13': 'Lawn/Patio', '14': 'Luggage', '15': 'Appliances',
+                '16': 'Musical', '17': 'Pet', '18': 'Phones',
+                '19': 'Sporting', '20': 'Tools', '21': 'Toys',
+                '22': 'Portable A/V', '99': 'Miscellaneous'
             };
 
             itemsImportData.slice(0, 10).forEach(item => {

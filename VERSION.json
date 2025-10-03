@@ -1,6 +1,6 @@
 {
-  "version": "2.15.0",
-  "previousVersion": "2.14.2",
-  "timestamp": "2025-10-03T14:26:33.150Z",
-  "bumpType": "minor"
+  "version": "2.15.1",
+  "previousVersion": "2.15.0",
+  "timestamp": "2025-10-03T14:34:18.552Z",
+  "bumpType": "patch"
 }
