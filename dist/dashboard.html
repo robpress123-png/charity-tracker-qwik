@@ -5168,21 +5168,35 @@
             status.innerHTML = '<h4>🔍 Analyzing files...</h4>';
 
             for (const file of files) {
-                // Add to file list display
-                fileList.innerHTML += `
-                    <div style="padding: 0.5rem; background: #f0fdf4; border: 1px solid #10b981; border-radius: 4px; margin-bottom: 0.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>📄 ${file.name}</span>
-                            <span style="color: #059669; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
-                        </div>
-                    </div>
-                `;
-
                 // Process based on file type
                 if (file.name.endsWith('.zip')) {
-                    // Handle ZIP file - would need a library like JSZip
-                    status.innerHTML += '<p style="color: #dc2626;">⚠️ ZIP file detected - please extract and upload CSV files individually for now</p>';
+                    // Handle ZIP file
+                    fileList.innerHTML += `
+                        <div style="padding: 0.5rem; background: #dbeafe; border: 1px solid #3b82f6; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>🗜️ ${file.name}</span>
+                                <span style="color: #2563eb; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                            </div>
+                        </div>
+                    `;
+
+                    try {
+                        await processItsDeductibleZip(file);
+                        status.innerHTML += '<p style="color: #059669;">✅ ZIP file processed successfully</p>';
+                    } catch (error) {
+                        console.error('Error processing ZIP file:', error);
+                        status.innerHTML += '<p style="color: #dc2626;">⚠️ Error processing ZIP file. Please extract and upload CSV files individually.</p>';
+                    }
                 } else if (file.name.endsWith('.csv')) {
+                    // Add to file list display
+                    fileList.innerHTML += `
+                        <div style="padding: 0.5rem; background: #f0fdf4; border: 1px solid #10b981; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>📄 ${file.name}</span>
+                                <span style="color: #059669; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                            </div>
+                        </div>
+                    `;
                     await processItsDeductibleCSV(file);
                 }
             }
@@ -5194,6 +5208,31 @@
                 document.getElementById('itsDeductibleImportBtn').style.display = 'inline-block';
                 updateItsDeductibleStatus();
             }
+        }
+
+        // Process ZIP file containing ItsDeductible CSVs
+        async function processItsDeductibleZip(zipFile) {
+            // For now, show helpful message about extracting ZIP files
+            // Full ZIP support would require adding a library like JSZip
+            const message = `
+                <div style="padding: 1rem; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; margin-top: 1rem;">
+                    <h4 style="color: #92400e; margin: 0 0 0.5rem 0;">📦 ZIP File Detected</h4>
+                    <p style="color: #92400e; margin: 0 0 0.5rem 0;">
+                        Please extract the ZIP file on your computer first, then upload the CSV files:
+                    </p>
+                    <ol style="color: #92400e; margin: 0; padding-left: 1.5rem;">
+                        <li>Extract the ZIP file to a folder</li>
+                        <li>Select all CSV files (Items.csv, Money.csv, Mileage.csv, Stock.csv)</li>
+                        <li>Drag them here or click "Choose Files" to upload</li>
+                    </ol>
+                    <p style="color: #92400e; margin: 0.5rem 0 0 0; font-size: 0.875rem;">
+                        💡 Tip: You can select and upload multiple CSV files at once!
+                    </p>
+                </div>
+            `;
+
+            document.getElementById('itsDeductibleStatus').innerHTML += message;
+            throw new Error('ZIP extraction not yet supported - please extract and upload CSV files');
         }
 
         async function processItsDeductibleCSV(file) {
@@ -9412,10 +9451,14 @@
                 // Update search placeholder
                 itemSearch.placeholder = `Type to search or browse all ${category.name} items below...`;
 
+                // Clear search text when category changes (like Add form)
+                itemSearch.value = '';
+
                 // Load items for this category immediately
                 if (dropdown) {
                     dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#6b7280;">Loading items...</div>';
                     dropdown.style.display = 'block';
+                    positionEditDropdown(itemSearch, dropdown);
                 }
 
                 try {
@@ -9424,6 +9467,31 @@
                     const data = await response.json();
 
                     if (data.success && data.items) {
+                        // Check if category has any items
+                        if (data.items.length === 0) {
+                            // No items in this category
+                            dropdown.innerHTML = `
+                                <div style="padding:1rem;text-align:center;">
+                                    <div style="color:#6b7280;margin-bottom:1rem;">
+                                        No items found in ${category.name}
+                                    </div>
+                                    <div style="color:#059669;font-size:0.875rem;">
+                                        💡 Try typing an item name to search, or select "Other Item" to add custom values
+                                    </div>
+                                </div>
+                                <div onclick="selectEditCustomItem(${index})" style="padding:0.75rem;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);cursor:pointer;border-top:2px solid #f59e0b;">
+                                    <div style="font-weight:600;color:#92400e;">✏️ Add Custom Item</div>
+                                    <div style="font-size:0.75rem;color:#92400e;">Enter your own description and value</div>
+                                </div>
+                            `;
+                            dropdown.style.display = 'block';
+
+                            // Clear stored items
+                            window[`editCategoryItems_${index}`] = [];
+                            window[`editItemPagination_${index}`] = null;
+                            return;
+                        }
+
                         // Sort items alphabetically with variant
                         const sortedItems = data.items.sort((a, b) => {
                             const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
