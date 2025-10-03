@@ -32,6 +32,16 @@ export async function onRequestPost({ request, env }) {
 
         // Helper function to parse dates from ItsDeductible format
         function parseItsDeductibleDate(dateStr) {
+            // Check if date string is valid
+            if (!dateStr || typeof dateStr !== 'string' || dateStr.trim() === '') {
+                // Return today's date as fallback
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
             // Format: "October 3, 2025" or "June 7, 2025"
             const months = {
                 'January': '01', 'February': '02', 'March': '03', 'April': '04',
@@ -39,16 +49,39 @@ export async function onRequestPost({ request, env }) {
                 'September': '09', 'October': '10', 'November': '11', 'December': '12'
             };
 
-            const parts = dateStr.split(' ');
-            const month = months[parts[0]];
-            const day = parts[1].replace(',', '').padStart(2, '0');
-            const year = parts[2];
+            try {
+                const parts = dateStr.split(' ');
+                if (parts.length < 3) {
+                    throw new Error('Invalid date format');
+                }
 
-            return `${year}-${month}-${day}`;
+                const month = months[parts[0]];
+                const day = parts[1].replace(',', '').padStart(2, '0');
+                const year = parts[2];
+
+                if (!month || !day || !year) {
+                    throw new Error('Invalid date components');
+                }
+
+                return `${year}-${month}-${day}`;
+            } catch (error) {
+                console.error('Error parsing ItsDeductible date:', dateStr, error);
+                // Return today's date as fallback
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
         }
 
         // Helper to find or create charity
         async function findOrCreateCharity(charityName, charityAddress) {
+            // Validate charity name
+            if (!charityName || charityName.trim() === '') {
+                throw new Error('Charity name is required');
+            }
+
             // First check if charity exists in main database
             let charityResult = await env.DB.prepare(
                 'SELECT id FROM charities WHERE LOWER(name) = LOWER(?) LIMIT 1'
@@ -82,6 +115,12 @@ export async function onRequestPost({ request, env }) {
             const groupedItems = {};
 
             for (const item of items) {
+                // Skip items without required fields
+                if (!item['Charity'] || !item['Donation Date']) {
+                    console.log('Skipping item with missing charity or date:', item);
+                    continue;
+                }
+
                 const key = `${item['Charity']}_${item['Donation Date']}`;
 
                 if (!groupedItems[key]) {
@@ -179,6 +218,12 @@ export async function onRequestPost({ request, env }) {
         if (money && money.length > 0) {
             for (const donation of money) {
                 try {
+                    // Skip donations without required fields
+                    if (!donation['Charity'] || !donation['Donation Date']) {
+                        console.log('Skipping cash donation with missing charity or date:', donation);
+                        continue;
+                    }
+
                     const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const amount = parseFloat(donation['Donation Value in $']) || 0;
@@ -209,6 +254,12 @@ export async function onRequestPost({ request, env }) {
         if (mileage && mileage.length > 0) {
             for (const donation of mileage) {
                 try {
+                    // Skip donations without required fields
+                    if (!donation['Charity'] || !donation['Donation Date']) {
+                        console.log('Skipping mileage donation with missing charity or date:', donation);
+                        continue;
+                    }
+
                     const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const milesDriven = parseFloat(donation['Miles Driven']) || 0;
@@ -240,6 +291,12 @@ export async function onRequestPost({ request, env }) {
         if (stock && stock.length > 0) {
             for (const donation of stock) {
                 try {
+                    // Skip donations without required fields
+                    if (!donation['Charity'] || !donation['Donation Date']) {
+                        console.log('Skipping stock donation with missing charity or date:', donation);
+                        continue;
+                    }
+
                     const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const costBasis = parseFloat(donation['Original Cost Adjusted Basis in $']) || 0;
