@@ -129,10 +129,14 @@ export async function onRequestPost({ request, env }) {
                         charityAddress: item['Charity Address'] || '',
                         date: item['Donation Date'],
                         items: [],
-                        // Include mapping info if present
-                        mapped_charity_id: item.mapped_charity_id,
-                        create_personal: item.create_personal
+                        // Include mapping info if present (from any item in the group)
+                        mapped_charity_id: item.mapped_charity_id || undefined,
+                        create_personal: item.create_personal || false
                     };
+                } else if (!groupedItems[key].mapped_charity_id && item.mapped_charity_id) {
+                    // If this item has mapping info and the group doesn't, add it
+                    groupedItems[key].mapped_charity_id = item.mapped_charity_id;
+                    groupedItems[key].create_personal = item.create_personal || false;
                 }
 
                 // Map ItsDeductible quality to our condition values
@@ -157,12 +161,19 @@ export async function onRequestPost({ request, env }) {
             // Create donations for each group
             for (const group of Object.values(groupedItems)) {
                 try {
+                    console.log('Processing item group for charity:', group.charity, 'mapped_id:', group.mapped_charity_id);
+
                     // Use mapped charity ID if provided, otherwise find/create
                     let charityId;
                     if (group.mapped_charity_id) {
                         charityId = group.mapped_charity_id;
+                        console.log('Using mapped charity ID:', charityId);
+                    } else if (group.create_personal) {
+                        charityId = await findOrCreateCharity(group.charity, group.charityAddress);
+                        console.log('Created personal charity:', charityId);
                     } else {
                         charityId = await findOrCreateCharity(group.charity, group.charityAddress);
+                        console.log('Found/created charity:', charityId);
                     }
                     const donationDate = parseItsDeductibleDate(group.date);
                     const totalValue = group.items.reduce((sum, item) => sum + item.totalValue, 0);

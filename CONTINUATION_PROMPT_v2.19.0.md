@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.18.1
+# Charity Tracker Qwik - Complete Continuation Prompt v2.19.0
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,11 +28,24 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.18.1 - CATEGORY BROWSING FIX
+## 🎉 Version 2.19.0 - CHARITY MATCHING FOR ITSDEDUCTIBLE
 
-### What's New (v2.18.1)
-- 🔧 **Category Browsing Fix**: API now correctly uses category_id instead of category name
-- ✅ **Item Loading**: Selecting a category without typing now properly loads items
+### What's New (v2.19.0)
+- 🔍 **Charity Matching UI**: ItsDeductible import now includes validation step with charity matching
+- 🏢 **Smart Matching**: Automatically searches for existing charities and shows top 3 matches
+- ✏️ **User Control**: Choose between matched charities or create as personal charity
+- 📝 **Data Completion**: Add missing EINs and addresses during import process
+
+### Previous Updates
+#### v2.18.6
+- 🛡️ **Error Handling**: Robust validation for missing/invalid data in imports
+- 📊 **Overall File**: Gracefully skips ItsDeductible summary file
+
+#### v2.18.1-2.18.5
+- 🔧 **Category Browsing**: Fixed API to use category_id
+- ♾️ **Infinite Scroll**: Fixed endless loop in edit form
+- 🔒 **Security Claim**: Updated to accurate statement
+- 📦 **ZIP Handling**: Clear instructions for file extraction
 
 ### Previous (v2.18.0) - ITSDEDUCTIBLE MIGRATION TOOL
 - 🚀 **ItsDeductible Migration**: Complete import tool for users switching from ItsDeductible
@@ -187,7 +200,7 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 #### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
 1. ~~**v2.17.7 Breaking Error**: FIXED in v2.17.8~~
 
-## Current Status (v2.18.1) - System at 92% Complete
+## Current Status (v2.19.0) - System at 93% Complete
 ### What's Working:
 - ✅ All donation types functioning properly
 - ✅ Item search with infinite scroll (50 items at a time)
@@ -424,7 +437,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.18.1
+- **Version**: 2.19.0
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -501,7 +514,7 @@ Donation on Aug 15 → Uses $175
 3. **Category field**: Both ID and text name for compatibility
 4. **Infinite scroll**: Loads 50 items at a time, triggers near bottom
 5. **Display format**: Always show as "Name: Variant" if variant exists
-6. **Version**: Current version 2.18.1
+6. **Version**: Current version 2.19.0
 7. **FMV updates**: Must handle items with variants in matching logic
 8. **Loading states**: Show immediately when fetching data
 9. **Dropdown size**: 400px max-height for better visibility
