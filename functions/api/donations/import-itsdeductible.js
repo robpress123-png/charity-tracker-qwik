@@ -515,10 +515,25 @@ export async function onRequestPost(context) {
                     const fairMarketValue = parseFloat(donation['Fair Market Value on Date Donated in $']) || 0;
                     const totalValue = parseFloat(donation['Donation Value in $']) || 0;
 
+                    // ItsDeductible may provide shares directly or we may need to calculate
+                    // Check for various possible column names
+                    let stockQuantity = parseFloat(donation['Number of Shares']) ||
+                                       parseFloat(donation['Shares']) ||
+                                       parseFloat(donation['Quantity']) || 0;
+
+                    // If no quantity but we have price per share, calculate it
+                    const pricePerShare = parseFloat(donation['Price per Share']) ||
+                                         parseFloat(donation['Share Price']) || 0;
+                    if (!stockQuantity && pricePerShare > 0 && totalValue > 0) {
+                        stockQuantity = totalValue / pricePerShare;
+                    }
+
                     const donationId = `don_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
                     const notes = `Stock: ${donation['Full Name of Stock']} (${donation['Stock Symbol']}), ` +
-                                 `Purchased: ${donation['Original Purchase Date']} (Imported from ItsDeductible)`;
+                                 `Purchased: ${donation['Original Purchase Date']}` +
+                                 (stockQuantity > 0 ? `, Shares: ${stockQuantity.toFixed(4)}` : '') +
+                                 ` (Imported from ItsDeductible)`;
 
                     // Determine if this is a personal charity
                     const isPersonalCharity = charityId.startsWith('charity_');
@@ -526,15 +541,15 @@ export async function onRequestPost(context) {
                     await env.DB.prepare(`
                         INSERT INTO donations (
                             id, user_id, charity_id, user_charity_id, donation_type,
-                            date, stock_symbol, fair_market_value,
+                            date, stock_symbol, stock_quantity, fair_market_value,
                             amount, notes
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `).bind(
                         donationId, userId,
                         isPersonalCharity ? null : charityId,
                         isPersonalCharity ? charityId : null,
                         'stock', donationDate,
-                        donation['Stock Symbol'], fairMarketValue,
+                        donation['Stock Symbol'], stockQuantity, fairMarketValue,
                         totalValue, notes
                     ).run();
 
