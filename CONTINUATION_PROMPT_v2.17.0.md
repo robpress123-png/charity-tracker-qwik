@@ -172,6 +172,7 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 #### 🔴 HIGH PRIORITY
 1. **Payment Integration**: Stripe not implemented ($49/year tier)
 2. **Mobile Responsiveness**: Not optimized for mobile/tablets
+3. **Delete All Items Performance**: Takes ~10 seconds (9613ms) - likely deleting one-by-one instead of batch DELETE
 
 #### 🟡 MEDIUM PRIORITY
 1. **Charity Database**: Missing major charities (Salvation Army, etc.)
