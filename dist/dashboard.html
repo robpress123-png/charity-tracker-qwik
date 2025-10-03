@@ -1421,6 +1421,16 @@
                             </div>
                         </div>
 
+                        <!-- ItsDeductible Import Tool -->
+                        <div class="tool-card" onclick="showItsDeductibleImport()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s; position: relative;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="height: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+                            <div style="position: absolute; top: 0.5rem; right: 0.5rem; background: #fbbf24; color: #92400e; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.625rem; font-weight: 600;">NEW</div>
+                            <div style="padding: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 600; color: #1e293b;">🚀 ItsDeductible Migration</h4>
+                                <p style="margin: 0; font-size: 0.875rem; color: #64748b; line-height: 1.4;">Switching from ItsDeductible? Import your exported data files directly - we'll handle the conversion automatically.</p>
+                            </div>
+                        </div>
+
                         <!-- Personal Charity Management Tool -->
                         <div class="tool-card" onclick="showPersonalCharities()" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; cursor: pointer; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
                             <div style="height: 4px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
@@ -1616,6 +1626,77 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- ItsDeductible Import Panel -->
+        <div id="itsDeductibleImportPanel" style="display:none; margin-top: 1rem; position: fixed; top: 100px; left: 0; right: 0; bottom: 0; background: white; z-index: 100; overflow: auto;">
+            <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+                <!-- Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="color: #1e293b; margin: 0;">🚀 Import from ItsDeductible</h2>
+                        <p style="color: #64748b; margin-top: 0.5rem;">Seamlessly migrate your donation history from ItsDeductible</p>
+                    </div>
+                    <button class="btn-secondary" onclick="closeItsDeductiblePanel()" style="padding: 0.5rem 1rem;">✕ Close</button>
+                </div>
+
+                <!-- Instructions -->
+                <div style="background: #f0f9ff; border: 1px solid #0284c7; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #0c4a6e; margin: 0 0 1rem 0;">📋 How to Export from ItsDeductible:</h3>
+                    <ol style="margin: 0; padding-left: 1.5rem; color: #075985;">
+                        <li style="margin-bottom: 0.5rem;">Open ItsDeductible and go to <strong>File → Export</strong></li>
+                        <li style="margin-bottom: 0.5rem;">Select <strong>"Export All Data"</strong> or individual donation types</li>
+                        <li style="margin-bottom: 0.5rem;">Save the ZIP file or individual CSV files</li>
+                        <li>Upload the files below - we'll handle the conversion automatically!</li>
+                    </ol>
+                </div>
+
+                <!-- Upload Area -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <!-- Left: File Upload -->
+                    <div>
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">Upload Files</h3>
+                        <div id="itsDeductibleDropZone" style="border: 2px dashed #10b981; border-radius: 12px; padding: 3rem; text-align: center; background: #f0fdf4; cursor: pointer;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📂</div>
+                            <p style="color: #047857; font-weight: 600; margin-bottom: 0.5rem;">Drop ItsDeductible files here</p>
+                            <p style="color: #6b7280; font-size: 0.875rem;">Accepts: ZIP file or individual CSV files</p>
+                            <input type="file" id="itsDeductibleFiles" multiple accept=".csv,.zip" style="display: none;">
+                            <button class="btn-primary" onclick="document.getElementById('itsDeductibleFiles').click()" style="margin-top: 1rem;">
+                                Choose Files
+                            </button>
+                        </div>
+
+                        <!-- File List -->
+                        <div id="itsDeductibleFileList" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <!-- Right: Import Status -->
+                    <div>
+                        <h3 style="color: #1e293b; margin-bottom: 1rem;">Import Progress</h3>
+                        <div id="itsDeductibleStatus" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; min-height: 300px;">
+                            <p style="color: #6b7280; text-align: center;">No files uploaded yet</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button id="itsDeductiblePreviewBtn" class="btn-secondary" onclick="previewItsDeductibleImport()" style="display: none;">
+                                👁️ Preview Import
+                            </button>
+                            <button id="itsDeductibleImportBtn" class="btn-primary" onclick="startItsDeductibleImport()" style="display: none;">
+                                ⬆️ Start Import
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview/Results Area -->
+                <div id="itsDeductibleResults" style="margin-top: 2rem; display: none;">
+                    <h3 style="color: #1e293b; margin-bottom: 1rem;">📊 Import Preview</h3>
+                    <div id="itsDeductibleResultsContent" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+                        <!-- Results will be displayed here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -5009,12 +5090,279 @@
         // CSV Import functionality
         let importData = [];
 
+        // ItsDeductible Import Functions
+        let itsDeductibleFiles = {};
+        let itsDeductibleData = {
+            items: [],
+            money: [],
+            mileage: [],
+            stock: []
+        };
+
+        function showItsDeductibleImport() {
+            // Navigate to tools section first
+            showSection('tools');
+            // Hide other panels
+            document.getElementById('personalCharitiesPanel').style.display = 'none';
+            document.getElementById('charityVerificationPanel').style.display = 'none';
+            document.getElementById('importDonationsPanel').style.display = 'none';
+            // Show ItsDeductible panel
+            document.getElementById('itsDeductibleImportPanel').style.display = 'block';
+
+            // Setup file handlers
+            setupItsDeductibleHandlers();
+        }
+
+        function closeItsDeductiblePanel() {
+            document.getElementById('itsDeductibleImportPanel').style.display = 'none';
+            // Reset state
+            itsDeductibleFiles = {};
+            itsDeductibleData = {
+                items: [],
+                money: [],
+                mileage: [],
+                stock: []
+            };
+            document.getElementById('itsDeductibleFileList').innerHTML = '';
+            document.getElementById('itsDeductibleStatus').innerHTML = '<p style="color: #6b7280; text-align: center;">No files uploaded yet</p>';
+            document.getElementById('itsDeductibleResults').style.display = 'none';
+            document.getElementById('itsDeductiblePreviewBtn').style.display = 'none';
+            document.getElementById('itsDeductibleImportBtn').style.display = 'none';
+        }
+
+        function setupItsDeductibleHandlers() {
+            const dropZone = document.getElementById('itsDeductibleDropZone');
+            const fileInput = document.getElementById('itsDeductibleFiles');
+
+            // Drop zone handlers
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#059669';
+                dropZone.style.background = '#d1fae5';
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#10b981';
+                dropZone.style.background = '#f0fdf4';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#10b981';
+                dropZone.style.background = '#f0fdf4';
+                handleItsDeductibleFiles(e.dataTransfer.files);
+            });
+
+            // File input handler
+            fileInput.addEventListener('change', (e) => {
+                handleItsDeductibleFiles(e.target.files);
+            });
+        }
+
+        async function handleItsDeductibleFiles(files) {
+            const fileList = document.getElementById('itsDeductibleFileList');
+            const status = document.getElementById('itsDeductibleStatus');
+
+            fileList.innerHTML = '<h4 style="margin: 0 0 0.5rem 0;">📁 Uploaded Files:</h4>';
+            status.innerHTML = '<h4>🔍 Analyzing files...</h4>';
+
+            for (const file of files) {
+                // Add to file list display
+                fileList.innerHTML += `
+                    <div style="padding: 0.5rem; background: #f0fdf4; border: 1px solid #10b981; border-radius: 4px; margin-bottom: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>📄 ${file.name}</span>
+                            <span style="color: #059669; font-size: 0.875rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                    </div>
+                `;
+
+                // Process based on file type
+                if (file.name.endsWith('.zip')) {
+                    // Handle ZIP file - would need a library like JSZip
+                    status.innerHTML += '<p style="color: #dc2626;">⚠️ ZIP file detected - please extract and upload CSV files individually for now</p>';
+                } else if (file.name.endsWith('.csv')) {
+                    await processItsDeductibleCSV(file);
+                }
+            }
+
+            // Show preview button if we have data
+            if (itsDeductibleData.items.length > 0 || itsDeductibleData.money.length > 0 ||
+                itsDeductibleData.mileage.length > 0 || itsDeductibleData.stock.length > 0) {
+                document.getElementById('itsDeductiblePreviewBtn').style.display = 'inline-block';
+                document.getElementById('itsDeductibleImportBtn').style.display = 'inline-block';
+                updateItsDeductibleStatus();
+            }
+        }
+
+        async function processItsDeductibleCSV(file) {
+            const text = await file.text();
+            const lines = text.split('\n');
+            const headers = parseCSVLine(lines[0]);
+
+            // Determine file type based on headers
+            let fileType = '';
+            if (headers.includes('Item Description')) {
+                fileType = 'items';
+            } else if (headers.includes('Payment Type')) {
+                fileType = 'money';
+            } else if (headers.includes('Miles Driven')) {
+                fileType = 'mileage';
+            } else if (headers.includes('Stock Symbol')) {
+                fileType = 'stock';
+            }
+
+            if (!fileType) {
+                console.error('Unknown file type:', file.name);
+                return;
+            }
+
+            // Parse data rows
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const values = parseCSVLine(lines[i]);
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    itsDeductibleData[fileType].push(row);
+                }
+            }
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current.trim());
+            return result;
+        }
+
+        function updateItsDeductibleStatus() {
+            const status = document.getElementById('itsDeductibleStatus');
+            let html = '<h4>📊 Files Analyzed:</h4>';
+
+            if (itsDeductibleData.items.length > 0) {
+                html += `<p>✅ <strong>Items:</strong> ${itsDeductibleData.items.length} donations found</p>`;
+            }
+            if (itsDeductibleData.money.length > 0) {
+                html += `<p>✅ <strong>Cash:</strong> ${itsDeductibleData.money.length} donations found</p>`;
+            }
+            if (itsDeductibleData.mileage.length > 0) {
+                html += `<p>✅ <strong>Mileage:</strong> ${itsDeductibleData.mileage.length} donations found</p>`;
+            }
+            if (itsDeductibleData.stock.length > 0) {
+                html += `<p>✅ <strong>Stock:</strong> ${itsDeductibleData.stock.length} donations found</p>`;
+            }
+
+            const total = itsDeductibleData.items.length + itsDeductibleData.money.length +
+                         itsDeductibleData.mileage.length + itsDeductibleData.stock.length;
+
+            html += `<div style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 8px;">
+                        <p style="font-size: 1.125rem; font-weight: 600; color: #047857;">
+                            Total: ${total} donations ready to import
+                        </p>
+                     </div>`;
+
+            status.innerHTML = html;
+        }
+
+        function previewItsDeductibleImport() {
+            const results = document.getElementById('itsDeductibleResults');
+            const content = document.getElementById('itsDeductibleResultsContent');
+
+            results.style.display = 'block';
+            let html = '';
+
+            // Preview items donations
+            if (itsDeductibleData.items.length > 0) {
+                html += '<h4>📦 Item Donations:</h4>';
+                html += '<table style="width: 100%; font-size: 0.875rem;">';
+                html += '<thead><tr style="background: #f3f4f6;"><th>Charity</th><th>Date</th><th>Item</th><th>Qty</th><th>Value</th></tr></thead>';
+                html += '<tbody>';
+                itsDeductibleData.items.slice(0, 5).forEach(item => {
+                    html += `<tr>
+                        <td>${item['Charity']}</td>
+                        <td>${item['Donation Date']}</td>
+                        <td>${item['Item Description']}</td>
+                        <td>${item['Quantity']}</td>
+                        <td>$${item['Donation Value in $']}</td>
+                    </tr>`;
+                });
+                if (itsDeductibleData.items.length > 5) {
+                    html += `<tr><td colspan="5" style="text-align: center;">...and ${itsDeductibleData.items.length - 5} more</td></tr>`;
+                }
+                html += '</tbody></table>';
+            }
+
+            // Similar previews for other types...
+            content.innerHTML = html;
+        }
+
+        async function startItsDeductibleImport() {
+            const importBtn = document.getElementById('itsDeductibleImportBtn');
+            const token = getAuthToken();
+
+            if (!token) {
+                alert('Please log in to import donations');
+                return;
+            }
+
+            importBtn.disabled = true;
+            importBtn.textContent = '⏳ Importing...';
+
+            try {
+                const response = await fetch('/api/donations/import-itsdeductible', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(itsDeductibleData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(`✅ Successfully imported ${result.imported} donations!`, 'success');
+                    setTimeout(() => {
+                        closeItsDeductiblePanel();
+                        loadDonations(); // Refresh donations list
+                    }, 2000);
+                } else {
+                    showToast('❌ Import failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                showToast('❌ Import failed: ' + error.message, 'error');
+            } finally {
+                importBtn.disabled = false;
+                importBtn.textContent = '⬆️ Start Import';
+            }
+        }
+
         function showImportDonations() {
             // Navigate to tools section first
             showSection('tools');
             // Hide other panels
             document.getElementById('personalCharitiesPanel').style.display = 'none';
             document.getElementById('charityVerificationPanel').style.display = 'none';
+            document.getElementById('itsDeductibleImportPanel').style.display = 'none';
             // Show import panel as full-screen overlay
             document.getElementById('importDonationsPanel').style.display = 'block';
         }
