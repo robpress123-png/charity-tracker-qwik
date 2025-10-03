@@ -1,0 +1,51 @@
+category_id,name,item_variant,description,value_good,value_very_good,value_excellent,source_reference,effective_date,search_keywords
+6,"Coat","Men's Winter","Heavy winter coat - updated pricing",75,95,125,"Test Update 2025","2025-01-15","coat winter mens outerwear"
+6,"Dress","Evening","Formal evening dress - price increase",35,50,75,"Market Adjustment","2025-01-10","dress formal evening womens"
+8,"Sofa","3-Seat","Living room sofa - new valuation",250,400,600,"Furniture Guide 2025","2025-01-01","sofa couch living room furniture"
+6,"Jeans","Designer","Premium denim jeans",25,40,60,"ItsDeductible Update","2025-01-20","jeans denim pants designer"
+12,"Blender","High-Speed","Kitchen blender with new pricing",30,45,65,,,
+19,"Tennis Racket","Professional","Pro-level tennis racket",45,70,100,"Sports Equipment Guide",,
+6,"Sweater","Cashmere","Luxury cashmere sweater - revalued",50,75,110,"Premium Items Update","2025-02-01","sweater cashmere luxury knit"
+10,"Television","55-inch LED","Modern flat screen TV - price drop",200,350,500,,"2025-01-15","tv television led flat screen"
+6,"Shoes","Running","Athletic running shoes",30,45,65,"Athletic Gear Update","2025-01-05","shoes running athletic sneakers"
+2,"Crib","Wooden","Baby crib with updated safety standards",100,150,225,"Baby Items 2025","2025-01-01","crib baby nursery furniture"
+6,"Belt","Leather","Genuine leather belt",12,18,28,"Accessories Update",,"belt leather accessories"
+8,"Dining Table","6-Seat","Wooden dining table",300,450,700,"Furniture Revaluation","2025-01-18","table dining furniture wood"
+4,"Books","Hardcover Set","Collection of 10 hardcover books",20,30,45,,,
+6,"Scarf","Silk","Designer silk scarf - luxury item",25,40,60,"Designer Items","2025-01-12","scarf silk designer accessories"
+20,"Drill","Cordless","Power drill with battery",40,60,85,"Tools Update 2025","2025-01-08","drill cordless power tools"
+6,"Pants","Dress","Business dress pants",20,32,48,"Professional Wear",,
+15,"Refrigerator","French Door","Large capacity refrigerator",400,650,950,"Appliance Guide 2025","2025-01-15","refrigerator fridge appliance kitchen"
+6,"Shirt","Button-Down","Cotton dress shirt",15,22,35,,"2025-01-10","shirt dress cotton business"
+21,"Board Game","Strategy","Complex strategy board game",15,25,40,"Games Valuation","2025-01-05","game board strategy toys"
+6,"Jacket","Windbreaker","Light windbreaker jacket",25,38,55,"Outerwear Update",,"jacket windbreaker light"
+12,"Coffee Maker","Espresso","Espresso machine - premium",75,120,180,"Kitchen Update","2025-01-20","coffee espresso machine kitchen"
+6,"Socks","Athletic Pack","Pack of 12 athletic socks",8,12,18,,,
+8,"Bookshelf","5-Shelf","Wooden bookshelf unit",50,80,120,"Furniture Items",,
+6,"Tie","Silk","Silk necktie collection (3)",20,30,45,"Men's Accessories","2025-01-14","tie silk necktie accessories"
+19,"Bicycle","Mountain","Mountain bike - trail ready",150,250,400,"Sporting Goods 2025","2025-01-01","bicycle bike mountain cycling"
+6,"Gloves","Winter","Insulated winter gloves",10,15,22,,,
+10,"Speakers","Bluetooth","Wireless bluetooth speakers",40,65,95,"Audio Update","2025-01-17","speakers bluetooth wireless audio"
+6,"Boots","Hiking","Waterproof hiking boots",40,60,90,"Outdoor Gear",,"boots hiking waterproof outdoor"
+12,"Microwave","Countertop","Standard microwave oven",30,50,75,"Appliance Values","2025-01-11","microwave oven kitchen appliance"
+6,"T-Shirt","Graphic Pack","Pack of 5 graphic t-shirts",15,22,35,,,
+8,"Lamp","Table","Decorative table lamp",20,32,48,"Home Decor",,
+6,"Skirt","Midi","Professional midi skirt",18,28,42,"Women's Wear Update","2025-01-09","skirt midi professional womens"
+2,"Stroller","Jogging","Three-wheel jogging stroller",80,130,200,"Baby Gear 2025","2025-01-15","stroller baby jogging"
+6,"Underwear","Pack","Pack of new underwear (6)",10,15,22,,,
+19,"Golf Clubs","Set of 7","Partial golf club set",120,200,300,"Golf Equipment","2025-01-13","golf clubs sports equipment"
+6,"Blazer","Wool","Professional wool blazer",45,70,105,"Professional Update",,
+10,"Camera","Digital SLR","Digital SLR camera body",200,350,500,"Photography Gear","2025-01-16","camera dslr digital photography"
+6,"Pajamas","Set","Complete pajama set",15,23,35,,,
+12,"Toaster","4-Slice","Four slice toaster",20,30,45,"Small Appliances",,
+6,"Vest","Fleece","Fleece vest for layering",18,27,40,"Outerwear Items","2025-01-07","vest fleece outerwear"
+8,"Desk","Computer","Home office computer desk",100,160,240,"Office Furniture 2025","2025-01-01","desk computer office furniture"
+6,"Handbag","Designer","Designer handbag - authenticated",60,95,145,"Luxury Items","2025-01-19","handbag purse designer luxury"
+21,"Puzzle","1000 Piece","Complex jigsaw puzzle",10,15,25,,,
+6,"Shorts","Athletic","Athletic shorts - moisture wicking",12,18,28,"Athletic Wear",,
+15,"Washer","Front-Load","Energy efficient washer",300,500,750,"Major Appliances 2025","2025-01-15","washer washing machine appliance"
+6,"Cardigan","Knit","Knitted cardigan sweater",22,35,52,,,
+10,"Tablet","10-inch","Android tablet device",80,130,200,"Electronics Update","2025-01-21","tablet android electronics"
+6,"Hat","Baseball Cap","Sports team baseball cap",8,12,18,,,
+12,"Vacuum","Upright","Bagless upright vacuum",50,85,125,"Cleaning Equipment","2025-01-04","vacuum cleaner upright"
+6,"Raincoat","Waterproof","Full length raincoat",30,45,68,"Weather Gear Update","2025-01-22","raincoat waterproof outerwear"
