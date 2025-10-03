@@ -5711,6 +5711,18 @@
                     }
                 });
 
+                console.log('[ItsDeductible Client] Sending data to API:', mappedData);
+                console.log('[ItsDeductible Client] Data structure:', {
+                    hasItems: !!mappedData.items,
+                    itemsLength: mappedData.items?.length,
+                    hasMoney: !!mappedData.money,
+                    moneyLength: mappedData.money?.length,
+                    hasMileage: !!mappedData.mileage,
+                    mileageLength: mappedData.mileage?.length,
+                    hasStock: !!mappedData.stock,
+                    stockLength: mappedData.stock?.length
+                });
+
                 const response = await fetch('/api/donations/import-itsdeductible', {
                     method: 'POST',
                     headers: {
@@ -5720,7 +5732,18 @@
                     body: JSON.stringify(mappedData)
                 });
 
-                const result = await response.json();
+                console.log('[ItsDeductible Client] Response status:', response.status);
+
+                let result;
+                const responseText = await response.text();
+                console.log('[ItsDeductible Client] Response text:', responseText);
+
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('[ItsDeductible Client] Failed to parse response:', parseError);
+                    throw new Error('Server returned invalid JSON: ' + responseText.substring(0, 200));
+                }
 
                 if (result.success) {
                     showToast(`✅ Successfully imported ${result.imported} donations!`, 'success');
@@ -5729,10 +5752,11 @@
                         loadDonations(); // Refresh donations list
                     }, 2000);
                 } else {
+                    console.error('[ItsDeductible Client] Import failed:', result);
                     showToast('❌ Import failed: ' + result.error, 'error');
                 }
             } catch (error) {
-                console.error('Import error:', error);
+                console.error('[ItsDeductible Client] Import error:', error);
                 showToast('❌ Import failed: ' + error.message, 'error');
             } finally {
                 importBtn.disabled = false;
