@@ -1,55 +1,42 @@
 // API endpoint for importing ItsDeductible donation data
 export async function onRequestPost(context) {
+    const { request, env } = context;
+
     try {
-        console.log('[ItsDeductible Import] Function called with:', typeof context);
+        console.log('[ItsDeductible Import] Starting import process...');
 
-        // Handle both possible calling conventions
-        let request, env;
-
-        if (context && typeof context === 'object') {
-            if (context.request && context.env) {
-                // Standard context object
-                request = context.request;
-                env = context.env;
-            } else if (context.headers && context.json) {
-                // Context IS the request object
-                request = context;
-                env = context.env || {};
-            } else {
-                console.error('[ItsDeductible Import] Unexpected context structure:', Object.keys(context));
-                throw new Error('Invalid context structure');
-            }
-        } else {
-            throw new Error('No context provided');
-        }
-
-        // Verify we have what we need
-        if (!request || !request.headers) {
-            console.error('[ItsDeductible Import] Missing request or headers');
-            throw new Error('Invalid request object');
-        }
-
-        // Verify authentication
+        // Verify authentication (same pattern as donations.js)
         const authHeader = request.headers.get('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+        let userId = null;
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            // Parse the token to get user ID
+            // Token format is "token-{userId}-{timestamp}" from login.js
+            if (token.startsWith('token-')) {
+                const parts = token.split('-');
+                if (parts.length >= 2) {
+                    userId = parts[1]; // Extract the user ID from token
+                }
+            } else if (token === 'test-token') {
+                // For test token, we need to look up the test user
+                const testUserStmt = env.DB.prepare("SELECT id FROM users WHERE email = 'test@example.com'");
+                const testUser = await testUserStmt.first();
+                if (testUser) {
+                    userId = testUser.id;
+                }
+            }
+        }
+
+        if (!userId) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: 'Unauthorized - invalid or missing token'
+            }), {
                 status: 401,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
-
-        const token = authHeader.substring(7);
-        const sessionData = await env.KV.get(`session_${token}`);
-
-        if (!sessionData) {
-            return new Response(JSON.stringify({ success: false, error: 'Invalid session' }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        const session = JSON.parse(sessionData);
-        const userId = session.userId;
 
         // Parse the import data
         let importData;
