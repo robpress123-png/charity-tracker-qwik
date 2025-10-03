@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.15.8</title>
+    <title>Admin Dashboard - Charity Tracker v2.16.0</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.8</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.16.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1719,6 +1719,8 @@
             showItemsPreview();
         }
 
+        let itemCategoryOverrides = {}; // Store category reassignments
+
         function showItemsPreview() {
             const preview = document.getElementById('itemsImportPreview');
             const table = document.getElementById('itemsPreviewTable');
@@ -1737,18 +1739,52 @@
                 '22': 'Portable A/V', '99': 'Miscellaneous'
             };
 
+            // Check for invalid categories
+            let invalidCategoryCount = 0;
+            let suspiciousCategoryCount = 0;
+            itemsImportData.forEach(item => {
+                const catId = String(item.category_id).trim();
+                if (!categoryNames[catId]) {
+                    invalidCategoryCount++;
+                }
+                // Check for suspicious assignments (e.g., Television in Clothing)
+                const name = (item.name || '').toLowerCase();
+                if (catId === '6' && (name.includes('television') || name.includes('tv') ||
+                    name.includes('drill') || name.includes('camera'))) {
+                    suspiciousCategoryCount++;
+                }
+            });
+
             // Create scrollable container with all items
             let html = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h4 style="color: #f3f4f6;">Preview: ${itemsImportData.length} items to import</h4>
                     <span style="color: #9ca3af; font-size: 0.875rem;">Scroll to review all items</span>
                 </div>
+            `;
+
+            // Show warnings if there are issues
+            if (invalidCategoryCount > 0 || suspiciousCategoryCount > 0) {
+                html += `
+                    <div style="background: #7f1d1d; border: 1px solid #ef4444; border-radius: 6px; padding: 1rem; margin-bottom: 1rem;">
+                        <div style="color: #fca5a5; font-weight: bold; margin-bottom: 0.5rem;">⚠️ Category Issues Detected</div>
+                        ${invalidCategoryCount > 0 ? `<div style="color: #fca5a5;">• ${invalidCategoryCount} items with invalid categories (will default to Miscellaneous)</div>` : ''}
+                        ${suspiciousCategoryCount > 0 ? `<div style="color: #fca5a5;">• ${suspiciousCategoryCount} items may be in wrong categories</div>` : ''}
+                        <div style="color: #fbbf24; margin-top: 0.5rem;">Review and reassign categories below as needed</div>
+                        <div style="color: #9ca3af; margin-top: 0.5rem; font-size: 0.875rem;">
+                            ℹ️ Note: Reassigning categories may cause items to match existing items in the new category
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
                 <div style="max-height: 400px; overflow-y: auto; border: 1px solid #374151; border-radius: 6px;">
                     <table class="admin-table" style="margin: 0;">
                         <thead style="position: sticky; top: 0; background: #1f2937; z-index: 10;">
                             <tr>
                                 <th style="width: 60px;">#</th>
-                                <th style="width: 120px;">Category</th>
+                                <th style="width: 180px;">Category</th>
                                 <th>Name</th>
                                 <th style="width: 80px;">Good</th>
                                 <th style="width: 80px;">Very Good</th>
@@ -1760,11 +1796,30 @@
 
             itemsImportData.forEach((item, index) => {
                 const catId = String(item.category_id).trim();
-                const categoryName = categoryNames[catId] || `Cat ${catId}`;
+                const isInvalidCategory = !categoryNames[catId];
+                const effectiveCatId = itemCategoryOverrides[index] || catId;
+                const categoryName = categoryNames[effectiveCatId] || 'Miscellaneous';
 
-                html += `<tr>
+                // Check for suspicious assignments
+                const name = (item.name || '').toLowerCase();
+                const isSuspicious = catId === '6' && (name.includes('television') || name.includes('tv') ||
+                    name.includes('drill') || name.includes('camera'));
+
+                const rowStyle = isInvalidCategory ? 'background: #7f1d1d;' : (isSuspicious ? 'background: #713f12;' : '');
+
+                html += `<tr style="${rowStyle}">
                     <td style="color: #9ca3af;">${index + 1}</td>
-                    <td>${categoryName}</td>
+                    <td>
+                        <select id="category_${index}" onchange="updateCategoryOverride(${index}, this.value)"
+                                style="background: #1f2937; color: #f3f4f6; border: 1px solid ${isInvalidCategory ? '#ef4444' : (isSuspicious ? '#f59e0b' : '#374151')};
+                                       padding: 0.25rem; border-radius: 4px; width: 100%;">
+                            ${Object.entries(categoryNames).map(([id, name]) =>
+                                `<option value="${id}" ${effectiveCatId == id ? 'selected' : ''}>${name}</option>`
+                            ).join('')}
+                        </select>
+                        ${isInvalidCategory ? '<div style="color: #ef4444; font-size: 0.75rem;">Invalid: ' + catId + '</div>' : ''}
+                        ${isSuspicious ? '<div style="color: #f59e0b; font-size: 0.75rem;">Check category</div>' : ''}
+                    </td>
                     <td>${item.name || 'Unnamed'}</td>
                     <td>$${parseFloat(item.value_good || 0).toFixed(2)}</td>
                     <td>$${parseFloat(item.value_very_good || 0).toFixed(2)}</td>
@@ -1780,6 +1835,14 @@
 
             table.innerHTML = html;
             preview.classList.add('active');
+        }
+
+        function updateCategoryOverride(index, newCategoryId) {
+            itemCategoryOverrides[index] = newCategoryId;
+            // Update the item data
+            if (itemsImportData[index]) {
+                itemsImportData[index].category_id = newCategoryId;
+            }
         }
 
         async function confirmItemsImport() {
