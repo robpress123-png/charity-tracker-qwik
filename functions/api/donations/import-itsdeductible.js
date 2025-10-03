@@ -25,7 +25,110 @@ export async function onRequestPost({ request, env }) {
 
         // Parse the import data
         const importData = await request.json();
-        const { items, money, mileage, stock } = importData;
+        console.log('Import data received - determining donation types from column headers');
+
+        // Determine donation types based on column headers
+        const categorizedDonations = {
+            items: [],
+            money: [],
+            mileage: [],
+            stock: []
+        };
+
+        // Helper function to determine donation type from column headers
+        function determineDonationType(row) {
+            const columns = Object.keys(row);
+            const columnsLower = columns.map(c => c.toLowerCase());
+
+            // Check for unique columns that identify each type
+            // Mileage: has "Miles Driven" or "IRS Rate per Mile"
+            if (columns.some(c => c.includes('Miles Driven')) ||
+                columns.some(c => c.includes('IRS Rate per Mile'))) {
+                return 'mileage';
+            }
+
+            // Stock: has "Stock Symbol" or "Original Cost Adjusted Basis" or "Full Name of Stock"
+            if (columns.some(c => c.includes('Stock Symbol')) ||
+                columns.some(c => c.includes('Original Cost Adjusted Basis')) ||
+                columns.some(c => c.includes('Full Name of Stock'))) {
+                return 'stock';
+            }
+
+            // Cash/Money: has "Payment Type" but no Item Description/Quality
+            if (columns.some(c => c.includes('Payment Type')) &&
+                !columns.some(c => c.includes('Item Description') || c.includes('Quality'))) {
+                return 'money';
+            }
+
+            // Items: has "Item Description" or "Quality" or "Quantity" (for items)
+            if (columns.some(c => c.includes('Item Description')) ||
+                columns.some(c => c.includes('Quality')) ||
+                (columns.some(c => c.includes('Quantity')) && !columns.some(c => c.includes('Stock')))) {
+                return 'items';
+            }
+
+            // Default to items if unsure
+            console.warn('Could not determine donation type from columns:', columns);
+            return 'items';
+        }
+
+        // Process each type of donation from the import
+        if (importData.items && Array.isArray(importData.items)) {
+            for (const row of importData.items) {
+                const type = determineDonationType(row);
+                categorizedDonations[type].push(row);
+            }
+        }
+        if (importData.money && Array.isArray(importData.money)) {
+            for (const row of importData.money) {
+                const type = determineDonationType(row);
+                categorizedDonations[type].push(row);
+            }
+        }
+        if (importData.mileage && Array.isArray(importData.mileage)) {
+            for (const row of importData.mileage) {
+                const type = determineDonationType(row);
+                categorizedDonations[type].push(row);
+            }
+        }
+        if (importData.stock && Array.isArray(importData.stock)) {
+            for (const row of importData.stock) {
+                const type = determineDonationType(row);
+                categorizedDonations[type].push(row);
+            }
+        }
+
+        // Also check if we got a flat array (all donations in one array)
+        if (importData.donations && Array.isArray(importData.donations)) {
+            for (const row of importData.donations) {
+                const type = determineDonationType(row);
+                categorizedDonations[type].push(row);
+            }
+        }
+
+        // Log what we determined
+        console.log('Categorized donations:', {
+            itemsCount: categorizedDonations.items.length,
+            moneyCount: categorizedDonations.money.length,
+            mileageCount: categorizedDonations.mileage.length,
+            stockCount: categorizedDonations.stock.length
+        });
+
+        // Log sample of each type to verify categorization
+        if (categorizedDonations.items.length > 0) {
+            console.log('First item columns:', Object.keys(categorizedDonations.items[0]));
+        }
+        if (categorizedDonations.money.length > 0) {
+            console.log('First money columns:', Object.keys(categorizedDonations.money[0]));
+        }
+        if (categorizedDonations.mileage.length > 0) {
+            console.log('First mileage columns:', Object.keys(categorizedDonations.mileage[0]));
+        }
+        if (categorizedDonations.stock.length > 0) {
+            console.log('First stock columns:', Object.keys(categorizedDonations.stock[0]));
+        }
+
+        const { items, money, mileage, stock } = categorizedDonations;
 
         let imported = 0;
         let errors = [];
@@ -149,11 +252,17 @@ export async function onRequestPost({ request, env }) {
                     condition = 'good';
                 }
 
+                // Handle different possible column names
+                const itemDesc = item['Item Description'] || item['Item'] || item['Description'] || '';
+                const qty = item['Quantity'] || item['Qty'] || '1';
+                const unitVal = item['Fair Market Value per Unit in $'] || item['Unit Value'] || item['FMV per Unit'] || '0';
+                const totalVal = item['Donation Value in $'] || item['Total Value'] || item['FMV'] || '0';
+
                 groupedItems[key].items.push({
-                    itemName: item['Item Description'],
-                    quantity: parseInt(item['Quantity']) || 1,
-                    unitValue: parseFloat(item['Fair Market Value per Unit in $']) || 0,
-                    totalValue: parseFloat(item['Donation Value in $']) || 0,
+                    itemName: itemDesc,
+                    quantity: parseInt(qty) || 1,
+                    unitValue: parseFloat(unitVal) || 0,
+                    totalValue: parseFloat(totalVal) || 0,
                     condition: condition
                 });
             }
@@ -378,9 +487,11 @@ export async function onRequestPost({ request, env }) {
 
     } catch (error) {
         console.error('ItsDeductible import error:', error);
+        console.error('Error stack:', error.stack);
         return new Response(JSON.stringify({
             success: false,
-            error: error.message || 'Import failed'
+            error: error.message || 'Import failed',
+            details: error.stack
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
