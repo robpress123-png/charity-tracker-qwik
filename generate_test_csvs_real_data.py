@@ -13,9 +13,10 @@ import os
 
 print("Starting test CSV generation with REAL data...")
 
-# Load REAL charities from export
+# Load REAL charities from export (or use defaults if not available)
 REAL_CHARITIES = []
-charity_file = '/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/charities_export_2025-09-25.csv'
+# Update this path to your current charity export
+charity_file = '/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/charities_export_current.csv'
 print(f"Loading charities from: {charity_file}")
 try:
     with open(charity_file, 'r', encoding='utf-8') as f:
@@ -25,24 +26,68 @@ try:
                 REAL_CHARITIES.append(row['name'])
     print(f"Loaded {len(REAL_CHARITIES)} real charities")
 except Exception as e:
-    print(f"Error loading charities: {e}")
-    exit(1)
+    print(f"Warning: Could not load charity file ({e}). Using default charities.")
+    # Use a default set of well-known charities
+    REAL_CHARITIES = [
+        "American Red Cross", "United Way", "Salvation Army", "Goodwill Industries",
+        "Habitat for Humanity", "Boys & Girls Clubs of America", "YMCA", "Make-A-Wish Foundation",
+        "St. Jude Children's Research Hospital", "Feeding America", "World Wildlife Fund",
+        "American Cancer Society", "Doctors Without Borders", "The Nature Conservancy",
+        "Planned Parenthood", "American Heart Association", "National Public Radio",
+        "Smithsonian Institution", "Wikimedia Foundation", "American Civil Liberties Union",
+        "Amnesty International", "Sierra Club", "National Wildlife Federation",
+        "ASPCA", "Humane Society", "Best Friends Animal Society", "PBS Foundation",
+        "National Geographic Society", "Special Olympics", "Wounded Warrior Project"
+    ]
+    print(f"Using {len(REAL_CHARITIES)} default charities")
+
+# Category mapping from ItsDeductible database
+CATEGORY_MAP = {
+    1: "Automotive Supplies",
+    2: "Baby Gear",
+    3: "Bedding & Linens",
+    4: "Books, Movies & Music",
+    5: "Cameras & Equipment",
+    6: "Clothing, Footwear & Accessories",
+    7: "Computers & Office",
+    8: "Furniture & Furnishings",
+    9: "Health & Beauty",
+    10: "Home Audio & Video",
+    11: "Housekeeping",
+    12: "Kitchen",
+    13: "Lawn & Patio",
+    14: "Luggage, Backpacks & Cases",
+    15: "Major Appliances",
+    16: "Musical Instruments",
+    17: "Pet Supplies",
+    18: "Phones & Communications",
+    19: "Sporting Goods",
+    20: "Tools & Hardware",
+    21: "Toys, Games & Hobbies",
+    22: "Portable Audio & Video",
+    99: "Miscellaneous"
+}
 
 # Load REAL items from database
 items_by_category = {}
-items_file = '/mnt/c/Users/RobertPressman/charity-tracker/items_database_2025-09-25 (1).csv'
+# Use the new ItsDeductible items database export
+items_file = '/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/Itsdeductible/items_database_itsdeductible.csv'
 print(f"Loading items from: {items_file}")
 try:
     with open(items_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            category = row['category']
+            # Map category_id to category name
+            category_id = int(row.get('category_id', 99)) if row.get('category_id') else 99
+            category = CATEGORY_MAP.get(category_id, 'Miscellaneous')
+
             if category not in items_by_category:
                 items_by_category[category] = []
             items_by_category[category].append({
                 'name': row['name'],
-                'low_value': float(row.get('low_value', 0)),
-                'high_value': float(row.get('high_value', 0))
+                'value_good': float(row.get('value_good', 0)),
+                'value_very_good': float(row.get('value_very_good', 0)),
+                'value_excellent': float(row.get('value_excellent', 0))
             })
     print(f"Loaded {sum(len(items) for items in items_by_category.values())} items in {len(items_by_category)} categories")
     print(f"Categories: {list(items_by_category.keys())}")
@@ -190,7 +235,10 @@ def generate_item_donation(date, charity):
         row[f'item_{i}_category'] = category
         row[f'item_{i}_name'] = item['name']
         row[f'item_{i}_quantity'] = str(random.randint(1, 3))
-        row[f'item_{i}_condition'] = random.choice(['good', 'very_good', 'excellent', 'good'])
+        # Include fair and poor conditions to test non-deductible handling
+        # Weight towards deductible conditions but include some non-deductible
+        conditions = ['good', 'good', 'very_good', 'very_good', 'excellent', 'fair', 'poor']
+        row[f'item_{i}_condition'] = random.choice(conditions)
 
     return row
 
