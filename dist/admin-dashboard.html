@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.14.1</title>
+    <title>Admin Dashboard - Charity Tracker v2.14.2</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.1</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.2</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -842,7 +842,7 @@
                 </div>
 
                 <!-- Scrollable Table Container -->
-                <div style="max-height: 600px; overflow-y: auto; border: 1px solid #374151; border-radius: 8px;">
+                <div id="userTableContainer" style="min-height: 200px; max-height: 600px; overflow-y: auto; overflow-x: visible; border: 1px solid #374151; border-radius: 8px; position: relative;">
                     <table class="admin-table" style="margin: 0;">
                         <thead style="position: sticky; top: 0; background: #1f2937; z-index: 10;">
                             <tr>
@@ -2103,10 +2103,10 @@
                                 <td>${totalDonations}</td>
                                 <td>
                                     <div class="dropdown-container" style="position: relative;">
-                                        <button onclick="toggleUserMenu('${user.id}')" style="background: #374151; color: #f3f4f6; border: none; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 1rem; line-height: 1; font-weight: bold;">
+                                        <button onclick="toggleUserMenu('${user.id}', event)" style="background: #374151; color: #f3f4f6; border: none; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 1rem; line-height: 1; font-weight: bold;">
                                             ⋯
                                         </button>
-                                        <div id="menu-${user.id}" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: #1f2937; border: 1px solid #374151; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 1000; min-width: 180px; margin-top: 0.25rem;">
+                                        <div id="menu-${user.id}" class="dropdown-menu" style="display: none; position: fixed; background: #1f2937; border: 1px solid #374151; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10000; min-width: 200px;">
                                             <button onclick="resetUserPassword('${user.id}'); closeAllMenus();" style="display: block; width: 100%; text-align: left; padding: 0.75rem 1rem; background: none; color: #f3f4f6; border: none; cursor: pointer; hover: background: #374151;">
                                                 🔑 Reset Password
                                             </button>
@@ -2148,14 +2148,61 @@
         }
 
         // User management functions
-        function toggleUserMenu(userId) {
+        function toggleUserMenu(userId, event) {
             // Close all other menus first
             closeAllMenus();
 
-            // Toggle this menu
             const menu = document.getElementById(`menu-${userId}`);
-            if (menu) {
-                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            const button = event ? event.currentTarget : document.querySelector(`[onclick*="toggleUserMenu('${userId}')"]`);
+
+            if (menu && button) {
+                if (menu.style.display === 'none') {
+                    // Use fixed positioning to avoid overflow issues
+                    const rect = button.getBoundingClientRect();
+
+                    // Calculate menu height (estimate based on number of items)
+                    const menuItemCount = 7; // Approximate number of menu items
+                    const estimatedMenuHeight = menuItemCount * 40; // ~40px per item
+
+                    // Check if menu would go off bottom of screen
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+
+                    menu.style.position = 'fixed';
+
+                    // Position horizontally (to the left of button)
+                    menu.style.left = `${Math.max(10, rect.left - 120)}px`;
+
+                    // Position vertically - above button if not enough space below
+                    if (spaceBelow < estimatedMenuHeight && spaceAbove > estimatedMenuHeight) {
+                        // Open upward
+                        menu.style.bottom = `${window.innerHeight - rect.top + 5}px`;
+                        menu.style.top = 'auto';
+                    } else {
+                        // Open downward (default)
+                        menu.style.top = `${rect.bottom + 5}px`;
+                        menu.style.bottom = 'auto';
+                    }
+
+                    menu.style.display = 'block';
+
+                    // After display, check actual position and adjust if needed
+                    setTimeout(() => {
+                        const menuRect = menu.getBoundingClientRect();
+
+                        // Adjust if menu goes off right edge
+                        if (menuRect.right > window.innerWidth - 10) {
+                            menu.style.left = `${window.innerWidth - menuRect.width - 10}px`;
+                        }
+
+                        // Adjust if menu goes off left edge
+                        if (menuRect.left < 10) {
+                            menu.style.left = '10px';
+                        }
+                    }, 0);
+                } else {
+                    menu.style.display = 'none';
+                }
             }
         }
 
