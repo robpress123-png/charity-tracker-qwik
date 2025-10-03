@@ -173,7 +173,9 @@ export async function onRequestPost(context) {
         }
 
         // Process items in batches to avoid too many bindings
-        const BATCH_SIZE = 50; // Process 50 items at a time
+        // SQLite limit is ~999 variables, with 14 fields per item = ~70 items max
+        // Using 20 to be safe: 20 items × 14 fields = 280 variables
+        const BATCH_SIZE = 20; // Process 20 items at a time to stay under SQLite limits
 
         for (let i = 0; i < itemsToProcess.length; i += BATCH_SIZE) {
             const batch = itemsToProcess.slice(i, Math.min(i + BATCH_SIZE, itemsToProcess.length));
