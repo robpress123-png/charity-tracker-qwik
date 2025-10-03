@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.15.1</title>
+    <title>Admin Dashboard - Charity Tracker v2.15.2</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.1</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.2</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -790,11 +790,17 @@
                 </div>
 
                 <div id="itemsImportPreview" class="import-panel">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview</h3>
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Preview Import Data</h3>
                     <div id="itemsPreviewTable"></div>
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem; align-items: center;">
                         <button class="tool-btn" onclick="confirmItemsImport()">Import Items</button>
                         <button class="tool-btn secondary" onclick="cancelItemsImport()">Cancel</button>
+                        <div id="importProgress" style="display: none; flex: 1; margin-left: 1rem;">
+                            <div style="background: #374151; border-radius: 4px; height: 8px; overflow: hidden;">
+                                <div id="importProgressBar" style="background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                            <span id="importProgressText" style="color: #9ca3af; font-size: 0.875rem; margin-left: 0.5rem;">0%</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1717,7 +1723,8 @@
             const preview = document.getElementById('itemsImportPreview');
             const table = document.getElementById('itemsPreviewTable');
 
-            let html = '<table class="admin-table"><thead><tr><th>Category</th><th>Name</th><th>Good</th><th>Very Good</th><th>Excellent</th></tr></thead><tbody>';
+            // Debug: Check first few items
+            console.log('First 3 items parsed:', itemsImportData.slice(0, 3));
 
             const categoryNames = {
                 '1': 'Automotive', '2': 'Baby Gear', '3': 'Bedding',
@@ -1730,21 +1737,47 @@
                 '22': 'Portable A/V', '99': 'Miscellaneous'
             };
 
-            itemsImportData.slice(0, 10).forEach(item => {
+            // Create scrollable container with all items
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4 style="color: #f3f4f6;">Preview: ${itemsImportData.length} items to import</h4>
+                    <span style="color: #9ca3af; font-size: 0.875rem;">Scroll to review all items</span>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid #374151; border-radius: 6px;">
+                    <table class="admin-table" style="margin: 0;">
+                        <thead style="position: sticky; top: 0; background: #1f2937; z-index: 10;">
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th style="width: 120px;">Category</th>
+                                <th>Name</th>
+                                <th style="width: 80px;">Good</th>
+                                <th style="width: 80px;">Very Good</th>
+                                <th style="width: 80px;">Excellent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            itemsImportData.forEach((item, index) => {
+                const catId = String(item.category_id).trim();
+                const categoryName = categoryNames[catId] || `Cat ${catId}`;
+
                 html += `<tr>
-                    <td>${categoryNames[item.category_id] || item.category_id}</td>
-                    <td>${item.name}</td>
+                    <td style="color: #9ca3af;">${index + 1}</td>
+                    <td>${categoryName}</td>
+                    <td>${item.name || 'Unnamed'}</td>
                     <td>$${parseFloat(item.value_good || 0).toFixed(2)}</td>
                     <td>$${parseFloat(item.value_very_good || 0).toFixed(2)}</td>
                     <td>$${parseFloat(item.value_excellent || 0).toFixed(2)}</td>
                 </tr>`;
             });
 
-            if (itemsImportData.length > 10) {
-                html += `<tr><td colspan="5" style="text-align: center; color: #9ca3af;">... and ${itemsImportData.length - 10} more items</td></tr>`;
-            }
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
 
-            html += '</tbody></table>';
             table.innerHTML = html;
             preview.classList.add('active');
         }
@@ -1757,6 +1790,16 @@
             const resultsContent = document.getElementById('itemsResultsContent');
 
             resultsContent.innerHTML = '<p style="color: #f59e0b;">Processing import with smart matching...</p>';
+
+            // Show progress bar
+            const progressDiv = document.getElementById('importProgress');
+            const progressBar = document.getElementById('importProgressBar');
+            const progressText = document.getElementById('importProgressText');
+            if (progressDiv) {
+                progressDiv.style.display = 'flex';
+                progressBar.style.width = '10%';
+                progressText.textContent = 'Uploading...';
+            }
             resultsDiv.classList.add('active');
 
             try {
@@ -1790,7 +1833,18 @@
                     })
                 });
 
+                // Update progress
+                if (progressBar) {
+                    progressBar.style.width = '75%';
+                    progressText.textContent = 'Processing...';
+                }
+
                 const data = await response.json();
+
+                // Hide progress on completion
+                if (progressDiv) {
+                    progressDiv.style.display = 'none';
+                }
 
                 if (data.success) {
                     // Check if there are items needing review
