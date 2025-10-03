@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.15.2</title>
+    <title>Admin Dashboard - Charity Tracker v2.15.3</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.2</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.3</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -744,8 +744,8 @@
                 </div>
 
                 <!-- Import Settings -->
-                <div style="background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Settings</h3>
+                <div style="background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 2px solid #3b82f6;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">📋 Import Settings (Configure These First)</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                         <div>
                             <label style="display: block; color: #9ca3af; margin-bottom: 0.5rem;">Source Reference</label>
@@ -762,8 +762,8 @@
                     <div style="margin-top: 1rem;">
                         <label style="display: block; color: #9ca3af; margin-bottom: 0.5rem;">Duplicate Handling</label>
                         <select id="duplicateHandling" style="width: 100%; padding: 0.5rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px;">
-                            <option value="review">Review matches (recommended)</option>
-                            <option value="replace">Replace existing items</option>
+                            <option value="replace" selected>Replace existing items (for initial import)</option>
+                            <option value="review">Review close matches only (90%+ similarity)</option>
                             <option value="keep_both">Keep both (versioning)</option>
                             <option value="skip">Skip duplicates</option>
                         </select>

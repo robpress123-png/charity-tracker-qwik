@@ -248,13 +248,21 @@ export async function onRequestPost(context) {
                             break;
                     }
                 } else if (potentialMatches.length > 0 && duplicateHandling === 'review') {
-                    // Store for review
-                    results.potentialMatches.push({
-                        row: i,
-                        item: item,
-                        matches: potentialMatches,
-                        type: 'fuzzy'
-                    });
+                    // Only flag for review if there's a VERY close match (90%+)
+                    const hasCloseMatch = potentialMatches.some(m => m.similarity >= 90);
+                    if (hasCloseMatch) {
+                        // Store for review
+                        results.potentialMatches.push({
+                            row: i,
+                            item: item,
+                            matches: potentialMatches.filter(m => m.similarity >= 90),
+                            type: 'fuzzy'
+                        });
+                    } else {
+                        // No close match, just insert as new
+                        await insertNewItem(env.DB, item, itemSource, itemDate);
+                        results.added++;
+                    }
                 } else {
                     // Insert new item
                     await insertNewItem(env.DB, item, itemSource, itemDate);
