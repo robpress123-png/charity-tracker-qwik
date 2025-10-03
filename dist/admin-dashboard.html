@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.14.2</title>
+    <title>Admin Dashboard - Charity Tracker v2.15.0</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.2</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -522,7 +522,7 @@
                         👥 Manage Users
                     </button>
                     <button class="sidebar-item" onclick="showSection('donations-management')">
-                        💰 View All Donations
+                        💰 Manage User Donations
                     </button>
                     <button class="sidebar-item" onclick="showSection('donations-backup')">
                         💾 Donation Backup/Restore
@@ -739,8 +739,47 @@
                     <p>Bulk import donation items from CSV file</p>
                 </div>
 
-                <div class="alert alert-warning">
-                    ⚠️ <strong>Important:</strong> CSV must contain: category_id, name, value_good, value_very_good, value_excellent
+                <div class="alert alert-info" style="background: #1e40af; border-color: #3b82f6; color: #dbeafe;">
+                    💡 <strong>Enhanced Import:</strong> Automatically detects duplicates and similar items for review
+                </div>
+
+                <!-- Import Settings -->
+                <div style="background: #1f2937; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 1rem;">Import Settings</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <label style="display: block; color: #9ca3af; margin-bottom: 0.5rem;">Source Reference</label>
+                            <input type="text" id="itemsSource" value="Valuation Guide 2024"
+                                   style="width: 100%; padding: 0.5rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px;"
+                                   placeholder="e.g., ItsDeductible 2024, Goodwill 2025">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #9ca3af; margin-bottom: 0.5rem;">Effective Date</label>
+                            <input type="date" id="itemsEffectiveDate" value="2024-01-01"
+                                   style="width: 100%; padding: 0.5rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <label style="display: block; color: #9ca3af; margin-bottom: 0.5rem;">Duplicate Handling</label>
+                        <select id="duplicateHandling" style="width: 100%; padding: 0.5rem; background: #374151; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 6px;">
+                            <option value="review">Review matches (recommended)</option>
+                            <option value="replace">Replace existing items</option>
+                            <option value="keep_both">Keep both (versioning)</option>
+                            <option value="skip">Skip duplicates</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #e5e7eb;">
+                            <input type="checkbox" id="overrideCsvSettings" checked>
+                            <span>Override CSV source/date with above settings (if CSV contains these fields)</span>
+                        </label>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #374151;">
+                        <button onclick="downloadItemsTemplate()" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            📥 Download Donation Items Template
+                        </button>
+                        <span style="margin-left: 1rem; color: #9ca3af; font-size: 0.875rem;">Get a template with all supported fields</span>
+                    </div>
                 </div>
 
                 <div id="itemsCsvDropZone" class="drop-zone">
@@ -748,13 +787,6 @@
                     <h3 style="color: #f3f4f6; margin-bottom: 0.5rem;">Drop CSV File Here</h3>
                     <p style="color: #9ca3af;">or click to browse files</p>
                     <input type="file" id="itemsCsvFileInput" accept=".csv" style="display: none;" onchange="handleItemsCsvSelect(event)">
-                </div>
-
-                <div style="margin-top: 1rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #e5e7eb;">
-                        <input type="checkbox" id="updateExistingItems">
-                        <span>Update existing items (if unchecked, duplicates will be skipped)</span>
-                    </label>
                 </div>
 
                 <div id="itemsImportPreview" class="import-panel">
@@ -1581,7 +1613,10 @@
                 section.classList.add('active');
 
                 // Load data specific to this section if needed
-                if (sectionName === 'users') {
+                if (sectionName === 'dashboard') {
+                    // Refresh all dashboard stats
+                    loadDashboardStats();
+                } else if (sectionName === 'users') {
                     loadUsers();
                 } else if (sectionName === 'charity-management') {
                     // Update charity count when showing charity management
@@ -1610,6 +1645,22 @@
         // Items Import Functions
         let itemsImportData = [];
         let charitiesImportData = [];
+
+        // Download CSV template for items
+        function downloadItemsTemplate() {
+            const template = `id,category_id,name,item_variant,description,value_good,value_very_good,value_excellent,source_reference,effective_date,search_keywords,original_description,category
+1,6,"Sample Shirt","Men's","Button-down shirt in good condition",8.00,12.00,15.00,"Valuation Guide 2024","2024-01-01","clothing shirt button down mens","Men's Button-Down Shirt","Clothing, Footwear & Accessories"
+2,6,"Sample Jeans","Women's","Denim jeans in very good condition",12.00,18.00,25.00,"Valuation Guide 2024","2024-01-01","clothing jeans denim womens pants","Women's Denim Jeans","Clothing, Footwear & Accessories"
+3,8,"Sample Chair","Office","Ergonomic office chair",45.00,65.00,85.00,"Valuation Guide 2024","2024-01-01","furniture chair office ergonomic desk","Office Chair - Ergonomic","Furniture & Furnishings"`;
+
+            const blob = new Blob([template], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `donation_items_import_template_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
 
         function handleItemsCsvSelect(event) {
             const file = event.target.files[0];
@@ -1695,49 +1746,76 @@
         }
 
         async function confirmItemsImport() {
-            const updateExisting = document.getElementById('updateExistingItems').checked;
+            const source = document.getElementById('itemsSource').value || 'Manual Import';
+            const effectiveDate = document.getElementById('itemsEffectiveDate').value || new Date().toISOString().split('T')[0];
+            const duplicateHandling = document.getElementById('duplicateHandling').value || 'review';
             const resultsDiv = document.getElementById('itemsImportResults');
             const resultsContent = document.getElementById('itemsResultsContent');
 
-            resultsContent.innerHTML = '<p style="color: #f59e0b;">Importing items...</p>';
+            resultsContent.innerHTML = '<p style="color: #f59e0b;">Processing import with smart matching...</p>';
             resultsDiv.classList.add('active');
 
             try {
-                const response = await fetch('/api/items/import', {
+                // Check if CSV contains source/date and if we should override
+                const overrideSettings = document.getElementById('overrideCsvSettings').checked;
+
+                // Create CSV string properly handling quoted values
+                const csvString = [Object.keys(itemsImportData[0]).join(',')]
+                    .concat(itemsImportData.map(row => {
+                        return Object.keys(itemsImportData[0]).map(k => {
+                            const value = row[k];
+                            // Quote values that contain commas, quotes, or newlines
+                            if (value && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                                return `"${value.replace(/"/g, '""')}"`;
+                            }
+                            return value || '';
+                        }).join(',');
+                    })).join('\n');
+
+                // Use enhanced import endpoint
+                const response = await fetch('/api/items/import-enhanced', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        csvData: [Object.keys(itemsImportData[0]).join(',')]
-                            .concat(itemsImportData.map(row =>
-                                Object.keys(itemsImportData[0]).map(k => row[k]).join(',')
-                            )).join('\n'),
-                        updateExisting: updateExisting
+                        csvData: csvString,
+                        source: overrideSettings ? source : null,  // null means use CSV value
+                        effectiveDate: overrideSettings ? effectiveDate : null,
+                        duplicateHandling: duplicateHandling,
+                        matchThreshold: 85,
+                        overrideSettings: overrideSettings
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    resultsContent.innerHTML = `
-                        <div class="alert alert-success">
-                            ✅ <strong>Import Successful!</strong>
-                        </div>
-                        <p>Processed: ${data.results.processed} items</p>
-                        <p>Added: ${data.results.added} new items</p>
-                        <p>Updated: ${data.results.updated} existing items</p>
-                        <p>Failed: ${data.results.failed} items</p>
-                        ${data.results.errors && data.results.errors.length > 0 ? `
-                            <div style="margin-top: 1rem; color: #ef4444;">
-                                <strong>Errors:</strong>
-                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                                    ${data.results.errors.map(e => `<li>${e}</li>`).join('')}
-                                </ul>
+                    // Check if there are items needing review
+                    if (data.needsReview && data.results.potentialMatches.length > 0) {
+                        displayMatchReview(data.results.potentialMatches, source, effectiveDate);
+                    } else {
+                        resultsContent.innerHTML = `
+                            <div class="alert alert-success">
+                                ✅ <strong>Import Successful!</strong>
                             </div>
-                        ` : ''}
-                    `;
+                            <p>📊 Processed: ${data.results.processed} items</p>
+                            <p>✅ Added: ${data.results.added} new items</p>
+                            <p>📝 Updated: ${data.results.updated} existing items</p>
+                            <p>⏭️ Skipped: ${data.results.skipped} items</p>
+                            <p>🔍 Review needed: ${data.results.potentialMatches?.length || 0} items</p>
+                            ${data.results.errors && data.results.errors.length > 0 ? `
+                                <div style="margin-top: 1rem; color: #ef4444;">
+                                    <strong>Errors:</strong>
+                                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                        ${data.results.errors.map(e => `<li>${e}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        `;
+                    }
 
                     // Reload stats to show updated counts
                     await loadAdminStats();
+                    loadItemsCount();
                 } else {
                     resultsContent.innerHTML = `
                         <div class="alert alert-warning">
@@ -1756,6 +1834,62 @@
             }
 
             document.getElementById('itemsImportPreview').classList.remove('active');
+        }
+
+        // Display match review for potential duplicates
+        function displayMatchReview(matches, source, effectiveDate) {
+            const resultsContent = document.getElementById('itemsResultsContent');
+
+            let html = `
+                <div class="alert alert-info" style="background: #1e40af; border-color: #3b82f6; color: #dbeafe;">
+                    🔍 <strong>Review Required:</strong> Found ${matches.length} potential duplicate(s)
+                </div>
+                <div id="matchReviewContainer" style="max-height: 400px; overflow-y: auto; margin: 1rem 0;">
+            `;
+
+            matches.forEach((match, index) => {
+                const isExact = match.type === 'exact';
+                html += `
+                    <div style="background: #374151; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <h4 style="color: #f3f4f6; margin-bottom: 0.5rem;">
+                            ${isExact ? '✅ Exact Match' : '🔄 Similar Item'} (Row ${match.row})
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <h5 style="color: #9ca3af;">New Item:</h5>
+                                <p style="color: #e5e7eb;">Name: ${match.item.name}</p>
+                                <p style="color: #e5e7eb;">Values: $${match.item.value_good} / $${match.item.value_very_good} / $${match.item.value_excellent}</p>
+                            </div>
+                            <div>
+                                <h5 style="color: #9ca3af;">Existing Item:</h5>
+                                ${isExact ? `
+                                    <p style="color: #e5e7eb;">Name: ${match.match.name}</p>
+                                    <p style="color: #e5e7eb;">Values: $${match.match.value_good} / $${match.match.value_very_good} / $${match.match.value_excellent}</p>
+                                ` : match.matches.map(m => `
+                                    <p style="color: #e5e7eb;">${m.name} (${m.similarity}% match)</p>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div style="margin-top: 0.5rem;">
+                            <select id="matchAction_${index}" style="padding: 0.5rem; background: #1f2937; color: #f3f4f6; border: 1px solid #4b5563; border-radius: 4px;">
+                                <option value="replace">Replace existing</option>
+                                <option value="keep_both">Keep both versions</option>
+                                <option value="skip" selected>Skip this item</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button onclick="applyMatchDecisions()" class="tool-btn">Apply Decisions</button>
+                    <button onclick="skipAllMatches()" class="tool-btn secondary">Skip All</button>
+                </div>
+            `;
+
+            resultsContent.innerHTML = html;
         }
 
         function cancelItemsImport() {
