@@ -169,6 +169,12 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 
 ### Known Issues
 
+#### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
+1. **v2.17.7 Breaking Error**: "Identifier 'item' has already been declared" at dashboard:6403
+   - Prevents Add Donation button from working
+   - Causes "showSection is not defined" errors
+   - CARDINAL RULE BROKEN: Don't break working features
+
 #### 🔴 HIGH PRIORITY
 1. **Payment Integration**: Stripe not implemented ($49/year tier)
 2. **Mobile Responsiveness**: Not optimized for mobile/tablets
