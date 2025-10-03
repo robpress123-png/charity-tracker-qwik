@@ -1,6 +1,7 @@
 // API endpoint for importing ItsDeductible donation data
 export async function onRequestPost({ request, env }) {
     try {
+        console.log('[ItsDeductible Import] Starting import process...');
         // Verify authentication
         const authHeader = request.headers.get('Authorization');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -24,8 +25,22 @@ export async function onRequestPost({ request, env }) {
         const userId = session.userId;
 
         // Parse the import data
-        const importData = await request.json();
-        console.log('Import data received - determining donation types from column headers');
+        let importData;
+        try {
+            importData = await request.json();
+            console.log('[ItsDeductible Import] Successfully parsed JSON data');
+            console.log('[ItsDeductible Import] Data structure:', {
+                hasItems: !!importData.items,
+                hasMoney: !!importData.money,
+                hasMileage: !!importData.mileage,
+                hasStock: !!importData.stock,
+                hasDonations: !!importData.donations,
+                keys: Object.keys(importData)
+            });
+        } catch (parseError) {
+            console.error('[ItsDeductible Import] Failed to parse JSON:', parseError);
+            throw new Error('Invalid JSON data: ' + parseError.message);
+        }
 
         // Determine donation types based on column headers
         const categorizedDonations = {
@@ -37,7 +52,13 @@ export async function onRequestPost({ request, env }) {
 
         // Helper function to determine donation type from column headers
         function determineDonationType(row) {
+            if (!row || typeof row !== 'object') {
+                console.error('[ItsDeductible Import] Invalid row:', row);
+                return 'items';
+            }
+
             const columns = Object.keys(row);
+            console.log('[ItsDeductible Import] Analyzing columns:', columns);
             const columnsLower = columns.map(c => c.toLowerCase());
 
             // Check for unique columns that identify each type
@@ -73,37 +94,47 @@ export async function onRequestPost({ request, env }) {
         }
 
         // Process each type of donation from the import
-        if (importData.items && Array.isArray(importData.items)) {
-            for (const row of importData.items) {
-                const type = determineDonationType(row);
-                categorizedDonations[type].push(row);
+        try {
+            if (importData.items && Array.isArray(importData.items)) {
+                console.log(`[ItsDeductible Import] Processing ${importData.items.length} items`);
+                for (const row of importData.items) {
+                    const type = determineDonationType(row);
+                    categorizedDonations[type].push(row);
+                }
             }
-        }
-        if (importData.money && Array.isArray(importData.money)) {
-            for (const row of importData.money) {
-                const type = determineDonationType(row);
-                categorizedDonations[type].push(row);
+            if (importData.money && Array.isArray(importData.money)) {
+                console.log(`[ItsDeductible Import] Processing ${importData.money.length} money donations`);
+                for (const row of importData.money) {
+                    const type = determineDonationType(row);
+                    categorizedDonations[type].push(row);
+                }
             }
-        }
-        if (importData.mileage && Array.isArray(importData.mileage)) {
-            for (const row of importData.mileage) {
-                const type = determineDonationType(row);
-                categorizedDonations[type].push(row);
+            if (importData.mileage && Array.isArray(importData.mileage)) {
+                console.log(`[ItsDeductible Import] Processing ${importData.mileage.length} mileage donations`);
+                for (const row of importData.mileage) {
+                    const type = determineDonationType(row);
+                    categorizedDonations[type].push(row);
+                }
             }
-        }
-        if (importData.stock && Array.isArray(importData.stock)) {
-            for (const row of importData.stock) {
-                const type = determineDonationType(row);
-                categorizedDonations[type].push(row);
+            if (importData.stock && Array.isArray(importData.stock)) {
+                console.log(`[ItsDeductible Import] Processing ${importData.stock.length} stock donations`);
+                for (const row of importData.stock) {
+                    const type = determineDonationType(row);
+                    categorizedDonations[type].push(row);
+                }
             }
-        }
 
-        // Also check if we got a flat array (all donations in one array)
-        if (importData.donations && Array.isArray(importData.donations)) {
-            for (const row of importData.donations) {
-                const type = determineDonationType(row);
-                categorizedDonations[type].push(row);
+            // Also check if we got a flat array (all donations in one array)
+            if (importData.donations && Array.isArray(importData.donations)) {
+                console.log(`[ItsDeductible Import] Processing ${importData.donations.length} donations (flat array)`);
+                for (const row of importData.donations) {
+                    const type = determineDonationType(row);
+                    categorizedDonations[type].push(row);
+                }
             }
+        } catch (categorizationError) {
+            console.error('[ItsDeductible Import] Error categorizing donations:', categorizationError);
+            throw new Error('Failed to categorize donations: ' + categorizationError.message);
         }
 
         // Log what we determined
@@ -214,13 +245,14 @@ export async function onRequestPost({ request, env }) {
 
         // Process ITEM donations
         if (items && items.length > 0) {
+            console.log(`[ItsDeductible Import] Processing ${items.length} categorized items`);
             // Group items by charity and date to create consolidated item donations
             const groupedItems = {};
 
             for (const item of items) {
                 // Skip items without required fields
                 if (!item['Charity'] || !item['Donation Date']) {
-                    console.log('Skipping item with missing charity or date:', item);
+                    console.log('[ItsDeductible Import] Skipping item with missing charity or date:', item);
                     continue;
                 }
 
@@ -486,12 +518,19 @@ export async function onRequestPost({ request, env }) {
         });
 
     } catch (error) {
-        console.error('ItsDeductible import error:', error);
-        console.error('Error stack:', error.stack);
+        console.error('[ItsDeductible Import] CRITICAL ERROR:', error);
+        console.error('[ItsDeductible Import] Error stack:', error.stack);
+        console.error('[ItsDeductible Import] Error details:', {
+            message: error.message,
+            name: error.name,
+            cause: error.cause
+        });
+
         return new Response(JSON.stringify({
             success: false,
             error: error.message || 'Import failed',
-            details: error.stack
+            details: error.stack,
+            type: error.name
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
