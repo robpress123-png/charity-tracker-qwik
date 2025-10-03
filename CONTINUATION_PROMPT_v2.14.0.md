@@ -38,6 +38,26 @@
 
 ### Migration Process for ItsDeductible Database
 
+#### Key Migration Files Location
+```bash
+# Base directory for all migration files
+cd /home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/Itsdeductible/
+
+# Main files:
+csvfmv_guide.csv                    # Original ItsDeductible CSV (1,757 items)
+transform_itsdeductible.py          # Python script to transform CSV to SQL
+items_database_itsdeductible.csv   # Transformed CSV output
+items_database_itsdeductible.sql   # SQL INSERT statements (ready to run)
+migration_schema_update.sql         # Database schema changes
+add_columns_only.sql               # Alternative: just add columns to existing table
+
+# API endpoint for delete all:
+../functions/api/items/delete-all.js  # Delete all items endpoint
+
+# Admin UI with delete button:
+../dist/admin-dashboard.html        # Line 1039-1051: Delete All Items section
+```
+
 #### Step 1: Prepare Database
 1. Go to Admin Dashboard → Items Database → Manage Items
 2. Click "Delete All Items" (red section)
@@ -47,7 +67,7 @@
 #### Step 2: Update Database Schema
 Run in Cloudflare D1 Console:
 ```sql
--- From migration_schema_update.sql
+-- From /home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/Itsdeductible/migration_schema_update.sql
 DROP TABLE IF EXISTS items;
 CREATE TABLE items (
     id INTEGER PRIMARY KEY,
@@ -76,8 +96,12 @@ CREATE INDEX idx_items_search_keywords ON items(search_keywords);
 ```
 
 #### Step 3: Import ItsDeductible Data
-1. Run the transformation script (if needed): `python3 transform_itsdeductible.py`
-2. Import via D1 Console: Copy/paste from `items_database_itsdeductible.sql`
+1. Run the transformation script (if needed):
+   ```bash
+   cd /home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/Itsdeductible
+   python3 transform_itsdeductible.py
+   ```
+2. Import via D1 Console: Copy/paste from `/home/robpressman/workspace/Charity-Tracker-Qwik-Design/charity-tracker-qwik/Itsdeductible/items_database_itsdeductible.sql`
 3. Update backward compatibility fields:
 ```sql
 UPDATE items SET
