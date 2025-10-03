@@ -6364,26 +6364,38 @@
                             );
                             const data = await response.json();
 
-                            if (data.success && data.items && data.items.length > 0) {
-                                // Sort new items
-                                const newItems = data.items.sort((a, b) => {
-                                    const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
-                                    const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
-                                    return aName.localeCompare(bName);
-                                });
+                            if (data.success && data.items) {
+                                // Check if we actually got items
+                                if (data.items.length > 0) {
+                                    // Sort new items
+                                    const newItems = data.items.sort((a, b) => {
+                                        const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                                        const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                                        return aName.localeCompare(bName);
+                                    });
 
-                                // Append to current items
-                                currentItems = [...currentItems, ...newItems];
-                                window.itemPagination.allItems = [...currentItems];
-                                window.itemPagination.offset += newItems.length;
-                                window.itemPagination.hasMore = newItems.length >= 50;
+                                    // Append to current items
+                                    currentItems = [...currentItems, ...newItems];
+                                    window.itemPagination.allItems = [...currentItems];
+                                    window.itemPagination.offset += newItems.length;
 
-                                // Re-render dropdown
+                                    // Only continue if we got a full batch (50 items)
+                                    window.itemPagination.hasMore = newItems.length >= 50;
+                                } else {
+                                    // No more items to load
+                                    window.itemPagination.hasMore = false;
+                                    console.log(`No more items for category ${window.itemPagination.categoryId}. Total loaded: ${currentItems.length}`);
+                                }
+
+                                // Re-render dropdown to update indicator
                                 showItemDropdown();
 
-                                // Restore scroll position
-                                dropdown.scrollTop = dropdown.scrollHeight - 300;
+                                // Restore scroll position only if we added items
+                                if (data.items.length > 0) {
+                                    dropdown.scrollTop = dropdown.scrollHeight - 300;
+                                }
                             } else {
+                                // API error or no items field
                                 window.itemPagination.hasMore = false;
                                 showItemDropdown();
                             }

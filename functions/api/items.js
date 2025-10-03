@@ -113,8 +113,12 @@ export async function onRequestGet(context) {
       // Query the donation_items table that has the 497 IRS-based valuations
       // This is the original table with INTEGER PRIMARY KEY
       try {
+        // Get pagination parameters
+        const limit = parseInt(url.searchParams.get('limit')) || 50;
+        const offset = parseInt(url.searchParams.get('offset')) || 0;
+
         // Log for debugging
-        console.log('Fetching items for category_id:', categoryId);
+        console.log(`Fetching items for category_id: ${categoryId}, limit: ${limit}, offset: ${offset}`);
 
         // Query the items table which contains our 497 test items with valuations
         // The table uses category as TEXT, not category_id
@@ -155,10 +159,11 @@ export async function onRequestGet(context) {
           FROM items
           WHERE category_id = ?
           ORDER BY name
+          LIMIT ? OFFSET ?
         `);
-        const result = await stmt.bind(catId).all();
+        const result = await stmt.bind(catId, limit, offset).all();
 
-        console.log('Items found:', result.results?.length || 0);
+        console.log(`Items found: ${result.results?.length || 0} (offset: ${offset})`);
 
         return new Response(JSON.stringify({
           success: true,
