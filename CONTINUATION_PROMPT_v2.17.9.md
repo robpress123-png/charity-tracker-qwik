@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.17.0
+# Charity Tracker Qwik - Complete Continuation Prompt v2.17.9
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,21 +28,23 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.17.0 - TEMPORAL VERSIONING & BATCH IMPORT
+## 🎉 Version 2.17.9 - IMPROVED ITEM DONATION UX
 
-### What's New (v2.17.0)
+### What's New (v2.17.9)
+- 🔄 **Infinite Scroll**: Item dropdowns load 50 items at a time as you scroll
+- 📊 **Loading States**: Shows "Loading items..." immediately for better UX
+- 🎯 **Name:Variant Display**: Items show as "Bowling Shoes: Youth" on single line
+- 🔍 **Category Browsing**: Select category to browse items without typing
+- 📈 **Larger Dropdowns**: Increased from 200px to 400px for better visibility
+- ✅ **Edit Form Fix**: Condition changes now properly update FMV values
+- 🎨 **Consistent UI**: Applied all improvements to both Add and Edit forms
+
+### Previous Version (v2.17.0) - Temporal Versioning
 - 🔄 **Temporal Versioning**: Items can have multiple versions with different effective dates
 - 📅 **Date-Based Search**: New `/api/items/search-by-date` endpoint for accurate historical values
 - 🎯 **Smart Import Matching**: Same source+date = update, different = new version
 - 📦 **Batch Import Fix**: Single-item inserts avoid SQLite variable limits
-- 🔍 **Category Validation**: Preview shows invalid/suspicious categories first
-- 📊 **Progress Bar**: Visual progress during chunked imports
 - ✅ **1,757 ItsDeductible Items**: Successfully imported with batch system
-
-### Temporal Versioning Logic
-- **Correction**: Same item + same source + same date = UPDATE existing record
-- **New Version**: Same item + different source OR date = INSERT new version
-- **Audit Trail**: All versions preserved for IRS compliance
 
 ## 🎉 Version 2.14.0 - ITSDEDUCTIBLE DATABASE MIGRATION
 
@@ -172,23 +174,26 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 #### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
 1. ~~**v2.17.7 Breaking Error**: FIXED in v2.17.8~~
 
-## Current Status (v2.17.8) - System at 7% capacity
+## Current Status (v2.17.9) - System Stable
 ### What's Working:
-- Add Donation button works again (emergency fix applied)
-- Basic item search functionality
-- Category selection
-- Item database with 1,757 items loaded
+- ✅ All donation types functioning properly
+- ✅ Item search with infinite scroll (50 items at a time)
+- ✅ Category browsing without typing
+- ✅ Edit form condition changes update FMV correctly
+- ✅ Item database with 1,757 ItsDeductible items
+- ✅ Name:Variant display on single lines
 
-### Issues Being Worked On:
-1. **Item Donation Search**: When searching items without selecting category first:
-   - Category doesn't auto-fill when item selected (partially fixed)
-   - Some items not found (e.g., "women's dress") - increased limit to 200
-   - Need to ensure category-item relationship maintained
+### Recently Fixed Issues:
+- ✅ FIXED: JavaScript syntax errors breaking dashboard
+- ✅ FIXED: Condition changes not updating values in edit mode
+- ✅ FIXED: Small dropdown size (now 400px)
+- ✅ FIXED: Overwhelming item lists (infinite scroll added)
+- ✅ FIXED: Category auto-fill when item selected
 
-### Confusion Points Clarified:
-- **Donation TYPE**: Cash, Items, Miles, Stock, Crypto (main categories)
-- **Item TYPE/Category**: Within Item donations only (Clothing, Electronics, etc.)
-- The `addItemToList()` function is ONLY for item donations, not the main Add Donation flow
+### Known Limitations:
+- **Performance**: Large categories (300+ items) may load slowly
+- **Search**: Requires 2+ characters to trigger search
+- **Mobile**: Not yet optimized for mobile devices
 
 #### 🔴 HIGH PRIORITY
 1. **Payment Integration**: Stripe not implemented ($49/year tier)
@@ -405,7 +410,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.17.0
+- **Version**: 2.17.9
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -441,16 +446,16 @@ git push  # Auto-deploys to Cloudflare
 # Workers & Pages → D1 → charity-tracker-qwik-db
 ```
 
-## Testing Checklist for v2.17.0
-- [ ] Enhanced import UI shows source/date fields
-- [ ] CSV template downloads properly
-- [ ] Smart matching detects duplicates correctly
-- [ ] Match review UI displays for conflicts
-- [ ] Bulk user delete with checkboxes works
-- [ ] Dashboard auto-refreshes when switching sections
-- [ ] Dropdown menus don't get cut off
-- [ ] Import processes 1,757 items successfully
-- [ ] Effective date filtering works in donations
+## Testing Checklist for v2.17.9
+- [x] Item dropdowns show with infinite scroll
+- [x] Category selection loads first 50 items
+- [x] Scrolling near bottom loads more items
+- [x] Loading states display properly
+- [x] Items show as "Name: Variant" format
+- [x] Edit form condition changes update FMV
+- [x] Dropdown height is 400px
+- [x] Both Add and Edit forms have improvements
+- [x] No JavaScript errors on dashboard load
 
 ## Business Model
 - **Free Tier**: 3 donations limit
@@ -477,16 +482,16 @@ Donation on Aug 15 → Uses $175
 ```
 
 ## Critical Gotchas
-1. **Items table**: Now supports hierarchical structure
+1. **Items table**: Supports hierarchical structure with variants
 2. **Double values**: `low_value`/`high_value` for legacy, `value_good`/`value_excellent` for new
 3. **Category field**: Both ID and text name for compatibility
-4. **Search keywords**: New field for better search
-5. **Admin delete**: Requires typing "DELETE ALL" exactly
-6. **Version**: Current version 2.17.0
-7. **Smart matching**: 90% threshold for review prompts (reduced from 85%)
-8. **Category mapping**: Fixed - 1=Automotive, 6=Clothing (not 1=Women's)
-7. **Import endpoint**: Use `/api/items/import-enhanced` not `/api/items/import`
-8. **Condition values**: Fair=$0 (not deductible), Good/Very Good/Excellent have values
+4. **Infinite scroll**: Loads 50 items at a time, triggers near bottom
+5. **Display format**: Always show as "Name: Variant" if variant exists
+6. **Version**: Current version 2.17.9
+7. **FMV updates**: Must handle items with variants in matching logic
+8. **Loading states**: Show immediately when fetching data
+9. **Dropdown size**: 400px max-height for better visibility
+10. **Condition values**: Fair=$0 (not deductible), Good/Very Good/Excellent have values
 
 ## Import Strategy
 1. **Initial Import**: Use "Replace existing" for clean migration
