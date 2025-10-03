@@ -1645,13 +1645,21 @@
 
                 <!-- Instructions -->
                 <div style="background: #f0f9ff; border: 1px solid #0284c7; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="color: #0c4a6e; margin: 0 0 1rem 0;">📋 How to Export from ItsDeductible:</h3>
+                    <h3 style="color: #0c4a6e; margin: 0 0 1rem 0;">📋 Step-by-Step Instructions:</h3>
                     <ol style="margin: 0; padding-left: 1.5rem; color: #075985;">
-                        <li style="margin-bottom: 0.5rem;">Open ItsDeductible and go to <strong>File → Export</strong></li>
-                        <li style="margin-bottom: 0.5rem;">Select <strong>"Export All Data"</strong> or individual donation types</li>
-                        <li style="margin-bottom: 0.5rem;">Save the ZIP file or individual CSV files</li>
-                        <li>Upload the files below - we'll handle the conversion automatically!</li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Export from ItsDeductible:</strong>
+                            <ul style="margin-top: 0.25rem; list-style: disc;">
+                                <li>Open ItsDeductible desktop app</li>
+                                <li>Go to <strong>Reports → Tax Reports</strong></li>
+                                <li>Click <strong>"Export to CSV"</strong> for each donation type</li>
+                                <li>Save all CSV files (Items, Cash, Mileage, Stock)</li>
+                            </ul>
+                        </li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Upload Files:</strong> Drag & drop or click to select your CSV files below</li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Review & Match:</strong> We'll match your charities to our database</li>
+                        <li><strong>Import:</strong> Confirm matches and import all donations at once</li>
                     </ol>
+                    <p style="margin-top: 1rem; color: #dc2626; font-weight: 500;">⚠️ Note: Extract ZIP files first - upload individual CSV files only</p>
                 </div>
 
                 <!-- Upload Area -->
@@ -1676,27 +1684,18 @@
                     <!-- Right: Import Status -->
                     <div>
                         <h3 style="color: #1e293b; margin-bottom: 1rem;">Import Progress</h3>
-                        <div id="itsDeductibleStatus" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; min-height: 300px;">
+                        <div id="itsDeductibleStatus" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; min-height: 200px;">
                             <p style="color: #6b7280; text-align: center;">No files uploaded yet</p>
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                        <!-- Action Buttons (moved here for initial preview) -->
+                        <div id="itsDeductibleInitialButtons" style="margin-top: 1rem; display: flex; gap: 1rem; justify-content: flex-end;">
                             <button id="itsDeductiblePreviewBtn" class="btn-secondary" onclick="previewItsDeductibleImport()" style="display: none;">
                                 👁️ Preview Import
                             </button>
                             <button id="itsDeductibleValidateBtn" class="btn-primary" onclick="validateItsDeductibleImport()" style="display: none;">
                                 🔍 Validate Charities
                             </button>
-                            <button id="itsDeductibleImportBtn" class="btn-primary" onclick="startItsDeductibleImport()" style="display: none; background: #10b981;">
-                                ✅ Confirm & Import
-                            </button>
-                        </div>
-
-                        <!-- Charity Matching Section (hidden by default) -->
-                        <div id="itsDeductibleCharityMatching" style="display: none; margin-top: 2rem; border: 2px solid #3b82f6; border-radius: 12px; padding: 1.5rem; background: #eff6ff;">
-                            <h3 style="color: #1e40af; margin: 0 0 1rem 0;">🔍 Confirm Charity Matches</h3>
-                            <div id="itsDeductibleCharityMatchTable"></div>
                         </div>
                     </div>
                 </div>
@@ -1704,8 +1703,27 @@
                 <!-- Preview/Results Area -->
                 <div id="itsDeductibleResults" style="margin-top: 2rem; display: none;">
                     <h3 style="color: #1e293b; margin-bottom: 1rem;">📊 Import Preview</h3>
-                    <div id="itsDeductibleResultsContent" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; max-height: 400px; overflow-y: auto;">
+                    <div id="itsDeductibleResultsContent" style="background: #f9fafb; border-radius: 8px; padding: 1.5rem; max-height: 300px; overflow-y: auto;">
                         <!-- Results will be displayed here -->
+                    </div>
+                </div>
+
+                <!-- Charity Matching Section (moved to bottom) -->
+                <div id="itsDeductibleCharityMatching" style="display: none; margin-top: 2rem;">
+                    <div style="border: 2px solid #3b82f6; border-radius: 12px; padding: 1.5rem; background: #eff6ff;">
+                        <h3 style="color: #1e40af; margin: 0 0 1rem 0;">🔍 Confirm Charity Matches</h3>
+                        <p style="color: #1d4ed8; margin-bottom: 1rem;">Please review and confirm how each charity should be imported:</p>
+                        <div id="itsDeductibleCharityMatchTable" style="max-height: 400px; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem;">
+                            <!-- Charity matches will be displayed here -->
+                        </div>
+
+                        <!-- Final Import Button (at the bottom after review) -->
+                        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #93bbfc; padding-top: 1.5rem;">
+                            <p style="color: #1d4ed8; font-weight: 500;">✓ Review complete? Ready to import your donations!</p>
+                            <button id="itsDeductibleImportBtn" class="btn-primary" onclick="startItsDeductibleImport()" style="background: #10b981; padding: 0.75rem 2rem; font-size: 1.1rem;">
+                                ⬆️ Start Import
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
