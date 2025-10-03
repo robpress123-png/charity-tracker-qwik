@@ -1,11 +1,23 @@
 // API endpoint for importing ItsDeductible donation data
 export async function onRequestPost(context) {
-    const { request, env } = context;
-
     try {
         console.log('[ItsDeductible Import] Starting import process...');
-        console.log('[ItsDeductible Import] Request object:', !!request);
-        console.log('[ItsDeductible Import] Headers object:', !!request?.headers);
+        console.log('[ItsDeductible Import] Context:', !!context);
+        console.log('[ItsDeductible Import] Context keys:', context ? Object.keys(context) : 'no context');
+
+        if (!context) {
+            throw new Error('No context provided to function');
+        }
+
+        const { request, env } = context;
+
+        if (!request) {
+            throw new Error('No request object in context');
+        }
+
+        if (!request.headers) {
+            throw new Error('No headers object in request');
+        }
 
         // Verify authentication
         const authHeader = request.headers.get('Authorization');
