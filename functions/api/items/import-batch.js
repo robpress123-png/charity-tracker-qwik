@@ -160,13 +160,15 @@ export async function onRequestPost(context) {
         if (duplicateHandling !== 'keep_both') {
             const existing = await env.DB.prepare(`
                 SELECT id, name, category_id, item_variant,
-                       value_good, value_very_good, value_excellent
+                       value_good, value_very_good, value_excellent,
+                       source_reference, effective_date
                 FROM items
             `).all();
 
             if (existing.results) {
                 for (const item of existing.results) {
-                    const key = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}`;
+                    // Include source and date in the key for precise matching
+                    const key = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}|${item.source_reference || ''}|${item.effective_date || ''}`;
                     existingItems[key] = item;
                 }
             }
@@ -186,23 +188,25 @@ export async function onRequestPost(context) {
 
             for (const item of batch) {
                 try {
-                    const key = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}`;
-                    const exists = existingItems[key];
+                    // First check for exact match (same item, source, and date = potential correction)
+                    const exactKey = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}|${source}|${effectiveDate}`;
+                    const exactMatch = existingItems[exactKey];
 
                     results.processed++;
 
-                    if (exists) {
+                    if (exactMatch) {
+                        // Same source and date - this is a correction/update scenario
                         if (duplicateHandling === 'replace') {
                             // Check if values actually changed
                             const valuesChanged =
-                                parseFloat(exists.value_good || 0) !== parseFloat(item.value_good || 0) ||
-                                parseFloat(exists.value_very_good || 0) !== parseFloat(item.value_very_good || 0) ||
-                                parseFloat(exists.value_excellent || 0) !== parseFloat(item.value_excellent || 0);
+                                parseFloat(exactMatch.value_good || 0) !== parseFloat(item.value_good || 0) ||
+                                parseFloat(exactMatch.value_very_good || 0) !== parseFloat(item.value_very_good || 0) ||
+                                parseFloat(exactMatch.value_excellent || 0) !== parseFloat(item.value_excellent || 0);
 
                             if (valuesChanged) {
-                                // Prepare update only if values changed
+                                // Update with corrected values
                                 updateStatements.push({
-                                    id: exists.id,
+                                    id: exactMatch.id,
                                     item: item
                                 });
                                 results.updated++;
@@ -213,9 +217,24 @@ export async function onRequestPost(context) {
                             results.skipped++;
                         }
                     } else {
-                        // Prepare insert
+                        // No exact match - this is either a new item or new version
+                        // Check if this item exists with different source/date
+                        let isDifferentVersion = false;
+                        for (const [key, existing] of Object.entries(existingItems)) {
+                            if (existing.name === item.name &&
+                                existing.category_id == item.category_id &&
+                                existing.item_variant === (item.item_variant || null)) {
+                                isDifferentVersion = true;
+                                break;
+                            }
+                        }
+
+                        // Always insert as new (either new item or new version)
                         insertValues.push(item);
                         results.added++;
+
+                        // Note: Could track "new versions" separately if desired
+                        // if (isDifferentVersion) results.newVersions++;
                     }
                 } catch (itemError) {
                     results.failed++;
