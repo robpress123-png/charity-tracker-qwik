@@ -72,7 +72,9 @@ export async function onRequestPost(context) {
             processed: 0,
             added: 0,
             updated: 0,
+            unchanged: 0,
             skipped: 0,
+            failed: 0,
             errors: [],
             chunk: chunk || 1,
             totalChunks: totalChunks || 1,
@@ -157,7 +159,8 @@ export async function onRequestPost(context) {
         const existingItems = {};
         if (duplicateHandling !== 'keep_both') {
             const existing = await env.DB.prepare(`
-                SELECT id, name, category_id, item_variant
+                SELECT id, name, category_id, item_variant,
+                       value_good, value_very_good, value_excellent
                 FROM items
             `).all();
 
@@ -180,26 +183,41 @@ export async function onRequestPost(context) {
             const updateStatements = [];
 
             for (const item of batch) {
-                const key = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}`;
-                const exists = existingItems[key];
+                try {
+                    const key = `${item.name}|${item.category_id || ''}|${item.item_variant || ''}`;
+                    const exists = existingItems[key];
 
-                results.processed++;
+                    results.processed++;
 
-                if (exists) {
-                    if (duplicateHandling === 'replace') {
-                        // Prepare update
-                        updateStatements.push({
-                            id: exists.id,
-                            item: item
-                        });
-                        results.updated++;
-                    } else if (duplicateHandling === 'skip') {
-                        results.skipped++;
+                    if (exists) {
+                        if (duplicateHandling === 'replace') {
+                            // Check if values actually changed
+                            const valuesChanged =
+                                parseFloat(exists.value_good || 0) !== parseFloat(item.value_good || 0) ||
+                                parseFloat(exists.value_very_good || 0) !== parseFloat(item.value_very_good || 0) ||
+                                parseFloat(exists.value_excellent || 0) !== parseFloat(item.value_excellent || 0);
+
+                            if (valuesChanged) {
+                                // Prepare update only if values changed
+                                updateStatements.push({
+                                    id: exists.id,
+                                    item: item
+                                });
+                                results.updated++;
+                            } else {
+                                results.unchanged++;
+                            }
+                        } else if (duplicateHandling === 'skip') {
+                            results.skipped++;
+                        }
+                    } else {
+                        // Prepare insert
+                        insertValues.push(item);
+                        results.added++;
                     }
-                } else {
-                    // Prepare insert
-                    insertValues.push(item);
-                    results.added++;
+                } catch (itemError) {
+                    results.failed++;
+                    results.errors.push(`Item ${item.name}: ${itemError.message}`);
                 }
             }
 
@@ -241,7 +259,10 @@ export async function onRequestPost(context) {
                     `).bind(...insertBindings).run();
                 } catch (error) {
                     console.error('Batch insert error:', error);
-                    results.errors.push(`Batch insert failed: ${error.message}`);
+                    console.error('Failed items:', insertValues.map(i => i.name));
+                    results.errors.push(`Batch insert failed (${insertValues.length} items): ${error.message}`);
+                    // Track failed items
+                    results.failed += insertValues.length;
                     // Revert counts
                     results.added -= insertValues.length;
                 }
@@ -279,6 +300,7 @@ export async function onRequestPost(context) {
                     ).run();
                 } catch (error) {
                     results.errors.push(`Update failed for ${update.item.name}: ${error.message}`);
+                    results.failed++;
                     results.updated--;
                 }
             }

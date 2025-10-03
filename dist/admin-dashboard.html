@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.15.4</title>
+    <title>Admin Dashboard - Charity Tracker v2.15.5</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.4</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.15.5</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1821,7 +1821,9 @@
                     processed: 0,
                     added: 0,
                     updated: 0,
+                    unchanged: 0,
                     skipped: 0,
+                    failed: 0,
                     errors: []
                 };
 
@@ -1880,7 +1882,9 @@
                         aggregateResults.processed += data.results.processed;
                         aggregateResults.added += data.results.added;
                         aggregateResults.updated += data.results.updated;
+                        aggregateResults.unchanged += data.results.unchanged || 0;
                         aggregateResults.skipped += data.results.skipped;
+                        aggregateResults.failed += data.results.failed || 0;
                         if (data.results.errors && data.results.errors.length > 0) {
                             aggregateResults.errors.push(...data.results.errors);
                         }
@@ -1909,9 +1913,14 @@
                     </div>
                     <p>📊 <strong>Total Processed:</strong> ${aggregateResults.processed} items</p>
                     <p>✅ <strong>Added:</strong> ${aggregateResults.added} new items</p>
-                    <p>📝 <strong>Updated:</strong> ${aggregateResults.updated} existing items</p>
+                    <p>📝 <strong>Updated:</strong> ${aggregateResults.updated} existing items (values changed)</p>
+                    <p>✔️ <strong>Unchanged:</strong> ${aggregateResults.unchanged} items (already correct)</p>
                     <p>⏭️ <strong>Skipped:</strong> ${aggregateResults.skipped} items</p>
+                    ${aggregateResults.failed > 0 ? `<p>❌ <strong>Failed:</strong> ${aggregateResults.failed} items</p>` : ''}
                     <p>📦 <strong>Chunks processed:</strong> ${totalChunks}</p>
+                    <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #374151; color: #9ca3af;">
+                        <strong>Verification:</strong> ${aggregateResults.added + aggregateResults.updated + aggregateResults.unchanged + aggregateResults.skipped + aggregateResults.failed} = ${aggregateResults.processed} ✓
+                    </p>
                     ${aggregateResults.errors && aggregateResults.errors.length > 0 ? `
                         <div style="margin-top: 1rem; padding: 1rem; background: #7f1d1d; border-radius: 6px;">
                             <strong style="color: #ef4444;">Errors (${aggregateResults.errors.length}):</strong>
