@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.15.3
+# Charity Tracker Qwik - Complete Continuation Prompt v2.17.0
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -27,6 +27,22 @@
    - Read the entire file first
    - Understand the current implementation
    - Check for dependencies and side effects
+
+## 🎉 Version 2.17.0 - TEMPORAL VERSIONING & BATCH IMPORT
+
+### What's New (v2.17.0)
+- 🔄 **Temporal Versioning**: Items can have multiple versions with different effective dates
+- 📅 **Date-Based Search**: New `/api/items/search-by-date` endpoint for accurate historical values
+- 🎯 **Smart Import Matching**: Same source+date = update, different = new version
+- 📦 **Batch Import Fix**: Single-item inserts avoid SQLite variable limits
+- 🔍 **Category Validation**: Preview shows invalid/suspicious categories first
+- 📊 **Progress Bar**: Visual progress during chunked imports
+- ✅ **1,757 ItsDeductible Items**: Successfully imported with batch system
+
+### Temporal Versioning Logic
+- **Correction**: Same item + same source + same date = UPDATE existing record
+- **New Version**: Same item + different source OR date = INSERT new version
+- **Audit Trail**: All versions preserved for IRS compliance
 
 ## 🎉 Version 2.14.0 - ITSDEDUCTIBLE DATABASE MIGRATION
 
@@ -299,6 +315,13 @@ CREATE TABLE user_tax_settings (
 
 ## API Endpoints (VERIFIED)
 
+### Date-Based Item Search (NEW v2.17.0)
+```javascript
+// Get items effective on specific date
+GET /api/items/search-by-date?q=television&date=2025-01-15
+// Returns most recent version effective on that date
+```
+
 ### Core Endpoints
 ```javascript
 // Authentication - ALWAYS use Bearer prefix
@@ -357,7 +380,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.15.3
+- **Version**: 2.17.0
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -393,7 +416,7 @@ git push  # Auto-deploys to Cloudflare
 # Workers & Pages → D1 → charity-tracker-qwik-db
 ```
 
-## Testing Checklist for v2.15.0
+## Testing Checklist for v2.17.0
 - [ ] Enhanced import UI shows source/date fields
 - [ ] CSV template downloads properly
 - [ ] Smart matching detects duplicates correctly
@@ -410,13 +433,31 @@ git push  # Auto-deploys to Cloudflare
 - **Market**: ItsDeductible shutting down Oct 2025
 - **Advantages**: Free tier, crypto support, real-time tax calc
 
+## Import Matching Logic (v2.17.0)
+
+### Temporal Versioning Rules:
+1. **Same item + same source + same date** = UPDATE (correction)
+2. **Same item + different source OR date** = INSERT (new version)
+3. **Multiple versions** can exist with different effective dates
+4. **Donations use** the version effective on donation date
+
+### Example:
+```
+Jan 1: Import "TV, ItsDeductible 2025, 2025-01-01, $200"
+Jul 1: Import "TV, Mid-Year Update, 2025-07-01, $180"
+Jul 2: Import "TV, Mid-Year Update, 2025-07-01, $175" (updates Jul 1)
+
+Donation on Mar 15 → Uses $200
+Donation on Aug 15 → Uses $175
+```
+
 ## Critical Gotchas
 1. **Items table**: Now supports hierarchical structure
 2. **Double values**: `low_value`/`high_value` for legacy, `value_good`/`value_excellent` for new
 3. **Category field**: Both ID and text name for compatibility
 4. **Search keywords**: New field for better search
 5. **Admin delete**: Requires typing "DELETE ALL" exactly
-6. **Version**: Current version 2.15.3
+6. **Version**: Current version 2.17.0
 7. **Smart matching**: 90% threshold for review prompts (reduced from 85%)
 8. **Category mapping**: Fixed - 1=Automotive, 6=Clothing (not 1=Women's)
 7. **Import endpoint**: Use `/api/items/import-enhanced` not `/api/items/import`
