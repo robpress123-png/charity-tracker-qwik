@@ -48,7 +48,7 @@ export async function onRequestGet(context) {
       params.push(parseInt(categoryId));
     }
 
-    query += ' ORDER BY i.name LIMIT 50';
+    query += ' ORDER BY i.name LIMIT 200';
 
     // Execute the search
     const stmt = env.DB.prepare(query);

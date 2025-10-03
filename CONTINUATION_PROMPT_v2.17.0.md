@@ -173,12 +173,9 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 1. **Payment Integration**: Stripe not implemented ($49/year tier)
 2. **Mobile Responsiveness**: Not optimized for mobile/tablets
 3. **Delete All Items Performance**: Takes ~10 seconds (9613ms) - likely deleting one-by-one instead of batch DELETE
-4. **Security Claims**: Homepage says "bank level security" - MUST BE CHANGED. More honest alternatives:
-   - "Industry-standard encryption"
-   - "Secure cloud storage with encryption"
-   - "Your data is encrypted and protected"
-   - "SSL/TLS encryption for all data transfers"
-   - "Cloudflare-powered security"
+4. **Security Claims**: Homepage says "bank level security" - MUST BE CHANGED to:
+   **"Your data is encrypted and secure, 24/7"**
+   (This is accurate - D1 uses AES-256 encryption at rest and TLS in transit)
 
 #### 🟡 MEDIUM PRIORITY
 1. **Charity Database**: Missing major charities (Salvation Army, etc.)
