@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.13.4</title>
+    <title>Admin Dashboard - Charity Tracker v2.14.0</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.13.4</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.0</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -1025,7 +1025,7 @@
                         </button>
                     </div>
 
-                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px;">
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
                         <h4 style="color: #9ca3af; margin-bottom: 1rem;">Export Items Database</h4>
                         <p style="color: #6b7280; margin-bottom: 1rem;">
                             Download the current items pricing database as CSV
@@ -1034,6 +1034,20 @@
                             📥 Export Items CSV
                         </button>
                         <span id="exportItemsStatus" style="margin-left: 1rem; color: #10b981;"></span>
+                    </div>
+
+                    <div style="background: #1f2937; padding: 1.5rem; border-radius: 12px; border: 2px solid #dc2626;">
+                        <h4 style="color: #ef4444; margin-bottom: 1rem;">⚠️ Delete All Items</h4>
+                        <p style="color: #f87171; margin-bottom: 1rem;">
+                            <strong>DANGER:</strong> This will permanently delete ALL items from the pricing database. This action cannot be undone!
+                        </p>
+                        <p style="color: #6b7280; margin-bottom: 1rem;">
+                            Use this before importing a new items database (e.g., ItsDeductible data).
+                        </p>
+                        <button class="tool-btn" style="background: #dc2626; border-color: #dc2626;" onclick="deleteAllItems()">
+                            🗑️ Delete All Items
+                        </button>
+                        <span id="deleteItemsStatus" style="margin-left: 1rem; color: #10b981;"></span>
                     </div>
                 </div>
 
@@ -2943,6 +2957,72 @@
         // Edit item placeholder
         function editItem(itemId) {
             alert('Edit item feature coming soon. Item ID: ' + itemId);
+        }
+
+        // Delete all items from database
+        async function deleteAllItems() {
+            // Show confirmation dialog
+            const confirmMsg = `⚠️ WARNING: Delete ALL Items ⚠️\n\n` +
+                              `This will permanently delete ALL items from the pricing database.\n\n` +
+                              `This action CANNOT be undone!\n\n` +
+                              `Type "DELETE ALL" to confirm:`;
+
+            const userInput = prompt(confirmMsg);
+
+            if (userInput !== 'DELETE ALL') {
+                if (userInput) {
+                    alert('Confirmation text did not match. Deletion cancelled.');
+                }
+                return;
+            }
+
+            // Double confirmation
+            if (!confirm('Are you ABSOLUTELY SURE you want to delete ALL items?\n\nLast chance to cancel!')) {
+                return;
+            }
+
+            const statusEl = document.getElementById('deleteItemsStatus');
+            statusEl.style.color = '#f59e0b';
+            statusEl.textContent = 'Deleting all items...';
+
+            try {
+                const response = await fetch('/api/items/delete-all', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    statusEl.style.color = '#10b981';
+                    statusEl.textContent = `✅ ${data.message}`;
+
+                    // Update the items count
+                    const countEl = document.getElementById('itemsCount');
+                    if (countEl) {
+                        countEl.textContent = '0 items in pricing database';
+                    }
+
+                    // Clear any search results
+                    const resultsEl = document.getElementById('itemSearchResults');
+                    if (resultsEl) {
+                        resultsEl.innerHTML = '';
+                    }
+
+                    alert(`✅ Successfully deleted ${data.deletedCount} items.\n\nYou can now import a new items database.`);
+                } else {
+                    statusEl.style.color = '#ef4444';
+                    statusEl.textContent = '❌ Delete failed: ' + data.error;
+                    alert('❌ Failed to delete items: ' + data.error);
+                }
+            } catch (error) {
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = '❌ Delete error';
+                console.error('Delete error:', error);
+                alert('❌ Error deleting items: ' + error.message);
+            }
         }
 
         // Load items count
