@@ -1,7 +1,12 @@
 // API endpoint for importing ItsDeductible donation data
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost(context) {
+    const { request, env } = context;
+
     try {
         console.log('[ItsDeductible Import] Starting import process...');
+        console.log('[ItsDeductible Import] Request object:', !!request);
+        console.log('[ItsDeductible Import] Headers object:', !!request?.headers);
+
         // Verify authentication
         const authHeader = request.headers.get('Authorization');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
