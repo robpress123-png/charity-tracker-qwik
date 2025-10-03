@@ -5984,6 +5984,71 @@
             }
         }
 
+        // Setup infinite scroll for item dropdown
+        function setupInfiniteScroll() {
+            const dropdown = document.getElementById('itemDropdown');
+            if (!dropdown) return;
+
+            // Remove any existing listener
+            dropdown.onscroll = null;
+
+            // Add scroll listener
+            dropdown.onscroll = async function() {
+                // Check if scrolled near bottom (within 100px)
+                if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 100) {
+                    // Check if we can load more
+                    if (window.itemPagination &&
+                        window.itemPagination.hasMore &&
+                        !window.itemPagination.loading) {
+
+                        window.itemPagination.loading = true;
+
+                        // Show loading indicator
+                        const indicator = document.getElementById('loadMoreIndicator');
+                        if (indicator) {
+                            indicator.innerHTML = '<div style="font-size:0.75rem;color:#6b7280;">Loading more items...</div>';
+                        }
+
+                        try {
+                            // Load next batch
+                            const response = await fetch(
+                                `/api/items?category_id=${window.itemPagination.categoryId}&limit=50&offset=${window.itemPagination.offset}`
+                            );
+                            const data = await response.json();
+
+                            if (data.success && data.items && data.items.length > 0) {
+                                // Sort new items
+                                const newItems = data.items.sort((a, b) => {
+                                    const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                                    const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                                    return aName.localeCompare(bName);
+                                });
+
+                                // Append to current items
+                                currentItems = [...currentItems, ...newItems];
+                                window.itemPagination.allItems = [...currentItems];
+                                window.itemPagination.offset += newItems.length;
+                                window.itemPagination.hasMore = newItems.length >= 50;
+
+                                // Re-render dropdown
+                                showItemDropdown();
+
+                                // Restore scroll position
+                                dropdown.scrollTop = dropdown.scrollHeight - 300;
+                            } else {
+                                window.itemPagination.hasMore = false;
+                                showItemDropdown();
+                            }
+                        } catch (error) {
+                            console.error('Error loading more items:', error);
+                        } finally {
+                            window.itemPagination.loading = false;
+                        }
+                    }
+                }
+            };
+        }
+
         // Handle category selection change
         async function categoryChanged() {
             const categoryId = document.getElementById('itemCategory').value;
@@ -5993,11 +6058,16 @@
             if (categoryId) {
                 console.log(`Category ${categoryId} selected`);
 
-                // If no search text, load a sample of items in this category
+                // If no search text, load first batch of items in this category
                 if (!searchValue || searchValue.trim() === '') {
+                    // Show loading state immediately
+                    const dropdown = document.getElementById('itemDropdown');
+                    dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#6b7280;">Loading items...</div>';
+                    dropdown.style.display = 'block';
+
                     try {
-                        // Load limited set for browsing - user can type to see more
-                        const response = await fetch(`/api/items?category_id=${categoryId}&limit=50`);
+                        // Load first batch for browsing
+                        const response = await fetch(`/api/items?category_id=${categoryId}&limit=50&offset=0`);
                         const data = await response.json();
 
                         if (data.success && data.items) {
@@ -6008,15 +6078,19 @@
                                 const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
                                 return aName.localeCompare(bName);
                             });
-                            console.log(`Loaded ${currentItems.length} popular items for category`);
+                            console.log(`Loaded first ${currentItems.length} items for category`);
 
-                            // Check if there might be more items
-                            if (currentItems.length >= 50) {
-                                // Add a special indicator that there are more items
-                                currentItems.moreAvailable = true;
-                            }
+                            // Store pagination info for infinite scroll
+                            window.itemPagination = {
+                                categoryId: categoryId,
+                                offset: 50,
+                                hasMore: currentItems.length >= 50,
+                                loading: false,
+                                allItems: [...currentItems]  // Store all loaded items
+                            };
 
                             showItemDropdown();
+                            setupInfiniteScroll();
                         }
                     } catch (error) {
                         console.error('Error loading category items:', error);
@@ -6176,15 +6250,23 @@
                     `;
                 });
 
-                // Add "type to search" message if we hit the limit
-                if (currentItems.moreAvailable) {
-                    html += `
-                        <div style="padding:0.75rem;background:#f3f4f6;text-align:center;border-top:2px solid #e5e7eb;">
-                            <div style="font-size:0.75rem;color:#6b7280;">
-                                Showing first 50 items • Type to search all items in this category
+                // Add status message at bottom
+                if (window.itemPagination) {
+                    if (window.itemPagination.hasMore) {
+                        html += `
+                            <div id="loadMoreIndicator" style="padding:0.75rem;background:#f9fafb;text-align:center;border-top:1px solid #e5e7eb;">
+                                <div style="font-size:0.75rem;color:#6b7280;">
+                                    Showing ${filteredItems.length} items • Scroll for more
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else if (filteredItems.length > 50) {
+                        html += `
+                            <div style="padding:0.5rem;background:#f9fafb;text-align:center;border-top:1px solid #e5e7eb;">
+                                <div style="font-size:0.75rem;color:#6b7280;">All ${filteredItems.length} items loaded</div>
+                            </div>
+                        `;
+                    }
                 }
             }
 
