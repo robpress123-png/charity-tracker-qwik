@@ -1684,9 +1684,18 @@
                             <button id="itsDeductiblePreviewBtn" class="btn-secondary" onclick="previewItsDeductibleImport()" style="display: none;">
                                 👁️ Preview Import
                             </button>
-                            <button id="itsDeductibleImportBtn" class="btn-primary" onclick="startItsDeductibleImport()" style="display: none;">
-                                ⬆️ Start Import
+                            <button id="itsDeductibleValidateBtn" class="btn-primary" onclick="validateItsDeductibleImport()" style="display: none;">
+                                🔍 Validate Charities
                             </button>
+                            <button id="itsDeductibleImportBtn" class="btn-primary" onclick="startItsDeductibleImport()" style="display: none; background: #10b981;">
+                                ✅ Confirm & Import
+                            </button>
+                        </div>
+
+                        <!-- Charity Matching Section (hidden by default) -->
+                        <div id="itsDeductibleCharityMatching" style="display: none; margin-top: 2rem; border: 2px solid #3b82f6; border-radius: 12px; padding: 1.5rem; background: #eff6ff;">
+                            <h3 style="color: #1e40af; margin: 0 0 1rem 0;">🔍 Confirm Charity Matches</h3>
+                            <div id="itsDeductibleCharityMatchTable"></div>
                         </div>
                     </div>
                 </div>
@@ -5123,11 +5132,14 @@
                 mileage: [],
                 stock: []
             };
+            itsDeductibleCharityMappings = {};
             document.getElementById('itsDeductibleFileList').innerHTML = '';
             document.getElementById('itsDeductibleStatus').innerHTML = '<p style="color: #6b7280; text-align: center;">No files uploaded yet</p>';
             document.getElementById('itsDeductibleResults').style.display = 'none';
             document.getElementById('itsDeductiblePreviewBtn').style.display = 'none';
+            document.getElementById('itsDeductibleValidateBtn').style.display = 'none';
             document.getElementById('itsDeductibleImportBtn').style.display = 'none';
+            document.getElementById('itsDeductibleCharityMatching').style.display = 'none';
         }
 
         function setupItsDeductibleHandlers() {
@@ -5220,7 +5232,8 @@
             if (itsDeductibleData.items.length > 0 || itsDeductibleData.money.length > 0 ||
                 itsDeductibleData.mileage.length > 0 || itsDeductibleData.stock.length > 0) {
                 document.getElementById('itsDeductiblePreviewBtn').style.display = 'inline-block';
-                document.getElementById('itsDeductibleImportBtn').style.display = 'inline-block';
+                document.getElementById('itsDeductibleValidateBtn').style.display = 'inline-block';
+                document.getElementById('itsDeductibleImportBtn').style.display = 'none'; // Hide import until validation
                 updateItsDeductibleStatus();
             }
         }
@@ -5360,6 +5373,215 @@
             status.innerHTML = html;
         }
 
+        let itsDeductibleCharityMappings = {}; // Store charity mappings
+
+        async function validateItsDeductibleImport() {
+            const validateBtn = document.getElementById('itsDeductibleValidateBtn');
+            const token = getAuthToken();
+
+            if (!token) {
+                alert('Please log in to validate donations');
+                return;
+            }
+
+            validateBtn.disabled = true;
+            validateBtn.textContent = '🔍 Validating...';
+
+            try {
+                // Collect all unique charities from the data
+                const uniqueCharities = new Set();
+
+                // From items (grouped by charity)
+                if (itsDeductibleData.items.length > 0) {
+                    itsDeductibleData.items.forEach(item => {
+                        if (item['Charity']) {
+                            uniqueCharities.add(item['Charity']);
+                        }
+                    });
+                }
+
+                // From cash donations
+                if (itsDeductibleData.money.length > 0) {
+                    itsDeductibleData.money.forEach(donation => {
+                        if (donation['Charity']) {
+                            uniqueCharities.add(donation['Charity']);
+                        }
+                    });
+                }
+
+                // From mileage donations
+                if (itsDeductibleData.mileage.length > 0) {
+                    itsDeductibleData.mileage.forEach(donation => {
+                        if (donation['Charity']) {
+                            uniqueCharities.add(donation['Charity']);
+                        }
+                    });
+                }
+
+                // From stock donations
+                if (itsDeductibleData.stock.length > 0) {
+                    itsDeductibleData.stock.forEach(donation => {
+                        if (donation['Charity']) {
+                            uniqueCharities.add(donation['Charity']);
+                        }
+                    });
+                }
+
+                // Search for charity matches
+                const charityMatches = {};
+                let charityNum = 1;
+
+                for (const charityName of uniqueCharities) {
+                    // Search for the charity in our database
+                    const response = await fetch(`/api/charities/search?q=${encodeURIComponent(charityName)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+
+                    charityMatches[charityNum] = {
+                        searchName: charityName,
+                        matches: data.success ? data.charities.slice(0, 3) : [], // Top 3 matches
+                        hasExactMatch: data.success && data.charities.some(c =>
+                            c.name.toLowerCase() === charityName.toLowerCase()
+                        )
+                    };
+                    charityNum++;
+                }
+
+                // Show charity matching UI
+                showItsDeductibleCharityMatching(charityMatches);
+
+            } catch (error) {
+                console.error('Validation error:', error);
+                showToast('❌ Validation failed: ' + error.message, 'error');
+            } finally {
+                validateBtn.disabled = false;
+                validateBtn.textContent = '🔍 Validate Charities';
+            }
+        }
+
+        function showItsDeductibleCharityMatching(charityMatches) {
+            const matchingDiv = document.getElementById('itsDeductibleCharityMatching');
+            const matchTable = document.getElementById('itsDeductibleCharityMatchTable');
+
+            // Build matching interface (similar to test import)
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+
+            Object.entries(charityMatches).forEach(([charityNum, matchData]) => {
+                const hasMatches = matchData.matches && matchData.matches.length > 0;
+                const bgColor = matchData.hasExactMatch ? '#f0fdf4' : hasMatches ? '#fef3c7' : '#fee2e2';
+                const borderColor = matchData.hasExactMatch ? '#10b981' : hasMatches ? '#f59e0b' : '#ef4444';
+                const statusIcon = matchData.hasExactMatch ? '✅' : hasMatches ? '⚠️' : '❌';
+
+                html += `
+                    <div style="background: ${bgColor}; border: 2px solid ${borderColor}; border-radius: 8px; padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <span style="font-size: 1.25rem;">${statusIcon}</span>
+                            <strong style="color: #1e293b;">Charity: ${matchData.searchName}</strong>
+                        </div>
+                `;
+
+                if (hasMatches) {
+                    html += '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+
+                    matchData.matches.forEach((charity, index) => {
+                        const isExact = charity.name.toLowerCase() === matchData.searchName.toLowerCase();
+                        const defaultChecked = index === 0 ? 'checked' : '';
+
+                        html += `
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: ${index % 2 === 0 ? 'white' : '#f9fafb'}; border-radius: 6px; cursor: pointer; border: 2px solid transparent;"
+                                   onchange="if(this.querySelector('input').checked) { selectItsDeductibleCharity('${charityNum}', '${charity.id}', 'existing'); updateItsDeductibleMatchSelection(this.querySelector('input')); }">
+                                <input type="radio" name="itsCharity_${charityNum}" value="${charity.id}" ${defaultChecked}
+                                       style="margin-top: 0.25rem;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 500;">${charity.name} ${isExact ? '(Exact Match)' : ''}</div>
+                                    ${charity.ein ? `<div style="font-size: 0.75rem; color: #64748b;">EIN: ${charity.ein}</div>` : ''}
+                                    ${charity.city || charity.state ? `<div style="font-size: 0.75rem; color: #64748b;">${charity.city || ''}${charity.city && charity.state ? ', ' : ''}${charity.state || ''}</div>` : ''}
+                                </div>
+                            </label>
+                        `;
+
+                        // Set default selection
+                        if (index === 0) {
+                            selectItsDeductibleCharity(charityNum, charity.id, 'existing');
+                        }
+                    });
+
+                    html += '</div>';
+                } else {
+                    html += `
+                        <div style="padding: 0.75rem; background: #fef2f2; border-radius: 6px;">
+                            <div style="color: #dc2626; font-weight: 500;">No matches found in charity database</div>
+                        </div>
+                    `;
+                }
+
+                // Always show option to create as personal charity
+                html += `
+                    <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid ${borderColor};">
+                        <label style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #fffbeb; border-radius: 6px; cursor: pointer; border: 2px solid transparent;"
+                               onchange="if(this.querySelector('input').checked) { selectItsDeductiblePersonalCharity('${charityNum}', '${matchData.searchName}'); updateItsDeductibleMatchSelection(this.querySelector('input')); }">
+                            <input type="radio" name="itsCharity_${charityNum}" value="personal_${charityNum}"
+                                   ${!hasMatches ? 'checked' : ''}
+                                   style="margin-right: 0.75rem;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; color: #92400e;">Create as Personal Charity</div>
+                                <div style="font-size: 0.75rem; color: #92400e;">
+                                    "${matchData.searchName}" will be added to your personal charities
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                `;
+
+                // Set default for no matches
+                if (!hasMatches) {
+                    selectItsDeductiblePersonalCharity(charityNum, matchData.searchName);
+                }
+
+                html += '</div>';
+            });
+
+            html += '</div>';
+            matchTable.innerHTML = html;
+
+            // Show the matching section and update buttons
+            matchingDiv.style.display = 'block';
+            document.getElementById('itsDeductibleValidateBtn').style.display = 'none';
+            document.getElementById('itsDeductibleImportBtn').style.display = 'inline-block';
+
+            // Scroll to charity matching
+            matchingDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function selectItsDeductibleCharity(charityNum, charityId, charityType) {
+            itsDeductibleCharityMappings[charityNum] = { id: charityId, type: charityType };
+        }
+
+        function selectItsDeductiblePersonalCharity(charityNum, charityName) {
+            itsDeductibleCharityMappings[charityNum] = { name: charityName, type: 'personal_new' };
+        }
+
+        function updateItsDeductibleMatchSelection(radio) {
+            // Update visual state for all radio buttons in the same group
+            const name = radio.getAttribute('name');
+            const allRadios = document.querySelectorAll(`input[name="${name}"]`);
+
+            allRadios.forEach(r => {
+                const label = r.closest('label');
+                if (label) {
+                    if (r.checked) {
+                        label.style.background = '#eff6ff';
+                        label.style.borderColor = '#3b82f6';
+                    } else {
+                        const index = Array.from(allRadios).indexOf(r);
+                        label.style.background = index % 2 === 0 ? 'white' : '#f9fafb';
+                        label.style.borderColor = 'transparent';
+                    }
+                }
+            });
+        }
+
         function previewItsDeductibleImport() {
             const results = document.getElementById('itsDeductibleResults');
             const content = document.getElementById('itsDeductibleResultsContent');
@@ -5442,13 +5664,59 @@
             importBtn.textContent = '⏳ Importing...';
 
             try {
+                // Apply charity mappings to the data
+                const mappedData = { ...itsDeductibleData };
+
+                // Create a reverse mapping from charity name to mapped charity
+                const charityNameToMapping = {};
+                let charityNum = 1;
+                const uniqueCharities = new Set();
+
+                // Collect unique charities (same as in validate)
+                ['items', 'money', 'mileage', 'stock'].forEach(type => {
+                    if (mappedData[type] && mappedData[type].length > 0) {
+                        mappedData[type].forEach(donation => {
+                            if (donation['Charity']) {
+                                uniqueCharities.add(donation['Charity']);
+                            }
+                        });
+                    }
+                });
+
+                // Map charity numbers to names
+                for (const charityName of uniqueCharities) {
+                    if (itsDeductibleCharityMappings[charityNum]) {
+                        charityNameToMapping[charityName] = itsDeductibleCharityMappings[charityNum];
+                    }
+                    charityNum++;
+                }
+
+                // Apply mappings to each donation type
+                ['items', 'money', 'mileage', 'stock'].forEach(type => {
+                    if (mappedData[type] && mappedData[type].length > 0) {
+                        mappedData[type] = mappedData[type].map(donation => {
+                            const mapping = charityNameToMapping[donation['Charity']];
+                            if (mapping) {
+                                if (mapping.type === 'personal_new') {
+                                    // Mark for creation as personal charity
+                                    return { ...donation, create_personal: true };
+                                } else if (mapping.type === 'existing') {
+                                    // Use the mapped charity ID
+                                    return { ...donation, mapped_charity_id: mapping.id };
+                                }
+                            }
+                            return donation;
+                        });
+                    }
+                });
+
                 const response = await fetch('/api/donations/import-itsdeductible', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(itsDeductibleData)
+                    body: JSON.stringify(mappedData)
                 });
 
                 const result = await response.json();

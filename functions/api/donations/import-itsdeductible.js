@@ -128,7 +128,10 @@ export async function onRequestPost({ request, env }) {
                         charity: item['Charity'],
                         charityAddress: item['Charity Address'] || '',
                         date: item['Donation Date'],
-                        items: []
+                        items: [],
+                        // Include mapping info if present
+                        mapped_charity_id: item.mapped_charity_id,
+                        create_personal: item.create_personal
                     };
                 }
 
@@ -154,7 +157,13 @@ export async function onRequestPost({ request, env }) {
             // Create donations for each group
             for (const group of Object.values(groupedItems)) {
                 try {
-                    const charityId = await findOrCreateCharity(group.charity, group.charityAddress);
+                    // Use mapped charity ID if provided, otherwise find/create
+                    let charityId;
+                    if (group.mapped_charity_id) {
+                        charityId = group.mapped_charity_id;
+                    } else {
+                        charityId = await findOrCreateCharity(group.charity, group.charityAddress);
+                    }
                     const donationDate = parseItsDeductibleDate(group.date);
                     const totalValue = group.items.reduce((sum, item) => sum + item.totalValue, 0);
 
@@ -224,7 +233,13 @@ export async function onRequestPost({ request, env }) {
                         continue;
                     }
 
-                    const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    // Use mapped charity ID if provided, otherwise find/create
+                    let charityId;
+                    if (donation.mapped_charity_id) {
+                        charityId = donation.mapped_charity_id;
+                    } else {
+                        charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    }
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const amount = parseFloat(donation['Donation Value in $']) || 0;
 
@@ -260,7 +275,13 @@ export async function onRequestPost({ request, env }) {
                         continue;
                     }
 
-                    const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    // Use mapped charity ID if provided, otherwise find/create
+                    let charityId;
+                    if (donation.mapped_charity_id) {
+                        charityId = donation.mapped_charity_id;
+                    } else {
+                        charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    }
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const milesDriven = parseFloat(donation['Miles Driven']) || 0;
                     const mileageRate = parseFloat(donation['IRS Rate per Mile in $']) || 0.14;
@@ -297,7 +318,13 @@ export async function onRequestPost({ request, env }) {
                         continue;
                     }
 
-                    const charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    // Use mapped charity ID if provided, otherwise find/create
+                    let charityId;
+                    if (donation.mapped_charity_id) {
+                        charityId = donation.mapped_charity_id;
+                    } else {
+                        charityId = await findOrCreateCharity(donation['Charity'], donation['Charity Address'] || '');
+                    }
                     const donationDate = parseItsDeductibleDate(donation['Donation Date']);
                     const costBasis = parseFloat(donation['Original Cost Adjusted Basis in $']) || 0;
                     const fairMarketValue = parseFloat(donation['Fair Market Value on Date Donated in $']) || 0;
