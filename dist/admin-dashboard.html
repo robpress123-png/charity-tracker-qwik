@@ -1789,7 +1789,10 @@
             const resultsDiv = document.getElementById('itemsImportResults');
             const resultsContent = document.getElementById('itemsResultsContent');
 
-            resultsContent.innerHTML = '<p style="color: #f59e0b;">Processing import with smart matching...</p>';
+            // For batch imports, use replace to avoid excessive review
+            const batchDuplicateHandling = duplicateHandling === 'review' ? 'replace' : duplicateHandling;
+
+            resultsContent.innerHTML = '<p style="color: #f59e0b;">Preparing batch import...</p>';
 
             // Show progress bar
             const progressDiv = document.getElementById('importProgress');
@@ -1797,8 +1800,8 @@
             const progressText = document.getElementById('importProgressText');
             if (progressDiv) {
                 progressDiv.style.display = 'flex';
-                progressBar.style.width = '10%';
-                progressText.textContent = 'Uploading...';
+                progressBar.style.width = '0%';
+                progressText.textContent = 'Preparing...';
             }
             resultsDiv.classList.add('active');
 
@@ -1806,83 +1809,131 @@
                 // Check if CSV contains source/date and if we should override
                 const overrideSettings = document.getElementById('overrideCsvSettings').checked;
 
-                // Create CSV string properly handling quoted values
-                const csvString = [Object.keys(itemsImportData[0]).join(',')]
-                    .concat(itemsImportData.map(row => {
-                        return Object.keys(itemsImportData[0]).map(k => {
-                            const value = row[k];
-                            // Quote values that contain commas, quotes, or newlines
-                            if (value && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
-                                return `"${value.replace(/"/g, '""')}"`;
-                            }
-                            return value || '';
-                        }).join(',');
-                    })).join('\n');
+                // Calculate chunks - 200 items per chunk to stay well under limits
+                const CHUNK_SIZE = 200;
+                const totalItems = itemsImportData.length;
+                const totalChunks = Math.ceil(totalItems / CHUNK_SIZE);
 
-                // Use enhanced import endpoint
-                const response = await fetch('/api/items/import-enhanced', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        csvData: csvString,
-                        source: overrideSettings ? source : null,  // null means use CSV value
-                        effectiveDate: overrideSettings ? effectiveDate : null,
-                        duplicateHandling: duplicateHandling,
-                        matchThreshold: 85,
-                        overrideSettings: overrideSettings
-                    })
-                });
+                console.log(`Processing ${totalItems} items in ${totalChunks} chunks`);
 
-                // Update progress
-                if (progressBar) {
-                    progressBar.style.width = '75%';
-                    progressText.textContent = 'Processing...';
+                // Track aggregate results
+                const aggregateResults = {
+                    processed: 0,
+                    added: 0,
+                    updated: 0,
+                    skipped: 0,
+                    errors: []
+                };
+
+                // Session ID for this import
+                const sessionId = Date.now().toString();
+
+                // Process each chunk
+                for (let chunkNum = 0; chunkNum < totalChunks; chunkNum++) {
+                    const startIdx = chunkNum * CHUNK_SIZE;
+                    const endIdx = Math.min(startIdx + CHUNK_SIZE, totalItems);
+                    const chunkItems = itemsImportData.slice(startIdx, endIdx);
+
+                    // Update progress
+                    const percentComplete = Math.round((chunkNum / totalChunks) * 100);
+                    if (progressBar) {
+                        progressBar.style.width = percentComplete + '%';
+                        progressText.textContent = `Processing chunk ${chunkNum + 1} of ${totalChunks} (${percentComplete}%)`;
+                    }
+                    resultsContent.innerHTML = `
+                        <p style="color: #f59e0b;">Processing chunk ${chunkNum + 1} of ${totalChunks}...</p>
+                        <p style="color: #9ca3af;">Items ${startIdx + 1} to ${endIdx} of ${totalItems}</p>
+                    `;
+
+                    // Create CSV string for this chunk
+                    const csvString = [Object.keys(itemsImportData[0]).join(',')]
+                        .concat(chunkItems.map(row => {
+                            return Object.keys(itemsImportData[0]).map(k => {
+                                const value = row[k];
+                                // Quote values that contain commas, quotes, or newlines
+                                if (value && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+                                    return `"${value.replace(/"/g, '""')}"`;
+                                }
+                                return value || '';
+                            }).join(',');
+                        })).join('\n');
+
+                    // Use batch import endpoint
+                    const response = await fetch('/api/items/import-batch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            csvData: csvString,
+                            source: source,
+                            effectiveDate: effectiveDate,
+                            duplicateHandling: batchDuplicateHandling,
+                            chunk: chunkNum + 1,
+                            totalChunks: totalChunks,
+                            sessionId: sessionId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.results) {
+                        // Aggregate results
+                        aggregateResults.processed += data.results.processed;
+                        aggregateResults.added += data.results.added;
+                        aggregateResults.updated += data.results.updated;
+                        aggregateResults.skipped += data.results.skipped;
+                        if (data.results.errors && data.results.errors.length > 0) {
+                            aggregateResults.errors.push(...data.results.errors);
+                        }
+                    } else if (!data.success) {
+                        throw new Error(`Chunk ${chunkNum + 1} failed: ${data.error}`);
+                    }
                 }
 
-                const data = await response.json();
+                // Update progress to 100%
+                if (progressBar) {
+                    progressBar.style.width = '100%';
+                    progressText.textContent = 'Import complete!';
+                }
 
-                // Hide progress on completion
+                // Hide progress after brief delay
+                setTimeout(() => {
+                    if (progressDiv) {
+                        progressDiv.style.display = 'none';
+                    }
+                }, 1500);
+
+                // Display final results
+                resultsContent.innerHTML = `
+                    <div class="alert alert-success">
+                        ✅ <strong>Batch Import Successful!</strong>
+                    </div>
+                    <p>📊 <strong>Total Processed:</strong> ${aggregateResults.processed} items</p>
+                    <p>✅ <strong>Added:</strong> ${aggregateResults.added} new items</p>
+                    <p>📝 <strong>Updated:</strong> ${aggregateResults.updated} existing items</p>
+                    <p>⏭️ <strong>Skipped:</strong> ${aggregateResults.skipped} items</p>
+                    <p>📦 <strong>Chunks processed:</strong> ${totalChunks}</p>
+                    ${aggregateResults.errors && aggregateResults.errors.length > 0 ? `
+                        <div style="margin-top: 1rem; padding: 1rem; background: #7f1d1d; border-radius: 6px;">
+                            <strong style="color: #ef4444;">Errors (${aggregateResults.errors.length}):</strong>
+                            <div style="max-height: 200px; overflow-y: auto; margin-top: 0.5rem;">
+                                <ul style="padding-left: 1.5rem; color: #fca5a5;">
+                                    ${aggregateResults.errors.map(e => `<li>${e}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+
+                // Reload stats to show updated counts
+                await loadAdminStats();
+                loadItemsCount();
+
+            } catch (error) {
+                // Hide progress on error
                 if (progressDiv) {
                     progressDiv.style.display = 'none';
                 }
 
-                if (data.success) {
-                    // Check if there are items needing review
-                    if (data.needsReview && data.results.potentialMatches.length > 0) {
-                        displayMatchReview(data.results.potentialMatches, source, effectiveDate);
-                    } else {
-                        resultsContent.innerHTML = `
-                            <div class="alert alert-success">
-                                ✅ <strong>Import Successful!</strong>
-                            </div>
-                            <p>📊 Processed: ${data.results.processed} items</p>
-                            <p>✅ Added: ${data.results.added} new items</p>
-                            <p>📝 Updated: ${data.results.updated} existing items</p>
-                            <p>⏭️ Skipped: ${data.results.skipped} items</p>
-                            <p>🔍 Review needed: ${data.results.potentialMatches?.length || 0} items</p>
-                            ${data.results.errors && data.results.errors.length > 0 ? `
-                                <div style="margin-top: 1rem; color: #ef4444;">
-                                    <strong>Errors:</strong>
-                                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                                        ${data.results.errors.map(e => `<li>${e}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            ` : ''}
-                        `;
-                    }
-
-                    // Reload stats to show updated counts
-                    await loadAdminStats();
-                    loadItemsCount();
-                } else {
-                    resultsContent.innerHTML = `
-                        <div class="alert alert-warning">
-                            ❌ <strong>Import Failed</strong>
-                            <p style="margin-top: 0.5rem;">${data.error}</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
                 resultsContent.innerHTML = `
                     <div class="alert alert-warning">
                         ❌ <strong>Import Error</strong>

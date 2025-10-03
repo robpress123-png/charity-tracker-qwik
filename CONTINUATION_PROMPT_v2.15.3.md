@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.15.0
+# Charity Tracker Qwik - Complete Continuation Prompt v2.15.3
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -357,7 +357,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.15.0
+- **Version**: 2.15.3
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)
@@ -416,7 +416,9 @@ git push  # Auto-deploys to Cloudflare
 3. **Category field**: Both ID and text name for compatibility
 4. **Search keywords**: New field for better search
 5. **Admin delete**: Requires typing "DELETE ALL" exactly
-6. **Version**: Use minor bump (2.15.0) for database changes
+6. **Version**: Current version 2.15.3
+7. **Smart matching**: 90% threshold for review prompts (reduced from 85%)
+8. **Category mapping**: Fixed - 1=Automotive, 6=Clothing (not 1=Women's)
 7. **Import endpoint**: Use `/api/items/import-enhanced` not `/api/items/import`
 8. **Condition values**: Fair=$0 (not deductible), Good/Very Good/Excellent have values
 
