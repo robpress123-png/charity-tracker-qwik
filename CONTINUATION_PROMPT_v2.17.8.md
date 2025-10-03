@@ -170,10 +170,25 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 ### Known Issues
 
 #### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
-1. **v2.17.7 Breaking Error**: "Identifier 'item' has already been declared" at dashboard:6403
-   - Prevents Add Donation button from working
-   - Causes "showSection is not defined" errors
-   - CARDINAL RULE BROKEN: Don't break working features
+1. ~~**v2.17.7 Breaking Error**: FIXED in v2.17.8~~
+
+## Current Status (v2.17.8) - System at 7% capacity
+### What's Working:
+- Add Donation button works again (emergency fix applied)
+- Basic item search functionality
+- Category selection
+- Item database with 1,757 items loaded
+
+### Issues Being Worked On:
+1. **Item Donation Search**: When searching items without selecting category first:
+   - Category doesn't auto-fill when item selected (partially fixed)
+   - Some items not found (e.g., "women's dress") - increased limit to 200
+   - Need to ensure category-item relationship maintained
+
+### Confusion Points Clarified:
+- **Donation TYPE**: Cash, Items, Miles, Stock, Crypto (main categories)
+- **Item TYPE/Category**: Within Item donations only (Clothing, Electronics, etc.)
+- The `addItemToList()` function is ONLY for item donations, not the main Add Donation flow
 
 #### 🔴 HIGH PRIORITY
 1. **Payment Integration**: Stripe not implemented ($49/year tier)

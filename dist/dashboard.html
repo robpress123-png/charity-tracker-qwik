@@ -1704,7 +1704,7 @@
                                        style="font-size:0.875rem;width:100%;padding:0.375rem;">
                                 <input type="hidden" id="itemSelect">
                                 <!-- Item Dropdown -->
-                                <div id="itemDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
+                                <div id="itemDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:400px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:100;">
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
@@ -5988,18 +5988,55 @@
         async function categoryChanged() {
             const categoryId = document.getElementById('itemCategory').value;
             const itemSearch = document.getElementById('itemSearch');
+            const searchValue = itemSearch ? itemSearch.value : '';
 
-            // Category is now optional - items can be searched across all categories
             if (categoryId) {
-                // If category selected, search will be filtered to that category
-                console.log(`Category ${categoryId} selected, will filter searches`);
+                console.log(`Category ${categoryId} selected`);
+
+                // If no search text, load a sample of items in this category
+                if (!searchValue || searchValue.trim() === '') {
+                    try {
+                        // Load limited set for browsing - user can type to see more
+                        const response = await fetch(`/api/items?category_id=${categoryId}&limit=50`);
+                        const data = await response.json();
+
+                        if (data.success && data.items) {
+                            // Sort items alphabetically and store them
+                            currentItems = (data.items || []).sort((a, b) => {
+                                // Combine name with variant for sorting
+                                const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                                const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                                return aName.localeCompare(bName);
+                            });
+                            console.log(`Loaded ${currentItems.length} popular items for category`);
+
+                            // Check if there might be more items
+                            if (currentItems.length >= 50) {
+                                // Add a special indicator that there are more items
+                                currentItems.moreAvailable = true;
+                            }
+
+                            showItemDropdown();
+                        }
+                    } catch (error) {
+                        console.error('Error loading category items:', error);
+                    }
+                } else {
+                    // If there's search text, trigger a filtered search
+                    searchAllItems(searchValue);
+                }
             } else {
-                console.log('No category selected, will search all items');
+                console.log('No category selected');
+                // Hide dropdown if no category and no search
+                if (!searchValue || searchValue.trim() === '') {
+                    document.getElementById('itemDropdown').style.display = 'none';
+                }
             }
 
             // Keep search enabled regardless of category selection
-            itemSearch.placeholder = categoryId
-                ? 'Search items in this category...'
+            if (itemSearch) {
+                itemSearch.placeholder = categoryId
+                    ? 'Type to search or browse all items below...'
                 : 'Type item description to search all items...';
 
             // If there's already text in the search field, re-run the search with new category filter
@@ -6121,17 +6158,34 @@
             } else {
                 filteredItems.forEach(item => {
                     // Store item ID as data attribute to avoid quote escaping issues
+                    // Combine name and variant on one line
+                    const displayName = item.item_variant ?
+                        `${item.name}: ${item.item_variant}` :
+                        item.name;
+
                     html += `
                         <div onclick="selectItemByElement(this)"
                              data-item-id="${item.id}"
                              style="padding:0.5rem;cursor:pointer;border-bottom:1px solid #e5e7eb;transition:background 0.2s;"
                              onmouseover="this.style.background='#f3f4f6'"
                              onmouseout="this.style.background='white'">
-                            <div style="font-weight:500;">${item.name}</div>
-                            ${item.description ? `<div style="font-size:0.7rem;color:#6b7280;">${item.description}</div>` : ''}
+                            <div style="font-weight:500;">${displayName}</div>
+                            ${item.description && item.description !== displayName ?
+                                `<div style="font-size:0.7rem;color:#6b7280;">${item.description}</div>` : ''}
                         </div>
                     `;
                 });
+
+                // Add "type to search" message if we hit the limit
+                if (currentItems.moreAvailable) {
+                    html += `
+                        <div style="padding:0.75rem;background:#f3f4f6;text-align:center;border-top:2px solid #e5e7eb;">
+                            <div style="font-size:0.75rem;color:#6b7280;">
+                                Showing first 50 items • Type to search all items in this category
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             dropdown.innerHTML = html;
@@ -6201,8 +6255,13 @@
             const item = currentItems.find(i => i.id == itemId);
             if (!item) return;
 
+            // Use combined name with variant if available
+            const displayName = item.item_variant ?
+                `${item.name}: ${item.item_variant}` :
+                item.name;
+
             document.getElementById('itemSelect').value = itemId;
-            document.getElementById('itemSearch').value = item.name;
+            document.getElementById('itemSearch').value = displayName;
             document.getElementById('itemDropdown').style.display = 'none';
 
             // Auto-fill the category if item has category_id
@@ -8038,7 +8097,7 @@
                                                    style="width: 100%; padding: 0.375rem; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.875rem;">
                                             <input type="hidden" id="editItemSelect_${index}">
                                             <!-- Item Dropdown -->
-                                            <div id="editItemDropdown_${index}" style="display:none;position:absolute;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:200px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:1000;min-width:300px;">
+                                            <div id="editItemDropdown_${index}" style="display:none;position:absolute;background:white;border:1px solid #d1d5db;border-radius:6px;margin-top:2px;max-height:400px;overflow-y:auto;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:1000;min-width:300px;">
                                                 <!-- Populated dynamically -->
                                             </div>
                                         </div>
@@ -8362,10 +8421,18 @@
                 const data = await response.json();
 
                 if (data.success && data.items) {
-                    // Find matching item by name
-                    const matchingItem = data.items.find(dbItem =>
-                        dbItem.name.toLowerCase() === item.item_name.toLowerCase()
-                    );
+                    // Find matching item by name (handle items with variants)
+                    const matchingItem = data.items.find(dbItem => {
+                        // Check exact match first
+                        if (dbItem.name.toLowerCase() === item.item_name.toLowerCase()) {
+                            return true;
+                        }
+                        // Check if item_name includes variant (e.g., "Bowling Shoes: Youth")
+                        const nameWithVariant = dbItem.item_variant ?
+                            `${dbItem.name}: ${dbItem.item_variant}`.toLowerCase() :
+                            dbItem.name.toLowerCase();
+                        return nameWithVariant === item.item_name.toLowerCase();
+                    });
 
                     if (matchingItem) {
                         console.log('[EDIT ITEM] Found matching item in DB:', matchingItem);
