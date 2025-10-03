@@ -336,14 +336,22 @@ export async function onRequestPost(context) {
                     // Create the main donation record
                     const donationId = `don_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+                    // Determine if this is a personal charity
+                    const isPersonalCharity = charityId.startsWith('charity_');
+
                     await env.DB.prepare(`
                         INSERT INTO donations (
-                            id, user_id, charity_id, charity_name, donation_date,
-                            donation_type, amount, notes
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            id, user_id, charity_id, user_charity_id, donation_type,
+                            amount, date, notes, item_description, estimated_value
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `).bind(
-                        donationId, userId, charityId, group.charity, donationDate,
-                        'items', totalValue, 'Imported from ItsDeductible'
+                        donationId, userId,
+                        isPersonalCharity ? null : charityId,
+                        isPersonalCharity ? charityId : null,
+                        'items', totalValue, donationDate,
+                        'Imported from ItsDeductible',
+                        `${group.items.length} items`, // item_description
+                        totalValue // estimated_value
                     ).run();
 
                     // Add individual items
@@ -414,14 +422,19 @@ export async function onRequestPost(context) {
                     const notes = `Payment: ${donation['Payment Type']}${donation['Additional Description'] && donation['Additional Description'] !== '-' ?
                                   `, ${donation['Additional Description']}` : ''} (Imported from ItsDeductible)`;
 
+                    // Determine if this is a personal charity
+                    const isPersonalCharity = charityId.startsWith('charity_');
+
                     await env.DB.prepare(`
                         INSERT INTO donations (
-                            id, user_id, charity_id, charity_name, donation_date,
-                            donation_type, amount, notes
+                            id, user_id, charity_id, user_charity_id, donation_type,
+                            amount, date, notes
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     `).bind(
-                        donationId, userId, charityId, donation['Charity'], donationDate,
-                        'cash', amount, notes
+                        donationId, userId,
+                        isPersonalCharity ? null : charityId,
+                        isPersonalCharity ? charityId : null,
+                        'cash', amount, donationDate, notes
                     ).run();
 
                     imported++;
@@ -455,15 +468,21 @@ export async function onRequestPost(context) {
 
                     const donationId = `don_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+                    // Determine if this is a personal charity
+                    const isPersonalCharity = charityId.startsWith('charity_');
+
                     await env.DB.prepare(`
                         INSERT INTO donations (
-                            id, user_id, charity_id, charity_name, donation_date,
-                            donation_type, miles_driven, mileage_rate, amount,
+                            id, user_id, charity_id, user_charity_id, donation_type,
+                            date, miles_driven, mileage_rate, amount,
                             mileage_purpose, notes
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `).bind(
-                        donationId, userId, charityId, donation['Charity'], donationDate,
-                        'mileage', milesDriven, mileageRate, totalValue,
+                        donationId, userId,
+                        isPersonalCharity ? null : charityId,
+                        isPersonalCharity ? charityId : null,
+                        'mileage', donationDate,
+                        milesDriven, mileageRate, totalValue,
                         'Charitable', 'Imported from ItsDeductible'
                     ).run();
 
@@ -501,15 +520,21 @@ export async function onRequestPost(context) {
                     const notes = `Stock: ${donation['Full Name of Stock']} (${donation['Stock Symbol']}), ` +
                                  `Purchased: ${donation['Original Purchase Date']} (Imported from ItsDeductible)`;
 
+                    // Determine if this is a personal charity
+                    const isPersonalCharity = charityId.startsWith('charity_');
+
                     await env.DB.prepare(`
                         INSERT INTO donations (
-                            id, user_id, charity_id, charity_name, donation_date,
-                            donation_type, stock_symbol, cost_basis, fair_market_value,
+                            id, user_id, charity_id, user_charity_id, donation_type,
+                            date, stock_symbol, fair_market_value,
                             amount, notes
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `).bind(
-                        donationId, userId, charityId, donation['Charity'], donationDate,
-                        'stock', donation['Stock Symbol'], costBasis, fairMarketValue,
+                        donationId, userId,
+                        isPersonalCharity ? null : charityId,
+                        isPersonalCharity ? charityId : null,
+                        'stock', donationDate,
+                        donation['Stock Symbol'], fairMarketValue,
                         totalValue, notes
                     ).run();
 
