@@ -5257,8 +5257,19 @@
             const status = document.getElementById('itsDeductibleStatus');
             let html = '<h4>📊 Files Analyzed:</h4>';
 
+            // Group items by charity and date to count actual donations
+            let itemDonationCount = 0;
             if (itsDeductibleData.items.length > 0) {
-                html += `<p>✅ <strong>Items:</strong> ${itsDeductibleData.items.length} donations found</p>`;
+                const itemGroups = {};
+                itsDeductibleData.items.forEach(item => {
+                    const key = `${item['Charity']}_${item['Donation Date']}`;
+                    if (!itemGroups[key]) {
+                        itemGroups[key] = [];
+                        itemDonationCount++;
+                    }
+                    itemGroups[key].push(item);
+                });
+                html += `<p>✅ <strong>Items:</strong> ${itsDeductibleData.items.length} items → ${itemDonationCount} donation${itemDonationCount !== 1 ? 's' : ''} (grouped by charity & date)</p>`;
             }
             if (itsDeductibleData.money.length > 0) {
                 html += `<p>✅ <strong>Cash:</strong> ${itsDeductibleData.money.length} donations found</p>`;
@@ -5270,7 +5281,7 @@
                 html += `<p>✅ <strong>Stock:</strong> ${itsDeductibleData.stock.length} donations found</p>`;
             }
 
-            const total = itsDeductibleData.items.length + itsDeductibleData.money.length +
+            const total = itemDonationCount + itsDeductibleData.money.length +
                          itsDeductibleData.mileage.length + itsDeductibleData.stock.length;
 
             html += `<div style="margin-top: 1rem; padding: 1rem; background: #ecfdf5; border-radius: 8px;">
@@ -5289,25 +5300,51 @@
             results.style.display = 'block';
             let html = '';
 
-            // Preview items donations
+            // Preview items donations (grouped by charity and date)
             if (itsDeductibleData.items.length > 0) {
-                html += '<h4>📦 Item Donations:</h4>';
+                html += '<h4>📦 Item Donations (will be grouped by charity & date):</h4>';
+
+                // Group items by charity and date
+                const itemGroups = {};
+                itsDeductibleData.items.forEach(item => {
+                    const key = `${item['Charity']}_${item['Donation Date']}`;
+                    if (!itemGroups[key]) {
+                        itemGroups[key] = {
+                            charity: item['Charity'],
+                            date: item['Donation Date'],
+                            items: [],
+                            totalValue: 0
+                        };
+                    }
+                    itemGroups[key].items.push(item);
+                    itemGroups[key].totalValue += parseFloat(item['Donation Value in $']) || 0;
+                });
+
                 html += '<table style="width: 100%; font-size: 0.875rem;">';
-                html += '<thead><tr style="background: #f3f4f6;"><th>Charity</th><th>Date</th><th>Item</th><th>Qty</th><th>Value</th></tr></thead>';
+                html += '<thead><tr style="background: #f3f4f6;"><th>Charity</th><th>Date</th><th>Items</th><th>Total Value</th></tr></thead>';
                 html += '<tbody>';
-                itsDeductibleData.items.slice(0, 5).forEach(item => {
+
+                const groupKeys = Object.keys(itemGroups);
+                groupKeys.slice(0, 5).forEach(key => {
+                    const group = itemGroups[key];
+                    const itemsList = group.items.slice(0, 3).map(i => i['Item Description']).join(', ');
+                    const moreItems = group.items.length > 3 ? ` +${group.items.length - 3} more` : '';
+
                     html += `<tr>
-                        <td>${item['Charity']}</td>
-                        <td>${item['Donation Date']}</td>
-                        <td>${item['Item Description']}</td>
-                        <td>${item['Quantity']}</td>
-                        <td>$${item['Donation Value in $']}</td>
+                        <td>${group.charity}</td>
+                        <td>${group.date}</td>
+                        <td>${itemsList}${moreItems}</td>
+                        <td>$${group.totalValue.toFixed(2)}</td>
                     </tr>`;
                 });
-                if (itsDeductibleData.items.length > 5) {
-                    html += `<tr><td colspan="5" style="text-align: center;">...and ${itsDeductibleData.items.length - 5} more</td></tr>`;
+
+                if (groupKeys.length > 5) {
+                    html += `<tr><td colspan="4" style="text-align: center;">...and ${groupKeys.length - 5} more donations</td></tr>`;
                 }
                 html += '</tbody></table>';
+                html += `<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+                         ${itsDeductibleData.items.length} items will be consolidated into ${groupKeys.length} multi-item donation${groupKeys.length !== 1 ? 's' : ''}
+                         </p>`;
             }
 
             // Similar previews for other types...
@@ -9360,6 +9397,7 @@
         async function editCategoryChanged(index) {
             const categorySelect = document.getElementById(`editItemCategory_${index}`);
             const itemSearch = document.getElementById(`editItemSearch_${index}`);
+            const dropdown = document.getElementById(`editItemDropdown_${index}`);
 
             if (!categorySelect || !itemSearch) return;
 
@@ -9372,14 +9410,60 @@
                 editingItemsArray[index].category = category.name;
 
                 // Update search placeholder
-                itemSearch.placeholder = `Search ${category.name} items...`;
+                itemSearch.placeholder = `Type to search or browse all ${category.name} items below...`;
+
+                // Load items for this category immediately
+                if (dropdown) {
+                    dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#6b7280;">Loading items...</div>';
+                    dropdown.style.display = 'block';
+                }
+
+                try {
+                    // Load first 50 items for the selected category
+                    const response = await fetch(`/api/items?category_id=${categoryId}&limit=50&offset=0`);
+                    const data = await response.json();
+
+                    if (data.success && data.items) {
+                        // Sort items alphabetically with variant
+                        const sortedItems = data.items.sort((a, b) => {
+                            const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                            const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                            return aName.localeCompare(bName);
+                        });
+
+                        // Store items for this index
+                        window[`editCategoryItems_${index}`] = sortedItems;
+
+                        // Store pagination info for infinite scroll
+                        window[`editItemPagination_${index}`] = {
+                            categoryId: categoryId,
+                            offset: 50,
+                            hasMore: sortedItems.length >= 50,
+                            loading: false,
+                            allItems: [...sortedItems]
+                        };
+
+                        showEditItemDropdown(index);
+                        setupEditInfiniteScroll(index);
+                    } else {
+                        console.error('Failed to load category items:', data.error);
+                        dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#dc2626;">Error loading items. Please try again.</div>';
+                    }
+                } catch (error) {
+                    console.error('Error loading category items:', error);
+                    dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#dc2626;">Error loading items. Please try again.</div>';
+                }
             } else {
                 // No category selected - can still search all items
                 editingItemsArray[index].category_id = '';
                 editingItemsArray[index].category = '';
 
                 // Update search placeholder
-                itemSearch.placeholder = 'Type to search all items...';
+                itemSearch.placeholder = 'Type item description to search all items...';
+
+                // Clear stored items
+                window[`editCategoryItems_${index}`] = [];
+                window[`editItemPagination_${index}`] = null;
             }
 
             // If there's already search text, re-run the search with new category filter
@@ -9391,7 +9475,7 @@
 
         async function loadEditItemsForCategory(index, categoryId) {
             try {
-                const response = await fetch(`/api/items?category_id=${categoryId}`);
+                const response = await fetch(`/api/items?category_id=${categoryId}&limit=50&offset=0`);
                 const data = await response.json();
 
                 if (data.success && data.items) {
@@ -9401,6 +9485,84 @@
             } catch (error) {
                 console.error('Error loading items for category:', error);
             }
+        }
+
+        // Setup infinite scroll for edit item dropdown
+        function setupEditInfiniteScroll(index) {
+            const dropdown = document.getElementById(`editItemDropdown_${index}`);
+            if (!dropdown) return;
+
+            // Remove any existing listener
+            dropdown.onscroll = null;
+
+            // Add scroll listener
+            dropdown.onscroll = async function() {
+                // Check if scrolled near bottom (within 100px)
+                if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 100) {
+                    const pagination = window[`editItemPagination_${index}`];
+                    // Check if we can load more
+                    if (pagination &&
+                        pagination.hasMore &&
+                        !pagination.loading) {
+
+                        pagination.loading = true;
+
+                        // Show loading indicator
+                        const indicator = document.getElementById(`editLoadMoreIndicator_${index}`);
+                        if (indicator) {
+                            indicator.innerHTML = '<div style="font-size:0.75rem;color:#6b7280;">Loading more items...</div>';
+                        }
+
+                        try {
+                            // Load next batch
+                            const response = await fetch(
+                                `/api/items?category_id=${pagination.categoryId}&limit=50&offset=${pagination.offset}`
+                            );
+                            const data = await response.json();
+
+                            if (data.success && data.items) {
+                                // Check if we actually got items
+                                if (data.items.length > 0) {
+                                    // Sort new items
+                                    const newItems = data.items.sort((a, b) => {
+                                        const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                                        const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                                        return aName.localeCompare(bName);
+                                    });
+
+                                    // Append to current items
+                                    window[`editCategoryItems_${index}`] = [...window[`editCategoryItems_${index}`], ...newItems];
+                                    pagination.allItems = [...window[`editCategoryItems_${index}`]];
+                                    pagination.offset += newItems.length;
+
+                                    // Only continue if we got a full batch (50 items)
+                                    pagination.hasMore = newItems.length >= 50;
+                                } else {
+                                    // No more items to load
+                                    pagination.hasMore = false;
+                                    console.log(`No more items for category ${pagination.categoryId}. Total loaded: ${window[`editCategoryItems_${index}`].length}`);
+                                }
+
+                                // Re-render dropdown to update indicator
+                                showEditItemDropdown(index);
+
+                                // Restore scroll position only if we added items
+                                if (data.items.length > 0) {
+                                    dropdown.scrollTop = dropdown.scrollHeight - 300;
+                                }
+                            } else {
+                                // API error or no items field
+                                pagination.hasMore = false;
+                                showEditItemDropdown(index);
+                            }
+                        } catch (error) {
+                            console.error('Error loading more items:', error);
+                        } finally {
+                            pagination.loading = false;
+                        }
+                    }
+                }
+            };
         }
 
         function showEditItemDropdown(index) {
@@ -9428,8 +9590,13 @@
             `;
 
             const filteredItems = searchTerm
-                ? items.filter(item => item.name.toLowerCase().includes(searchTerm))
-                : items.slice(0, 10); // Show first 10 if no search
+                ? items.filter(item => {
+                    const displayName = item.item_variant ?
+                        `${item.name}: ${item.item_variant}` :
+                        item.name;
+                    return displayName.toLowerCase().includes(searchTerm);
+                })
+                : items; // Show all loaded items when browsing
 
             if (items.length === 0) {
                 html += '<div style="padding: 0.75rem; color: #6b7280; text-align: center;">No items in database for this category</div>';
@@ -9460,9 +9627,32 @@
                 });
             }
 
+            // Add infinite scroll indicator if there are more items to load
+            const pagination = window[`editItemPagination_${index}`];
+            if (pagination && pagination.hasMore) {
+                html += `
+                    <div id="editLoadMoreIndicator_${index}" style="padding:0.75rem;background:#f9fafb;text-align:center;border-top:1px solid #e5e7eb;">
+                        <div style="font-size:0.75rem;color:#6b7280;">
+                            Showing ${filteredItems.length} items • Scroll for more
+                        </div>
+                    </div>
+                `;
+            } else if (filteredItems.length > 50) {
+                html += `
+                    <div style="padding:0.5rem;background:#f9fafb;text-align:center;border-top:1px solid #e5e7eb;">
+                        <div style="font-size:0.75rem;color:#6b7280;">All ${filteredItems.length} items loaded</div>
+                    </div>
+                `;
+            }
+
             dropdown.innerHTML = html;
             dropdown.style.display = 'block';
             positionEditDropdown(searchInput, dropdown);
+
+            // Setup infinite scroll if we have pagination
+            if (pagination) {
+                setupEditInfiniteScroll(index);
+            }
         }
 
         function positionEditDropdown(input, dropdown) {
