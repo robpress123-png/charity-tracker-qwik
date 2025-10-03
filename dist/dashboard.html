@@ -9024,17 +9024,23 @@
             } else {
                 filteredItems.forEach(item => {
                     const goodValue = item.value_good || item.low_value || 0;
+                    // Combine name and variant on one line
+                    const displayName = item.item_variant ?
+                        `${item.name}: ${item.item_variant}` :
+                        item.name;
+
                     // Use data attributes to avoid quote escaping issues
                     html += `
                         <div onclick="selectEditItemByElement(this, ${index})"
                              data-item-id="${item.id}"
-                             data-item-name="${item.name.replace(/"/g, '&quot;')}"
+                             data-item-name="${displayName.replace(/"/g, '&quot;')}"
                              data-item-value="${goodValue}"
                              style="padding: 0.4rem 0.75rem; border-bottom: 1px solid #e5e7eb; cursor: pointer;"
                              onmouseover="this.style.background='#f9fafb';"
                              onmouseout="this.style.background='white';">
-                            <div style="font-size: 0.875rem; font-weight: 500;">${item.name}</div>
-                            ${item.description ? `<div style="font-size: 0.7rem; color: #6b7280;">${item.description}</div>` : ''}
+                            <div style="font-size: 0.875rem; font-weight: 500;">${displayName}</div>
+                            ${item.description && item.description !== displayName ?
+                                `<div style="font-size: 0.7rem; color: #6b7280;">${item.description}</div>` : ''}
                         </div>
                     `;
                 });
