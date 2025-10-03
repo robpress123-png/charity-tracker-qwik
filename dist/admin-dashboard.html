@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Charity Tracker v2.14.0</title>
+    <title>Admin Dashboard - Charity Tracker v2.14.1</title>
     <style>
         * {
             margin: 0;
@@ -445,7 +445,7 @@
         <div class="admin-title">
             <h1>🔐 Admin Dashboard</h1>
             <span class="admin-badge">ADMINISTRATOR</span>
-            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.0</span>
+            <span class="admin-badge" style="background: rgba(255,255,255,0.1); margin-left: 0.5rem;">v2.14.1</span>
         </div>
         <div class="admin-user">
             <span>Welcome, <strong id="adminName">Admin</strong></span>
@@ -828,22 +828,41 @@
                     </div>
                 </div>
 
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>Plan</th>
-                            <th>Registered</th>
-                            <th>Total Donations</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <!-- Users will be loaded dynamically -->
-                    </tbody>
-                </table>
+                <!-- Bulk Actions Bar -->
+                <div id="bulkActionsBar" style="display: none; background: #374151; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span id="selectedCount" style="color: #f3f4f6; font-weight: 600;">0 users selected</span>
+                        <button onclick="clearSelection()" style="padding: 0.5rem 1rem; background: #4b5563; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Clear Selection
+                        </button>
+                    </div>
+                    <button onclick="deleteSelectedUsers()" style="padding: 0.5rem 1.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                        🗑️ Delete Selected Users
+                    </button>
+                </div>
+
+                <!-- Scrollable Table Container -->
+                <div style="max-height: 600px; overflow-y: auto; border: 1px solid #374151; border-radius: 8px;">
+                    <table class="admin-table" style="margin: 0;">
+                        <thead style="position: sticky; top: 0; background: #1f2937; z-index: 10;">
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAll()" style="width: 18px; height: 18px; cursor: pointer;">
+                                </th>
+                                <th style="width: 80px;">ID</th>
+                                <th style="min-width: 200px;">Email</th>
+                                <th style="min-width: 150px;">Name</th>
+                                <th style="width: 80px;">Plan</th>
+                                <th style="width: 100px;">Registered</th>
+                                <th style="width: 100px;">Donations</th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Users will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Donations Management Section -->
@@ -2051,8 +2070,24 @@
                             row.setAttribute('data-email', user.email);
                             row.setAttribute('data-name', user.name || '');
                             row.setAttribute('data-plan', user.plan || 'free');
+                            row.setAttribute('data-user-id', user.id);
+
+                            // Disable checkbox for test@example.com
+                            const isProtected = user.email === 'test@example.com';
+                            const checkboxDisabled = isProtected ? 'disabled' : '';
+                            const checkboxTitle = isProtected ? 'Admin account cannot be deleted' : 'Select user for bulk action';
 
                             row.innerHTML = `
+                                <td>
+                                    <input type="checkbox"
+                                           class="user-checkbox"
+                                           value="${user.id}"
+                                           data-email="${user.email}"
+                                           ${checkboxDisabled}
+                                           title="${checkboxTitle}"
+                                           onchange="updateSelectedCount()"
+                                           style="width: 18px; height: 18px; cursor: ${isProtected ? 'not-allowed' : 'pointer'};">
+                                </td>
                                 <td>${user.id}</td>
                                 <td>${user.email}</td>
                                 <td>${user.name || 'No name'}</td>
@@ -2099,7 +2134,7 @@
                         });
 
                         if (data.users.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af;">No users found</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #9ca3af;">No users found</td></tr>';
                         }
                     }
                 }
@@ -2107,7 +2142,7 @@
                 console.error('Error loading users:', error);
                 const tbody = document.getElementById('userTableBody');
                 if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ef4444;">Failed to load users</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #ef4444;">Failed to load users</td></tr>';
                 }
             }
         }
@@ -2449,6 +2484,119 @@
                 console.error('Error cleaning duplicates:', error);
                 alert('Failed to clean duplicate charities: ' + error.message);
             }
+        }
+
+        // Bulk selection functions
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAllUsers');
+            const checkboxes = document.querySelectorAll('.user-checkbox:not([disabled])');
+
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const selectedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const count = selectedBoxes.length;
+            const bulkBar = document.getElementById('bulkActionsBar');
+            const countSpan = document.getElementById('selectedCount');
+
+            if (count > 0) {
+                bulkBar.style.display = 'flex';
+                countSpan.textContent = `${count} user${count !== 1 ? 's' : ''} selected`;
+            } else {
+                bulkBar.style.display = 'none';
+            }
+
+            // Update select all checkbox state
+            const selectAll = document.getElementById('selectAllUsers');
+            const allBoxes = document.querySelectorAll('.user-checkbox:not([disabled])');
+            if (allBoxes.length > 0) {
+                selectAll.checked = count === allBoxes.length;
+                selectAll.indeterminate = count > 0 && count < allBoxes.length;
+            }
+        }
+
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('selectAllUsers').checked = false;
+            updateSelectedCount();
+        }
+
+        async function deleteSelectedUsers() {
+            const selectedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const selectedUsers = Array.from(selectedBoxes).map(cb => ({
+                id: cb.value,
+                email: cb.getAttribute('data-email')
+            }));
+
+            if (selectedUsers.length === 0) {
+                alert('No users selected');
+                return;
+            }
+
+            const userList = selectedUsers.map(u => `• ${u.email}`).join('\n');
+
+            if (!confirm(`⚠️ WARNING: You are about to delete ${selectedUsers.length} user(s):\n\n${userList}\n\nThis will permanently delete:\n• User accounts\n• All their donations\n• All their personal charities\n• All their tax settings\n\nThis action CANNOT be undone!\n\nAre you sure?`)) {
+                return;
+            }
+
+            // Second confirmation for safety
+            if (!confirm(`🔴 FINAL CONFIRMATION:\n\nReally delete ${selectedUsers.length} user(s)?\n\nType OK to proceed.`)) {
+                return;
+            }
+
+            // Show progress notification
+            const notification = document.createElement('div');
+            notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 10000;';
+            notification.innerHTML = `<div>Deleting users...</div><div id="deleteProgress" style="margin-top: 0.5rem; font-size: 0.875rem;">0 / ${selectedUsers.length}</div>`;
+            document.body.appendChild(notification);
+
+            let successCount = 0;
+            let failedUsers = [];
+
+            for (const user of selectedUsers) {
+                try {
+                    const response = await fetch(`/api/admin/users/${user.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken') || localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        failedUsers.push(user.email);
+                    }
+
+                    // Update progress
+                    document.getElementById('deleteProgress').textContent = `${successCount} / ${selectedUsers.length}`;
+
+                } catch (error) {
+                    failedUsers.push(user.email);
+                    console.error(`Failed to delete user ${user.email}:`, error);
+                }
+            }
+
+            // Remove notification
+            document.body.removeChild(notification);
+
+            // Show results
+            let message = `Deleted ${successCount} user(s) successfully.`;
+            if (failedUsers.length > 0) {
+                message += `\n\nFailed to delete:\n${failedUsers.join('\n')}`;
+            }
+
+            alert(message);
+
+            // Reload users list
+            clearSelection();
+            loadUsers();
         }
 
         // Filter users based on search and filters
