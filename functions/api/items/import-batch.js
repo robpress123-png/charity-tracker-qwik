@@ -223,15 +223,18 @@ export async function onRequestPost(context) {
                 }
             }
 
-            // Execute batch inserts
-            if (insertValues.length > 0) {
-                const insertPlaceholders = insertValues.map(() =>
-                    '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'
-                ).join(',');
-
-                const insertBindings = [];
-                for (const item of insertValues) {
-                    insertBindings.push(
+            // Execute inserts one at a time (like charity import which works)
+            for (const item of insertValues) {
+                try {
+                    await env.DB.prepare(`
+                        INSERT INTO items (
+                            category_id, name, item_variant, description,
+                            value_good, value_very_good, value_excellent,
+                            source_reference, effective_date, search_keywords, original_description,
+                            category, low_value, high_value,
+                            created_at, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    `).bind(
                         parseInt(item.category_id) || null,
                         item.name,
                         item.item_variant || null,
@@ -246,27 +249,26 @@ export async function onRequestPost(context) {
                         item.category,
                         parseFloat(item.value_good) || 0,
                         parseFloat(item.value_excellent) || 0
-                    );
-                }
-
-                try {
-                    await env.DB.prepare(`
-                        INSERT INTO items (
-                            category_id, name, item_variant, description,
-                            value_good, value_very_good, value_excellent,
-                            source_reference, effective_date, search_keywords, original_description,
-                            category, low_value, high_value,
-                            created_at, updated_at
-                        ) VALUES ${insertPlaceholders}
-                    `).bind(...insertBindings).run();
+                    ).run();
                 } catch (error) {
-                    console.error('Batch insert error:', error);
-                    console.error('Failed items:', insertValues.map(i => i.name));
-                    results.errors.push(`Batch insert failed (${insertValues.length} items): ${error.message}`);
-                    // Track failed items
-                    results.failed += insertValues.length;
-                    // Revert counts
-                    results.added -= insertValues.length;
+                    // More detailed error logging to identify the problem
+                    const errorDetail = {
+                        name: item.name,
+                        category_id: item.category_id,
+                        variant: item.item_variant,
+                        error: error.message
+                    };
+                    console.error(`Failed to insert item:`, errorDetail);
+
+                    // Show first 5 detailed errors, rest as summary
+                    if (results.errors.length < 5) {
+                        results.errors.push(`${item.name} (Cat:${item.category_id}): ${error.message}`);
+                    } else if (results.errors.length === 5) {
+                        results.errors.push(`... and more items failed with similar errors`);
+                    }
+
+                    results.failed++;
+                    results.added--; // Revert the count
                 }
             }
 
