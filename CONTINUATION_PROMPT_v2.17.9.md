@@ -1,4 +1,4 @@
-# Charity Tracker Qwik - Complete Continuation Prompt v2.17.9
+# Charity Tracker Qwik - Complete Continuation Prompt v2.18.0
 
 ## 🚨 CRITICAL DEVELOPMENT GUIDELINES - READ FIRST
 
@@ -28,16 +28,25 @@
    - Understand the current implementation
    - Check for dependencies and side effects
 
-## 🎉 Version 2.17.9 - IMPROVED ITEM DONATION UX
+## 🎉 Version 2.18.0 - ITSDEDUCTIBLE MIGRATION TOOL
 
-### What's New (v2.17.9)
+### What's New (v2.18.0)
+- 🚀 **ItsDeductible Migration**: Complete import tool for users switching from ItsDeductible
+- 📂 **Multi-format Support**: Handles items, cash, mileage, and stock donation exports
+- 🎯 **Smart Grouping**: Groups item donations by charity and date automatically
+- 🔄 **Quality Mapping**: Converts ItsDeductible quality levels to our conditions
+- 📊 **Preview Mode**: See what will be imported before committing
+- ✨ **Auto Charity Creation**: Creates personal charities if not in database
+- 🔍 **Cross-category Search**: Falls back to all categories when none found in selected
+
+### Previous (v2.17.9-10) - Item Donation UX
 - 🔄 **Infinite Scroll**: Item dropdowns load 50 items at a time as you scroll
 - 📊 **Loading States**: Shows "Loading items..." immediately for better UX
 - 🎯 **Name:Variant Display**: Items show as "Bowling Shoes: Youth" on single line
 - 🔍 **Category Browsing**: Select category to browse items without typing
 - 📈 **Larger Dropdowns**: Increased from 200px to 400px for better visibility
 - ✅ **Edit Form Fix**: Condition changes now properly update FMV values
-- 🎨 **Consistent UI**: Applied all improvements to both Add and Edit forms
+- 🔧 **API Fix**: Fixed category_id query to properly load items when browsing
 
 ### Previous Version (v2.17.0) - Temporal Versioning
 - 🔄 **Temporal Versioning**: Items can have multiple versions with different effective dates
@@ -174,26 +183,27 @@ SELECT * FROM items WHERE name LIKE '%television%' LIMIT 5;
 #### 🔴 CRITICAL - BREAKING BUGS (FIX IMMEDIATELY)
 1. ~~**v2.17.7 Breaking Error**: FIXED in v2.17.8~~
 
-## Current Status (v2.17.9) - System Stable
+## Current Status (v2.18.0) - System at 92% Complete
 ### What's Working:
 - ✅ All donation types functioning properly
 - ✅ Item search with infinite scroll (50 items at a time)
-- ✅ Category browsing without typing
+- ✅ Category browsing (fixed API to use category_id)
 - ✅ Edit form condition changes update FMV correctly
 - ✅ Item database with 1,757 ItsDeductible items
 - ✅ Name:Variant display on single lines
+- ✅ ItsDeductible import tool for migration
+- ✅ Cross-category search fallback
 
 ### Recently Fixed Issues:
+- ✅ FIXED: Category browsing not showing items (API was using category name instead of category_id)
 - ✅ FIXED: JavaScript syntax errors breaking dashboard
 - ✅ FIXED: Condition changes not updating values in edit mode
 - ✅ FIXED: Small dropdown size (now 400px)
 - ✅ FIXED: Overwhelming item lists (infinite scroll added)
-- ✅ FIXED: Category auto-fill when item selected
 
-### Known Limitations:
-- **Performance**: Large categories (300+ items) may load slowly
-- **Search**: Requires 2+ characters to trigger search
-- **Mobile**: Not yet optimized for mobile devices
+### Remaining Issues:
+- **Payment Integration**: Stripe not implemented ($49/year tier) - 5% of work
+- **Mobile Responsiveness**: Not optimized for mobile/tablets - 3% of work
 
 #### 🔴 HIGH PRIORITY
 1. **Payment Integration**: Stripe not implemented ($49/year tier)
@@ -410,7 +420,7 @@ charity-tracker-qwik/
 - **Live URL**: https://charity-tracker-qwik.pages.dev
 - **GitHub**: https://github.com/robpress123-png/charity-tracker-qwik
 - **Database**: Cloudflare D1 (ID: 4b7b5031-1844-4ed9-aac0-fcb0e4bf0b3d)
-- **Version**: 2.17.9
+- **Version**: 2.18.0
 
 ### Tech Stack
 - Frontend: Vanilla JavaScript (NOT Qwik framework despite name)

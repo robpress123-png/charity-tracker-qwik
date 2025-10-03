@@ -6418,7 +6418,7 @@
                         const response = await fetch(`/api/items?category_id=${categoryId}&limit=50&offset=0`);
                         const data = await response.json();
 
-                        if (data.success && data.items) {
+                        if (data.success) {
                             // Sort items alphabetically and store them
                             currentItems = (data.items || []).sort((a, b) => {
                                 // Combine name with variant for sorting
@@ -6426,7 +6426,31 @@
                                 const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
                                 return aName.localeCompare(bName);
                             });
-                            console.log(`Loaded first ${currentItems.length} items for category`);
+                            console.log(`Loaded ${currentItems.length} items for category ${categoryId}`);
+
+                            // Check if category has no items
+                            if (currentItems.length === 0) {
+                                const categoryName = document.getElementById('itemCategory').options[
+                                    document.getElementById('itemCategory').selectedIndex
+                                ].text;
+
+                                dropdown.innerHTML = `
+                                    <div style="padding:1rem;text-align:center;">
+                                        <div style="color:#6b7280;margin-bottom:1rem;">
+                                            No items found in ${categoryName}
+                                        </div>
+                                        <div style="color:#059669;font-size:0.875rem;">
+                                            💡 Try typing an item name to search, or select "Other Item" to add custom values
+                                        </div>
+                                    </div>
+                                    <div onclick="selectCustomItem()" style="padding:0.75rem;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);cursor:pointer;border-top:2px solid #f59e0b;">
+                                        <div style="font-weight:600;color:#92400e;">✏️ Add Custom Item</div>
+                                        <div style="font-size:0.75rem;color:#92400e;">Enter your own description and value</div>
+                                    </div>
+                                `;
+                                dropdown.style.display = 'block';
+                                return;
+                            }
 
                             // Store pagination info for infinite scroll
                             window.itemPagination = {
@@ -6439,6 +6463,9 @@
 
                             showItemDropdown();
                             setupInfiniteScroll();
+                        } else {
+                            console.error('Failed to load category items:', data.error);
+                            dropdown.innerHTML = '<div style="padding:1rem;text-align:center;color:#dc2626;">Error loading items. Please try again.</div>';
                         }
                     } catch (error) {
                         console.error('Error loading category items:', error);
@@ -6636,7 +6663,7 @@
             const categoryId = document.getElementById('itemCategory').value;
 
             try {
-                // Search using the enhanced search endpoint
+                // First, search within the selected category if one is selected
                 let url = `/api/items/search?q=${encodeURIComponent(searchValue)}`;
                 if (categoryId) {
                     url += `&category_id=${categoryId}`;
@@ -6647,8 +6674,34 @@
 
                 if (data.success) {
                     // Sort items alphabetically and store them
-                    currentItems = (data.items || []).sort((a, b) => a.name.localeCompare(b.name));
-                    console.log(`Found ${currentItems.length} matching items`);
+                    currentItems = (data.items || []).sort((a, b) => {
+                        const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                        const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                        return aName.localeCompare(bName);
+                    });
+                    console.log(`Found ${currentItems.length} matching items in category`);
+
+                    // If no items found in category, search all categories
+                    if (currentItems.length === 0 && categoryId) {
+                        console.log('No items found in selected category, searching all categories...');
+
+                        // Search without category filter
+                        const allResponse = await fetch(`/api/items/search?q=${encodeURIComponent(searchValue)}`);
+                        const allData = await allResponse.json();
+
+                        if (allData.success && allData.items && allData.items.length > 0) {
+                            currentItems = (allData.items || []).sort((a, b) => {
+                                const aName = a.item_variant ? `${a.name}: ${a.item_variant}` : a.name;
+                                const bName = b.item_variant ? `${b.name}: ${b.item_variant}` : b.name;
+                                return aName.localeCompare(bName);
+                            });
+                            console.log(`Found ${currentItems.length} matching items across all categories`);
+
+                            // Add indicator that results are from all categories
+                            currentItems.fromAllCategories = true;
+                        }
+                    }
+
                     showItemDropdown();
                 } else {
                     console.error('Search failed:', data.error);

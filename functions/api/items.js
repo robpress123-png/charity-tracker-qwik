@@ -145,16 +145,18 @@ export async function onRequestGet(context) {
           SELECT
             id,
             name,
+            item_variant,
+            description,
             0 as value_poor,
             0 as value_fair,
-            COALESCE(low_value, 0) as value_good,
-            COALESCE((low_value + high_value) / 2, low_value, 0) as value_verygood,
-            COALESCE(high_value, low_value, 0) as value_excellent
+            COALESCE(value_good, low_value, 0) as value_good,
+            COALESCE(value_very_good, (value_good + value_excellent) / 2, (low_value + high_value) / 2, 0) as value_verygood,
+            COALESCE(value_excellent, high_value, 0) as value_excellent
           FROM items
-          WHERE category = ?
+          WHERE category_id = ?
           ORDER BY name
         `);
-        const result = await stmt.bind(categoryName).all();
+        const result = await stmt.bind(catId).all();
 
         console.log('Items found:', result.results?.length || 0);
 
